@@ -144,6 +144,13 @@ const css = `/* ================================================================
   width: 100%;
 }
 
+.ac-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
 .ac-demo__title {
   margin: 0 0 0.6rem;
   padding-bottom: 0.4rem;

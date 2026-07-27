@@ -69,7 +69,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 3 / 33
+## Component roster — 4 / 33
 
 ### foundations
 - [ ] `skip-link`
@@ -91,7 +91,9 @@ take their logic and not their layout. See item 1 under remaining work.
   dropdown keeps its own copy on purpose, so a change here means a change there too. Also carries
   provisional `.ac-input` / `.ac-textarea` / `.ac-group` / `.ac-choice` for the demo — `text-input`,
   `textarea` and `fieldset-group` own the canonical versions of those when they land.
-- [ ] `text-input`
+- [x] `text-input` — complete, **CSS-only** (`--no-js`), 19/19 tests in Chromium. Canonical home for
+  `.ac-input`. Centered on the attributes rather than the styling: `autocomplete` tokens (SC 1.3.5),
+  `type` vs `inputmode`, and `readonly` vs `disabled`.
 - [ ] `input-group`
 - [ ] `textarea`
 - [ ] `native-select`

@@ -1,0 +1,195 @@
+<!-- ===========================================================================
+     TEXT INPUT — a native <input> that looks like it belongs
+
+     WHAT TO COPY
+       Any one example below is self-contained. Take its section plus the
+       matching [CORE] sections of component.css. There is no JavaScript:
+       a text input that needs a script to be accessible is a broken one.
+       Copy the file whole for the library-grade version.
+
+     THE CONTRACT
+       label[for]  ->  input.id          never a placeholder as the label
+       input       ->  type=""           the right one, so the right keyboard
+       input       ->  autocomplete=""   SC 1.3.5, and the most-skipped one
+       input       ->  aria-describedby="<hint id>"
+
+     The wrapper, hint and error markup is the Field component — see that page
+     for the aria-describedby and role="alert" rules. Repeated here so this file
+     stands alone.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     =========================================================================== -->
+
+<div class="ac-demo-grid">
+  <!-- ======================================================================
+       EXAMPLE 1 · The baseline
+       CSS [CORE] + [FIELD]. Label, input, hint. Nothing else needed.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">1 &middot; The baseline</h3>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-ti-name">Full name</label>
+      <input class="ac-input" id="ac-ti-name" type="text" name="name"
+             autocomplete="name" aria-describedby="ac-ti-name-hint" />
+      <p class="ac-field__hint" id="ac-ti-name-hint">As it appears on your ID.</p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 2 · autocomplete — SC 1.3.5
+       CSS [CORE] + [FIELD].
+
+       The most-skipped criterion in this group, and the one with the widest
+       payoff: it is what lets a password manager fill the form, what saves
+       someone with a motor impairment from typing an address by hand, and what
+       lets a personalization tool recognize a field.
+
+       Use the token from the HTML spec's autofill field list, not a guess.
+       "username", not "user". "tel-national", not "phone2".
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">2 &middot; autocomplete (SC 1.3.5)</h3>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-ti-email">Email</label>
+      <input class="ac-input" id="ac-ti-email" type="email" name="email"
+             autocomplete="email" />
+    </div>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-ti-tel">Phone</label>
+      <input class="ac-input" id="ac-ti-tel" type="tel" name="tel"
+             autocomplete="tel" />
+    </div>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-ti-postcode">ZIP / postal code</label>
+      <input class="ac-input" id="ac-ti-postcode" type="text" name="postal-code"
+             autocomplete="postal-code" inputmode="numeric" />
+    </div>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-ti-password">Password</label>
+      <!-- current-password, not "password": it tells a manager to fill rather
+           than to suggest a new one. Use new-password on a signup form. -->
+      <input class="ac-input" id="ac-ti-password" type="password" name="password"
+             autocomplete="current-password" />
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 3 · type and inputmode
+       CSS [CORE] + [FIELD].
+
+       `type` picks the on-screen keyboard and the browser's own validation.
+       `inputmode` changes only the keyboard, which is what you want when the
+       value is digits but not a number — a card number, a ZIP, a PIN.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">3 &middot; type and inputmode</h3>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-ti-url">Website</label>
+      <input class="ac-input" id="ac-ti-url" type="url" name="url"
+             autocomplete="url" placeholder="https://example.com"
+             aria-describedby="ac-ti-url-hint" />
+      <!-- A placeholder is fine as an EXAMPLE of the format. It is never the
+           label, and never the only place the format is explained. -->
+      <p class="ac-field__hint" id="ac-ti-url-hint">Include https://</p>
+    </div>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-ti-card">Card number</label>
+      <!-- Deliberately type="text": type="number" accepts e, +, - and a spinner,
+           drops leading zeros, and changes on a mouse wheel. For digit strings
+           that are not quantities, text + inputmode is the correct pair. -->
+      <input class="ac-input" id="ac-ti-card" type="text" name="cc-number"
+             autocomplete="cc-number" inputmode="numeric" maxlength="19"
+             aria-describedby="ac-ti-card-hint" />
+      <p class="ac-field__hint" id="ac-ti-card-hint">Digits only, no spaces.</p>
+    </div>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-ti-qty">Quantity</label>
+      <!-- A real number, so type="number" earns its place. -->
+      <input class="ac-input ac-input--short" id="ac-ti-qty" type="number"
+             name="quantity" min="1" max="99" step="1" value="1" />
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 4 · Read-only is not disabled
+       CSS [CORE] + [FIELD] + [READONLY].
+
+       readonly  focusable, selectable, copyable, submitted with the form.
+       disabled  skipped by Tab, announces nothing, NOT submitted.
+
+       Use readonly when the user still needs to read or copy the value. Use
+       disabled only when the control is genuinely inapplicable — and if they
+       need to know why, use aria-disabled and explain it instead.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">4 &middot; Read-only vs disabled</h3>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-ti-key">API key</label>
+      <input class="ac-input" id="ac-ti-key" type="text" name="api-key"
+             value="sk_live_4eC39HqLyjWDarjtT1zd" readonly
+             aria-describedby="ac-ti-key-hint" />
+      <p class="ac-field__hint" id="ac-ti-key-hint">
+        Read-only, so it can still be focused and copied.
+      </p>
+    </div>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-ti-legacy">Legacy ID</label>
+      <input class="ac-input" id="ac-ti-legacy" type="text" name="legacy-id"
+             value="none" disabled aria-describedby="ac-ti-legacy-hint" />
+      <p class="ac-field__hint" id="ac-ti-legacy-hint">
+        Disabled: not focusable, and not submitted.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 5 · Invalid
+       CSS [CORE] + [FIELD] + [INVALID].
+       Same contract as Field: aria-invalid drives the styling, and the message
+       lives in a role="alert" that is always present.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">5 &middot; Invalid</h3>
+
+    <div class="ac-field ac-field--invalid">
+      <label class="ac-field__label" for="ac-ti-user">Username</label>
+      <input class="ac-input" id="ac-ti-user" type="text" name="username"
+             autocomplete="username" value="a b" aria-invalid="true"
+             aria-describedby="ac-ti-user-hint ac-ti-user-error" />
+      <p class="ac-field__hint" id="ac-ti-user-hint">Letters, numbers, underscores.</p>
+      <p class="ac-field__error" id="ac-ti-user-error" role="alert">
+        Remove the space &mdash; try <code>a_b</code>.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 6 · Long values and long labels
+       CSS [CORE] + [FIELD].
+       An input scrolls its own value rather than growing, so nothing here can
+       push the page sideways. The label wraps instead of truncating — a clipped
+       label is a lost label.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">6 &middot; Long values</h3>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-ti-long">
+        Which internal service should receive the webhook payload?
+      </label>
+      <input class="ac-input" id="ac-ti-long" type="url" name="webhook"
+             autocomplete="off"
+             value="https://internal.example.com/hooks/billing/reconciliation/v2/inbound" />
+    </div>
+  </div>
+</div>
