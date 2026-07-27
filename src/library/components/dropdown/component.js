@@ -115,7 +115,7 @@
     panel.appendChild(list);
 
     /* --- Accessible name --------------------------------------------------
-       Carry over whatever labelled the <select>. A <label for> is the common
+       Carry over whatever labeled the <select>. A <label for> is the common
        case and the one the original this is based on used to drop. */
 
     function resolveLabel() {
@@ -633,7 +633,7 @@
   global.AC = global.AC || {};
   global.AC.createDropdown = createDropdown;
 
-  /* --- Auto-init. Delete this block if you initialise manually. -------------- */
+  /* --- Auto-init. Delete this block if you initialize manually. -------------- */
   function initAll(scope) {
     (scope || document).querySelectorAll('select[data-ac-dropdown]').forEach(function (el) {
       createDropdown(el);

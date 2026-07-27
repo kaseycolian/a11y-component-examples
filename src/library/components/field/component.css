@@ -1,27 +1,56 @@
-/* =============================================================================
-   Field
+/* ===========================================================================
+   FIELD
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+
+     [CORE]        every example. The wrapper, label, hint, error.
+     [CONTROLS]    examples 1-5. .ac-input / .ac-textarea.
+     [INVALID]     examples 2, 3, 5, 6. The error state.
+     [GROUPS]      example 6. <fieldset> + radios.
+     [FORCED]      always ship this. High Contrast rebuilds every cue.
+     [DEMO]        this page only. Do not copy.
+
+   Copy the file whole for the library version.
 
    Every color is var(--ac-token, var(--theme-token, #literal)) so this works
-   standalone, inside a theme-service app, and inside an app that sets --ac-*.
+   standalone, in a theme-service app, and in an app that sets --ac-*.
    scripts/check-tokens.mjs enforces it.
 
-   This file is the canonical home for the .ac-field wrapper classes. Dropdown
-   carries its own copy of them on purpose -- every component in this library has
-   to work pasted on its own -- so the two are kept identical rather than shared.
+   .ac-field* is canonical here. Dropdown carries its own copy so it stands
+   alone — change one, change both. .ac-input / .ac-textarea / .ac-group /
+   .ac-choice are provisional; text-input, textarea and fieldset-group will own
+   them.
+   =========================================================================== */
 
-   .ac-input / .ac-textarea are here for the same reason: the demo needs styled
-   controls to sit in. The Text Input and Textarea components own the canonical
-   versions of those.
-   ============================================================================= */
+/* --- [DEMO] this page only ------------------------------------------------- */
 
 .ac-demo-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 1.75rem;
   width: 100%;
 }
 
-/* --- Wrapper ---------------------------------------------------------------- */
+.ac-demo__title {
+  margin: 0 0 0.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--ac-border, var(--border, #34205a));
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", Consolas, ui-monospace, monospace));
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  text-transform: none;
+}
+
+.ac-demo__legend {
+  margin: 0 0 1.5rem;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.78rem;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* --- [CORE] the wrapper --------------------------------------------------- */
 
 .ac-field {
   display: flex;
@@ -46,21 +75,20 @@
   color: var(--ac-text-muted, var(--text-muted, #bcadde));
 }
 
-/* The asterisk is decoration and is marked aria-hidden in the markup: the
-   control's own `required` attribute is what assistive tech announces. */
+/* aria-hidden in the markup; `required` is what announces. */
 .ac-field__required {
   color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
 }
 
-/* The key to the whole file. This element is never hidden and never
-   display:none, even with nothing in it -- a role="alert" has to already be in
-   the accessibility tree for inserted text to register as a change. Empty, it
-   has no content box and so takes no height; all it costs is one flex gap. */
+/* --- [CORE] the error ----------------------------------------------------- */
+
+/* Never hidden, never display:none, even empty: a role="alert" must already be
+   in the accessibility tree for inserted text to register as a change. Empty it
+   generates no line box, so it costs one flex gap and no more.
+
+   Not a flex container — flex would promote inline children to flex items, so a
+   <code> or a link in the message would break onto its own line. */
 .ac-field__error {
-  /* Deliberately NOT a flex container. Flex would make every inline element in
-     the message its own flex item, so a <code> or an <a> inside the text would
-     break onto its own line. The marker is positioned instead, which leaves the
-     message as ordinary flowing text with a hanging indent. */
   position: relative;
   margin: 0;
   padding-left: 1.3rem;
@@ -70,8 +98,8 @@
   color: var(--ac-danger, var(--accent-pink, #ff2ec4));
 }
 
-/* A shape, not a glyph: content:"" contributes nothing to the accessibility
-   tree, where a "!" or a warning emoji would be read out before the message. */
+/* A shape, not a glyph: content:"" adds nothing to the accessibility tree,
+   where "!" or a warning emoji would be read ahead of the message. */
 .ac-field__error::before {
   content: "";
   position: absolute;
@@ -91,8 +119,8 @@
   content: none;
 }
 
-/* Fully specified rather than inheriting: a host page's own `code` rule would
-   otherwise decide what a validation message looks like. */
+/* Fully specified, or a host page's own `code` rule decides what a validation
+   message looks like. */
 .ac-field__error code {
   font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", Consolas, ui-monospace, monospace));
   font-size: 0.95em;
@@ -102,15 +130,7 @@
   color: inherit;
 }
 
-.ac-field-legend {
-  margin: 0 0 1.5rem;
-  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
-  font-size: 0.78rem;
-  color: var(--ac-text-muted, var(--text-muted, #bcadde));
-}
-
-/* --- Controls ----------------------------------------------------------------
-   Canonical versions live in the Text Input and Textarea components. */
+/* --- [CONTROLS] examples 1-5 ---------------------------------------------- */
 
 .ac-input,
 .ac-textarea {
@@ -130,9 +150,9 @@
     box-shadow calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
 }
 
+/* Never `resize: none` — removing resize is a reflow problem (SC 1.4.4) for
+   anyone who needs the text bigger to proof-read it. */
 .ac-textarea {
-  /* Never `resize: none` -- taking resize away is a reflow problem (SC 1.4.4)
-     for anyone who needs the text bigger to read what they typed. */
   resize: vertical;
   line-height: 1.5;
 }
@@ -155,11 +175,11 @@
   border-style: dashed;
 }
 
-/* --- Invalid ------------------------------------------------------------------
-   Driven by aria-invalid, so the styling cannot disagree with what is
-   announced. Two cues, never color alone (SC 1.4.1): the border thickens, and
-   the message itself is there to read. */
+/* --- [INVALID] examples 2, 3, 5, 6 ---------------------------------------- */
 
+/* Driven by aria-invalid so the styling cannot disagree with what is announced.
+   Two cues, never color alone (SC 1.4.1): the border thickens, and there is a
+   message to read. */
 .ac-field--invalid .ac-input,
 .ac-field--invalid .ac-textarea,
 [aria-invalid="true"].ac-input,
@@ -168,10 +188,10 @@
   border-color: var(--ac-danger, var(--accent-pink, #ff2ec4));
 }
 
-/* --- Groups -------------------------------------------------------------------
-   Fieldsets carry stubborn UA defaults and cannot be a reliable flex container
-   in older Safari, hence the inner .ac-group__body. */
+/* --- [GROUPS] example 6 --------------------------------------------------- */
 
+/* Fieldsets carry stubborn UA defaults and are not a reliable flex container in
+   older Safari, hence the inner .ac-group__body. */
 .ac-group {
   margin: 0;
   padding: 0;
@@ -186,11 +206,11 @@
   margin-top: 0.35rem;
 }
 
+/* The whole label is the target, not just the 13px radio (SC 2.5.8). */
 .ac-choice {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  /* The label is the target, not just the 13px radio (SC 2.5.8). */
   min-height: var(--ac-target, 44px);
   font-size: 0.9rem;
   color: var(--ac-text, var(--text, #f3ecff));
@@ -211,9 +231,10 @@
   border-left: 2px solid var(--ac-danger, var(--accent-pink, #ff2ec4));
 }
 
-/* --- Windows High Contrast ---------------------------------------------------
-   forced-colors drops color-mix fills, glows and opacity, so any state cue built
-   from them disappears. Rebuild the cues from system colors. */
+/* --- [FORCED] Windows High Contrast — always ship this -------------------- */
+
+/* forced-colors drops color-mix, glows and opacity, so every cue built from them
+   has to be rebuilt from system colors. */
 @media (forced-colors: active) {
   .ac-input,
   .ac-textarea {
@@ -225,8 +246,7 @@
     outline-color: CanvasText;
   }
 
-  /* opacity is ignored here, so the dashed border becomes the only cue left
-     that the control cannot be edited. */
+  /* opacity is ignored here, leaving the dashed border as the only cue. */
   .ac-input:disabled,
   .ac-textarea:disabled {
     color: GrayText;
@@ -234,8 +254,8 @@
     opacity: 1;
   }
 
-  /* The accent pink collapses to the user's text color, so the invalid border
-     is no longer distinguishable by hue -- the extra width has to carry it. */
+  /* The accent collapses to the user's text color, so hue can no longer
+     distinguish invalid — width has to carry it. */
   .ac-field--invalid .ac-input,
   .ac-field--invalid .ac-textarea,
   [aria-invalid="true"].ac-input,
@@ -249,7 +269,6 @@
     color: CanvasText;
   }
 
-  /* color-mix is dropped here, so the inline code would lose its surface. */
   .ac-field__error code {
     background: Canvas;
     border: 1px solid CanvasText;
@@ -257,5 +276,10 @@
 
   .ac-field--invalid .ac-group__body {
     border-left-color: CanvasText;
+  }
+
+  .ac-demo__title {
+    color: CanvasText;
+    border-bottom-color: CanvasText;
   }
 }

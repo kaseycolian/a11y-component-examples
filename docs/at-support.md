@@ -54,7 +54,7 @@ roles are probably wrong.
 
 ### JAWS (Windows, 40-minute demo mode)
 
-Same walkthrough. JAWS is stricter than NVDA about ARIA and is where over-labelling shows up as
+Same walkthrough. JAWS is stricter than NVDA about ARIA and is where over-labeling shows up as
 double announcements — an element named by both `aria-label` and visible text, or a group label read
 twice.
 

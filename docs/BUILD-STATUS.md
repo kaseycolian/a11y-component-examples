@@ -31,8 +31,13 @@ npm run new:component -- <slug> --group <group-id> --name "Display Name"
 
 The **definition of done** is the checklist at the bottom of `component-specs.md`.
 
-**Reference implementations:** `dropdown` is the thorough one (popover positioning, roving focus,
-type-ahead, 14 tests). `disclosure` is the small one. Copy their shape rather than inventing a new one.
+**Reference implementation: `field`.** It is the only component that follows the current
+copyability and writing-style conventions in `CLAUDE.md` — numbered example sections across all three
+files, a copy map in each header, the framework caveat in `docs.md`. Copy its shape.
+
+`dropdown` is still the best reference for *hard behavior* (popover positioning, roving focus,
+type-ahead, 14 tests) and `disclosure` for a minimal factory — but both predate the conventions, so
+take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
@@ -40,7 +45,7 @@ type-ahead, 14 tests). `disclosure` is the small one. Copy their shape rather th
 
 - **Scaffold** — `package.json`, Astro 5, `.gitignore`, `README.md`, `CLAUDE.md`. Git history was
   squashed to a single root commit on `main` at the user's request, and the project carries **no
-  licence** — do not reintroduce one, in `package.json`, the footer, or the README.
+  license** — do not reintroduce one, in `package.json`, the footer, or the README.
 - **Pages pipeline** — `.github/workflows/deploy.yml`. `astro.config.mjs`:
   `site: https://kaseycolian.github.io`, `base: /a11y-component-examples`, `srcDir: ./src/site`,
   `trailingSlash: always`.
@@ -96,8 +101,10 @@ type-ahead, 14 tests). `disclosure` is the small one. Copy their shape rather th
 - [ ] `fieldset-group`
 
 ### overlays-disclosure
-- [x] `disclosure` — complete. **No spec yet — backfill one.**
-- [x] `dropdown` — complete. 14/14 tests pass in Chromium.
+- [x] `disclosure` — works, but **predates the copyability + style conventions — retrofit (item 1)**.
+  Also still has **no spec** — backfill one.
+- [x] `dropdown` — works, 14/14 tests in Chromium, but **predates the copyability + style conventions
+  — retrofit (item 1)**. Five unlabeled demos; highest-value retrofit on the list.
 - [ ] `tooltip`
 
 ### navigation
@@ -122,7 +129,40 @@ type-ahead, 14 tests). `disclosure` is the small one. Copy their shape rather th
 
 ## Remaining non-component work
 
-### 1. Shared a11y gate — `tests/shared/a11y.spec.mjs`
+### 1. Retrofit everything built before the copyability conventions
+
+`CLAUDE.md` gained a **Writing style** and a **Copyability** section after `dropdown`, `disclosure`
+and the site pages were written. Those three predate it and do not follow it. `field` is the
+reference implementation — copy its shape.
+
+Each retrofit target needs:
+
+- **Numbered example sections in `component.html`**, each with a visible `<h3 class="ac-demo__title">`
+  so the rendered demo and the HTML tab match by eye. This was the actual complaint: with five demos
+  on the dropdown page there is no way to tell which markup is which.
+- **`component.css` / `component.js` sectioned by concern**, each header naming the examples that
+  need it (`[CORE — all examples]`, `[3, 5]`, `[OPTIONAL — …]`), plus a copy map in the file header.
+- **The framework caveat** at the top of `docs.md`.
+- **Verbosity cut.** `dropdown`'s `docs.md` and `component.js` header are the worst offenders.
+
+| Target | Why it needs it |
+| --- | --- |
+| `dropdown` | 5 unlabeled demos; the CSS and JS are one long undifferentiated run. Highest value. |
+| `disclosure` | Small, but same problem, and still has **no spec** — backfill that at the same time. |
+| `src/site/pages/index.astro` (home) | Prose predates the style rules. |
+| `src/site/pages/components/index.astro` | Same. |
+
+Two things to decide once, here, rather than per-component:
+
+- `ac-demo__title` currently lives in each component's own CSS, which means every component ships a
+  copy of the same three rules. That is consistent with "fully self-contained", but it is demo
+  scaffolding rather than component code, so `site.css` is arguably the right home. Pick one and
+  apply it everywhere.
+- Whether the demo `<h3>`s should be linkable (`id` + anchor). Deep-linking to "example 3" would be
+  genuinely useful and the global `scroll-margin-top` already handles the sticky header. Deliberately
+  left out for now to avoid six landmark-ish headings with no consumer.
+
+### 2. Shared a11y gate — `tests/shared/a11y.spec.mjs`
 
 Drives every component in the registry:
 
@@ -145,13 +185,13 @@ Several of these bullets now have a one-component precedent in `field`'s spec (r
 320px reflow, the ≥24×24 sweep). Lift them from there rather than reinventing, then delete the
 per-component copies once the shared gate covers every slug.
 
-### 2. Docs
+### 3. Docs
 
 `docs/authoring-a-component.md`, `docs/at-support.md` (manual NVDA/JAWS/VoiceOver/TalkBack matrix,
 dated; mark untested combinations untested rather than assuming they pass), `docs/wcag-mapping.md`
 (outcomes + SC + contrast in both WCAG 2.x ratio and APCA Lc, for the eventual WCAG 3 migration).
 
-### 3. Final verification
+### 4. Final verification
 
 `npm run verify`, install the other two browsers, manual keyboard + screen reader pass, check at
 320px and 200% zoom, deploy, confirm the live URL matches preview.
@@ -196,7 +236,7 @@ It must match `npm run preview` exactly, base path included.
   `is:inline` stops Astro bundling it, which is what keeps the served file byte-identical to the
   copy panel.
 - **`[popover]` needs a UA-style reset** — `inset: auto; margin: 0; border: 0; padding: 0` — or the
-  browser centres it in the viewport.
+  browser centers it in the viewport.
 - **Do not use `includeHidden: true` with `getByRole('option')`** in dropdown tests: it also matches
   the hidden native `<select>`'s `<option>` elements and trips strict mode.
 - **npm 11 gates install scripts.** `allowScripts` in `package.json` already approves esbuild and

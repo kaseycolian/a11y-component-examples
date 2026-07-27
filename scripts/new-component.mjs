@@ -8,7 +8,7 @@
  *
  * The templates already satisfy every convention the linter and the a11y gate
  * check for -- the token fallback chain, the motion gate, a forced-colors
- * block, the IIFE + destroy() shape. Fill in the behaviour, do not re-derive
+ * block, the IIFE + destroy() shape. Fill in the behavior, do not re-derive
  * the boilerplate. See docs/component-specs.md for the contract to build to.
  */
 import { mkdir, writeFile, access } from 'node:fs/promises';
@@ -79,27 +79,84 @@ try {
 
 /* --- Templates ---------------------------------------------------------------- */
 
-const html = `<!--
-  ${name}
+const html = `<!-- ===========================================================================
+     ${name.toUpperCase()} — TODO one line: what it is
 
-  TODO: the canonical accessible markup. This is what visitors copy, so it is
-  the reference implementation, not a demo rig -- keep it minimal and correct.
+     WHAT TO COPY
+       Any one example below is self-contained. Take its section, plus the
+       matching [CORE] sections of component.css and component.js.
+       Copy all three files whole for the library-grade version.
 
-  Show the awkward states too: disabled, empty, error, and long text that has to
-  wrap or truncate. Those are the ones people get wrong.
--->
-<div class="ac-${slug}"${withJs ? ` data-ac-${slug}` : ''}>
-  <!-- TODO -->
+     THE CONTRACT (the same in every example)
+       TODO: the two or three attributes that make this work, from
+       docs/component-specs.md. This block is the reason the file exists.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the grid and the
+     per-example headings. Never copy it into your app.
+     =========================================================================== -->
+
+<div class="ac-demo-grid">
+  <!-- ======================================================================
+       EXAMPLE 1 · TODO the baseline case
+       CSS [CORE]. ${withJs ? 'JS [CORE].' : 'No JS.'}
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">1 &middot; TODO</h3>
+
+    <div class="ac-${slug}"${withJs ? ` data-ac-${slug}` : ''}>
+      <!-- TODO -->
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 2 · TODO an awkward state
+       Ship the ones people get wrong: disabled, empty, error, long text that
+       has to wrap. One example each, numbered, so they can be copied apart.
+       ====================================================================== -->
 </div>
 `;
 
-const css = `/* =============================================================================
-   ${name}
+const css = `/* ===========================================================================
+   ${name.toUpperCase()}
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+
+     [CORE]      every example.
+     [FORCED]    always ship this. High Contrast rebuilds every cue.
+     [DEMO]      this page only. Do not copy.
+
+   TODO: add a section per concern (states, variants, sub-parts) and name the
+   examples that need it, e.g. "[INVALID] examples 2, 3".
+
+   Copy the file whole for the library version.
 
    Every color is var(--ac-token, var(--theme-token, #literal)) so this works
-   standalone, inside a theme-service app, and inside an app that sets --ac-*.
+   standalone, in a theme-service app, and in an app that sets --ac-*.
    scripts/check-tokens.mjs enforces it.
-   ============================================================================= */
+   =========================================================================== */
+
+/* --- [DEMO] this page only ------------------------------------------------- */
+
+.ac-demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 1.75rem;
+  width: 100%;
+}
+
+.ac-demo__title {
+  margin: 0 0 0.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--ac-border, var(--border, #34205a));
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", Consolas, ui-monospace, monospace));
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  text-transform: none;
+}
+
+/* --- [CORE] --------------------------------------------------------------- */
 
 .ac-${slug} {
   font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
@@ -119,9 +176,10 @@ const css = `/* ================================================================
   outline-offset: 2px;
 }
 
-/* --- Windows High Contrast ---------------------------------------------------
-   forced-colors drops color-mix fills, glows and opacity, so any state cue built
-   from them disappears. Rebuild the cues from system colors. */
+/* --- [FORCED] Windows High Contrast — always ship this --------------------- */
+
+/* forced-colors drops color-mix, glows and opacity, so every cue built from them
+   has to be rebuilt from system colors. */
 @media (forced-colors: active) {
   .ac-${slug} {
     border-color: ButtonBorder;
@@ -130,23 +188,31 @@ const css = `/* ================================================================
   .ac-${slug}:focus-visible {
     outline-color: CanvasText;
   }
+
+  .ac-demo__title {
+    color: CanvasText;
+    border-bottom-color: CanvasText;
+  }
 }
 `;
 
-const js = `/* =============================================================================
-   ${name}
+const js = `/* ===========================================================================
+   ${name.toUpperCase()}
 
-   No dependencies. Plain IIFE, so a straight paste into a <script> tag works.
+   WHAT TO COPY
+     [CORE]       every example. The whole contract.
+     [AUTO-INIT]  delete if you construct instances yourself.
 
-   Vanilla:   <script src="component.js"></script> -- anything with
-              [data-ac-${slug}] is wired up automatically.
+   TODO: if any behavior is optional, put it in its own [NAME] block and say
+   which examples need it, so it can be deleted without unpicking the rest.
 
-   Framework: delete the auto-init block at the bottom and call the factory from
-              your own lifecycle:
+   Copy the file whole for the library version.
 
-                const c = AC.create${pascal}(ref.current);
-                c.destroy();   // on unmount
-   ============================================================================= */
+   TODO: two or three lines on the non-obvious accessibility decision this file
+   makes. If there isn't one, this component probably needs no JS.
+
+   No dependencies. Plain IIFE, so a paste into a <script> tag works.
+   =========================================================================== */
 (function (global) {
   'use strict';
 
@@ -157,11 +223,13 @@ const js = `/* =================================================================
    * @param {object} [options]
    */
   function create${pascal}(root, options) {
-    // Idempotent: initialising twice would double up the listeners.
+    // Idempotent: initializing twice would double up the listeners.
     if (!root || root._ac${pascal}) return root && root._ac${pascal};
 
     var settings = options || {};
     var id = root.id || 'ac-${slug}-' + ++uid;
+
+    /* === [CORE] ========================================================== */
 
     // TODO: query the parts, mint any ids that are missing, set the ARIA
     // attributes, bind the listeners. See docs/component-specs.md for the
@@ -182,7 +250,7 @@ const js = `/* =================================================================
   global.AC = global.AC || {};
   global.AC.create${pascal} = create${pascal};
 
-  /* --- Auto-init. Delete this block if you initialise manually. ------------- */
+  /* === [AUTO-INIT] delete this block if you construct instances yourself === */
   function initAll(scope) {
     (scope || document).querySelectorAll('[data-ac-${slug}]').forEach(function (el) {
       create${pascal}(el);
@@ -213,9 +281,21 @@ const meta = `{
 }
 `;
 
-const docs = `## How it works
+const docs = `## Before you copy
 
-TODO: the shape of the pattern in two or three sentences, then the contract.
+Your framework may have a better idiom for this than ${withJs ? `\`AC.create${pascal}\`` : 'these classes'}.
+Use it. **The ARIA wiring below is the same either way**, and it is the part almost every
+implementation gets wrong. Take the markup and the CSS, keep the attribute contract, and let your
+framework own the state.
+
+Each example on this page is separately copyable: the HTML sections are numbered, and the CSS${
+  withJs ? ' and JS' : ''
+}
+sections say which examples need them.
+
+## The contract
+
+TODO: the shape of the pattern in two or three sentences, then the table.
 
 | Element | Attribute | Why |
 | --- | --- | --- |
@@ -227,7 +307,7 @@ TODO: the shape of the pattern in two or three sentences, then the contract.
 | --- | --- |
 | <kbd>Tab</kbd> | |
 
-## Screen reader behaviour
+## Screen reader behavior
 
 TODO: what NVDA, JAWS, VoiceOver and TalkBack actually announce, and anywhere
 they differ. Say what was tested rather than what should happen.
@@ -235,7 +315,7 @@ they differ. Say what was tested rather than what should happen.
 ## States
 
 TODO: default, hover, focus, active, disabled, empty, error -- whichever apply.
-Note how each is signalled without relying on color.
+Note how each is signaled without relying on color.
 ${
   withJs
     ? `

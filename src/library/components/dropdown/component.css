@@ -140,7 +140,7 @@
 }
 
 /* --- Panel -------------------------------------------------------------------
-   The [popover] rules undo the UA defaults, which centre the popover in the
+   The [popover] rules undo the UA defaults, which center the popover in the
    viewport with a border and padding. Everything else here applies whether or
    not the browser supports the Popover API. */
 

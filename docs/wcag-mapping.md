@@ -56,7 +56,7 @@ Where it costs nothing, components aim past the minimum:
 - **Contrast** targets AAA (7:1) for body text where the theme allows, though only AA is guaranteed.
 - **Target size** aims at 44px — the AAA figure (2.5.5) — falling back to the 24px AA floor only
   where layout genuinely forbids it.
-- **Reduced motion** is honoured through a token rather than a blanket `!important` reset, so a host
+- **Reduced motion** is honored through a token rather than a blanket `!important` reset, so a host
   app's own animation is untouched.
 - **Forced colors** is not a WCAG requirement at all. Every component supports it anyway, because
   Windows High Contrast users are a real population that automated checkers ignore.

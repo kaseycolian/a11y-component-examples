@@ -41,10 +41,10 @@ House style, in order:
 2. **Keyboard** — a table. If the component behaves differently open vs closed, use two columns.
    Include keys you deliberately did **not** bind and say why (the disclosure explains why it has no
    Escape handler).
-3. **Screen reader behaviour** — what NVDA, JAWS, VoiceOver and TalkBack actually announce. Where
+3. **Screen reader behavior** — what NVDA, JAWS, VoiceOver and TalkBack actually announce. Where
    they differ, say so. Never write what *should* happen as if it were tested; if it has not been
    verified, mark it in `at-support.md` as untested and say nothing here.
-4. **States** — how each is signalled *without* relying on color.
+4. **States** — how each is signaled *without* relying on color.
 5. **API** — the factory options and every method.
 6. **Using it in a framework** — the React snippet, and a sentence on Angular. People arrive here
    from a framework and leave if they cannot see how it fits.
@@ -104,7 +104,7 @@ with nothing else. A shared `core/` module would break that the first time someo
 component without it. The cost is some repetition; the benefit is that every component is provably
 independent, which the per-page CSS loading verifies on every build.
 
-When two components need the same behaviour, copy it and let them diverge. If a genuinely reusable
+When two components need the same behavior, copy it and let them diverge. If a genuinely reusable
 utility emerges, it becomes its own Foundations entry that people can choose to copy — not an
 import.
 

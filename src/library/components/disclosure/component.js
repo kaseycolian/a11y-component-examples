@@ -23,7 +23,7 @@
    * @param {{ open?: boolean, onToggle?: (open: boolean) => void }} [options]
    */
   function createDisclosure(root, options) {
-    // Idempotent: initialising twice would double up the listeners.
+    // Idempotent: initializing twice would double up the listeners.
     if (!root || root._acDisclosure) return root && root._acDisclosure;
 
     var settings = options || {};
@@ -96,7 +96,7 @@
   global.AC = global.AC || {};
   global.AC.createDisclosure = createDisclosure;
 
-  /* --- Auto-init. Delete this block if you initialise manually. ------------- */
+  /* --- Auto-init. Delete this block if you initialize manually. ------------- */
   function initAll(scope) {
     (scope || document).querySelectorAll('[data-ac-disclosure]').forEach(function (el) {
       createDisclosure(el);

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 const PAGE = 'components/dropdown/';
 
-/** The first demo: a labelled select with icons and secondary text. */
+/** The first demo: a labeled select with icons and secondary text. */
 function env(page) {
   const wrap = page.locator('.ac-dropdown').filter({ has: page.locator('#ac-demo-env') });
   return {

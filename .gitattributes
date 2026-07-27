@@ -1,4 +1,4 @@
-# Normalise line endings so the files people copy out of this repo are
+# Normalize line endings so the files people copy out of this repo are
 # consistent regardless of the platform they were authored on.
 * text=auto eol=lf
 

@@ -61,7 +61,7 @@
   outline-offset: -3px;
 }
 
-/* Expanded state is signalled three ways -- rotated chevron, tinted background,
+/* Expanded state is signaled three ways -- rotated chevron, tinted background,
    and aria-expanded -- so it never depends on color alone. */
 .ac-disclosure__trigger[aria-expanded="true"] {
   color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));

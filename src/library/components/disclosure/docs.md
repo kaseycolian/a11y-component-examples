@@ -29,7 +29,7 @@ There is deliberately no <kbd>Escape</kbd> handler. Escape closes things that tr
 dialogs, menus, popovers. A disclosure does not trap focus, so binding Escape would take a key away
 from whatever surrounds it.
 
-## Screen reader behaviour
+## Screen reader behavior
 
 Announced as `"<label>, button, collapsed"` / `"expanded"` in NVDA, JAWS, and VoiceOver. TalkBack
 says `"double tap to expand"`, which is why the state has to live in `aria-expanded` rather than in
@@ -45,7 +45,7 @@ knowing:
 
 - Without JavaScript the content is still readable. It cannot be collapsed, but nothing is lost.
 - Nothing flashes open before the script runs, because the closing happens synchronously during
-  initialisation rather than after a paint.
+  initialization rather than after a paint.
 
 If you would rather ship it closed, add `hidden` to the panel in your markup and set
 `aria-expanded="false"` on the trigger &mdash; but then plan for the no-JS case yourself.

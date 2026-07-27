@@ -1,6 +1,6 @@
 ## How it works
 
-You author a plain, labelled `<select>`. The script hides it &mdash; keeping it in the DOM as the
+You author a plain, labeled `<select>`. The script hides it &mdash; keeping it in the DOM as the
 value store &mdash; and builds the styled listbox next to it.
 
 That matters more than it sounds. Because the native element is still there and still holds the

@@ -48,7 +48,7 @@ test('aria-describedby names the hint AND the error from the start', async ({ pa
 
   // No error yet, so the empty element contributes nothing to the description.
   await expect(error).toBeEmpty();
-  await expect(control).toHaveAccessibleDescription(/^Shown beside anything you post[\s\S]*later\.$/);
+  await expect(control).toHaveAccessibleDescription('Shown beside anything you post.');
 });
 
 test('the error element is present and rendered while empty, so the alert can fire', async ({
@@ -80,7 +80,7 @@ test('showing an error does not clobber the hint -- the whole point', async ({ p
 
   // The list is untouched, and BOTH descriptions are now readable.
   expect(await control.getAttribute('aria-describedby')).toBe(before);
-  await expect(control).toHaveAccessibleDescription(/Only used to send your sign-in link/);
+  await expect(control).toHaveAccessibleDescription(/Used only for your sign-in link/);
   await expect(control).toHaveAccessibleDescription(/Enter the email address you use at work/);
 });
 
@@ -92,7 +92,7 @@ test('a format error and a missing error use their own messages', async ({ page 
   await expect(error).toHaveText('Enter an address in the form name@example.com.');
 
   // And the hint survived the second message too.
-  await expect(control).toHaveAccessibleDescription(/Only used to send your sign-in link/);
+  await expect(control).toHaveAccessibleDescription(/Used only for your sign-in link/);
 });
 
 test('fixing the value clears the error without waiting for blur', async ({ page }) => {

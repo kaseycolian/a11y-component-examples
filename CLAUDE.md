@@ -14,7 +14,7 @@ next steps, and the gotchas already solved.
 | Original design rationale | `C:\Users\kasey\.claude\plans\this-will-be-a-curious-pnueli.md` |
 
 To start a component: `npm run new:component -- <slug> --group <id> --name "Name"`. The templates
-already satisfy every convention below, so fill in behaviour rather than boilerplate. Copy the shape
+already satisfy every convention below, so fill in behavior rather than boilerplate. Copy the shape
 of `dropdown` (thorough) or `disclosure` (small) rather than inventing a new one.
 
 ## The three rules everything follows
@@ -88,6 +88,40 @@ served by each file standing alone.
 **Targets** ≥24×24px (SC 2.5.8), 44px preferred. **Anything with an `id`** gets
 `scroll-margin-top` clearing the sticky header (SC 2.4.11) — handled globally in `site.css`.
 
+## Writing style
+
+**American English.** `color`, `behavior`, `labeled`, `initialize`, `center`, `organization`,
+`gray`, `signaled`. The only exceptions are ARIA's own spellings — `aria-labelledby` is spec.
+
+**Say it once, in as few words as carry the information.** Comments and docs here are load-bearing:
+they explain *why* a non-obvious accessibility decision was made, and that's the bar. Cut restated
+context, cut the same point made twice in prose and again in a table, cut adjectives. Never cut the
+reason a decision was made, a WCAG SC reference, or a gotcha — those are the product.
+
+## Copyability — the demo has to be dissectable
+
+A visitor arrives wanting *one* of the examples on the page, and has to be able to find the three
+pieces that make it work. So all three files carry the **same numbered sections in the same order**:
+
+```
+EXAMPLE 3 · Server-rendered error
+```
+
+- **`component.html`** — one banner per example, with a visible `<h3 class="ac-demo__title">` so the
+  rendered demo and the HTML tab match by eye.
+- **`component.css` / `component.js`** — sectioned by *concern*, since concerns are shared. Every
+  section header names which examples need it: `[CORE — all examples]`, `[3, 5, 6]`,
+  `[OPTIONAL — delete if your framework validates]`.
+- **Each file opens with a copy map**: a few lines saying "want just example 2? take these
+  sections." The whole file is the fully-fledged library version; the map is how someone takes less.
+
+`ac-demo-*` and `ac-demo__*` are **demo scaffolding, never part of a component** — the grid, the
+per-example headings, the legend. Say so in the file header so nobody copies them by accident.
+
+**Every `docs.md` states the framework caveat once**, near the top: your framework probably has a
+better idiom for this, but the ARIA attributes and their wiring are the same either way, and this is
+enough for a person or an agent to start from. Don't apologize for it beyond that.
+
 ## Environment gotchas
 
 - **Node is not on the inherited PATH.** Prefix PowerShell calls:
@@ -113,7 +147,7 @@ npm run verify         # all three
   library rebuilds. Structural tokens it would have provided live in `src/site/styles/site.css`
   and `src/library/tokens/tokens.css` instead.
 - **`theme-select.js` is not vendored** — the theme picker is this library's own Dropdown.
-- **The project carries no licence.** No `LICENSE` file, no `license` field in `package.json`, no
+- **The project carries no license.** No `LICENSE` file, no `license` field in `package.json`, no
   mention in the footer or README. Removed deliberately — do not add one back.
 - **Dropdown uses real DOM focus on options, not `aria-activedescendant`.** Both are APG-legal;
   activedescendant is unreliable on iOS VoiceOver and TalkBack, and mobile AT support is a

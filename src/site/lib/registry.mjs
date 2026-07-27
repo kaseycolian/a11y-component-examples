@@ -24,7 +24,7 @@ export const GROUPS = [
     id: 'forms-inputs',
     name: 'Forms & Inputs',
     summary:
-      'Labelled, described, and error-wired controls. The field wrapper here is the backbone every other input reuses.',
+      'Labeled, described, and error-wired controls. The field wrapper here is the backbone every other input reuses.',
   },
   {
     id: 'overlays-disclosure',

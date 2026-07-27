@@ -110,7 +110,7 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
 
 ### switch
 - **Markup** Native checkbox with a visual track/thumb that is `aria-hidden`. Existing implementation in `SiteHeader.astro` — promote it here.
-- **Gotcha** `role="switch"` is an option but announces inconsistently in older JAWS; a plain checkbox with clear on/off labelling is safer. State must not be conveyed by track color alone — the thumb position is the second cue. On/off applies **immediately**; if it needs a Save button, use a checkbox instead.
+- **Gotcha** `role="switch"` is an option but announces inconsistently in older JAWS; a plain checkbox with clear on/off labeling is safer. State must not be conveyed by track color alone — the thumb position is the second cue. On/off applies **immediately**; if it needs a Save button, use a checkbox instead.
 
 ### fieldset-group
 - **Markup** `<fieldset class="ac-group">` + `<legend>` grouping related controls.
@@ -122,7 +122,7 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
 
 ### tooltip
 - **Markup** Trigger with `aria-describedby` pointing at a `role="tooltip"` element.
-- **Behaviour** Shows on **hover and focus**; hides on <kbd>Esc</kbd>; stays visible while the pointer moves onto it.
+- **Behavior** Shows on **hover and focus**; hides on <kbd>Esc</kbd>; stays visible while the pointer moves onto it.
 - **Gotcha** SC 1.4.13 requires it be dismissible, hoverable, and persistent — hover-only tooltips fail all three. Tooltips must contain **no interactive content**. Never put essential information only in a tooltip; touch users often cannot summon one.
 
 ---
@@ -145,7 +145,7 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
 ### notice
 - **Markup** `.ac-notice` with `--info` / `--success` / `--warn` / `--error`, each with an `aria-hidden` icon **and** a text prefix.
 - **ARIA** Static notices: none. Notices appearing in response to an action: `role="status"` (polite) or `role="alert"` (errors only).
-- **Gotcha** Colour alone fails 1.4.1 — the icon is decorative, so the *word* ("Error:") carries the meaning. Do not put `role="alert"` on notices present at page load; they fire on every render.
+- **Gotcha** Color alone fails 1.4.1 — the icon is decorative, so the *word* ("Error:") carries the meaning. Do not put `role="alert"` on notices present at page load; they fire on every render.
 
 ### badge
 - **Markup** `<span class="ac-badge">`, plus a `--solid` variant.
@@ -193,7 +193,10 @@ A component is not finished until **all** of these are true:
 
 - [ ] `component.html`, `component.css`, `component.js` (omit `js` if genuinely static — record it in `meta.json` `files`)
 - [ ] `meta.json` with a `group` that exists in `registry.mjs`
-- [ ] `docs.md` covering: how it works, keyboard table, ARIA contract, states, API, framework use, gotchas
+- [ ] **Numbered example sections in all three files**, matching order, each CSS/JS section naming the examples that need it, plus a copy map in every file header (see `CLAUDE.md` → Copyability, and `field` for the reference)
+- [ ] Visible `<h3 class="ac-demo__title">` per example, so the demo and the HTML tab match by eye
+- [ ] American English, and no sentence that restates one already there (`CLAUDE.md` → Writing style)
+- [ ] `docs.md` covering: the framework caveat, ARIA contract, keyboard table, states, screen reader behavior, API, gotchas
 - [ ] `tests/<slug>.spec.mjs` asserting the keyboard map and the ARIA contract, not just that it renders
 - [ ] `npm run check:tokens` clean — every color in a `var()` fallback chain
 - [ ] A `@media (forced-colors: active)` block

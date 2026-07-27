@@ -570,7 +570,7 @@ code {
 }
 
 /* The code itself is read-only by construction: a <pre>, never a textarea and
-   never contenteditable. It is focusable and labelled because it scrolls, and
+   never contenteditable. It is focusable and labeled because it scrolls, and
    a scrollable region must be reachable by keyboard (SC 2.1.1). */
 .code-block {
   margin: 0;
