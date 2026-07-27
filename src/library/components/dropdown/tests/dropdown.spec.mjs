@@ -172,20 +172,53 @@ test('icons and swatches are decoration; secondary text is content', async ({ pa
   await expect(palette.getByRole('option').nth(0)).toHaveAccessibleName('Rink Classic');
 });
 
-test('becomes a bottom sheet on a narrow viewport', async ({ page }) => {
+test('stays anchored to its trigger on a narrow viewport', async ({ page }) => {
+  // Deliberately NOT a bottom sheet. That is the `drawer` component, which has a
+  // different focus and dismissal model. A dropdown anchors at every width.
   await page.setViewportSize({ width: 375, height: 720 });
   await page.reload();
 
   const { toggle, panel } = env(page);
   await toggle.click();
 
-  const box = await panel.boundingBox();
+  const panelBox = await panel.boundingBox();
+  const toggleBox = await toggle.boundingBox();
   const viewport = page.viewportSize();
 
-  // Pinned to the bottom edge, spanning the full width.
-  expect(box.width).toBeCloseTo(viewport.width, 0);
-  expect(box.y + box.height).toBeCloseTo(viewport.height, 0);
-  await expect(panel.locator('.ac-dropdown__sheet-head')).toBeVisible();
+  // Same width as the trigger, and starting at the same left edge.
+  expect(panelBox.width).toBeCloseTo(toggleBox.width, 0);
+  expect(panelBox.x).toBeCloseTo(toggleBox.x, 0);
+  // Directly below it, not pinned to the bottom of the screen.
+  expect(panelBox.y).toBeGreaterThanOrEqual(toggleBox.y + toggleBox.height);
+  expect(panelBox.y + panelBox.height).toBeLessThan(viewport.height - 1);
+});
+
+test('flips above the trigger when there is no room below', async ({ page }) => {
+  await page.setViewportSize({ width: 900, height: 400 });
+  await page.reload();
+
+  const { toggle, panel } = env(page);
+  // Push the trigger to the bottom of the viewport.
+  await toggle.evaluate((el) => el.scrollIntoView({ block: 'end' }));
+  await toggle.click();
+
+  const panelBox = await panel.boundingBox();
+  const toggleBox = await toggle.boundingBox();
+
+  expect(panelBox.y + panelBox.height).toBeLessThanOrEqual(toggleBox.y + 1);
+  await expect(page.locator('.ac-dropdown--up')).toHaveCount(1);
+});
+
+test('the panel fits inside a narrow viewport rather than hanging off an edge', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.reload();
+
+  const { toggle, panel } = env(page);
+  await toggle.click();
+
+  const box = await panel.boundingBox();
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width).toBeLessThanOrEqual(320);
 });
 
 test('the panel is not clipped by an overflow:hidden ancestor', async ({ page }) => {

@@ -116,7 +116,9 @@ EXAMPLE 3 · Server-rendered error
   sections." The whole file is the fully-fledged library version; the map is how someone takes less.
 
 `ac-demo-*` and `ac-demo__*` are **demo scaffolding, never part of a component** — the grid, the
-per-example headings, the legend. Say so in the file header so nobody copies them by accident.
+per-example headings, the legend. They live in `src/site/styles/site.css`, **not** in any
+`component.css`, so that everything in a component's own files is real component code. Use the
+classes in `component.html` and say in the file header that they are not to be copied.
 
 **Every `docs.md` states the framework caveat once**, near the top: your framework probably has a
 better idiom for this, but the ARIA attributes and their wiring are the same either way, and this is

@@ -1,27 +1,37 @@
-/* =============================================================================
-   Dropdown / listbox
+/* ===========================================================================
+   DROPDOWN / LISTBOX
 
-   The panel is position:fixed and, where supported, promoted to the top layer
-   by the Popover API. That is deliberate: an absolutely-positioned panel gets
-   clipped by any ancestor with overflow:hidden or a transform, which is the
-   single most common way a custom dropdown breaks in a real layout.
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) is in the
+   site's own stylesheet, not this file.
 
-   Under 640px the panel stops being an anchored popup and becomes a bottom
-   sheet. That removes the "does it fit above or below" problem on phones
-   entirely rather than fighting it, and gives much bigger touch targets.
+     [FIELD]        all examples. The label/hint wrapper. Canonical in the Field
+                    component; repeated so this file stands alone.
+     [CORE]         all examples. Wrapper, trigger, panel, options.
+     [DECORATION]   examples 1 and 3. Icons, swatches, secondary text.
+     [GROUPS]       example 2. <optgroup> rendering.
+     [DISABLED]     examples 2 and 4.
+     [EMPTY]        example 5.
+     [TOUCH]        keep it. Bigger rows on a touch device.
+     [FORCED]       always ship this. High Contrast rebuilds every cue.
 
-   The .ac-field wrapper classes are included here rather than imported, so this
-   file works pasted on its own. The Field component owns the canonical version.
-   ============================================================================= */
+   Copy the file whole for the library version.
 
-.ac-demo-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
-  gap: 1.25rem;
-  width: 100%;
-}
+   The panel is position:fixed and, where supported, promoted to the top layer by
+   the Popover API. That is the fix for the most common way a custom dropdown
+   breaks in a real layout: an absolutely-positioned panel is clipped the moment
+   an ancestor has overflow:hidden or a transform, and no z-index rescues it.
 
-/* --- Field wrapper ---------------------------------------------------------- */
+   It anchors to its trigger at every viewport width. For a panel that rises from
+   the bottom of the screen instead, that is a different component with a
+   different focus and dismissal model — see `drawer`.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [FIELD] the wrapper — canonical in the Field component ---------------- */
 
 .ac-field {
   display: flex;
@@ -46,7 +56,7 @@
   color: var(--ac-text-muted, var(--text-muted, #bcadde));
 }
 
-/* --- Wrapper ---------------------------------------------------------------- */
+/* --- [CORE] wrapper ------------------------------------------------------- */
 
 .ac-dropdown {
   position: relative;
@@ -60,13 +70,13 @@
   display: none !important;
 }
 
-/* The native <select> stays in the DOM as the value store -- form submission,
-   .value reads and change handlers all still work -- but is never shown. */
+/* The native <select> stays in the DOM as the value store — form submission,
+   .value reads and change handlers all still work — but is never shown. */
 .ac-dropdown__native {
   display: none;
 }
 
-/* --- Toggle ------------------------------------------------------------------ */
+/* --- [CORE] trigger ------------------------------------------------------- */
 
 .ac-dropdown__toggle {
   display: flex;
@@ -131,18 +141,14 @@
   transform: rotate(180deg);
 }
 
-/* Disabled uses aria-disabled, not the disabled attribute, so the control stays
-   focusable and a keyboard user can still reach it and hear why. */
-.ac-dropdown--disabled .ac-dropdown__toggle {
-  cursor: not-allowed;
-  opacity: 0.6;
-  border-style: dashed;
-}
-
-/* --- Panel -------------------------------------------------------------------
+/* --- [CORE] panel ---------------------------------------------------------
    The [popover] rules undo the UA defaults, which center the popover in the
-   viewport with a border and padding. Everything else here applies whether or
-   not the browser supports the Popover API. */
+   viewport with a border and padding. Everything else applies whether or not the
+   browser supports the Popover API.
+
+   Width, position and max-height are written inline by component.js, which
+   anchors the panel to the trigger and flips it above when there is more room
+   there. */
 
 .ac-dropdown__panel,
 .ac-dropdown__panel[popover] {
@@ -176,7 +182,7 @@
   padding: 0.25rem;
 }
 
-/* --- Options ------------------------------------------------------------------ */
+/* --- [CORE] options ------------------------------------------------------- */
 
 .ac-dropdown__option {
   display: flex;
@@ -191,8 +197,8 @@
 }
 
 /* Focus lands on the option itself (real DOM focus, not aria-activedescendant),
-   so :focus is the state to style. A border, not just a tint -- a 16% wash does
-   not reach the 3:1 that SC 1.4.11 asks of a state indicator. */
+   so :focus is the state to style. A border, not just a tint: a 16% wash does not
+   reach the 3:1 that SC 1.4.11 asks of a state indicator. */
 .ac-dropdown__option:focus {
   outline: none;
   border-color: var(--ac-focus, var(--focus-ring, #3ceaff));
@@ -204,8 +210,8 @@
   font-weight: 700;
 }
 
-/* Selection is shown by the tick as well as the color, so it never depends on
-   color alone (SC 1.4.1). */
+/* Selection shows as a tick as well as a color, so it never rests on color alone
+   (SC 1.4.1). */
 .ac-dropdown__check {
   flex: none;
   margin-left: auto;
@@ -217,15 +223,7 @@
   opacity: 1;
 }
 
-.ac-dropdown__option[aria-disabled="true"] {
-  cursor: not-allowed;
-  color: var(--ac-text-muted, var(--text-muted, #bcadde));
-  opacity: 0.6;
-  text-decoration: line-through;
-  text-decoration-thickness: 1px;
-}
-
-/* --- Option content ------------------------------------------------------------ */
+/* --- [DECORATION] examples 1 and 3 ---------------------------------------- */
 
 .ac-dropdown__text {
   display: flex;
@@ -270,7 +268,7 @@
   height: 1.15rem;
 }
 
-/* --- Groups --------------------------------------------------------------------- */
+/* --- [GROUPS] example 2 --------------------------------------------------- */
 
 .ac-dropdown__group + .ac-dropdown__group {
   margin-top: 0.25rem;
@@ -287,6 +285,26 @@
   color: var(--ac-text-muted, var(--text-muted, #bcadde));
 }
 
+/* --- [DISABLED] examples 2 and 4 ------------------------------------------ */
+
+/* aria-disabled, not the disabled attribute, so the control stays focusable and a
+   keyboard user can reach it and hear why. */
+.ac-dropdown--disabled .ac-dropdown__toggle {
+  cursor: not-allowed;
+  opacity: 0.6;
+  border-style: dashed;
+}
+
+.ac-dropdown__option[aria-disabled="true"] {
+  cursor: not-allowed;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  opacity: 0.6;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+/* --- [EMPTY] example 5 ---------------------------------------------------- */
+
 .ac-dropdown__empty {
   padding: 1.25rem 0.75rem;
   text-align: center;
@@ -294,87 +312,30 @@
   color: var(--ac-text-muted, var(--text-muted, #bcadde));
 }
 
-/* --- Bottom sheet header ----------------------------------------------------------
-   Hidden on wide viewports; the sheet layout below reveals it. */
+/* --- [TOUCH] -------------------------------------------------------------- */
 
-.ac-dropdown__sheet-head {
-  display: none;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--ac-border, var(--border, #34205a));
-}
-
-.ac-dropdown__sheet-title {
-  font-size: 0.8rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ac-text-muted, var(--text-muted, #bcadde));
-}
-
-.ac-dropdown__sheet-close {
-  min-height: var(--ac-target, 44px);
-  padding: 0 1rem;
-  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
-  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
-  background: none;
-  color: var(--ac-text, var(--text, #f3ecff));
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.ac-dropdown__sheet-close:focus-visible {
-  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
-  outline-offset: 2px;
-}
-
-/* --- Bottom sheet ------------------------------------------------------------------
-   Must match SHEET_BREAKPOINT in component.js. */
-
-@media (max-width: 640px) {
-  .ac-dropdown__panel,
-  .ac-dropdown__panel[popover] {
-    /* !important because component.js writes inline top/left/width for the
-       anchored layout; on a narrow viewport the sheet wins outright. */
-    top: auto !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    width: auto !important;
-    max-height: 60vh !important;
-    border-width: 1px 0 0;
-    border-radius: var(--ac-radius, var(--radius, 10px)) var(--ac-radius, var(--radius, 10px)) 0 0;
-    padding-bottom: env(safe-area-inset-bottom, 0);
-  }
-
-  .ac-dropdown__sheet-head {
-    display: flex;
-  }
-
-  .ac-dropdown__list {
-    padding: 0.5rem;
-  }
-
-  /* Bigger rows: this is the touch layout. */
+/* Keyed on the pointer rather than on viewport width: a finger needs a bigger row
+   on a tablet in landscape just as much as on a phone, and a mouse does not need
+   one just because the window is narrow. */
+@media (pointer: coarse) {
   .ac-dropdown__option {
     min-height: var(--ac-target, 44px);
     padding: 0.6rem 0.75rem;
   }
+
+  .ac-dropdown__list {
+    padding: 0.35rem;
+  }
 }
 
-/* --- Windows High Contrast -----------------------------------------------------------
-   color-mix fills, glows and opacity are all dropped in forced-colors mode, so
-   focus and selection would become invisible. Rebuild them from system colors. */
+/* --- [FORCED] Windows High Contrast — always ship this -------------------- */
 
+/* forced-colors drops color-mix, glows and opacity, so every cue built from them
+   has to be rebuilt from system colors. */
 @media (forced-colors: active) {
   .ac-dropdown__toggle,
   .ac-dropdown__panel,
-  .ac-dropdown__panel[popover],
-  .ac-dropdown__sheet-close {
+  .ac-dropdown__panel[popover] {
     border-color: ButtonBorder;
   }
 
@@ -401,8 +362,7 @@
     opacity: 1;
   }
 
-  .ac-dropdown__toggle:focus-visible,
-  .ac-dropdown__sheet-close:focus-visible {
+  .ac-dropdown__toggle:focus-visible {
     outline-color: CanvasText;
   }
 }

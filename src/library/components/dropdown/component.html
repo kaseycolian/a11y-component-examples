@@ -1,20 +1,36 @@
-<!--
-  Dropdown / listbox
+<!-- ===========================================================================
+     DROPDOWN / LISTBOX — a styled select over a real <select>
 
-  You author a plain, labeled <select>. component.js hides it (keeping it as
-  the value store, so .value, change events and form submission all still work)
-  and builds the styled listbox beside it.
+     WHAT TO COPY
+       Any one example below is self-contained. Take its section, plus the
+       matching [CORE] sections of component.css and component.js.
+       Copy all three files whole for the library-grade version.
 
-  Per-option decoration, all optional:
-    data-ac-swatch="#hex[,#hex,...]"  a color strip -- used by this site's own theme picker
-    data-ac-icon="<symbol id>"        renders <use href="#id"> from a sprite on the page
-    data-ac-secondary="text"          a muted second line
+     HOW IT WORKS
+       You author a plain, labeled <select>. component.js hides it — keeping it
+       in the DOM as the value store, so .value, change events and form
+       submission all keep working — and builds the styled listbox beside it.
 
-  All of it is aria-hidden, so the accessible name of an option is always just
-  its text. Decoration never becomes content.
--->
+     THE CONTRACT (all of it built by the script)
+       trigger  ->  button, aria-haspopup="listbox", aria-expanded,
+                    aria-controls, aria-labelledby="<label id> <value id>"
+       panel    ->  role="listbox", aria-labelledby="<label id>"
+       option   ->  role="option", aria-selected, tabindex="-1"
+       Your job is the <select> and its label.
 
-<!-- Icon sprite. Anywhere on the page is fine; it renders nothing itself. -->
+     PER-OPTION DECORATION (all optional)
+       data-ac-icon="<symbol id>"        <use href="#id"> from a sprite
+       data-ac-swatch="#hex[,#hex,…]"    a color strip
+       data-ac-secondary="text"          a muted second line
+
+       Icons and swatches render aria-hidden, so they never reach the accessible
+       name. Secondary text DOES — it is information, not decoration.
+
+     ac-demo-* is scaffolding for this page only. Never copy it.
+     =========================================================================== -->
+
+<!-- Icon sprite for example 1. Anywhere on the page is fine; it renders nothing
+     itself. Skip it entirely if you use no icons. -->
 <svg hidden aria-hidden="true" focusable="false">
   <symbol id="ac-icon-rocket" viewBox="0 0 16 16">
     <path d="M8 1.5c2.5 1.4 4 4 4 6.6L10 11H6L4 8.1C4 5.5 5.5 2.9 8 1.5Z" fill="none"
@@ -35,61 +51,109 @@
 </svg>
 
 <div class="ac-demo-grid">
-  <!-- 1. The common case: a labeled select with decorated options. -->
-  <div class="ac-field">
-    <label class="ac-field__label" for="ac-demo-env">Deploy target</label>
-    <select id="ac-demo-env" data-ac-dropdown aria-describedby="ac-demo-env-hint">
-      <option value="prod" data-ac-icon="ac-icon-rocket" data-ac-secondary="app.example.com" selected>
-        Production
-      </option>
-      <option value="staging" data-ac-icon="ac-icon-flask" data-ac-secondary="staging.example.com">
-        Staging
-      </option>
-      <option value="local" data-ac-icon="ac-icon-laptop" data-ac-secondary="localhost:3000">
-        Local
-      </option>
-    </select>
-    <p class="ac-field__hint" id="ac-demo-env-hint">
-      Type the first letters of a name to jump to it.
-    </p>
+  <!-- ======================================================================
+       EXAMPLE 1 · Icons and secondary text
+       CSS [FIELD] + [CORE] + [DECORATION]. JS [CORE] + [DECORATION].
+       Also the type-ahead demo: open it and type "st".
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">1 &middot; Icons and secondary text</h3>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-demo-env">Deploy target</label>
+      <select id="ac-demo-env" data-ac-dropdown aria-describedby="ac-demo-env-hint">
+        <option value="prod" data-ac-icon="ac-icon-rocket" data-ac-secondary="app.example.com" selected>
+          Production
+        </option>
+        <option value="staging" data-ac-icon="ac-icon-flask" data-ac-secondary="staging.example.com">
+          Staging
+        </option>
+        <option value="local" data-ac-icon="ac-icon-laptop" data-ac-secondary="localhost:3000">
+          Local
+        </option>
+      </select>
+      <!-- aria-describedby on the <select> is forwarded to the visible trigger. -->
+      <p class="ac-field__hint" id="ac-demo-env-hint">
+        Type the first letters of a name to jump to it.
+      </p>
+    </div>
   </div>
 
-  <!-- 2. Groups, and an option nobody can choose. -->
-  <div class="ac-field">
-    <label class="ac-field__label" for="ac-demo-region">Region</label>
-    <select id="ac-demo-region" data-ac-dropdown>
-      <optgroup label="Americas">
-        <option value="us-east">US East</option>
-        <option value="us-west">US West</option>
-        <option value="sa-east" disabled>South America (at capacity)</option>
-      </optgroup>
-      <optgroup label="Europe">
-        <option value="eu-west" selected>EU West</option>
-        <option value="eu-north">EU North</option>
-      </optgroup>
-    </select>
+  <!-- ======================================================================
+       EXAMPLE 2 · Groups, and an option nobody can choose
+       CSS [FIELD] + [CORE] + [GROUPS] + [DISABLED]. JS [CORE] + [GROUPS].
+       A disabled option stays in the list with aria-disabled rather than being
+       removed, so a screen reader user learns it exists and why it is out.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">2 &middot; Groups and a disabled option</h3>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-demo-region">Region</label>
+      <select id="ac-demo-region" data-ac-dropdown>
+        <optgroup label="Americas">
+          <option value="us-east">US East</option>
+          <option value="us-west">US West</option>
+          <option value="sa-east" disabled>South America (at capacity)</option>
+        </optgroup>
+        <optgroup label="Europe">
+          <option value="eu-west" selected>EU West</option>
+          <option value="eu-north">EU North</option>
+        </optgroup>
+      </select>
+    </div>
   </div>
 
-  <!-- 3. Color swatches instead of icons. -->
-  <div class="ac-field">
-    <label class="ac-field__label" for="ac-demo-theme">Palette</label>
-    <select id="ac-demo-theme" data-ac-dropdown>
-      <option value="rink" data-ac-swatch="#ff2ec4,#5bff3a,#3ceaff" selected>Rink Classic</option>
-      <option value="sunset" data-ac-swatch="#ff6b9d,#ffd166,#8b5cf6">Synthwave Sunset</option>
-      <option value="acid" data-ac-swatch="#c6ff00,#00e5ff,#ff3d81">Acid Arcade</option>
-    </select>
+  <!-- ======================================================================
+       EXAMPLE 3 · Color swatches
+       CSS [FIELD] + [CORE] + [DECORATION]. JS [CORE] + [DECORATION].
+       This is the site header's own theme picker in miniature. A swatch is the
+       one place a literal color belongs in this library: it comes from the
+       author's data, not the stylesheet.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">3 &middot; Color swatches</h3>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-demo-theme">Palette</label>
+      <select id="ac-demo-theme" data-ac-dropdown>
+        <option value="rink" data-ac-swatch="#ff2ec4,#5bff3a,#3ceaff" selected>Rink Classic</option>
+        <option value="sunset" data-ac-swatch="#ff6b9d,#ffd166,#8b5cf6">Synthwave Sunset</option>
+        <option value="acid" data-ac-swatch="#c6ff00,#00e5ff,#ff3d81">Acid Arcade</option>
+      </select>
+    </div>
   </div>
 
-  <!-- 4. Disabled, and empty. Both states people forget to design. -->
-  <div class="ac-field">
-    <label class="ac-field__label" for="ac-demo-locked">Billing plan</label>
-    <select id="ac-demo-locked" data-ac-dropdown disabled>
-      <option value="team" selected>Team (contact sales to change)</option>
-    </select>
+  <!-- ======================================================================
+       EXAMPLE 4 · Disabled
+       CSS [FIELD] + [CORE] + [DISABLED]. JS [CORE].
+       The trigger gets aria-disabled, not the disabled attribute, so it stays
+       focusable and a keyboard user can reach it and hear why it is locked.
+       A disabled button is skipped by Tab and announces nothing.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">4 &middot; Disabled</h3>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-demo-locked">Billing plan</label>
+      <select id="ac-demo-locked" data-ac-dropdown disabled>
+        <option value="team" selected>Team (contact sales to change)</option>
+      </select>
+    </div>
   </div>
 
-  <div class="ac-field">
-    <label class="ac-field__label" for="ac-demo-empty">Saved filters</label>
-    <select id="ac-demo-empty" data-ac-dropdown data-ac-empty-text="No saved filters yet"></select>
+  <!-- ======================================================================
+       EXAMPLE 5 · Empty
+       CSS [FIELD] + [CORE] + [EMPTY]. JS [CORE].
+       The state everyone forgets to design. Say what is missing rather than "no
+       results" — data-ac-empty-text, or the default "No options available".
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">5 &middot; Empty</h3>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-demo-empty">Saved filters</label>
+      <select id="ac-demo-empty" data-ac-dropdown data-ac-empty-text="No saved filters yet"></select>
+    </div>
   </div>
 </div>

@@ -493,6 +493,61 @@ code {
   max-width: 100%;
 }
 
+/* --- Demo scaffolding ---------------------------------------------------------
+   `ac-demo-*` is the frame around a component's examples -- the grid, the
+   per-example heading, the legend -- and is explicitly NOT part of any
+   component. It lives here rather than in each component.css because:
+
+     - it would otherwise be duplicated in every component, and
+     - dropdown's component.css is loaded site-wide for the header theme picker,
+       so its copy leaked onto every page.
+
+   Keeping it here means what a visitor copies out of the code panel is only ever
+   real component code. The file headers say not to copy these classes. */
+
+.ac-demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 1.75rem;
+  width: 100%;
+}
+
+.ac-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+/* Deliberately not styled like the site's own h3: it is a code-side marker that
+   pairs with the "EXAMPLE 3 ·" banner in the source, so it is monospace and
+   quiet rather than a document heading. */
+.ac-demo__title {
+  margin: 0 0 0.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent-blue);
+  text-transform: none;
+  text-shadow: none;
+}
+
+.ac-demo__legend {
+  margin: 0 0 1.5rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+@media (forced-colors: active) {
+  .ac-demo__title {
+    color: CanvasText;
+    border-bottom-color: CanvasText;
+  }
+}
+
 /* --- Code panel ---------------------------------------------------------------- */
 
 .code-panel {

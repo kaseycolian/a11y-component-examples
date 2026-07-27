@@ -120,10 +120,11 @@ const css = `/* ================================================================
    ${name.toUpperCase()}
 
    WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) lives in
+   the site's own stylesheet, not this file.
 
      [CORE]      every example.
      [FORCED]    always ship this. High Contrast rebuilds every cue.
-     [DEMO]      this page only. Do not copy.
 
    TODO: add a section per concern (states, variants, sub-parts) and name the
    examples that need it, e.g. "[INVALID] examples 2, 3".
@@ -134,34 +135,6 @@ const css = `/* ================================================================
    standalone, in a theme-service app, and in an app that sets --ac-*.
    scripts/check-tokens.mjs enforces it.
    =========================================================================== */
-
-/* --- [DEMO] this page only ------------------------------------------------- */
-
-.ac-demo-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
-  gap: 1.75rem;
-  width: 100%;
-}
-
-.ac-demo {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  min-width: 0;
-}
-
-.ac-demo__title {
-  margin: 0 0 0.6rem;
-  padding-bottom: 0.4rem;
-  border-bottom: 1px solid var(--ac-border, var(--border, #34205a));
-  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", Consolas, ui-monospace, monospace));
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
-  text-transform: none;
-}
 
 /* --- [CORE] --------------------------------------------------------------- */
 
@@ -194,11 +167,6 @@ const css = `/* ================================================================
 
   .ac-${slug}:focus-visible {
     outline-color: CanvasText;
-  }
-
-  .ac-demo__title {
-    color: CanvasText;
-    border-bottom-color: CanvasText;
   }
 }
 `;

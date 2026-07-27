@@ -1,23 +1,35 @@
-/* =============================================================================
-   Dropdown / listbox
+/* ===========================================================================
+   DROPDOWN / LISTBOX
 
-   Progressive enhancement of a real <select>. The native element stays in the
-   DOM as the value store, so `.value`, `.selectedIndex`, `change` listeners and
-   form submission keep working exactly as before -- you can drop this onto an
-   existing form and nothing downstream needs to know.
+   WHAT TO COPY
+     [CORE]        every example. The whole contract: trigger, panel, options,
+                   positioning, keyboard, open/close.
+     [DECORATION]  examples 1 and 3. Icons, swatches, secondary text. Marked
+                   inline inside decorate().
+     [GROUPS]      example 2. <optgroup> handling inside rebuild().
+     [TYPEAHEAD]   nice to have. Delete typeAhead() and the two single-character
+                   key branches that call it.
+     [AUTO-INIT]   delete if you construct instances yourself.
+
+   Copy the file whole for the library version.
+
+   Progressive enhancement of a real <select>. The native element stays in the DOM
+   as the value store, so `.value`, `.selectedIndex`, `change` listeners and form
+   submission keep working — you can drop this onto an existing form and nothing
+   downstream needs to know.
 
    Focus model: when the panel opens, DOM focus moves onto the option itself
-   (roving tabindex), rather than staying on the button with
-   `aria-activedescendant`. Both are permitted by the APG. Real focus is used
-   here because activedescendant is unreliable on VoiceOver for iOS and on
-   TalkBack, and mobile screen reader support is a requirement for this library.
+   (roving tabindex) rather than staying on the button with
+   `aria-activedescendant`. Both are APG-legal. Real focus is used because
+   activedescendant is unreliable on VoiceOver for iOS and on TalkBack, and mobile
+   screen reader support is a requirement for this library.
 
-   Vanilla:   <script src="component.js"></script> and every
-              <select data-ac-dropdown> on the page is enhanced.
+   The panel anchors to its trigger at every viewport width. For a panel that
+   rises from the bottom of the screen instead — a different focus and dismissal
+   model — see `drawer`.
 
-   Framework: delete the auto-init block at the bottom and call
-              AC.createDropdown(selectEl) yourself; call .destroy() on unmount.
-   ============================================================================= */
+   No dependencies. Plain IIFE, so a paste into a <script> tag works.
+   =========================================================================== */
 (function (global) {
   'use strict';
 
@@ -29,13 +41,6 @@
   var SUPPORTS_POPOVER =
     typeof HTMLElement !== 'undefined' &&
     Object.prototype.hasOwnProperty.call(HTMLElement.prototype, 'showPopover');
-
-  /** Below this width the panel becomes a bottom sheet instead of an anchored popup. */
-  var SHEET_BREAKPOINT = 640;
-
-  function isSheet() {
-    return window.matchMedia('(max-width: ' + SHEET_BREAKPOINT + 'px)').matches;
-  }
 
   /**
    * @param {HTMLSelectElement} select
@@ -58,7 +63,7 @@
     var emptyText =
       settings.emptyText || select.getAttribute('data-ac-empty-text') || 'No options available';
 
-    /* --- Build the shell -------------------------------------------------- */
+    /* === [CORE] Build the shell =========================================== */
 
     var wrap = document.createElement('div');
     wrap.className = 'ac-dropdown';
@@ -94,29 +99,13 @@
       panel.setAttribute('popover', 'manual');
     }
 
-    // Bottom-sheet header. Hidden by CSS on wide viewports; on a phone it gives
-    // the sheet a visible title and a close control that is easy to hit.
-    var sheetHead = document.createElement('div');
-    sheetHead.className = 'ac-dropdown__sheet-head';
-    var sheetTitle = document.createElement('span');
-    sheetTitle.className = 'ac-dropdown__sheet-title';
-    sheetTitle.id = id + '-sheet-title';
-    var sheetClose = document.createElement('button');
-    sheetClose.type = 'button';
-    sheetClose.className = 'ac-dropdown__sheet-close';
-    sheetClose.textContent = 'Close';
-    sheetHead.appendChild(sheetTitle);
-    sheetHead.appendChild(sheetClose);
-
     var list = document.createElement('div');
     list.className = 'ac-dropdown__list';
-
-    panel.appendChild(sheetHead);
     panel.appendChild(list);
 
-    /* --- Accessible name --------------------------------------------------
-       Carry over whatever labeled the <select>. A <label for> is the common
-       case and the one the original this is based on used to drop. */
+    /* === [CORE] Accessible name ===========================================
+       Carry over whatever labeled the <select>. A <label for> is the common case
+       and the one this pattern usually drops. */
 
     function resolveLabel() {
       var labelledBy = select.getAttribute('aria-labelledby');
@@ -125,7 +114,6 @@
       var ariaLabel = select.getAttribute('aria-label');
       if (ariaLabel) return { ids: null, text: ariaLabel };
 
-      // <label for="..."> or an ancestor <label>
       var labels = select.labels;
       if (labels && labels.length) {
         var ids = [];
@@ -139,7 +127,7 @@
       return { ids: null, text: null };
     }
 
-    // The toggle's name is "<label>, <current value>", which is how a native
+    // The trigger's name is "<label>, <current value>", which is how a native
     // <select> announces. Referencing the value element rather than copying its
     // text means the name updates itself whenever the selection changes.
     valueEl.id = id + '-value';
@@ -152,13 +140,12 @@
       toggle.setAttribute('aria-label', label.text);
       panel.setAttribute('aria-label', label.text);
     }
-    sheetTitle.textContent = label.text || 'Choose an option';
 
     // Descriptions (hints, error text) apply to the visible control too.
     var describedBy = select.getAttribute('aria-describedby');
     if (describedBy) toggle.setAttribute('aria-describedby', describedBy);
 
-    /* --- Insert, and demote the native select to a value store ------------- */
+    /* === [CORE] Insert, and demote the native select to a value store ===== */
 
     select.parentNode.insertBefore(wrap, select);
     wrap.appendChild(toggle);
@@ -167,18 +154,21 @@
 
     select.classList.add('ac-dropdown__native');
     select.tabIndex = -1;
-    // display:none already removes it from the accessibility tree; this makes
-    // the intent explicit for anyone reading the DOM.
+    // display:none already removes it from the accessibility tree; this makes the
+    // intent explicit for anyone reading the DOM.
     select.setAttribute('aria-hidden', 'true');
 
-    /* --- Options ----------------------------------------------------------- */
+    /* === [CORE] Options =================================================== */
 
-    /** @type {HTMLElement[]} rows in visual order, index-aligned to enabled option indexes */
+    /** @type {HTMLElement[]} rows in visual order, index-aligned to enabled options */
     var rows = [];
     /** @type {number[]} select.options index for each row */
     var rowIndexes = [];
 
     function decorate(row, option) {
+      /* [DECORATION] an icon or a color strip. Delete this block if you use
+         neither. Both render aria-hidden, so no symbol name reaches the option's
+         accessible name. */
       var swatch = option.getAttribute('data-ac-swatch');
       var icon = option.getAttribute('data-ac-icon');
 
@@ -198,7 +188,7 @@
         strip.setAttribute('aria-hidden', 'true');
         for (var i = 0; i < colors.length; i++) {
           var dot = document.createElement('span');
-          // The only place a literal color is legitimate: it comes from the
+          // The one place a literal color is legitimate: it comes from the
           // author's data, not from the stylesheet.
           dot.style.background = colors[i].trim();
           strip.appendChild(dot);
@@ -206,6 +196,7 @@
         row.appendChild(strip);
       }
 
+      /* [CORE] the option's own text */
       var text = document.createElement('span');
       text.className = 'ac-dropdown__text';
 
@@ -214,6 +205,8 @@
       primary.textContent = option.textContent.trim();
       text.appendChild(primary);
 
+      /* [DECORATION] a muted second line. NOT aria-hidden: it is real
+         information, so it belongs in the accessible name. */
       var secondary = option.getAttribute('data-ac-secondary');
       if (secondary) {
         var sub = document.createElement('span');
@@ -224,6 +217,7 @@
 
       row.appendChild(text);
 
+      /* [CORE] the tick, so selection is never shown by color alone */
       var check = document.createElement('span');
       check.className = 'ac-dropdown__check';
       check.setAttribute('aria-hidden', 'true');
@@ -240,8 +234,8 @@
       row.dataset.index = String(optionIndex);
 
       if (option.disabled) {
-        // aria-disabled rather than removing it: the option stays discoverable
-        // so a screen reader user learns it exists and why it is unavailable.
+        // aria-disabled rather than removing it: the option stays discoverable, so
+        // a screen reader user learns it exists and why it is unavailable.
         row.setAttribute('aria-disabled', 'true');
       } else {
         row.tabIndex = -1;
@@ -264,6 +258,8 @@
       for (var i = 0; i < children.length; i++) {
         var child = children[i];
 
+        /* [GROUPS] <optgroup> becomes role="group". Delete this branch if you
+           never group options. */
         if (child.tagName === 'OPTGROUP') {
           var group = document.createElement('div');
           group.setAttribute('role', 'group');
@@ -272,8 +268,8 @@
           groupLabel.className = 'ac-dropdown__group-label';
           groupLabel.id = id + '-group-' + i;
           groupLabel.textContent = child.label;
-          // aria-hidden on the visible text + aria-label on the group avoids
-          // the label being announced twice, once as text and once as the name.
+          // aria-hidden on the visible text plus aria-label on the group stops the
+          // label being announced twice, once as text and once as the name.
           groupLabel.setAttribute('aria-hidden', 'true');
           group.setAttribute('aria-label', child.label);
           group.appendChild(groupLabel);
@@ -313,36 +309,32 @@
     }
 
     function syncDisabled() {
-      // aria-disabled, not the disabled attribute: the control stays focusable,
-      // so a keyboard user can still reach it and hear why it is unavailable.
+      // aria-disabled, not the disabled attribute: the control stays focusable, so
+      // a keyboard user can still reach it and hear why it is unavailable.
       toggle.setAttribute('aria-disabled', String(select.disabled));
       wrap.classList.toggle('ac-dropdown--disabled', select.disabled);
     }
 
-    /* --- Positioning -------------------------------------------------------
-       The panel is position:fixed and, where supported, in the top layer. That
-       is what stops an ancestor with overflow:hidden or a transform from
-       clipping it -- the failure the absolutely-positioned original had. */
+    /* === [CORE] Positioning ===============================================
+       The panel is position:fixed and, where supported, in the top layer. That is
+       what stops an ancestor with overflow:hidden or a transform from clipping it.
+       Recomputed on scroll and resize rather than once at open time, so it cannot
+       drift away from its trigger. */
 
     function position() {
-      if (isSheet()) {
-        // The sheet is laid out entirely in CSS; clear any inline anchoring.
-        panel.style.top = '';
-        panel.style.left = '';
-        panel.style.width = '';
-        panel.style.maxHeight = '';
-        return;
-      }
-
       var rect = toggle.getBoundingClientRect();
       var gap = 6;
       var margin = 8;
       var spaceBelow = window.innerHeight - rect.bottom - gap - margin;
       var spaceAbove = rect.top - gap - margin;
+      // Flip up only when below is genuinely cramped AND above has more room.
       var flipUp = spaceBelow < 200 && spaceAbove > spaceBelow;
 
+      // Match the trigger's width, the way a native select does, but never let the
+      // panel hang off either edge of a narrow viewport.
       panel.style.width = rect.width + 'px';
-      panel.style.left = Math.max(margin, Math.min(rect.left, window.innerWidth - rect.width - margin)) + 'px';
+      panel.style.left =
+        Math.max(margin, Math.min(rect.left, window.innerWidth - rect.width - margin)) + 'px';
       panel.style.maxHeight = Math.max(120, flipUp ? spaceAbove : spaceBelow) + 'px';
 
       if (flipUp) {
@@ -353,10 +345,11 @@
         panel.style.top = rect.bottom + gap + 'px';
       }
 
+      // A styling hook for consumers who want to square off the adjoining corners.
       wrap.classList.toggle('ac-dropdown--up', flipUp);
     }
 
-    /* --- Open / close ------------------------------------------------------ */
+    /* === [CORE] Open and close ============================================ */
 
     function isOpen() {
       return toggle.getAttribute('aria-expanded') === 'true';
@@ -386,7 +379,7 @@
 
       // Focus the selected option so a screen reader announces the listbox and
       // where you are in it. Falling back to the first option when nothing is
-      // selected keeps arrow keys predictable.
+      // selected keeps the arrow keys predictable.
       var target = rows[indexOfSelected()] || rows[0];
       if (target) {
         target.focus();
@@ -416,9 +409,8 @@
       window.removeEventListener('resize', position);
       window.removeEventListener('scroll', onScroll, true);
 
-      // Focus has to go somewhere -- if we hid the element holding it without
-      // moving it first, focus would fall to <body> and the user would lose
-      // their place entirely.
+      // Focus has to go somewhere. Hiding the element that holds it without moving
+      // it first drops focus to <body>, and the user loses their place entirely.
       if (restoreFocus !== false) toggle.focus();
     }
 
@@ -456,7 +448,7 @@
 
       if (select.selectedIndex !== optionIndex) {
         select.selectedIndex = optionIndex;
-        // Dispatched on the native element, so existing handlers bound to the
+        // Dispatched on the native element, so handlers already bound to the
         // <select> fire exactly as they did before this was enhanced.
         select.dispatchEvent(new Event('input', { bubbles: true }));
         select.dispatchEvent(new Event('change', { bubbles: true }));
@@ -466,13 +458,15 @@
       close();
     }
 
-    /* --- Type-ahead --------------------------------------------------------- */
+    /* === [TYPEAHEAD] optional — delete this and the two key branches below == */
 
     var buffer = '';
     var bufferTime = 0;
 
     function typeAhead(char) {
       var now = Date.now();
+      // An 800ms window, so "st" lands on Staging rather than jumping to the first
+      // "s" and then the first "t".
       buffer = (now - bufferTime > 800 ? '' : buffer) + char.toLowerCase();
       bufferTime = now;
 
@@ -486,7 +480,7 @@
       }
     }
 
-    /* --- Events -------------------------------------------------------------- */
+    /* === [CORE] Events ==================================================== */
 
     function onToggleClick() {
       if (select.disabled) return;
@@ -511,6 +505,7 @@
         return;
       }
 
+      /* [TYPEAHEAD] */
       if (key.length === 1 && /\S/.test(key)) {
         event.preventDefault();
         typeAhead(key);
@@ -542,10 +537,11 @@
         event.stopPropagation();
         close();
       } else if (key === 'Tab') {
-        // Move focus back to the toggle first, then let the browser continue
-        // tabbing from there -- otherwise focus is on an element we are hiding.
+        // Move focus back to the toggle first, then let the browser carry on
+        // tabbing from there — otherwise focus sits on an element we are hiding.
         close();
       } else if (key.length === 1 && /\S/.test(key)) {
+        /* [TYPEAHEAD] */
         event.preventDefault();
         typeAhead(key);
       }
@@ -569,10 +565,6 @@
       if (index > -1 && document.activeElement !== rows[index]) rows[index].focus();
     }
 
-    function onSheetClose() {
-      close();
-    }
-
     function onNativeChange() {
       syncValue();
     }
@@ -582,7 +574,6 @@
     panel.addEventListener('keydown', onPanelKeydown);
     list.addEventListener('click', onListClick);
     list.addEventListener('pointermove', onListPointerMove);
-    sheetClose.addEventListener('click', onSheetClose);
     select.addEventListener('change', onNativeChange);
 
     // Mirror the native element's own `hidden` and `disabled` so app code that
@@ -594,6 +585,8 @@
     });
     observer.observe(select, { attributes: true, attributeFilter: ['hidden', 'disabled'] });
     wrap.hidden = select.hidden;
+
+    /* === [CORE] API ======================================================= */
 
     var api = {
       /** Re-read the <select> after its options changed. */
@@ -613,7 +606,6 @@
         panel.removeEventListener('keydown', onPanelKeydown);
         list.removeEventListener('click', onListClick);
         list.removeEventListener('pointermove', onListPointerMove);
-        sheetClose.removeEventListener('click', onSheetClose);
         select.removeEventListener('change', onNativeChange);
 
         select.classList.remove('ac-dropdown__native');
@@ -633,7 +625,7 @@
   global.AC = global.AC || {};
   global.AC.createDropdown = createDropdown;
 
-  /* --- Auto-init. Delete this block if you initialize manually. -------------- */
+  /* === [AUTO-INIT] delete this block if you construct instances yourself === */
   function initAll(scope) {
     (scope || document).querySelectorAll('select[data-ac-dropdown]').forEach(function (el) {
       createDropdown(el);

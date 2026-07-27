@@ -120,6 +120,14 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
 
 ## overlays-disclosure
 
+### drawer
+- **What it is** A panel that slides in from an edge of the viewport and sits above the page. Carved out of `dropdown`, which used to become a bottom sheet under 640px — one component with two keyboard stories. This is that behavior as its own thing, on **desktop as well as mobile**.
+- **Markup** `<div class="ac-drawer" popover>` holding `.ac-drawer__head` (title + close button) and `.ac-drawer__body`. Triggered by a real `<button aria-expanded aria-controls>`.
+- **ARIA** `role="dialog"` + `aria-modal="true"` when it takes a backdrop, `aria-labelledby` pointing at the visible title. **Not** `role="listbox"` — the drawer is a container, and whatever goes inside it keeps its own semantics.
+- **Keyboard** <kbd>Esc</kbd> closes. Focus moves to the first focusable element (or the close button) on open, is **trapped** while open, and returns to the trigger on close. `Tab` cycles within.
+- **Edges** `data-ac-edge="bottom|right|left|top"`, default `bottom`. Slide transform is motion-gated, so with reduced motion it appears rather than slides.
+- **Gotcha** The whole component is the focus-management story; get that wrong and it is worse than no drawer. Use `popover` + the top layer so no ancestor can clip it, but note `popover="auto"` light-dismiss fights a custom Escape handler — `dropdown` hit this and uses `manual`. Scroll-lock the body while open, but do it without a layout jump (`scrollbar-gutter`, not `overflow: hidden` alone). The close button needs a real accessible name, and a 44px target. A drawer with **no** visible close control is a trap on touch, where there is no Escape key.
+
 ### tooltip
 - **Markup** Trigger with `aria-describedby` pointing at a `role="tooltip"` element.
 - **Behavior** Shows on **hover and focus**; hides on <kbd>Esc</kbd>; stays visible while the pointer moves onto it.

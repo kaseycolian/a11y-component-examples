@@ -69,7 +69,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 4 / 33
+## Component roster — 4 / 34
 
 ### foundations
 - [ ] `skip-link`
@@ -105,8 +105,13 @@ take their logic and not their layout. See item 1 under remaining work.
 ### overlays-disclosure
 - [x] `disclosure` — works, but **predates the copyability + style conventions — retrofit (item 1)**.
   Also still has **no spec** — backfill one.
-- [x] `dropdown` — works, 14/14 tests in Chromium, but **predates the copyability + style conventions
-  — retrofit (item 1)**. Five unlabeled demos; highest-value retrofit on the list.
+- [x] `dropdown` — complete and retrofitted. 17/17 tests in Chromium. **The bottom sheet was removed:**
+  it anchors to its trigger at every viewport width, flips above when there is no room below, and
+  sizes rows by `@media (pointer: coarse)` rather than a width breakpoint. The sheet behavior moved to
+  `drawer`.
+- [ ] `drawer` — the panel that rises from the edge of the screen, on **both** mobile and desktop.
+  Carved out of `dropdown`, where it was a second personality with a second keyboard story. Needs a
+  real dismissal model (backdrop, focus trap or not, Escape) — see `component-specs.md`.
 - [ ] `tooltip`
 
 ### navigation
@@ -149,20 +154,19 @@ Each retrofit target needs:
 
 | Target | Why it needs it |
 | --- | --- |
-| `dropdown` | 5 unlabeled demos; the CSS and JS are one long undifferentiated run. Highest value. |
+| ~~`dropdown`~~ | **Done.** Also lost its bottom sheet to `drawer`. |
 | `disclosure` | Small, but same problem, and still has **no spec** — backfill that at the same time. |
 | `src/site/pages/index.astro` (home) | Prose predates the style rules. |
 | `src/site/pages/components/index.astro` | Same. |
 
-Two things to decide once, here, rather than per-component:
+**Settled:** demo scaffolding (`.ac-demo-grid`, `.ac-demo`, `.ac-demo__title`, `.ac-demo__legend`)
+lives in `src/site/styles/site.css`, not in any `component.css`. It was duplicated per component, and
+dropdown's copy leaked site-wide because `BaseLayout` loads that file for the header theme picker.
+Keeping it in the shell means everything inside a `component.css` is real component code.
 
-- `ac-demo__title` currently lives in each component's own CSS, which means every component ships a
-  copy of the same three rules. That is consistent with "fully self-contained", but it is demo
-  scaffolding rather than component code, so `site.css` is arguably the right home. Pick one and
-  apply it everywhere.
-- Whether the demo `<h3>`s should be linkable (`id` + anchor). Deep-linking to "example 3" would be
-  genuinely useful and the global `scroll-margin-top` already handles the sticky header. Deliberately
-  left out for now to avoid six landmark-ish headings with no consumer.
+**Still open:** whether the demo `<h3>`s should be linkable (`id` + anchor). Deep-linking to "example
+3" would be genuinely useful and the global `scroll-margin-top` already clears the sticky header. Left
+out for now rather than adding six ids with no consumer.
 
 ### 2. Shared a11y gate — `tests/shared/a11y.spec.mjs`
 
