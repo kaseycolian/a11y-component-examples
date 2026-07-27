@@ -1,0 +1,291 @@
+---
+import { THEME_GROUPS } from '../lib/themes.mjs';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="site-brand" href={base}>
+      <span class="site-brand__mark">a11y components</span>
+      <span class="site-brand__sub">WCAG 2.2 AA &middot; copy &amp; paste</span>
+    </a>
+
+    <div class="site-header__controls">
+      <div class="control">
+        <label class="control__label" for="theme-select">Theme</label>
+        {/*
+          The picker is the library's own Dropdown (data-ac-dropdown), which is
+          why theme-service's theme-select.js is not vendored -- see
+          src/site/theme/THEME-SERVICE.md. The native <select> stays in the DOM
+          as the value store, so the change listener below is unchanged from
+          when this was a plain select.
+
+          data-ac-swatch is each theme's real accent triple, parsed out of
+          theme.css at build time by themes.mjs. The swatch is decoration and
+          the Dropdown marks it aria-hidden, so an option's accessible name is
+          always just the theme name.
+        */}
+        <select id="theme-select" data-ac-dropdown data-theme-select>
+          {/*
+            Auto is its own group so that having no swatch reads as deliberate
+            rather than as a missing one.
+          */}
+          <optgroup label="System">
+            <option value="">Auto (match system)</option>
+          </optgroup>
+          {
+            THEME_GROUPS.map((group) => (
+              <optgroup label={group.label}>
+                {group.themes.map((theme) => (
+                  <option value={theme.id} data-ac-swatch={theme.swatch.join(',')}>
+                    {theme.label}
+                  </option>
+                ))}
+              </optgroup>
+            ))
+          }
+        </select>
+      </div>
+
+      <div class="control">
+        <span class="control__label" id="motion-label">Animation</span>
+        <label class="switch">
+          <input type="checkbox" data-motion-toggle aria-describedby="motion-label" />
+          <span class="switch__track" aria-hidden="true"><span class="switch__thumb"></span></span>
+          <span class="switch__text">Reduce motion</span>
+        </label>
+        {/*
+          Revealed by the script when the OS asks for reduced motion, and only
+          then added to the toggle's aria-describedby. Visible text rather than a
+          title attribute: title is not announced by TalkBack at all, is
+          inconsistent in NVDA and JAWS, and never appears for a touch user.
+        */}
+        <p class="control__note" id="motion-note" hidden>
+          Your system already asks for reduced motion, so animation stays off.
+        </p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .control {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .control__label {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .control__note {
+    margin: 0;
+    max-width: 18rem;
+    font-size: 0.72rem;
+    line-height: 1.4;
+    color: var(--text-muted);
+  }
+
+  .control__note[hidden] {
+    display: none;
+  }
+
+  /* --- Theme picker --------------------------------------------------------
+     The Dropdown builds its own wrapper at runtime, so it never carries Astro's
+     scoping attribute -- hence :global(). Giving the component a width is the
+     consumer's job and the only thing done here; nothing reaches into its
+     internals. */
+  .control :global(.ac-dropdown) {
+    width: 12.5rem;
+    max-width: 100%;
+  }
+
+  /* --- Motion switch ------------------------------------------------------
+     A real checkbox drives it: the visible track and thumb are decoration
+     (aria-hidden), so screen readers announce the native control and its
+     checked state, and the label text is part of the accessible name. */
+  .switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.25rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+
+  .switch input {
+    position: absolute;
+    width: 2.5rem;
+    height: 1.4rem;
+    opacity: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .switch__track {
+    position: relative;
+    flex: none;
+    width: 2.5rem;
+    height: 1.4rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-pill);
+    background: var(--bg-elevated);
+    transition: background-color var(--dur) ease, border-color var(--dur) ease;
+  }
+
+  .switch__thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: calc(1.4rem - 6px);
+    height: calc(1.4rem - 6px);
+    border-radius: 50%;
+    background: var(--text-muted);
+    transition: transform var(--dur) ease, background-color var(--dur) ease;
+  }
+
+  .switch input:checked + .switch__track {
+    background: var(--accent-green);
+    border-color: var(--accent-green);
+    box-shadow: var(--bglow-green);
+  }
+
+  .switch input:checked + .switch__track .switch__thumb {
+    transform: translateX(1.1rem);
+    background: var(--on-green);
+  }
+
+  .switch input:focus-visible + .switch__track {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* aria-disabled, not the disabled attribute: the control stays focusable, so
+     a keyboard user reaches it and hears the note explaining why it is stuck. */
+  .switch:has(input[aria-disabled="true"]) {
+    cursor: not-allowed;
+    color: var(--text-muted);
+  }
+
+  .switch input[aria-disabled="true"] + .switch__track {
+    border-style: dashed;
+    opacity: 0.7;
+  }
+
+  @media (max-width: 560px) {
+    .switch__text {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+  }
+
+  /* Forced colors: the tinted track and glow disappear, so fall back to
+     system colors that keep the on/off distinction visible. */
+  @media (forced-colors: active) {
+    .switch input:checked + .switch__track {
+      background: Highlight;
+      forced-color-adjust: none;
+    }
+
+    .switch input:checked + .switch__track .switch__thumb {
+      background: HighlightText;
+    }
+
+    /* opacity and the muted text color are both dropped here, so the dashed
+       border becomes the only cue left that the toggle cannot be changed. */
+    .switch input[aria-disabled="true"] + .switch__track {
+      border-color: GrayText;
+      opacity: 1;
+    }
+  }
+</style>
+
+{/*
+  Astro compiles this to an external module script -- no inline JS, so it works
+  under a strict CSP. It only reflects state the theme-init.js bootstrap has
+  already applied, so there is never a flash.
+*/}
+<script>
+  const root = document.documentElement;
+
+  /* --- Theme --------------------------------------------------------------- */
+  const select = document.querySelector<HTMLSelectElement>('[data-theme-select]');
+
+  if (select) {
+    // theme-init.js already set data-theme before paint; mirror it into the
+    // control so the two never disagree.
+    select.value = root.getAttribute('data-theme') ?? '';
+
+    // Setting .value programmatically fires no change event, so if the Dropdown
+    // has already enhanced this select its trigger is still showing the old
+    // option. Guarded rather than ordered: if the dropdown script has not run
+    // yet it reads the corrected selectedIndex when it does.
+    (select as HTMLSelectElement & { _acDropdown?: { sync(): void } })._acDropdown?.sync();
+
+    select.addEventListener('change', () => {
+      const id = select.value;
+      if (id) {
+        root.setAttribute('data-theme', id);
+        localStorage.setItem('theme', id);
+      } else {
+        root.removeAttribute('data-theme');
+        localStorage.removeItem('theme');
+      }
+    });
+  }
+
+  /* --- Motion --------------------------------------------------------------
+     Note the asymmetry, and it is deliberate: --motion resolves to 0 under
+     [data-motion="off"] OR prefers-reduced-motion, with the media query last
+     in the cascade. So this toggle can only add the restriction. Someone whose
+     OS asks for reduced motion keeps it regardless of what this control says,
+     which is why we start it checked for them. */
+  const motionToggle = document.querySelector<HTMLInputElement>('[data-motion-toggle]');
+
+  if (motionToggle) {
+    const osPrefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    motionToggle.checked = root.getAttribute('data-motion') === 'off' || osPrefersReduced;
+
+    // The OS preference wins outright, so the control would be a lie.
+    if (osPrefersReduced) {
+      const note = document.getElementById('motion-note');
+      if (note) {
+        // Unhide first: a hidden element is out of the accessibility tree, so
+        // referencing it while hidden would describe the toggle with nothing.
+        note.hidden = false;
+        motionToggle.setAttribute('aria-describedby', 'motion-label motion-note');
+      }
+
+      // aria-disabled rather than the disabled attribute, so the toggle keeps
+      // its place in the tab order and the note above is actually announced --
+      // a disabled input is skipped and explains nothing. preventDefault on
+      // click is what stops the box from flipping, and Space fires a click too,
+      // so this covers the keyboard as well.
+      motionToggle.setAttribute('aria-disabled', 'true');
+      motionToggle.addEventListener('click', (event) => event.preventDefault());
+    }
+
+    motionToggle.addEventListener('change', () => {
+      if (motionToggle.checked) {
+        root.setAttribute('data-motion', 'off');
+        localStorage.setItem('motion', 'off');
+      } else {
+        root.removeAttribute('data-motion');
+        localStorage.removeItem('motion');
+      }
+    });
+  }
+</script>

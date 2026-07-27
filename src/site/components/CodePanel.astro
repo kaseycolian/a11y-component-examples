@@ -1,0 +1,214 @@
+---
+import { Code } from 'astro:components';
+
+/**
+ * The copy panel.
+ *
+ * Read-only by construction: the source is rendered into a <pre>, never a
+ * textarea and never contenteditable. This is a library, not a playground --
+ * visitors copy, they do not edit in place.
+ *
+ * The tabs implement the WAI-ARIA APG tabs pattern with automatic activation
+ * (content is already in the DOM, so switching is instant and there is no cost
+ * to activating on arrow). Each panel is focusable and labelled because it
+ * scrolls, and a scrollable region has to be keyboard reachable -- SC 2.1.1.
+ */
+
+interface SourceFile {
+  /** Tab label, e.g. "HTML". */
+  label: string;
+  /** Shiki language id. */
+  lang: string;
+  /** File contents, verbatim. */
+  code: string;
+  /** Filename shown under the tabs and used for the download link. */
+  filename: string;
+  /** URL of the same file, served as a static asset. */
+  href?: string;
+}
+
+interface Props {
+  files: SourceFile[];
+  /** Unique-per-page id prefix, so multiple panels can coexist. */
+  id?: string;
+  title?: string;
+}
+
+const { files, id = 'source', title = 'Source' } = Astro.props;
+const titleId = `${id}-title`;
+---
+
+<section class="panel code-panel" aria-labelledby={titleId}>
+  <div class="panel__head">
+    <h2 class="panel__title" id={titleId}>{title}</h2>
+
+    <div class="code-tabs" role="tablist" aria-labelledby={titleId}>
+      {
+        files.map((file, i) => (
+          <button
+            type="button"
+            role="tab"
+            class="code-tab"
+            id={`${id}-tab-${i}`}
+            aria-controls={`${id}-panel-${i}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            tabindex={i === 0 ? 0 : -1}
+          >
+            {file.label}
+          </button>
+        ))
+      }
+    </div>
+
+    <button type="button" class="code-copy" data-copy-button>
+      <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.6">
+        <rect x="5.5" y="5.5" width="8" height="8" rx="1.5"></rect>
+        <path d="M10.5 3.5v-1a1 1 0 0 0-1-1h-7a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h1"></path>
+      </svg>
+      <span data-copy-label>Copy</span>
+    </button>
+  </div>
+
+  {
+    files.map((file, i) => (
+      <div
+        role="tabpanel"
+        id={`${id}-panel-${i}`}
+        aria-labelledby={`${id}-tab-${i}`}
+        class="code-block"
+        tabindex="0"
+        data-code={file.code}
+        data-filename={file.filename}
+        data-href={file.href}
+        hidden={i !== 0}
+      >
+        <Code code={file.code} lang={file.lang} />
+      </div>
+    ))
+  }
+
+  <p class="code-note" data-code-note>
+    <span data-filename>{files[0]?.filename}</span>
+    {files[0]?.href && (
+      <>
+        {' · '}
+        <a href={files[0].href} download data-download>
+          download the raw file
+        </a>
+      </>
+    )}
+  </p>
+
+  {/* Copy confirmations are announced here rather than only shown on the button. */}
+  <p class="visually-hidden" role="status" aria-live="polite" data-copy-status></p>
+</section>
+
+<script>
+  interface PanelState {
+    tabs: HTMLButtonElement[];
+    panels: HTMLElement[];
+    filenames: string[];
+    hrefs: (string | null)[];
+  }
+
+  document.querySelectorAll<HTMLElement>('.code-panel').forEach((panel) => {
+    const tabs = Array.from(panel.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+    const panels = Array.from(panel.querySelectorAll<HTMLElement>('[role="tabpanel"]'));
+    const copyButton = panel.querySelector<HTMLButtonElement>('[data-copy-button]');
+    const copyLabel = panel.querySelector<HTMLElement>('[data-copy-label]');
+    const status = panel.querySelector<HTMLElement>('[data-copy-status]');
+    const filenameEl = panel.querySelector<HTMLElement>('[data-filename]');
+    const downloadEl = panel.querySelector<HTMLAnchorElement>('[data-download]');
+
+    if (!tabs.length) return;
+
+    // Captured once so the note can follow the selected tab.
+    const state: PanelState = {
+      tabs,
+      panels,
+      filenames: panels.map((p) => p.dataset.filename ?? ''),
+      hrefs: panels.map((p) => p.dataset.href ?? null),
+    };
+
+    let selected = 0;
+
+    function select(index: number, moveFocus = true) {
+      selected = index;
+
+      state.tabs.forEach((tab, i) => {
+        const isSelected = i === index;
+        tab.setAttribute('aria-selected', String(isSelected));
+        // Roving tabindex: only the selected tab is in the Tab order, so one
+        // Tab press moves past the whole tablist to the panel.
+        tab.tabIndex = isSelected ? 0 : -1;
+      });
+
+      state.panels.forEach((p, i) => {
+        p.hidden = i !== index;
+      });
+
+      const label = state.tabs[index]?.textContent?.trim() ?? '';
+      if (filenameEl) filenameEl.textContent = state.filenames[index] || label;
+      if (downloadEl) {
+        const href = state.hrefs[index];
+        if (href) {
+          downloadEl.hidden = false;
+          downloadEl.href = href;
+        } else {
+          downloadEl.hidden = true;
+        }
+      }
+
+      if (moveFocus) state.tabs[index]?.focus();
+    }
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(i, false));
+    });
+
+    // APG keyboard model for a horizontal tablist.
+    panel.querySelector('[role="tablist"]')?.addEventListener('keydown', (event) => {
+      const e = event as KeyboardEvent;
+      const last = tabs.length - 1;
+      let next: number | null = null;
+
+      if (e.key === 'ArrowRight') next = selected === last ? 0 : selected + 1;
+      else if (e.key === 'ArrowLeft') next = selected === 0 ? last : selected - 1;
+      else if (e.key === 'Home') next = 0;
+      else if (e.key === 'End') next = last;
+
+      if (next !== null) {
+        e.preventDefault();
+        select(next);
+      }
+    });
+
+    /* --- Copy ------------------------------------------------------------- */
+    let resetTimer: ReturnType<typeof setTimeout>;
+
+    copyButton?.addEventListener('click', async () => {
+      const code = state.panels[selected]?.dataset.code ?? '';
+      const label = state.tabs[selected]?.textContent?.trim() ?? 'Code';
+
+      try {
+        await navigator.clipboard.writeText(code);
+        if (copyLabel) copyLabel.textContent = 'Copied';
+        // The visual label change is not enough on its own -- a screen reader
+        // user needs to hear that it worked.
+        if (status) status.textContent = `${label} copied to clipboard.`;
+      } catch {
+        if (copyLabel) copyLabel.textContent = 'Press Ctrl+C';
+        if (status) {
+          status.textContent =
+            'Could not copy automatically. Select the code and press Control or Command plus C.';
+        }
+      }
+
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(() => {
+        if (copyLabel) copyLabel.textContent = 'Copy';
+        if (status) status.textContent = '';
+      }, 4000);
+    });
+  });
+</script>

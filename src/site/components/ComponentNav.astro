@@ -1,0 +1,36 @@
+---
+import { COMPONENTS_BY_GROUP } from '../lib/registry.mjs';
+
+interface Props {
+  /** Slug of the component currently being viewed, if any. */
+  current?: string;
+}
+
+const { current } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<nav class="sidebar" aria-label="Components">
+  {
+    COMPONENTS_BY_GROUP.map((group) => (
+      <div class="sidebar__group">
+        <h2 class="sidebar__title" id={`nav-${group.id}`}>
+          {group.name}
+        </h2>
+        <ul class="sidebar__list" aria-labelledby={`nav-${group.id}`}>
+          {group.components.map((component) => (
+            <li>
+              <a
+                class="sidebar__link"
+                href={`${base}components/${component.slug}/`}
+                aria-current={component.slug === current ? 'page' : undefined}
+              >
+                {component.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))
+  }
+</nav>

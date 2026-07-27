@@ -1,0 +1,78 @@
+<!--
+  Disclosure (show/hide)
+
+  The trigger is a real <button>, so Enter and Space work without a single line
+  of key handling. It lives inside a heading so screen-reader users can jump
+  between sections with their heading shortcuts -- change the level to match
+  where you put it on the page.
+
+  `aria-expanded` on the trigger and `hidden` on the panel are the whole
+  contract. component.js generates the ids and keeps them in sync; if you would
+  rather write the ids yourself, set them here and the script will leave them
+  alone.
+-->
+<div class="ac-disclosure-group">
+  <div class="ac-disclosure" data-ac-disclosure>
+    <h3 class="ac-disclosure__heading">
+      <button type="button" class="ac-disclosure__trigger">
+        <svg class="ac-disclosure__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M5 3.5 10.5 8 5 12.5" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span>Does this work without JavaScript?</span>
+      </button>
+    </h3>
+    <div class="ac-disclosure__panel">
+      <div class="ac-disclosure__content">
+        <p>
+          Partly. The panel starts visible in the markup, so a reader with no scripting
+          still gets the content &mdash; it simply cannot be collapsed. The script adds
+          <code>hidden</code> on startup, which is why nothing flashes open on load.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ac-disclosure" data-ac-disclosure>
+    <h3 class="ac-disclosure__heading">
+      <button type="button" class="ac-disclosure__trigger">
+        <svg class="ac-disclosure__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M5 3.5 10.5 8 5 12.5" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span>Why not use &lt;details&gt; and &lt;summary&gt;?</span>
+      </button>
+    </h3>
+    <div class="ac-disclosure__panel">
+      <div class="ac-disclosure__content">
+        <p>
+          Often you should &mdash; it is less code and it is accessible by default. Reach for
+          this version when you need the open state in JavaScript, an animated height, or a
+          trigger that is not the first child. Note that <code>&lt;summary&gt;</code> is
+          announced differently across screen readers, whereas a button with
+          <code>aria-expanded</code> is consistent everywhere.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ac-disclosure" data-ac-disclosure data-ac-open>
+    <h3 class="ac-disclosure__heading">
+      <button type="button" class="ac-disclosure__trigger">
+        <svg class="ac-disclosure__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M5 3.5 10.5 8 5 12.5" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span>Can one start open?</span>
+      </button>
+    </h3>
+    <div class="ac-disclosure__panel">
+      <div class="ac-disclosure__content">
+        <p>
+          Yes &mdash; add <code>data-ac-open</code> to the wrapper, as this one has. The
+          script reads it once on startup and sets <code>aria-expanded</code> to match.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

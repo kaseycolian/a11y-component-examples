@@ -1,0 +1,166 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { COMPONENTS, COMPONENTS_BY_GROUP } from '../lib/registry.mjs';
+
+const base = import.meta.env.BASE_URL;
+
+const promises = [
+  {
+    title: 'Every screen reader that matters',
+    body: 'Built and checked against NVDA, JAWS, VoiceOver on macOS and iOS, and TalkBack on Android. Where a pattern behaves differently in one of them, the component page says so rather than pretending otherwise.',
+  },
+  {
+    title: 'Keyboard first, touch too',
+    body: 'Full WAI-ARIA APG keyboard maps: arrows, Home, End, Escape, type-ahead. Targets are at least 24×24px, and every drag has a single-pointer alternative.',
+  },
+  {
+    title: 'Copy, do not integrate',
+    body: 'No package to install, no dependency to track. Take the HTML, CSS, and JS and paste them in. What you see running on the page is the same file you copy.',
+  },
+  {
+    title: 'Themeable from the start',
+    body: 'Colors, radii, and durations come from CSS custom properties with sensible fallbacks. Pasted into a bare app it just works; pasted into a themed one it adopts the theme.',
+  },
+];
+---
+
+<BaseLayout title="Accessible Component Examples">
+  <div class="layout layout--full">
+    <div class="hero">
+      <h1>Accessible components that don't look it</h1>
+      <p class="lede">
+        A reference library of UI components meeting <strong>WCAG 2.2 AA</strong> as a floor, written
+        in plain HTML, CSS, and JavaScript so you can lift them into React, Angular, Vue, or nothing
+        at all.
+      </p>
+      <p class="lede">
+        Accessibility has a reputation for producing grey boxes. It shouldn't. Every component here
+        ships with sixteen themes &mdash; switch one in the header and watch the whole page change
+        without a single contrast failure.
+      </p>
+
+      <p class="hero__actions">
+        <a class="button-primary" href={`${base}components/`}>Browse {COMPONENTS.length} components</a>
+        <a class="button-secondary" href="https://github.com/kaseycolian/a11y-component-examples">
+          Source on GitHub
+        </a>
+      </p>
+    </div>
+
+    <section aria-labelledby="promises-title">
+      <h2 id="promises-title">What every component here does</h2>
+      <ul class="card-grid">
+        {
+          promises.map((promise) => (
+            <li class="card card--static">
+              <h3 class="card__heading">{promise.title}</h3>
+              <p class="card__summary">{promise.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    {
+      COMPONENTS_BY_GROUP.length > 0 && (
+        <section aria-labelledby="groups-title">
+          <h2 id="groups-title">Browse by group</h2>
+          <ul class="card-grid">
+            {COMPONENTS_BY_GROUP.map((group) => (
+              <li class="card">
+                <a class="card__link" href={`${base}components/#group-${group.id}`}>
+                  {group.name}
+                </a>
+                <p class="card__summary">{group.summary}</p>
+                <p class="card__count">
+                  {group.components.length} component{group.components.length === 1 ? '' : 's'}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .hero {
+    max-width: 60ch;
+    margin: 1rem 0 3rem;
+  }
+
+  .hero__actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+
+  .button-primary,
+  .button-secondary {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 1.4rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    transition:
+      box-shadow var(--dur) ease,
+      filter var(--dur) ease;
+  }
+
+  .button-primary {
+    background: var(--accent-pink);
+    color: var(--on-pink);
+    box-shadow: var(--bglow-pink);
+  }
+
+  .button-primary:hover {
+    filter: brightness(1.08);
+    box-shadow: var(--bglow-pink-hi);
+  }
+
+  .button-secondary {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    box-shadow: var(--bglow-blue);
+  }
+
+  .button-secondary:hover {
+    background: color-mix(in srgb, var(--accent-blue) 16%, transparent);
+    box-shadow: var(--bglow-blue-hi);
+  }
+
+  .card--static:hover {
+    transform: none;
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .card__heading {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text);
+    text-shadow: none;
+  }
+
+  .card__count {
+    margin: auto 0 0;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  @media (forced-colors: active) {
+    .button-primary,
+    .button-secondary {
+      border-color: ButtonBorder;
+    }
+  }
+</style>

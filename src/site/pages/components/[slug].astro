@@ -1,0 +1,138 @@
+---
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ComponentNav from '../../components/ComponentNav.astro';
+import CodePanel from '../../components/CodePanel.astro';
+import { COMPONENTS } from '../../lib/registry.mjs';
+
+export function getStaticPaths() {
+  return COMPONENTS.map((component) => ({
+    params: { slug: component.slug },
+    props: { component },
+  }));
+}
+
+const { component } = Astro.props;
+const base = import.meta.env.BASE_URL;
+
+/**
+ * The whole point of this page: the demo below and the code panel below it are
+ * the SAME bytes. Both trace to src/library/components/<slug>/, so they cannot
+ * drift. `?raw` gives us the text for the panel; the served copy under
+ * public/library/ (produced by scripts/sync-library.mjs from the same source)
+ * is what the browser actually loads to run the demo.
+ */
+const rawHtml = import.meta.glob('../../../library/components/*/component.html', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+const rawCss = import.meta.glob('../../../library/components/*/component.css', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+const rawJs = import.meta.glob('../../../library/components/*/component.js', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+
+function pick(map: Record<string, unknown>, slug: string, file: string) {
+  const key = Object.keys(map).find((k) => k.endsWith(`/${slug}/${file}`));
+  return key ? (map[key] as string) : null;
+}
+
+const html = pick(rawHtml, component.slug, 'component.html');
+const css = pick(rawCss, component.slug, 'component.css');
+const js = pick(rawJs, component.slug, 'component.js');
+
+const assetPath = `${base}library/components/${component.slug}`;
+
+const sourceFiles = [
+  html && {
+    label: 'HTML',
+    lang: 'html',
+    code: html.trim(),
+    filename: 'component.html',
+    href: `${assetPath}/component.html`,
+  },
+  css && {
+    label: 'CSS',
+    lang: 'css',
+    code: css.trim(),
+    filename: 'component.css',
+    href: `${assetPath}/component.css`,
+  },
+  js && {
+    label: 'JS',
+    lang: 'js',
+    code: js.trim(),
+    filename: 'component.js',
+    href: `${assetPath}/component.js`,
+  },
+].filter(Boolean) as { label: string; lang: string; code: string; filename: string; href: string }[];
+
+const docsEntry = await getEntry('docs', component.slug);
+const Docs = docsEntry ? (await render(docsEntry)).Content : null;
+---
+
+<BaseLayout title={component.name} description={component.summary}>
+  {/* The component's own stylesheet -- only this one, so isolation is proven. */}
+  {css && <link slot="head" rel="stylesheet" href={`${assetPath}/component.css`} />}
+
+  <div class="layout">
+    <ComponentNav current={component.slug} />
+
+    <div>
+      <header class="component-header">
+        <p class="breadcrumb">
+          <a href={`${base}components/`}>All components</a>
+        </p>
+        <h1>{component.name}</h1>
+        <p class="lede">{component.summary}</p>
+
+        <ul class="meta-row">
+          {component.status !== 'stable' && <li><span class="badge badge--draft">{component.status}</span></li>}
+          {component.wcag.map((sc: string) => (
+            <li><span class="badge badge--wcag">WCAG {sc}</span></li>
+          ))}
+          {component.apg && (
+            <li>
+              <a class="badge" href={component.apg} rel="noopener">
+                APG pattern
+              </a>
+            </li>
+          )}
+        </ul>
+      </header>
+
+      <section class="panel" aria-labelledby="demo-title">
+        <div class="panel__head">
+          <h2 class="panel__title" id="demo-title">Live example</h2>
+        </div>
+        <div class="demo" set:html={html ?? ''} />
+      </section>
+
+      {component.demoNote && <p class="code-note">{component.demoNote}</p>}
+
+      <CodePanel files={sourceFiles} id={`src-${component.slug}`} />
+
+      {
+        Docs && (
+          <div class="prose">
+            <Docs />
+          </div>
+        )
+      }
+    </div>
+  </div>
+
+  {/*
+    The component's own script, loaded as an external file exactly as a visitor
+    would load it. `is:inline` keeps Astro from bundling or transforming it --
+    what runs here is byte-for-byte what the copy panel shows. `defer` makes it
+    execute after the demo markup is parsed.
+  */}
+  {js && <script slot="end" is:inline defer src={`${assetPath}/component.js`}></script>}
+</BaseLayout>

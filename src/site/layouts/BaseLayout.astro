@@ -1,0 +1,81 @@
+---
+import SiteHeader from '../components/SiteHeader.astro';
+import '../styles/site.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Set false on pages that supply their own <h1> layout wrapper. */
+  wide?: boolean;
+}
+
+const { title, description = 'Accessible, themeable UI components in vanilla HTML, CSS, and JavaScript.', wide = false } = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+const fullTitle = title === 'Accessible Component Examples' ? title : `${title} · Accessible Component Examples`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+
+    {/*
+      Applies the saved (or ?theme= / ?motion=) choice before first paint, so
+      there is no flash of the wrong theme. Must load from an external file and
+      must come before the stylesheets. Shipped by the theme-service as-is.
+    */}
+    <script is:inline src={`${base}theme/theme-init.js`}></script>
+
+    {/* Load order matters: color tokens, then the effect recipes built on them. */}
+    <link rel="stylesheet" href={`${base}theme/theme.css`} />
+    <link rel="stylesheet" href={`${base}theme/effects.css`} />
+
+    {/*
+      The header's theme picker is this library's own Dropdown, so the shell is a
+      consumer of the library like any other app: it loads the real served file,
+      the same bytes the copy panel shows. It comes before the per-page slot on
+      purpose -- a component page's own stylesheet must win any shared selector,
+      so what a visitor sees in the demo is what that page's CSS tab says.
+    */}
+    <link rel="stylesheet" href={`${base}library/components/dropdown/component.css`} />
+
+    {/* Per-page additions -- a component page loads its own component.css here. */}
+    <slot name="head" />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <SiteHeader />
+
+    <main id="main" tabindex="-1" class={wide ? 'layout layout--full' : undefined}>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <p>Built to WCAG 2.2 AA. Every component here is meant to be copied.</p>
+        <p>
+          <a href="https://github.com/kaseycolian/a11y-component-examples">Source on GitHub</a>
+        </p>
+      </div>
+    </footer>
+
+    {/*
+      Enhances the header's theme <select>. `defer` runs it after the header
+      markup is parsed; `is:inline` keeps Astro from bundling it, so this is the
+      same file the Dropdown page hands out. On that page it loads twice, which
+      is harmless -- createDropdown returns the existing instance rather than
+      binding a second set of listeners.
+    */}
+    <script is:inline defer src={`${base}library/components/dropdown/component.js`}></script>
+
+    {/* Per-page scripts, after the markup they act on. */}
+    <slot name="end" />
+  </body>
+</html>

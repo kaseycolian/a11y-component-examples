@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ComponentNav from '../../components/ComponentNav.astro';
+import { COMPONENTS, COMPONENTS_BY_GROUP } from '../../lib/registry.mjs';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout
+  title="All components"
+  description="Every component in the library, grouped by what it does."
+>
+  <div class="layout">
+    <ComponentNav />
+
+    <div>
+      <header class="component-header">
+        <h1>All components</h1>
+        <p class="lede">
+          {COMPONENTS.length} component{COMPONENTS.length === 1 ? '' : 's'}, grouped by what they do.
+          Each one is a folder of plain HTML, CSS, and JavaScript you can copy straight out.
+        </p>
+      </header>
+
+      {
+        COMPONENTS_BY_GROUP.map((group) => (
+          <section aria-labelledby={`group-${group.id}`}>
+            <h2 id={`group-${group.id}`}>{group.name}</h2>
+            <p class="lede">{group.summary}</p>
+
+            <ul class="card-grid">
+              {group.components.map((component) => (
+                <li class="card">
+                  <a class="card__link" href={`${base}components/${component.slug}/`}>
+                    {component.name}
+                  </a>
+                  <p class="card__summary">{component.summary}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+
+      {
+        COMPONENTS.length === 0 && (
+          <p class="lede">
+            No components registered yet. Run <code>npm run new:component &lt;slug&gt;</code> to add
+            the first one.
+          </p>
+        )
+      }
+    </div>
+  </div>
+</BaseLayout>

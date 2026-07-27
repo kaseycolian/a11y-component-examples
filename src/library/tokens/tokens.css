@@ -1,0 +1,117 @@
+/* =============================================================================
+   Accessible Component Examples — tokens.css
+
+   OPTIONAL. Every component works without this file: each component's CSS
+   writes its values as a three-level chain, so it falls back on its own.
+
+       background: var(--ac-surface, var(--bg-panel, #110620));
+                       |               |              |
+                       |               |              +-- literal default
+                       |               +-- theme-service token, if the host app has one
+                       +-- this file's token, if you loaded it
+
+   Copy this file when you want to:
+     - retheme every component from one place (set the --ac-* values), or
+     - get automatic light/dark instead of the neon dark defaults.
+
+   Without it, components render in the Rink Classic dark palette regardless of
+   the host page's color scheme. That is a deliberate default: a component that
+   renders *consistently* is easier to reason about than one that renders
+   half-styled. Load this file to opt into adaptation.
+   ============================================================================= */
+
+:root {
+  color-scheme: light dark;
+
+  /* --- Surfaces, ascending elevation ------------------------------------- */
+  --ac-bg: var(--bg, #070110);
+  --ac-surface: var(--bg-panel, #110620);
+  --ac-elevated: var(--bg-elevated, #1b0c30);
+
+  /* --- Text --------------------------------------------------------------- */
+  --ac-text: var(--text, #f3ecff);
+  --ac-text-muted: var(--text-muted, #bcadde);
+
+  /* --- Lines -------------------------------------------------------------- */
+  /* --ac-border is a hairline divider; --ac-border-strong is a control edge and
+     must stay >= 3:1 against its surface (WCAG 1.4.11 non-text contrast). */
+  --ac-border: var(--border, #34205a);
+  --ac-border-strong: var(--border-strong, #8064c0);
+
+  /* --- Focus -------------------------------------------------------------- */
+  --ac-focus: var(--focus-ring, #3ceaff);
+
+  /* --- Accents, each with the text color that is legible on top of it ------ */
+  /* Semantic use: pink = primary/danger, green = success, blue = info/links,
+     purple = secondary/warning. Kept consistent across every theme. */
+  --ac-accent-pink: var(--accent-pink, #ff2ec4);
+  --ac-on-pink: var(--on-pink, #22001a);
+  --ac-accent-green: var(--accent-green, #5bff3a);
+  --ac-on-green: var(--on-green, #062600);
+  --ac-accent-blue: var(--accent-blue, #3ceaff);
+  --ac-on-blue: var(--on-blue, #00212b);
+  --ac-accent-purple: var(--accent-purple, #b57fff);
+  --ac-on-purple: var(--on-purple, #1a0838);
+
+  /* --- Type --------------------------------------------------------------- */
+  --ac-font-ui: var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif);
+  --ac-font-mono: var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace);
+
+  /* --- Shape -------------------------------------------------------------- */
+  --ac-radius: var(--radius, 10px);
+  --ac-radius-sm: var(--radius-sm, 6px);
+  --ac-radius-pill: var(--radius-pill, 999px);
+
+  /* --- Motion ------------------------------------------------------------- */
+  /* --ac-motion is a 1/0 gate, not a duration. Multiply durations and
+     transforms by it so a single token switches all animation off:
+         transition: color calc(var(--ac-motion) * var(--ac-dur)) ease;
+     It resolves to 0 under prefers-reduced-motion or [data-motion="off"]. */
+  --ac-motion: var(--motion, 1);
+  --ac-dur: var(--dur, 150ms);
+  --ac-press-y: var(--press-y, 1px);
+  --ac-press-s: var(--press-s, 0.98);
+
+  /* --- Layout ------------------------------------------------------------- */
+  /* Minimum interactive target. WCAG 2.2 SC 2.5.8 requires 24px; 44px is the
+     comfortable touch size and what we use wherever layout allows. */
+  --ac-target-min: 24px;
+  --ac-target: 44px;
+}
+
+/* Light palette, when the host page has not forced a theme. Mirrors the
+   theme-service's Rink Classic light values. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --ac-bg: var(--bg, #f6f1fc);
+    --ac-surface: var(--bg-panel, #ffffff);
+    --ac-elevated: var(--bg-elevated, #ffffff);
+    --ac-text: var(--text, #1c0f2e);
+    --ac-text-muted: var(--text-muted, #5f5080);
+    --ac-border: var(--border, #e0d3f0);
+    --ac-border-strong: var(--border-strong, #9070c0);
+    --ac-focus: var(--focus-ring, #7b2ff0);
+    --ac-accent-pink: var(--accent-pink, #b60f86);
+    --ac-on-pink: var(--on-pink, #ffffff);
+    --ac-accent-green: var(--accent-green, #1f7d2f);
+    --ac-on-green: var(--on-green, #ffffff);
+    --ac-accent-blue: var(--accent-blue, #0a6a9e);
+    --ac-on-blue: var(--on-blue, #ffffff);
+    --ac-accent-purple: var(--accent-purple, #6d28d9);
+    --ac-on-purple: var(--on-purple, #ffffff);
+  }
+}
+
+/* Motion gate. Two independent ways to reach 0, matching the theme-service:
+   an explicit opt-out attribute, or the OS preference. The media query is last
+   so the OS preference wins -- a visitor who asked their system for reduced
+   motion cannot have it overridden by a page control. */
+[data-motion="off"] {
+  --ac-motion: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ac-motion: 0;
+  }
+}

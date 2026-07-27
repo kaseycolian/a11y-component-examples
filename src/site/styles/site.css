@@ -1,0 +1,740 @@
+/* =============================================================================
+   Site chrome.
+
+   This styles the gallery itself, not the library. It may use the theme tokens
+   directly (theme.css is always loaded here); library components must use the
+   three-level fallback chain instead -- see src/library/tokens/tokens.css.
+
+   Structural tokens live here because we deliberately do not vendor the
+   theme-service's components.css. See src/site/theme/THEME-SERVICE.md.
+   ============================================================================= */
+
+:root {
+  --font-ui: "Trebuchet MS", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "Cascadia Mono", "Consolas", ui-monospace, SFMono-Regular, monospace;
+
+  --radius: 10px;
+  --radius-sm: 6px;
+  --radius-pill: 999px;
+
+  /* Motion-gated duration. --motion comes from effects.css and flips to 0
+     under prefers-reduced-motion or [data-motion="off"]. */
+  --dur: calc(var(--motion, 1) * 160ms);
+  --press-y: calc(var(--motion, 1) * 1px);
+  --press-s: calc(1 - var(--motion, 1) * 0.02);
+
+  /* Height of the sticky header, used for scroll-margin so that jumping to an
+     anchor never parks the target underneath it (WCAG 2.2 SC 2.4.11). */
+  --header-h: 4.5rem;
+
+  --measure: 72ch;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.6;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Anything that can be jumped to must clear the sticky header. */
+:target,
+[id] {
+  scroll-margin-top: calc(var(--header-h) + 1rem);
+}
+
+/* --- Focus -----------------------------------------------------------------
+   One focus treatment for the whole site. Two rings -- an inner contrasting
+   halo and the accent itself -- so the indicator stays visible whatever
+   surface it lands on. */
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Remove the ring for pointer users but never for keyboard users. */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* --- Utilities -------------------------------------------------------------- */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  padding: 0.75rem 1.25rem;
+  background: var(--accent-blue);
+  color: var(--on-blue);
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 0 0 var(--radius) 0;
+  transform: translateY(-110%);
+  transition: transform var(--dur) ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* --- Header ----------------------------------------------------------------- */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  flex-wrap: wrap;
+  max-width: 90rem;
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  min-height: var(--header-h);
+}
+
+.site-brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: inherit;
+  margin-right: auto;
+}
+
+.site-brand__mark {
+  font-size: 1.1rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-pink);
+  text-shadow: var(--tglow-pink);
+}
+
+.site-brand__sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 560px) {
+  .site-brand__sub {
+    display: none;
+  }
+}
+
+.site-header__controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* --- Layout ------------------------------------------------------------------ */
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
+  gap: 2.5rem;
+  max-width: 90rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 6rem;
+  align-items: start;
+}
+
+.layout--full {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* --- Sidebar navigation ------------------------------------------------------ */
+
+.sidebar {
+  position: sticky;
+  top: calc(var(--header-h) + 1rem);
+  max-height: calc(100vh - var(--header-h) - 2rem);
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    position: static;
+    max-height: none;
+    overflow: visible;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    background: var(--bg-panel);
+  }
+}
+
+.sidebar__group + .sidebar__group {
+  margin-top: 1.5rem;
+}
+
+.sidebar__title {
+  margin: 0 0 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sidebar__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.sidebar__link {
+  display: block;
+  padding: 0.4rem 0.7rem;
+  min-height: 2rem;
+  border-radius: var(--radius-sm);
+  border-left: 2px solid transparent;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition:
+    color var(--dur) ease,
+    background-color var(--dur) ease,
+    border-color var(--dur) ease;
+}
+
+.sidebar__link:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent-blue) 10%, transparent);
+}
+
+.sidebar__link[aria-current="page"] {
+  color: var(--accent-blue);
+  border-left-color: var(--accent-blue);
+  background: color-mix(in srgb, var(--accent-blue) 14%, transparent);
+  font-weight: 700;
+  text-shadow: var(--tglow-blue-sm);
+}
+
+/* --- Typography -------------------------------------------------------------- */
+
+.prose {
+  max-width: var(--measure);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  line-height: 1.2;
+  margin: 0 0 0.5em;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: clamp(1.75rem, 1.2rem + 2.2vw, 2.6rem);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: var(--accent-pink);
+  text-shadow: var(--tglow-pink);
+}
+
+h2 {
+  font-size: clamp(1.25rem, 1.05rem + 0.9vw, 1.6rem);
+  font-weight: 800;
+  color: var(--accent-blue);
+  text-shadow: var(--tglow-blue-sm);
+  margin-top: 2.5rem;
+}
+
+h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--accent-green);
+  text-shadow: var(--tglow-green-sm);
+  margin-top: 2rem;
+}
+
+h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 1.5rem;
+}
+
+p,
+ul,
+ol {
+  margin: 0 0 1rem;
+}
+
+a {
+  color: var(--accent-blue);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  text-shadow: var(--tglow-blue-sm);
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--text) 10%, transparent);
+}
+
+.lede {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  max-width: var(--measure);
+}
+
+/* --- Panels ------------------------------------------------------------------ */
+
+.panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+  overflow: hidden;
+}
+
+.panel__head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel__title {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* --- Badges ------------------------------------------------------------------ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.badge--wcag {
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+  background: color-mix(in srgb, var(--accent-green) 12%, transparent);
+}
+
+.badge--draft {
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+  background: color-mix(in srgb, var(--accent-purple) 12%, transparent);
+}
+
+/* --- Group / component cards -------------------------------------------------- */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: 1rem;
+  list-style: none;
+  margin: 0 0 2rem;
+  padding: 0;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  height: 100%;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+  transition:
+    border-color var(--dur) ease,
+    box-shadow var(--dur) ease,
+    transform var(--dur) ease;
+}
+
+.card:hover {
+  border-color: var(--accent-blue);
+  box-shadow: var(--bglow-blue);
+  transform: translateY(calc(var(--motion, 1) * -2px));
+}
+
+/* The whole card is clickable, but only the title is a real link -- so the
+   accessible name stays "Dropdown", not the entire card's text. */
+.card__link {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.card__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.card {
+  position: relative;
+}
+
+.card:focus-within {
+  border-color: var(--focus-ring);
+}
+
+.card__summary {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+/* --- Component page ----------------------------------------------------------- */
+
+.component-header {
+  margin-bottom: 2rem;
+}
+
+.breadcrumb {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.meta-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The live demo surface. Deliberately its own panel so it reads as "this is
+   the component", separate from the page's own chrome. */
+.demo {
+  padding: 1.75rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+.demo > * {
+  max-width: 100%;
+}
+
+/* --- Code panel ---------------------------------------------------------------- */
+
+.code-panel {
+  margin: 1.5rem 0 0;
+}
+
+.code-tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-right: auto;
+  flex-wrap: wrap;
+}
+
+.code-tab {
+  padding: 0.35rem 0.85rem;
+  min-height: 2rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    color var(--dur) ease,
+    background-color var(--dur) ease,
+    border-color var(--dur) ease;
+}
+
+.code-tab:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+}
+
+.code-tab[aria-selected="true"] {
+  color: var(--accent-blue);
+  border-color: var(--accent-blue);
+  background: color-mix(in srgb, var(--accent-blue) 16%, transparent);
+  text-shadow: var(--tglow-blue-sm);
+}
+
+.code-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.8rem;
+  min-height: 2rem;
+  border: 1px solid var(--accent-green);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--accent-green) 12%, transparent);
+  color: var(--accent-green);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color var(--dur) ease,
+    box-shadow var(--dur) ease;
+}
+
+.code-copy:hover {
+  background: color-mix(in srgb, var(--accent-green) 22%, transparent);
+  box-shadow: var(--bglow-green);
+}
+
+.code-copy:active {
+  transform: translateY(var(--press-y)) scale(var(--press-s));
+}
+
+.code-copy svg {
+  width: 1em;
+  height: 1em;
+  flex: none;
+}
+
+/* The code itself is read-only by construction: a <pre>, never a textarea and
+   never contenteditable. It is focusable and labelled because it scrolls, and
+   a scrollable region must be reachable by keyboard (SC 2.1.1). */
+.code-block {
+  margin: 0;
+  max-height: 32rem;
+  overflow: auto;
+  padding: 1rem 1.1rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.65;
+  tab-size: 2;
+  background: color-mix(in srgb, var(--bg) 60%, var(--bg-panel));
+}
+
+.code-block[hidden] {
+  display: none;
+}
+
+.code-block code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* Shiki output. The `.code-block` wrapper already supplies the surface,
+   padding and scrolling, so flatten Shiki's own <pre>. */
+.code-block .astro-code {
+  margin: 0;
+  padding: 0;
+  background: none !important;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* Astro is configured with `defaultColor: false`, so Shiki emits both themes
+   as custom properties and leaves the choice to us. Dark is the default; the
+   light token is selected for the light themes and for the auto default when
+   the OS prefers light. `*=` rather than `$=` because the theme ids can carry
+   a `-no-background` suffix after the mode. */
+.code-block .astro-code,
+.code-block .astro-code span {
+  color: var(--shiki-dark);
+  font-style: var(--shiki-dark-font-style);
+  font-weight: var(--shiki-dark-font-weight);
+  text-decoration: var(--shiki-dark-text-decoration);
+}
+
+:root[data-theme*="-light"] .code-block .astro-code,
+:root[data-theme*="-light"] .code-block .astro-code span {
+  color: var(--shiki-light);
+  font-style: var(--shiki-light-font-style);
+  font-weight: var(--shiki-light-font-weight);
+  text-decoration: var(--shiki-light-text-decoration);
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) .code-block .astro-code,
+  :root:not([data-theme]) .code-block .astro-code span {
+    color: var(--shiki-light);
+    font-style: var(--shiki-light-font-style);
+    font-weight: var(--shiki-light-font-weight);
+    text-decoration: var(--shiki-light-text-decoration);
+  }
+}
+
+/* Syntax color is decoration; in forced-colors it must yield to the user's
+   palette or the code becomes unreadable. */
+@media (forced-colors: active) {
+  .code-block .astro-code,
+  .code-block .astro-code span {
+    color: CanvasText;
+    forced-color-adjust: none;
+  }
+}
+
+.code-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+/* --- Keyboard tables ------------------------------------------------------------ */
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 1.5rem;
+  font-size: 0.9rem;
+}
+
+.prose th,
+.prose td {
+  text-align: left;
+  padding: 0.5rem 0.7rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.prose th {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.prose kbd {
+  display: inline-block;
+  padding: 0.1em 0.45em;
+  border: 1px solid var(--border-strong);
+  border-bottom-width: 2px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  white-space: nowrap;
+}
+
+/* Wide content scrolls inside its own box; the page never scrolls sideways. */
+.table-scroll {
+  overflow-x: auto;
+}
+
+/* --- Footer ---------------------------------------------------------------------- */
+
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem 1.25rem 3rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.site-footer__inner {
+  max-width: 90rem;
+  margin: 0 auto;
+  display: flex;
+  gap: 1rem 2rem;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+/* --- Forced colors ----------------------------------------------------------------
+   Windows High Contrast throws away color-mix fills, glows and tints. Restore
+   the state cues with borders and system colors so nothing becomes invisible. */
+@media (forced-colors: active) {
+  .card,
+  .panel,
+  .code-block {
+    border: 1px solid ButtonBorder;
+  }
+
+  .sidebar__link[aria-current="page"],
+  .code-tab[aria-selected="true"] {
+    background: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+
+  .code-copy {
+    border-color: ButtonBorder;
+    color: ButtonText;
+  }
+
+  :focus-visible {
+    outline: 3px solid CanvasText;
+  }
+}

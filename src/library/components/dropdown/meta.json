@@ -1,0 +1,13 @@
+{
+  "slug": "dropdown",
+  "name": "Dropdown / Listbox",
+  "group": "overlays-disclosure",
+  "order": 20,
+  "summary": "A styled select that keeps a real <select> underneath as its value store, so forms and existing change handlers keep working.",
+  "tags": ["listbox", "select", "combobox", "popover", "progressive-enhancement", "bottom-sheet"],
+  "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/",
+  "wcag": ["1.4.11", "1.4.13", "2.1.1", "2.4.3", "2.5.8", "4.1.2"],
+  "status": "stable",
+  "files": ["html", "css", "js"],
+  "demoNote": "Narrow your window below 640px and open one: the panel becomes a bottom sheet rather than an anchored popup."
+}

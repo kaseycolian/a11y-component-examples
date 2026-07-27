@@ -1,0 +1,12 @@
+{
+  "slug": "disclosure",
+  "name": "Disclosure",
+  "group": "overlays-disclosure",
+  "order": 10,
+  "summary": "A button that shows and hides a panel. The smallest complete ARIA pattern, and the one most often got wrong.",
+  "tags": ["accordion", "expand", "collapse", "aria-expanded", "progressive-enhancement"],
+  "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/",
+  "wcag": ["1.3.1", "2.1.1", "4.1.2"],
+  "status": "stable",
+  "files": ["html", "css", "js"]
+}

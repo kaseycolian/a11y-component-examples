@@ -1,0 +1,95 @@
+<!--
+  Dropdown / listbox
+
+  You author a plain, labelled <select>. component.js hides it (keeping it as
+  the value store, so .value, change events and form submission all still work)
+  and builds the styled listbox beside it.
+
+  Per-option decoration, all optional:
+    data-ac-swatch="#hex[,#hex,...]"  a color strip -- used by this site's own theme picker
+    data-ac-icon="<symbol id>"        renders <use href="#id"> from a sprite on the page
+    data-ac-secondary="text"          a muted second line
+
+  All of it is aria-hidden, so the accessible name of an option is always just
+  its text. Decoration never becomes content.
+-->
+
+<!-- Icon sprite. Anywhere on the page is fine; it renders nothing itself. -->
+<svg hidden aria-hidden="true" focusable="false">
+  <symbol id="ac-icon-rocket" viewBox="0 0 16 16">
+    <path d="M8 1.5c2.5 1.4 4 4 4 6.6L10 11H6L4 8.1C4 5.5 5.5 2.9 8 1.5Z" fill="none"
+          stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" />
+    <circle cx="8" cy="6.5" r="1.4" fill="currentColor" />
+    <path d="M6 11.5 5 14.5l3-1.5 3 1.5-1-3" fill="none" stroke="currentColor"
+          stroke-width="1.4" stroke-linejoin="round" />
+  </symbol>
+  <symbol id="ac-icon-flask" viewBox="0 0 16 16">
+    <path d="M6.5 1.5v4L2.8 12A1.5 1.5 0 0 0 4.1 14.5h7.8A1.5 1.5 0 0 0 13.2 12L9.5 5.5v-4"
+          fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" />
+    <path d="M5.5 1.5h5M4.8 9.5h6.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+  </symbol>
+  <symbol id="ac-icon-laptop" viewBox="0 0 16 16">
+    <rect x="2.5" y="3.5" width="11" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.4" />
+    <path d="M1 12.5h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+  </symbol>
+</svg>
+
+<div class="ac-demo-grid">
+  <!-- 1. The common case: a labelled select with decorated options. -->
+  <div class="ac-field">
+    <label class="ac-field__label" for="ac-demo-env">Deploy target</label>
+    <select id="ac-demo-env" data-ac-dropdown aria-describedby="ac-demo-env-hint">
+      <option value="prod" data-ac-icon="ac-icon-rocket" data-ac-secondary="app.example.com" selected>
+        Production
+      </option>
+      <option value="staging" data-ac-icon="ac-icon-flask" data-ac-secondary="staging.example.com">
+        Staging
+      </option>
+      <option value="local" data-ac-icon="ac-icon-laptop" data-ac-secondary="localhost:3000">
+        Local
+      </option>
+    </select>
+    <p class="ac-field__hint" id="ac-demo-env-hint">
+      Type the first letters of a name to jump to it.
+    </p>
+  </div>
+
+  <!-- 2. Groups, and an option nobody can choose. -->
+  <div class="ac-field">
+    <label class="ac-field__label" for="ac-demo-region">Region</label>
+    <select id="ac-demo-region" data-ac-dropdown>
+      <optgroup label="Americas">
+        <option value="us-east">US East</option>
+        <option value="us-west">US West</option>
+        <option value="sa-east" disabled>South America (at capacity)</option>
+      </optgroup>
+      <optgroup label="Europe">
+        <option value="eu-west" selected>EU West</option>
+        <option value="eu-north">EU North</option>
+      </optgroup>
+    </select>
+  </div>
+
+  <!-- 3. Color swatches instead of icons. -->
+  <div class="ac-field">
+    <label class="ac-field__label" for="ac-demo-theme">Palette</label>
+    <select id="ac-demo-theme" data-ac-dropdown>
+      <option value="rink" data-ac-swatch="#ff2ec4,#5bff3a,#3ceaff" selected>Rink Classic</option>
+      <option value="sunset" data-ac-swatch="#ff6b9d,#ffd166,#8b5cf6">Synthwave Sunset</option>
+      <option value="acid" data-ac-swatch="#c6ff00,#00e5ff,#ff3d81">Acid Arcade</option>
+    </select>
+  </div>
+
+  <!-- 4. Disabled, and empty. Both states people forget to design. -->
+  <div class="ac-field">
+    <label class="ac-field__label" for="ac-demo-locked">Billing plan</label>
+    <select id="ac-demo-locked" data-ac-dropdown disabled>
+      <option value="team" selected>Team (contact sales to change)</option>
+    </select>
+  </div>
+
+  <div class="ac-field">
+    <label class="ac-field__label" for="ac-demo-empty">Saved filters</label>
+    <select id="ac-demo-empty" data-ac-dropdown data-ac-empty-text="No saved filters yet"></select>
+  </div>
+</div>
