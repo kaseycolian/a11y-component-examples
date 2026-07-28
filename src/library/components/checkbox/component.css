@@ -1,0 +1,340 @@
+/* ===========================================================================
+   CHECKBOX
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) lives in
+   the site's own stylesheet, not this file.
+
+     [GROUP]      examples 2, 3. The fieldset shell. Canonical in the Fieldset
+                  Group component; repeated so this file stands alone.
+     [CORE]       all examples. .ac-choice — a row, its input, its label text.
+                  Canonical in the Radio Group component.
+     [MIXED]      example 3. The select-all row and its count.
+     [INVALID]    example 4.
+     [DISABLED]   examples 2, 5.
+     [CUSTOM]     example 5. Only needed if the browser's box is not enough.
+     [FORCED]     always ship this. High Contrast rebuilds every cue.
+
+   Copy the file whole for the library version.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [GROUP] the fieldset shell — canonical in Fieldset Group -------------
+   min-width: 0 because a fieldset's default min-inline-size is min-content, so
+   one long unbreakable child pushes the page sideways at 320px. The contents are
+   wrapped in a <div> because a <legend> cannot be a flex item. */
+
+.ac-group {
+  min-width: 0;
+  margin: 0;
+  padding: 0.85rem 1rem 1rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+}
+
+.ac-group__legend {
+  padding: 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-group__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+/* --- [CORE] one choice — canonical in Radio Group ------------------------
+   The whole row is the <label>, so the sentence is part of the target. A 1rem
+   box is a 16px target and fails SC 2.5.8 on its own. */
+
+.ac-choice {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  /* SC 2.5.8 floor is 24px; 44px is the comfortable touch size. */
+  min-height: var(--ac-target, 44px);
+  padding: 0.25rem 0.4rem;
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.9rem;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.ac-choice:hover {
+  background: color-mix(
+    in srgb,
+    var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 10%,
+    transparent
+  );
+}
+
+/* accent-color rather than a drawn control: the browser keeps the box, the tick,
+   the mixed dash, the keyboard and the High Contrast handling, and we change
+   only the hue. Example 5 is for when that is not enough. */
+.ac-choice__input {
+  flex: none;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+  accent-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  cursor: pointer;
+}
+
+.ac-choice__input:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-choice__text {
+  min-width: 0;
+}
+
+/* Checked is bolder as well as ticked, so state does not rest on the box alone
+   for someone scanning a long list. */
+.ac-choice:has(.ac-choice__input:checked) .ac-choice__text {
+  font-weight: 700;
+}
+
+/* A lone checkbox with its own error message needs a column, not a row. */
+.ac-choice-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+/* --- [MIXED] example 3 ---------------------------------------------------
+   The select-all row is separated by a rule rather than indentation: indentation
+   alone is invisible to a screen reader, and the rule is decoration either way.
+   What actually conveys the relationship is that the parent announces "mixed". */
+
+.ac-choice--all {
+  margin-bottom: 0.3rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: 0;
+  font-weight: 700;
+}
+
+.ac-group__count {
+  margin: 0.6rem 0 0;
+  font-size: 0.76rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* The live region. Off screen but in the accessibility tree — display: none or
+   `hidden` would take it out, and then nothing is ever announced. */
+.ac-group__status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- [INVALID] example 4 -------------------------------------------------
+   Driven by aria-invalid, so the styling cannot disagree with what is announced.
+   Two cues, never color alone (SC 1.4.1): the row is outlined, and there is a
+   message to read. */
+
+.ac-choice--invalid {
+  border: 2px solid var(--ac-danger, var(--accent-pink, #ff2ec4));
+}
+
+.ac-group__error {
+  position: relative;
+  margin: 0;
+  padding-left: 1.3rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  font-weight: 700;
+  color: var(--ac-danger, var(--accent-pink, #ff2ec4));
+}
+
+.ac-group__error::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.28em;
+  width: 0.85rem;
+  height: 0.85rem;
+  background: currentColor;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.ac-group__error:empty {
+  padding-left: 0;
+}
+
+.ac-group__error:empty::before {
+  content: none;
+}
+
+/* --- [DISABLED] examples 2, 5 ------------------------------------------- */
+
+/* :disabled covers both the control's own attribute and a disabled <fieldset>,
+   which disables everything inside it. */
+.ac-choice:has(.ac-choice__input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.ac-choice:has(.ac-choice__input:disabled):hover {
+  background: none;
+}
+
+/* --- [CUSTOM] example 5 ------------------------------------------------
+   The real input stays in the DOM, in the tab order, and in the accessibility
+   tree. opacity: 0 — never display: none or visibility: hidden.
+
+   It is also kept the size of the drawn box and stacked over it, so a pointer
+   still lands on a real control if the label wiring ever breaks. */
+
+.ac-choice--card {
+  position: relative;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+}
+
+.ac-choice__input--drawn {
+  position: absolute;
+  left: 0.7rem;
+  width: 1.15rem;
+  height: 1.15rem;
+  opacity: 0;
+}
+
+.ac-choice__box {
+  position: relative;
+  flex: none;
+  display: block;
+  width: 1.15rem;
+  height: 1.15rem;
+  border: 2px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  transition:
+    border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease,
+    background-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+/* The tick is two borders of an empty box, rotated. No glyph, so it cannot go
+   missing with a font, and no image to ship. */
+.ac-choice__box::after {
+  content: "";
+  position: absolute;
+  left: 0.15rem;
+  top: 0.02rem;
+  width: 0.32rem;
+  height: 0.6rem;
+  border: solid var(--ac-on-blue, var(--on-blue, #00212b));
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0);
+  transition: transform calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-choice__input--drawn:checked + .ac-choice__box {
+  border-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  background: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+}
+
+.ac-choice__input--drawn:checked + .ac-choice__box::after {
+  transform: rotate(45deg) scale(1);
+}
+
+/* Mixed: a dash instead of a tick, from the same pseudo-element. :indeterminate
+   is a real CSS pseudo-class, so this needs no extra attribute — the script sets
+   the property and the styling follows. */
+.ac-choice__input--drawn:indeterminate + .ac-choice__box {
+  border-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  background: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+}
+
+.ac-choice__input--drawn:indeterminate + .ac-choice__box::after {
+  left: 0.2rem;
+  top: 0.44rem;
+  width: 0.55rem;
+  height: 0;
+  border-width: 0 0 2px 0;
+  transform: none;
+}
+
+.ac-choice__input--drawn:focus-visible + .ac-choice__box {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-choice--card:has(.ac-choice__input--drawn:checked) {
+  border-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this -------------------- */
+
+@media (forced-colors: active) {
+  .ac-group {
+    border-color: CanvasText;
+  }
+
+  /* The hover wash and the opacity are both dropped here. */
+  .ac-choice:hover {
+    background: none;
+  }
+
+  .ac-choice:has(.ac-choice__input:disabled) {
+    opacity: 1;
+    color: GrayText;
+  }
+
+  .ac-choice__input:focus-visible,
+  .ac-choice__input--drawn:focus-visible + .ac-choice__box {
+    outline-color: CanvasText;
+  }
+
+  /* The accent collapses to the user's text color, so hue can no longer
+     distinguish invalid — width has to carry it. */
+  .ac-choice--invalid {
+    border-width: 3px;
+    border-color: CanvasText;
+  }
+
+  .ac-group__error {
+    color: CanvasText;
+  }
+
+  /* Our fill and tick color are both discarded, which would leave the drawn box
+     blank in every state. forced-color-adjust: none keeps the geometry, and
+     system colors keep the user's palette. */
+  .ac-choice__box {
+    border-color: ButtonBorder;
+    background: Canvas;
+  }
+
+  .ac-choice__input--drawn:checked + .ac-choice__box,
+  .ac-choice__input--drawn:indeterminate + .ac-choice__box {
+    forced-color-adjust: none;
+    border-color: Highlight;
+    background: Highlight;
+  }
+
+  .ac-choice__box::after {
+    border-color: HighlightText;
+  }
+}

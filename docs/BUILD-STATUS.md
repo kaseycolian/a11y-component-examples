@@ -81,7 +81,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 9 / 34
+## Component roster — 10 / 34
 
 ### foundations
 - [ ] `skip-link`
@@ -134,7 +134,12 @@ take their logic and not their layout. See item 1 under remaining work.
   `min-content`, which overflows at 320px) and the inner `<div>` wrapper. Gotcha found: `input.disabled`
   is `false` for inputs inside a disabled fieldset — the IDL property reflects only the control's own
   attribute, so test and style on `:disabled`.
-- [ ] `checkbox`
+- [x] `checkbox` — done. 22/22 tests in Chromium. Four of five examples need no JS; the script exists
+  only because **`indeterminate` is a property with no attribute**, so a mixed parent cannot be server
+  rendered or set in CSS (though `:indeterminate` styles it once set). No hand-written
+  `aria-checked="mixed"` on a native input. `indeterminate` survives a change to `checked`, so it is
+  cleared explicitly. Documents the keyboard difference from radios — a checkbox set is one tab stop
+  *per box* and has no arrow keys.
 - [ ] `switch`
 - [ ] `fieldset-group`
 

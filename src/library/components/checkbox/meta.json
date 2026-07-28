@@ -1,0 +1,13 @@
+{
+  "slug": "checkbox",
+  "name": "Checkbox",
+  "group": "forms-inputs",
+  "order": 70,
+  "summary": "Native checkboxes, singly and in a fieldset, plus the tri-state parent — which needs a script because indeterminate is a property and no attribute exists for it.",
+  "tags": ["checkbox", "indeterminate", "mixed", "select-all", "fieldset", "live-region"],
+  "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/",
+  "wcag": ["1.3.1", "1.4.1", "2.1.1", "2.4.7", "2.5.8", "3.3.1", "4.1.2", "4.1.3"],
+  "status": "stable",
+  "files": ["html", "css", "js"],
+  "demoNote": "Tab through a group: every box is its own stop and the arrow keys do nothing, which is correct — any combination is allowed. Toggle one input in example 3 and the parent announces \"mixed\"."
+}
