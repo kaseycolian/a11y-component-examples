@@ -1,0 +1,172 @@
+<!-- ===========================================================================
+     INPUT GROUP — an input with a control or a text affix joined to it
+
+     WHAT TO COPY
+       Any one example below is self-contained. Take its section plus the
+       matching sections of component.css, and of component.js for 2 and 3.
+       Copy the file whole for the library-grade version.
+
+     THE CONTRACT
+       label[for]  ->  input.id       the addon is never the label
+       addon       ->  a real sibling <button> with its own accessible name
+       input       ->  aria-describedby="<hint id>"   affixes live here too
+
+     The addon is a **sibling in a flex row**, never an absolutely-positioned
+     overlay. An overlay sits on top of the text, so it covers the value at 200%
+     zoom (SC 1.4.4) and swallows clicks meant for the input.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     =========================================================================== -->
+
+<div class="ac-demo-grid">
+  <!-- ======================================================================
+       EXAMPLE 1 · Submit button — no JavaScript
+       CSS [FIELD] + [INPUT] + [CORE].
+
+       A real <form> with a real submit button, so Enter in the field works for
+       free. role="search" makes it a search landmark, which is worth having once
+       per page and not more.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">1 &middot; Submit button</h3>
+
+    <form class="ac-field" role="search" method="get" action="">
+      <label class="ac-field__label" for="ac-ig-q">Search components</label>
+      <div class="ac-input-group">
+        <input class="ac-input" id="ac-ig-q" type="search" name="q"
+               autocomplete="off" aria-describedby="ac-ig-q-hint" />
+        <button class="ac-input-group__btn" type="submit">Search</button>
+      </div>
+      <p class="ac-field__hint" id="ac-ig-q-hint">
+        Enter submits, so the button is a second route to it and not the only one.
+      </p>
+    </form>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 2 · Password reveal
+       CSS [FIELD] + [INPUT] + [CORE]. JS [CORE] + [REVEAL].
+
+       The name changes — "Show password" / "Hide password" — and there is no
+       aria-pressed. A toggle button announces as "Show password, pressed", which
+       leaves the user working out whether pressed means the password is showing
+       or that showing is what pressing does next. One or the other, never both.
+
+       Visible text "Show", accessible name "Show password": the visible string
+       starts the name, so speech input still reaches it (SC 2.5.3).
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">2 &middot; Password reveal</h3>
+
+    <div class="ac-field" data-ac-input-group>
+      <label class="ac-field__label" for="ac-ig-pw">Password</label>
+      <div class="ac-input-group">
+        <input class="ac-input" id="ac-ig-pw" type="password" name="password"
+               autocomplete="current-password" value="hunter2-but-longer"
+               aria-describedby="ac-ig-pw-hint" />
+        <!-- The script writes both the visible text and aria-label from these,
+             so the two names can never drift apart. -->
+        <button class="ac-input-group__btn" type="button" data-ac-reveal="ac-ig-pw"
+                data-ac-show-label="Show password" data-ac-hide-label="Hide password"
+                aria-label="Show password">
+          Show
+        </button>
+      </div>
+      <p class="ac-field__hint" id="ac-ig-pw-hint">
+        Revealing does not move the caret or clear the field.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 3 · Copy to clipboard
+       CSS [FIELD] + [INPUT] + [CORE] + [STATUS]. JS [CORE] + [COPY].
+
+       The confirmation goes to a role="status" that is **already in the DOM and
+       empty**. Insert the element and its text together and there is nothing for
+       a screen reader to notice changing, so nothing is announced.
+
+       status, not alert: a copy that worked is not an interruption.
+
+       The button's name stays "Copy" rather than becoming "Copied". The name of
+       the button under your finger changing out from under you reads as a
+       different button; the outcome is announced separately instead.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">3 &middot; Copy to clipboard</h3>
+
+    <div class="ac-field" data-ac-input-group>
+      <label class="ac-field__label" for="ac-ig-key">API key</label>
+      <div class="ac-input-group">
+        <input class="ac-input" id="ac-ig-key" type="text" name="api-key"
+               value="sk_live_4eC39HqLyjWDarjtT1zd" readonly
+               aria-describedby="ac-ig-key-hint" />
+        <button class="ac-input-group__btn" type="button" data-ac-copy="ac-ig-key"
+                aria-label="Copy API key">
+          Copy
+        </button>
+      </div>
+      <p class="ac-field__hint" id="ac-ig-key-hint">
+        Read-only, so it can still be focused and selected by hand.
+      </p>
+      <p class="ac-input-group__status" role="status" data-ac-copy-status></p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 4 · Text affixes
+       CSS [FIELD] + [INPUT] + [CORE] + [AFFIX].
+
+       The affixes are ordinary text, read in reading order — and reading order
+       is not where a form user is. Tabbing to the field puts a screen reader in
+       forms mode, where static text beside an input is skipped entirely. So the
+       format is repeated in the hint, which is wired up with aria-describedby
+       and therefore read out with the field.
+
+       A visual affix that exists only on screen is a format requirement the user
+       is expected to guess.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">4 &middot; Text affixes</h3>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-ig-sub">Subdomain</label>
+      <div class="ac-input-group">
+        <span class="ac-input-group__affix">https://</span>
+        <input class="ac-input" id="ac-ig-sub" type="text" name="subdomain"
+               autocomplete="off" aria-describedby="ac-ig-sub-hint" />
+        <span class="ac-input-group__affix">.example.com</span>
+      </div>
+      <p class="ac-field__hint" id="ac-ig-sub-hint">
+        The middle part only. Your site becomes https://&lt;name&gt;.example.com
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 5 · Invalid, and the button still works
+       CSS [FIELD] + [INPUT] + [CORE] + [INVALID].
+
+       aria-invalid marks the input, not the group: the value is what is wrong,
+       and the button is still a perfectly good button. The message lives in a
+       role="alert" that is always present, and the input describes both it and
+       the hint — aria-describedby is a space-separated list.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">5 &middot; Invalid</h3>
+
+    <div class="ac-field ac-field--invalid">
+      <label class="ac-field__label" for="ac-ig-coupon">Coupon code</label>
+      <div class="ac-input-group">
+        <input class="ac-input" id="ac-ig-coupon" type="text" name="coupon"
+               autocomplete="off" value="SPRING2019" aria-invalid="true"
+               aria-describedby="ac-ig-coupon-hint ac-ig-coupon-error" />
+        <button class="ac-input-group__btn" type="button">Apply</button>
+      </div>
+      <p class="ac-field__hint" id="ac-ig-coupon-hint">Case-insensitive.</p>
+      <p class="ac-field__error" id="ac-ig-coupon-error" role="alert">
+        That code expired. Try <code>SUMMER2026</code>.
+      </p>
+    </div>
+  </div>
+</div>

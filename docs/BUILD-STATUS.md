@@ -69,7 +69,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 5 / 34
+## Component roster — 6 / 34
 
 ### foundations
 - [ ] `skip-link`
@@ -94,7 +94,13 @@ take their logic and not their layout. See item 1 under remaining work.
 - [x] `text-input` — complete, **CSS-only** (`--no-js`), 19/19 tests in Chromium. Canonical home for
   `.ac-input`. Centered on the attributes rather than the styling: `autocomplete` tokens (SC 1.3.5),
   `type` vs `inputmode`, and `readonly` vs `disabled`.
-- [ ] `input-group`
+- [x] `input-group` — done. 20/20 tests in Chromium. Search + submit, password reveal, copy to
+  clipboard, text affixes, invalid. The addon is a flex sibling, never an overlay (an overlay covers
+  the value at 200% zoom and eats clicks). Reveal changes the button's **name** and sets no
+  `aria-pressed`; copy announces through a pre-existing empty `role="status"` and never renames the
+  button. Gotcha found: changing an input's `type` resets its selection **asynchronously**, after the
+  field has lost focus — snapshot the caret on `blur` and restore both synchronously and in a
+  `requestAnimationFrame`.
 - [ ] `textarea`
 - [ ] `native-select`
 - [ ] `radio-group`

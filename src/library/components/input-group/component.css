@@ -1,0 +1,318 @@
+/* ===========================================================================
+   INPUT GROUP
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) lives in
+   the site's own stylesheet, not this file.
+
+     [FIELD]     all examples. The label/hint/error wrapper. Canonical in the
+                 Field component; repeated so this file stands alone.
+     [INPUT]     all examples. .ac-input itself. Canonical in Text Input.
+     [CORE]      all examples. The row, the joined edges, the addon button.
+     [AFFIX]     example 4.
+     [STATUS]    example 3.
+     [INVALID]   example 5.
+     [FORCED]    always ship this. High Contrast rebuilds every cue.
+
+   Copy the file whole for the library version.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [FIELD] the wrapper — canonical in the Field component ---------------- */
+
+.ac-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  min-width: 0;
+}
+
+.ac-field__label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-field__hint {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* --- [INPUT] the input — canonical in the Text Input component ------------- */
+
+.ac-input {
+  width: 100%;
+  min-width: 0;
+  /* SC 2.5.8 floor is 24px; 44px is the comfortable touch size. */
+  min-height: var(--ac-target, 44px);
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  color: var(--ac-text, var(--text, #f3ecff));
+  /* `font: inherit` matters: an unstyled input drops to 13px in most browsers,
+     which then also defeats a page-level font-size preference. */
+  font: inherit;
+  font-size: 0.9rem;
+  transition:
+    border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-input:hover:enabled:not([readonly]) {
+  border-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+}
+
+.ac-input:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-input[readonly] {
+  background: color-mix(
+    in srgb,
+    var(--ac-text, var(--text, #f3ecff)) 8%,
+    var(--ac-surface, var(--bg-panel, #110620))
+  );
+  border-color: var(--ac-border, var(--border, #34205a));
+  border-style: dotted;
+  cursor: default;
+}
+
+/* --- [CORE] the row ------------------------------------------------------
+   A flex row of real siblings. Deliberately NOT an input with a button
+   positioned on top of it: an overlay covers the value once the text grows —
+   at 200% zoom, or in a language with longer words (SC 1.4.4) — and it eats
+   clicks that were aimed at the field.
+
+   No `overflow: hidden` here, ever. It clips the focus ring off the children,
+   and a focus indicator you cannot see is the same as not having one. */
+
+.ac-input-group {
+  display: flex;
+  align-items: stretch;
+  /* nowrap on purpose: the input shrinks (min-width: 0 above) and the button
+     holds its 44px, so the row survives 320px without the addon jumping to a
+     line of its own where it no longer reads as attached. */
+  flex-wrap: nowrap;
+  min-width: 0;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+}
+
+.ac-input-group > .ac-input {
+  flex: 1 1 auto;
+  /* Floor it, or a long affix squeezes the field down to a few characters. */
+  min-width: 4rem;
+}
+
+/* Joined edges: square everything, then round the two outer ends, whatever the
+   parts happen to be. The overlap pulls the shared border back to 1px. */
+.ac-input-group > * {
+  border-radius: 0;
+}
+
+.ac-input-group > :first-child {
+  border-start-start-radius: var(--ac-radius, var(--radius, 10px));
+  border-end-start-radius: var(--ac-radius, var(--radius, 10px));
+}
+
+.ac-input-group > :last-child {
+  border-start-end-radius: var(--ac-radius, var(--radius, 10px));
+  border-end-end-radius: var(--ac-radius, var(--radius, 10px));
+}
+
+.ac-input-group > * + * {
+  margin-inline-start: -1px;
+}
+
+/* The negative margin means the next sibling paints over the focus ring, so the
+   focused part is raised out of the stack. */
+.ac-input-group > *:focus,
+.ac-input-group > *:focus-visible,
+.ac-input-group > *:hover {
+  position: relative;
+  z-index: 1;
+}
+
+/* --- [CORE] the addon button --------------------------------------------- */
+
+.ac-input-group__btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Both floors, because an icon-only version of this button is square. */
+  min-width: var(--ac-target, 44px);
+  min-height: var(--ac-target, 44px);
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  background: var(--ac-elevated, var(--bg-elevated, #1b0c30));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-input-group__btn:hover {
+  border-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+}
+
+.ac-input-group__btn:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-input-group__btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  border-style: dashed;
+}
+
+/* --- [AFFIX] example 4 ---------------------------------------------------
+   Static text, not a control, so it gets no hover or focus treatment and no
+   target floor. It is also not the accessible description — see the hint in the
+   markup, which is what a screen reader actually reads with the field. */
+
+.ac-input-group__affix {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.6rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  background: color-mix(
+    in srgb,
+    var(--ac-text, var(--text, #f3ecff)) 8%,
+    var(--ac-surface, var(--bg-panel, #110620))
+  );
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  font-size: 0.85rem;
+  white-space: nowrap;
+  /* Selectable: the whole string is often what someone wants to copy. */
+  user-select: text;
+}
+
+/* --- [STATUS] example 3 --------------------------------------------------
+   The live region. It has to exist and be empty from the start; a container
+   inserted along with its text announces nothing. :empty keeps it from
+   reserving a line of space while it has nothing to say. */
+
+.ac-input-group__status {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ac-success, var(--accent-green, #5bff3a));
+}
+
+.ac-input-group__status:empty {
+  display: none;
+}
+
+/* --- [INVALID] example 5 -------------------------------------------------
+   Driven by aria-invalid, so the styling cannot disagree with what is
+   announced. Two cues, never color alone (SC 1.4.1): the border thickens, and
+   there is a message to read. */
+
+.ac-field__error {
+  position: relative;
+  margin: 0;
+  padding-left: 1.3rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  font-weight: 700;
+  color: var(--ac-danger, var(--accent-pink, #ff2ec4));
+}
+
+.ac-field__error::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.28em;
+  width: 0.85rem;
+  height: 0.85rem;
+  background: currentColor;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.ac-field__error:empty {
+  padding-left: 0;
+}
+
+.ac-field__error:empty::before {
+  content: none;
+}
+
+.ac-field__error code {
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", Consolas, ui-monospace, monospace));
+  font-size: 0.95em;
+  padding: 0.05em 0.3em;
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: color-mix(in srgb, currentColor 15%, transparent);
+  color: inherit;
+}
+
+/* The invalid input is raised, or the addon's border paints over the thicker
+   edge it shares with it. */
+.ac-input-group > [aria-invalid="true"].ac-input {
+  position: relative;
+  z-index: 1;
+  border-width: 2px;
+  border-color: var(--ac-danger, var(--accent-pink, #ff2ec4));
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------- */
+
+/* forced-colors drops color-mix, glows and opacity, so every cue built from them
+   has to be rebuilt from system colors. */
+@media (forced-colors: active) {
+  .ac-input,
+  .ac-input-group__btn {
+    border-color: ButtonBorder;
+  }
+
+  .ac-input:focus-visible,
+  .ac-input-group__btn:focus-visible {
+    outline-color: CanvasText;
+  }
+
+  /* opacity is ignored here, leaving the dashed border as the only cue. */
+  .ac-input-group__btn:disabled {
+    color: GrayText;
+    border-color: GrayText;
+    opacity: 1;
+  }
+
+  /* Both the affix tint and the read-only tint collapse to Canvas, so the row
+     would read as one undifferentiated box. The border has to carry it. */
+  .ac-input-group__affix,
+  .ac-input[readonly] {
+    border-color: GrayText;
+    color: CanvasText;
+  }
+
+  /* The accent collapses to the user's text color, so hue can no longer
+     distinguish invalid or a successful copy — width and text have to. */
+  .ac-input-group > [aria-invalid="true"].ac-input {
+    border-width: 3px;
+    border-color: CanvasText;
+  }
+
+  .ac-field__error,
+  .ac-input-group__status {
+    color: CanvasText;
+  }
+
+  .ac-field__error code {
+    background: Canvas;
+    border: 1px solid CanvasText;
+  }
+}
