@@ -1,0 +1,13 @@
+{
+  "slug": "typography",
+  "name": "Typography",
+  "group": "foundations",
+  "order": 50,
+  "summary": "A type scale that carries no semantics — why the element decides what a thing is and the class only decides what it looks like, what muted text still owes the reader, and the four spacing values a reader is allowed to force on your layout.",
+  "tags": ["typography", "type-scale", "headings", "rem", "line-height", "text-spacing", "contrast", "links", "no-js"],
+  "apg": null,
+  "wcag": ["1.4.1", "1.4.3", "1.4.4", "1.4.10", "1.4.12", "2.4.6"],
+  "status": "stable",
+  "files": ["html", "css"],
+  "demoNote": "No JavaScript on this page. Examples 3, 4 and 5 each carry a failure that is live rather than described — the third is a contrast ratio that appears nowhere in the CSS, and the fifth needs one click of a checkbox."
+}

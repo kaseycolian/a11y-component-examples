@@ -11,31 +11,30 @@ Last updated: 2026-07-28
 
 ---
 
-## START HERE — next component is `typography`
+## START HERE — next component is `motion-preferences`
 
-`live-region` landed (26/26 Chromium; full suite 372). Run the loop below with:
+`typography` landed (21/21 Chromium; full suite 393). Run the loop below with:
 
 ```sh
-node scripts/new-component.mjs typography --group foundations --name "Typography"
+node scripts/new-component.mjs motion-preferences --group foundations --name "Motion Preferences"
 ```
 
 Decided in advance, so do not re-derive:
 
-- Spec entry: `component-specs.md` → foundations → `typography`. `.ac-t-h1`–`.ac-t-h4`, `.ac-t-body`,
-  `.ac-t-muted`, `.ac-t-mono`, `.ac-t-link`. **CSS-only** — no `component.js`, so `files` is
-  `["html", "css"]` and the scaffolded JS file gets deleted.
-- The whole point is that these are **visual** classes carrying no semantics. An `<h2>` styled
-  `.ac-t-h4` is fine; a `<div class="ac-t-h1">` is not a heading and is missing from the heading list
-  every screen reader user navigates by. Put that failure on the page, live, the way `focus-ring`
-  example 4 and `live-region` example 3 do — an accessibility-tree readout beside two things that look
-  identical.
-- `.ac-t-muted` still needs 4.5:1 (SC 1.4.3). `--ac-text-muted` is `#bcadde` on `#110620`, which
-  passes; say the number rather than asserting the class is safe, because a consumer who retints the
-  token breaks it silently.
-- Reflow (SC 1.4.4 / 1.4.10) and `text-spacing` (SC 1.4.12) belong here and nowhere else: line-height
-  ≥1.5, no fixed `height` on a text box, and nothing that clips at 200% zoom.
+- Spec entry: `component-specs.md` → foundations → `motion-preferences`. A switch bound to
+  `data-motion` on `<html>`, plus a demo animation that visibly stops.
+- **This is the component that explains the asymmetry** the whole library already relies on: the page
+  toggle can only *add* the restriction, never override an OS `prefers-reduced-motion`. Show the token
+  chain (`--ac-motion` → `--motion` → 1) and the cascade order in `tokens.css` that makes the OS win.
+  It is documented in three places already and demonstrated in none.
+- The site header's own motion toggle is the working reference — including the part worth stealing:
+  under an OS preference it goes `aria-disabled`, not `disabled`, so it keeps its tab stop and the
+  visible note explaining why is actually announced. `tests/site-header.spec.mjs` covers it; that spec
+  is not the component's spec, so assert it again here.
+- Reuse `switch`'s markup rather than inventing one. Its example 4 already promotes this exact
+  pattern.
 
-Then `motion-preferences` and `effects` finish `foundations`.
+Then `effects` finishes `foundations`.
 
 ---
 
@@ -62,7 +61,7 @@ The **definition of done** is the checklist at the bottom of `component-specs.md
 **Reference implementations.** Every component below except `disclosure` follows the current
 copyability and writing-style conventions in `CLAUDE.md` — numbered example sections across all files,
 a copy map in each header, the framework caveat in `docs.md`. Copy the shape of `field` for a form
-component, `tooltip` for a hard-behavior one, `skip-link` for a **CSS-only** one.
+component, `tooltip` for a hard-behavior one, `skip-link` or `typography` for a **CSS-only** one.
 
 `dropdown` is still the best reference for *hard behavior* (popover positioning, roving focus,
 type-ahead, 14 tests) and `disclosure` for a minimal factory — but both predate the conventions, so
@@ -110,7 +109,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 18 / 35
+## Component roster — 19 / 35
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -173,7 +172,24 @@ take their logic and not their layout. See item 1 under remaining work.
   `textContent = <same string>` **does** fire a MutationObserver (old text node out, new one in), so
   the thing a test can assert is that the region is *observed empty* in between, never a mutation
   count.
-- [ ] `typography`
+- [x] `typography` — done, **CSS-only** (`--no-js`), 21/21 tests in Chromium. Eight classes that carry
+  no semantics at all, which is the entire argument: example 2 is an `<h4 class="ac-t-h2">` and a
+  `<div class="ac-t-h2">` rendered pixel-identical, with the heading list printed underneath holding
+  one entry. That printed list is hand-written and the spec asserts it against the real accessibility
+  tree, so it cannot drift. Three failures are live rather than described — `opacity: 0.45` for muted
+  text, a link identified by color alone, and a fixed `height` on a box of text with a checkbox that
+  applies the four SC 1.4.12 values. Numbers are quoted rather than claims: `--ac-text-muted` is
+  9.5:1, the opacity line is 4.1:1 dark and 3.0:1 light from a declaration naming no color, and the
+  link accent is 13:1 against the background but **1.27:1 against the body text one word away**, which
+  is the number SC 1.4.1 actually asks about — a pass in the light theme at 3.08:1 and a fail here.
+  Four findings: `.ac-t-h4` is body size and told apart by weight, so the scale is non-increasing
+  rather than strictly descending; a fixed-height box cannot both fit unspaced and clip spaced unless
+  its **width** is pinned too, so example 5's boxes are `width: 15rem` and its columns are sized to
+  hold them; the spacing toggle is CSS-only via `:has()`; and the one that mattered — **a host app's
+  own `h1`–`h6` rules cascade into every property the class does not set**, so `.ac-t-h2` on an `<h4>`
+  rendered uppercase with a glow and on a `<div>` did not, silently destroying example 2. The class
+  now declares `letter-spacing`, `text-transform` and `text-shadow` for that reason, and the spec
+  compares all three.
 - [ ] `motion-preferences`
 - [ ] `effects`
 
@@ -480,6 +496,14 @@ It must match `npm run preview` exactly, base path included.
   the page, so every assertion in the block is made against the ordinary stylesheet and **passes for
   the wrong reason**. Use `await page.emulateMedia({ forcedColors: 'active' })` in a `beforeEach`,
   which is the same API the reduced-motion tests already use. `focus-ring`'s spec is the precedent.
+- **A host page's own `h1`–`h6` rules cascade into anything you put a class on.** A class beats a bare
+  element selector only for the properties it actually declares; everything it stays quiet about still
+  comes from the host. `.ac-t-h2` on an `<h4>` inherited the shell's `text-transform: uppercase`, its
+  neon `text-shadow` and its `letter-spacing`, while the same class on a `<div>` got none of them — so
+  typography's example 2, whose whole argument is that the two are indistinguishable, quietly stopped
+  being true. Only visible at 320px, because that is where the two specimens stack and can be compared
+  by eye. A utility class that claims to own appearance has to declare the properties a host is likely
+  to set, not just the ones it cares about.
 - **Astro's bundled `site.css` loads *after* every `component.css`.** Head order is theme, effects,
   dropdown, the page's component, then the `_astro/*.css` bundle. So a shell rule at **equal**
   specificity wins over a component's. This bites exactly one rule shape: `site.css` ships a global

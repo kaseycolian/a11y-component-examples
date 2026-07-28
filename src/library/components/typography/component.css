@@ -1,0 +1,384 @@
+/* ===========================================================================
+   TYPOGRAPHY
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+
+     [CORE]      all examples. The whole scale. A type scale is one thing and
+                 there is no useful half of it, so this section is not split.
+     [BROKEN]    examples 3, 4, 5. Wrong on purpose and live on the page.
+                 Never copy these.
+     [MOCK]      the demo's page furniture. DELETE IT.
+     [FORCED]    always ship this.
+
+   Eight classes. Five of them — h1 to h4 and body — set size, weight,
+   line-height and margin, and are complete on their own. .ac-t-muted sets a
+   color and .ac-t-mono sets a family, so those two pair with any of the five.
+   .ac-t-link is complete for a link.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [CORE] the scale -----------------------------------------------------
+   Sizes are rem, never px. A px font-size ignores the reader's own default
+   font size — a setting in every browser's preferences, used by a lot of
+   people, and the most common way a type scale locks somebody out. Full-page
+   zoom scales px too, so this looks fine when you test it by pressing Ctrl and
+   +; the setting it ignores is the one you have to go looking for.
+
+   h1 and h2 are fluid. clamp() with a rem floor, a middle value that carries a
+   rem term, and a rem ceiling: it responds to the viewport *and* to the root
+   font size. A bare `font-size: 4vw` responds only to the viewport, and
+   text-only zoom does not move the viewport, so the text does not move at all
+   — SC 1.4.4 wants 200%.
+
+   Heading line-heights are below 1.5 and that is fine: SC 1.4.12 is about
+   whether the reader can *apply* 1.5 without losing content, not about what
+   you ship. Example 5 is that half of it.
+
+   overflow-wrap: break-word on all five, because a catalogue number or a URL
+   at h1 size is wider than a 320px viewport and would otherwise scroll the
+   whole page sideways (SC 1.4.10). */
+
+/* Case, shadow and tracking are declared rather than left open. Put one of
+   these classes on an <h2> and the host app's own h1-h6 rules still cascade
+   into every property the class does not set — which is how the same class
+   produced a glowing uppercase heading here and a plain one two inches away.
+   Case and shadow are also accessibility decisions rather than taste: some
+   screen readers read an all-caps word out letter by letter, and a text-shadow
+   spends the contrast the scale just promised. Uppercase it in a rule of your
+   own if you want it, and write the words in sentence case. */
+.ac-t-h1,
+.ac-t-h2,
+.ac-t-h3,
+.ac-t-h4 {
+  margin: 0 0 0.5em;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+  letter-spacing: normal;
+  text-transform: none;
+  text-shadow: none;
+  overflow-wrap: break-word;
+}
+
+.ac-t-h1 {
+  font-size: clamp(1.75rem, 1.45rem + 1.4vw, 2.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.ac-t-h2 {
+  font-size: clamp(1.375rem, 1.25rem + 0.6vw, 1.75rem);
+  line-height: 1.2;
+}
+
+.ac-t-h3 {
+  font-size: 1.25rem;
+  line-height: 1.3;
+}
+
+/* Body size, and told apart by weight rather than by being smaller. A heading
+   set below the text it introduces reads as a caption, and the reader who most
+   needs the structure is the one least able to spare the size. */
+.ac-t-h4 {
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+/* 1.6, not 1.2. Long lines set tight are hard to track back to the start of the
+   next one, which is a reading-difficulty and low-vision problem before it is a
+   taste one. 1.5 is the floor SC 1.4.12 asks the page to survive; shipping
+   above it means the reader's own setting changes nothing here. */
+.ac-t-body {
+  margin: 0 0 1em;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ac-text, var(--text, #f3ecff));
+  overflow-wrap: break-word;
+}
+
+/* Color only, so it composes: .ac-t-h3.ac-t-muted, .ac-t-body.ac-t-muted.
+   De-emphasized is not exempt from SC 1.4.3 — this value is 9.5:1 on the
+   library's dark surface and 7.1:1 on its light one, where 4.5:1 is the floor.
+   Quote the number rather than trusting the class: a consumer who retints
+   --ac-text-muted can drop under 4.5:1 without anything failing. */
+.ac-t-muted {
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* font-size: 1em is load-bearing twice. Browsers keep a *separate* default size
+   for the generic `monospace` family — 13px against 16px — so a family list
+   that resolves to it shrinks text by a fifth for no stated reason. And a
+   relative size compounds: `code` at 0.85em inside `pre` at 0.85em is 0.72em,
+   which is how inline code ends up unreadable in a nested context nobody
+   tested. Match the surrounding text and let the class it pairs with pick the
+   size. */
+.ac-t-mono {
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
+  font-size: 1em;
+}
+
+/* The underline is the accessibility feature; the color is decoration.
+   SC 1.4.1 allows color alone only when the link is 3:1 from the surrounding
+   text *and* gains a non-color cue on hover and focus. Example 4 measures the
+   first condition in this theme: 1.27:1. Underline it and neither condition
+   applies.
+
+   text-underline-offset keeps the line clear of descenders, so it stays a line
+   rather than becoming part of the letterforms. text-decoration-thickness in
+   `em` grows with the text instead of staying a hairline at h1 size.
+
+   No focus rule here: the ring is the Focus Ring component's job and the
+   library ships it globally. */
+.ac-t-link {
+  color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+.ac-t-link:hover {
+  text-decoration-thickness: 0.14em;
+}
+
+/* --- [BROKEN] examples 3, 4, 5 — never copy these -------------------------
+   Three failures, live, so they can be looked at rather than described. Each is
+   the version that gets written by somebody who is trying.
+
+   1. opacity for muted text. It composites against whatever is behind the
+      element, so the contrast ratio is not written down anywhere: this one
+      declaration is 4.1:1 on the library's dark surface and 3.0:1 on its light
+      one. Nothing in the CSS says so, no linter can see it, and it changes
+      when a designer changes a background two levels up. Set a color.
+
+   2. A link identified by color alone. Against this theme's background it is
+      13:1, which is the number people check and it passes easily. Against the
+      body text one word away it is 1.27:1, which is the number SC 1.4.1
+      actually asks about and needs 3:1.
+
+   3. A fixed height on a box of text. Fine at the spacing you shipped, and a
+      line goes the moment a reader applies their own — SC 1.4.12 allows them to
+      force line-height 1.5, letter-spacing 0.12em, word-spacing 0.16em and 2em
+      after each paragraph. overflow: hidden means no scrollbar, no error, and
+      nothing to see in a screenshot. Use min-height. */
+
+.ac-t-broken-faint {
+  opacity: 0.45;
+}
+
+.ac-t-broken-link {
+  color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  text-decoration: none;
+}
+
+.ac-t-broken-clip {
+  height: 13.5rem;
+  overflow: hidden;
+}
+
+/* --- [MOCK] delete this ---------------------------------------------------
+   The specimen sheet, the side-by-side frames, the reading of the heading list
+   and the spacing toggle. None of it is part of the component. */
+
+.ac-t-specimens {
+  display: grid;
+  gap: 0.2rem 0.9rem;
+  min-width: 0;
+  margin: 0;
+}
+
+/* Two columns once there is room for a label beside the specimen, one column
+   below that — at 320px an h1 and its label cannot share a line. */
+@media (min-width: 30rem) {
+  .ac-t-specimens {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+  }
+}
+
+.ac-t-specimens dt {
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
+  font-size: 0.7rem;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-t-specimens dd {
+  min-width: 0;
+  margin: 0 0 0.8rem;
+}
+
+.ac-t-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+/* Example 5's boxes are a fixed width, and its columns are wide enough to hold
+   them, so the only thing that differs between the two boxes is the height
+   rule. Let them reflow freely and the left one clips at some widths and not
+   others, which would make the demo an argument about column width. */
+.ac-t-pair--boxes {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  justify-items: start;
+}
+
+.ac-t-specimen,
+.ac-t-box {
+  min-width: 0;
+  padding: 0.7rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-bg, var(--bg, #070110));
+}
+
+/* min-height, not height — the point of example 5's right-hand box is that it
+   has nowhere to clip from. */
+.ac-t-box {
+  width: 15rem;
+  max-width: 100%;
+  min-height: 13.5rem;
+}
+
+.ac-t-specimen__note,
+.ac-t-outline__label,
+.ac-t-key {
+  margin: 0;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.72rem;
+  line-height: 1.6;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-t-outline__label {
+  margin-top: 0.4rem;
+  font-weight: 700;
+}
+
+/* The heading list, drawn as the screen reader dialog it stands in for. */
+.ac-t-outline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+  margin: 0.3rem 0 0;
+  padding: 0.5rem 0.7rem;
+  list-style: none;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-elevated, var(--bg-elevated, #1b0c30));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.78rem;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-t-outline__level {
+  display: inline-block;
+  min-width: 2.2em;
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
+  font-size: 0.9em;
+  color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+}
+
+.ac-t-key {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+  padding: 0;
+  list-style: decimal inside;
+}
+
+.ac-t-check-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  margin-bottom: 0.75rem;
+}
+
+/* SC 2.5.8 asks for 24px, and a native checkbox is 13px until you say
+   otherwise. accent-color leaves the control native — its own checked mark, its
+   own forced-colors behavior — and only recolors it. */
+.ac-t-check {
+  flex: none;
+  width: var(--ac-target-min, 24px);
+  height: var(--ac-target-min, 24px);
+  margin: 0;
+  accent-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+}
+
+.ac-t-check-row__label {
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.78rem;
+  color: var(--ac-text, var(--text, #f3ecff));
+  cursor: pointer;
+}
+
+/* The four values SC 1.4.12 says a reader must be able to force. :has() rather
+   than a sibling combinator so the checkbox can stay in its own labeled row —
+   demo plumbing, and not something the component needs. */
+.ac-t-spacing:has(.ac-t-check:checked) .ac-t-prose {
+  margin-bottom: 2em;
+  line-height: 1.5;
+  letter-spacing: 0.12em;
+  word-spacing: 0.16em;
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------
+   Type survives forced colors better than most things, with two exceptions
+   that matter here. opacity is *not* dropped, so the faint paragraph in
+   example 3 is still faint over the user's own background — it is the one
+   failure on this page that high contrast mode does not rescue. And the link
+   color is replaced by LinkText, which takes the color cue away from both
+   links at once, leaving only the underline. Example 4 is the argument, drawn
+   automatically. */
+
+@media (forced-colors: active) {
+  .ac-t-h1,
+  .ac-t-h2,
+  .ac-t-h3,
+  .ac-t-h4,
+  .ac-t-body,
+  .ac-t-muted {
+    color: CanvasText;
+  }
+
+  .ac-t-link,
+  .ac-t-broken-link {
+    color: LinkText;
+  }
+
+  /* Restated because it is the whole point: forced colors leaves the broken
+     link with no cue at all. */
+  .ac-t-broken-link {
+    text-decoration: none;
+  }
+
+  .ac-t-specimen,
+  .ac-t-box {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+
+  .ac-t-outline {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .ac-t-outline__level {
+    color: CanvasText;
+  }
+
+  .ac-t-specimens dt,
+  .ac-t-specimen__note,
+  .ac-t-outline__label,
+  .ac-t-key,
+  .ac-t-check-row__label {
+    color: CanvasText;
+  }
+}

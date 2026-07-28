@@ -53,8 +53,14 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
 - Reserve `assertive` for messages that stop being useful in a few seconds — not for messages that are merely important.
 
 ### typography
-- **Markup** `.ac-t-h1`–`.ac-t-h4`, `.ac-t-body`, `.ac-t-muted`, `.ac-t-mono`, `.ac-t-link`.
+- **Markup** `.ac-t-h1`–`.ac-t-h4`, `.ac-t-body`, `.ac-t-muted`, `.ac-t-mono`, `.ac-t-link`. **CSS-only.** `.ac-t-muted` sets a color and `.ac-t-mono` a family, so those two compose with the five sizing classes; the rest are complete on their own.
 - **Gotcha** These are *visual* classes and carry no semantics — say so loudly. An `<h2>` styled `.ac-t-h4` is fine; a `<div class="ac-t-h1">` is not a heading. Muted text still needs 4.5:1.
+- **`.ac-t-h4` is body size**, told apart by weight. A heading set smaller than the text it introduces reads as a caption.
+- **Declare `letter-spacing`, `text-transform` and `text-shadow`.** A class beats a bare `h1`–`h6` selector only for the properties it declares; everything else still comes from the host page. Leaving these open made the same class render an uppercase glowing heading on an `<h4>` and a plain one on a `<div>`.
+- **Sizes in `rem`, never `px`** (SC 1.4.4 — `px` ignores the browser's own default font size, and full-page zoom hides that). Fluid steps use `clamp()` with a `rem` floor *and* a `rem` term in the middle value; never a bare `vw`, which text-only zoom does not move.
+- **Never `opacity` for muted text.** It composites against whatever is behind, so the ratio is written nowhere and changes with the theme.
+- **Links in body copy get an underline.** Color alone needs 3:1 against the *surrounding text* as well as a hover/focus cue — this library's accent is 1.27:1 against its own body text in the dark theme.
+- **SC 1.4.12 belongs here.** A fixed `height` on a box of text is the failure; `min-height` is the fix. A demo of it needs the box's **width** pinned too, or it clips at some viewport widths and not others.
 
 ### motion-preferences
 - **Markup** A switch bound to `data-motion` on `<html>`, plus a demo animation that visibly stops.
