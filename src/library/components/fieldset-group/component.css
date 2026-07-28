@@ -1,0 +1,306 @@
+/* ===========================================================================
+   FIELDSET GROUP
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) lives in
+   the site's own stylesheet, not this file.
+
+     [GROUP]     all examples. The container, the legend, the body, the hint.
+     [CHOICE]    1, 3, 5. One checkbox row.
+     [ROW]       2. Parts of one answer, laid out side by side.
+     [HEADING]   3. A group named by a heading instead of a legend.
+     [INVALID]   4.
+     [DISABLED]  5.
+     [FORCED]    always ship this. High Contrast rebuilds every cue.
+
+   Copy the file whole for the library version.
+
+   The two rules here that are load-bearing rather than decorative:
+
+     min-width: 0 on the fieldset. Its default min-inline-size is min-content,
+     which no other element has, and which makes a fieldset the one box on a page
+     that refuses to shrink — the usual cause of sideways scroll at 320px
+     (SC 1.4.10).
+
+     the layout lives on .ac-group__body, not on the fieldset. A <legend> cannot
+     be a flex or grid item, and older Safari will not make a fieldset a flex
+     container at all.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [GROUP] the container — all examples --------------------------------- */
+
+.ac-group {
+  /* See the header: a fieldset defaults to min-inline-size: min-content. */
+  min-width: 0;
+  margin: 0;
+  padding: 0.85rem 1rem 1rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  transition: border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms)))
+    ease;
+}
+
+/* The group's accessible name. A real <legend>, first child of the fieldset —
+   a <div> styled to look like one names nothing. */
+.ac-group__legend {
+  padding: 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* Everything that is not the legend. This is the flex container. */
+.ac-group__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.ac-group__hint {
+  margin: 0.6rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* --- [CHOICE] one checkbox row — examples 1, 3, 5 -------------------------
+   Canonical in `checkbox`; repeated here so this file stands alone. Change one,
+   change both.
+
+   The whole row is the <label>, so the target is the text as well as the box —
+   a 1.15rem square is an 18px target and fails SC 2.5.8 on its own. */
+
+.ac-choice {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  /* SC 2.5.8 floor is 24px; 44px is the comfortable touch size. */
+  min-height: var(--ac-target, 44px);
+  padding: 0.25rem 0.4rem;
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  font-size: 0.9rem;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.ac-choice:hover {
+  background: color-mix(in srgb, var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 10%, transparent);
+}
+
+/* accent-color rather than a drawn box: the browser keeps the checkmark, the
+   keyboard, the indeterminate state and the forced-colors handling, and we
+   change only the hue. */
+.ac-choice__input {
+  flex: none;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+  accent-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  cursor: pointer;
+}
+
+.ac-choice__input:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+/* Long rows wrap rather than push the group wider than its column. */
+.ac-choice__text {
+  min-width: 0;
+}
+
+/* Checked rows are bolder as well as differently colored, so state is not
+   carried by hue alone (SC 1.4.1). The checkmark is the primary cue. */
+.ac-choice:has(.ac-choice__input:checked) .ac-choice__text {
+  font-weight: 700;
+}
+
+/* --- [ROW] parts of one answer — example 2 -------------------------------
+   Wrapping is deliberate: two 4rem inputs and a separator have to be able to
+   stack at 320px, and the group must not become the widest thing on the page. */
+
+.ac-group__body--row {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.ac-group__part {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.ac-group__part-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* Canonical in `text-input`; the two-character version lives here. */
+.ac-group__input {
+  width: 3.5rem;
+  min-height: var(--ac-target, 44px);
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-input-bg, var(--bg, #070110));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.ac-group__input:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+/* aria-hidden in the markup: a screen reader reading ":" between two fields
+   helps nobody, and the labels already say which part is which. */
+.ac-group__sep {
+  padding-bottom: 0.7rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* --- [HEADING] a group named by a heading — example 3 --------------------- */
+
+/* Sized like the legend it replaces, but it is a real heading, so it lands in
+   the heading list a screen reader user navigates a long form with. */
+.ac-group__heading {
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* --- [INVALID] example 4 -------------------------------------------------
+   The border thickens on the group rather than on each checkbox: the answer is
+   missing from the question, and the question is the fieldset. */
+
+.ac-group--invalid {
+  border-width: 2px;
+  border-color: var(--ac-danger, var(--accent-pink, #ff2ec4));
+}
+
+.ac-group__error {
+  position: relative;
+  margin: 0.5rem 0 0;
+  padding-left: 1.3rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  font-weight: 700;
+  color: var(--ac-danger, var(--accent-pink, #ff2ec4));
+}
+
+/* A triangle drawn in currentColor, so the error is not signaled by red alone
+   (SC 1.4.1) and needs no image. */
+.ac-group__error::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.28em;
+  width: 0.85rem;
+  height: 0.85rem;
+  background: currentColor;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+/* The element is in the HTML before it has anything to say, so the empty state
+   must take no room and draw no marker. */
+.ac-group__error:empty {
+  margin: 0;
+  padding-left: 0;
+}
+
+.ac-group__error:empty::before {
+  content: none;
+}
+
+/* --- [DISABLED] example 5 ------------------------------------------------- */
+
+/* :disabled covers both cases — the checkbox's own attribute, and a disabled
+   <fieldset>, which disables everything inside it. */
+.ac-choice:has(.ac-choice__input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.ac-choice:has(.ac-choice__input[aria-disabled="true"]) {
+  cursor: not-allowed;
+}
+
+.ac-choice:has(.ac-choice__input:disabled):hover,
+.ac-choice:has(.ac-choice__input[aria-disabled="true"]):hover {
+  background: none;
+}
+
+/* The dashed border is the second cue, because dimming alone reads as "ignore
+   this" rather than "you cannot change this" — and it is a contrast problem
+   besides. The legend stays at full strength: it is what tells someone what the
+   locked group was for. */
+.ac-group:disabled,
+.ac-group[aria-disabled="true"] {
+  border-style: dashed;
+}
+
+/* aria-disabled is not dimmed. The controls inside are still reachable, and a
+   faded group invites people to skip past the sentence explaining why. */
+.ac-group[aria-disabled="true"] .ac-choice__input {
+  accent-color: var(--ac-border-strong, var(--border-strong, #8064c0));
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------- */
+
+/* forced-colors drops color-mix, tinted fills and our accents, so every cue
+   built from them has to be rebuilt from system colors. */
+@media (forced-colors: active) {
+  .ac-group {
+    border-color: ButtonBorder;
+  }
+
+  .ac-group:disabled,
+  .ac-group[aria-disabled="true"] {
+    border-color: GrayText;
+  }
+
+  .ac-group--invalid {
+    border-color: CanvasText;
+  }
+
+  .ac-choice:hover {
+    background: none;
+  }
+
+  .ac-choice:has(.ac-choice__input:disabled) {
+    /* GrayText is the system's own "unavailable", and it survives where opacity
+       does not. */
+    color: GrayText;
+    opacity: 1;
+  }
+
+  .ac-group__error {
+    color: CanvasText;
+  }
+
+  .ac-group__input:focus-visible,
+  .ac-choice__input:focus-visible {
+    outline-color: CanvasText;
+  }
+}

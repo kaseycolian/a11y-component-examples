@@ -1,0 +1,13 @@
+{
+  "slug": "fieldset-group",
+  "name": "Fieldset Group",
+  "group": "forms-inputs",
+  "order": 100,
+  "summary": "A legend gives a set of controls the subject they are answers to — with the fieldset quirks that make people give up on it, the role=\"group\" alternative for when the name has to be a heading, and the \"pick at least one\" rule HTML has no way to express.",
+  "tags": ["fieldset", "legend", "group", "role-group", "validation", "aria-describedby", "disabled"],
+  "apg": "https://www.w3.org/WAI/tutorials/forms/grouping/",
+  "wcag": ["1.3.1", "1.4.1", "1.4.10", "2.1.1", "2.4.6", "2.4.7", "2.5.8", "3.3.1", "3.3.2", "4.1.2", "4.1.3"],
+  "status": "stable",
+  "files": ["html", "css", "js"],
+  "demoNote": "Uncheck everything in example 4 and the group says what is wrong — a rule `required` cannot express. Example 5 locks the same group twice: `disabled` cascades and takes the keyboard with it, `aria-disabled` cascades to nothing and keeps the reason reachable."
+}

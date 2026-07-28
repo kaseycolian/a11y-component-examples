@@ -7,7 +7,7 @@ component — read the one entry you need, not the whole file.
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-27
+Last updated: 2026-07-28
 
 ---
 
@@ -81,7 +81,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 11 / 34
+## Component roster — 12 / 34
 
 ### foundations
 - [ ] `skip-link`
@@ -151,7 +151,19 @@ take their logic and not their layout. See item 1 under remaining work.
   click, which covers Space too. Gotcha found: **Playwright treats `aria-disabled="true"` as
   unactionable**, so `toBeEnabled()` fails and the click needs `{ force: true }`; assert `el.disabled`
   directly instead.
-- [ ] `fieldset-group`
+- [x] `fieldset-group` — done. 25/25 tests in Chromium. **Canonical home for `.ac-group*`**; radio-group,
+  checkbox and switch each keep a copy, so a change here is a change in all four. Built around the
+  three things people don't know: the two quirks that make teams abandon the element (`min-width: 0`,
+  because a fieldset's default `min-inline-size: min-content` is the usual cause of sideways scroll at
+  320px; and the inner `__body` div, because a `<legend>` cannot be a flex item and older Safari won't
+  make a fieldset a flex container); `role="group"` + `aria-labelledby` when the name has to be a real
+  **heading**, since a legend never lands in the heading list; and that "pick at least one" has no HTML
+  (`required` on a checkbox means *that* box), so `data-ac-min` validates on `change` — never before the
+  group is touched — writing the error id onto **every** control's `aria-describedby`. Example 5 pairs
+  the two locks: `disabled` on a fieldset cascades (and `input.disabled` still reads `false`, so style
+  and test on `:disabled`), `aria-disabled` cascades to **nothing** and needs per-control marking plus
+  the click guard. Gotcha found: `getByRole('group', { name: 'Rider' })` also matches "Technical
+  rider" — role-name matching is substring, so `exact: true` where one name contains another.
 
 ### overlays-disclosure
 - [x] `disclosure` — works, but **predates the copyability + style conventions — retrofit (item 1)**.
