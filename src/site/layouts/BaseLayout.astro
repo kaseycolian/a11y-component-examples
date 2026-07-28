@@ -2,6 +2,20 @@
 import SiteHeader from '../components/SiteHeader.astro';
 import '../styles/site.css';
 
+/**
+ * The site's default theme goes on <html> below, in the markup rather than in
+ * JavaScript, so it is already right in the very first paint. theme-init.js
+ * overwrites it from ?theme= or localStorage, so a saved choice still wins.
+ *
+ * Nothing may sit between the doctype and <html> — an Astro comment there makes
+ * the compiler drop the <html> and <head> elements entirely.
+ *
+ * Choosing "Auto" in the picker removes the attribute, which hands the page back
+ * to theme.css's :root: the one setting that follows the OS light/dark
+ * preference. See src/site/lib/themes.mjs.
+ */
+import { SITE_THEME } from '../lib/themes.mjs';
+
 interface Props {
   title: string;
   description?: string;
@@ -16,7 +30,7 @@ const fullTitle = `${title} · Accessible & Stylized Components`;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme={SITE_THEME}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

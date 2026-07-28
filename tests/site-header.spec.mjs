@@ -18,7 +18,10 @@ test('the header theme picker is the library Dropdown and applies a theme', asyn
   const toggle = picker(page).locator('.ac-dropdown__toggle');
   await expect(toggle).toBeVisible();
   await expect(page.locator('#theme-select')).toBeHidden();
-  await expect(toggle).toHaveAccessibleName(/Theme.*Auto/s);
+  // The site's default is set on <html> in the markup (SITE_THEME), so the picker
+  // opens on it rather than on Auto.
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'acid-arcade-dark');
+  await expect(toggle).toHaveAccessibleName(/Theme.*Acid Arcade/s);
 
   await toggle.click();
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
@@ -31,14 +34,26 @@ test('the header theme picker is the library Dropdown and applies a theme', asyn
   expect(await options.count()).toBe(17);
 
   // By accessible name, not text: the row's textContent also carries the tick.
-  await picker(page).getByRole('option', { name: 'Acid Arcade', exact: true }).first().click();
+  await picker(page).getByRole('option', { name: 'Hot Neon', exact: true }).first().click();
 
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'acid-arcade-dark');
-  await expect(page.locator('#theme-select')).toHaveValue('acid-arcade-dark');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'hot-neon-dark');
+  await expect(page.locator('#theme-select')).toHaveValue('hot-neon-dark');
   await expect(toggle).toBeFocused();
 
   const stored = await page.evaluate(() => localStorage.getItem('theme'));
-  expect(stored).toBe('acid-arcade-dark');
+  expect(stored).toBe('hot-neon-dark');
+});
+
+test('Auto hands the page back to the OS light/dark preference', async ({ page }) => {
+  await page.goto('components/disclosure/');
+
+  await picker(page).locator('.ac-dropdown__toggle').click();
+  await picker(page).getByRole('option', { name: 'Auto', exact: true }).click();
+
+  // No attribute at all: theme.css's :root is the only rule that flips with
+  // prefers-color-scheme, so Auto has to mean "no override".
+  await expect(page.locator('html')).not.toHaveAttribute('data-theme', /.+/);
+  expect(await page.evaluate(() => localStorage.getItem('theme'))).toBeNull();
 });
 
 test('the choice survives a reload and the trigger shows it', async ({ page }) => {

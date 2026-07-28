@@ -45,4 +45,18 @@ export const THEME_GROUPS = [
 ];
 
 export const THEME_VERSION = index.version;
+
+/** theme-service's own default (Rink Classic). Left as it ships. */
 export const DEFAULT_THEME = index.default;
+
+/**
+ * This site's default, set on <html> by BaseLayout so a first-time visitor gets
+ * it before first paint.
+ *
+ * Deliberately not theme-service's `default` and deliberately not a hand-edit of
+ * the vendored `:root` block in theme.css — that block is generated upstream, and
+ * it is also what the picker's **Auto** option falls back to, which is the one
+ * setting here that follows the OS light/dark preference. Overriding it would
+ * take that option away; setting an attribute leaves it one click away.
+ */
+export const SITE_THEME = 'acid-arcade-dark';
