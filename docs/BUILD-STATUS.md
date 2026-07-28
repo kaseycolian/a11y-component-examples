@@ -11,43 +11,45 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-28 (effects)
+Last updated: 2026-07-28 (button)
 
 ---
 
-## START HERE — next component is `button`, and it opens `buttons-actions`
+## START HERE — next component is `icon-button`
 
-`effects` landed (16/16 Chromium) and **`foundations` is complete**. Run the loop below with:
+`button` landed (22/22 Chromium) and **`.ac-btn` now has a canonical home**. Run the loop below with:
 
 ```sh
-node scripts/new-component.mjs button --group buttons-actions --name "Button"
+node scripts/new-component.mjs icon-button --group buttons-actions --name "Icon Button"
 ```
 
 Decided in advance, so do not re-derive:
 
-- Spec entry: `component-specs.md` → buttons-actions → `button`. Native `<button type="button">`
-  with `.ac-btn`, the three weights (`--solid` / `--outline` / `--ghost`) and the four accents
-  (`--pink` / `--green` / `--blue` / `--purple`). No ARIA — it is a button.
-- **This is the canonical home for `.ac-btn`, and there is no `.ac-btn` anywhere in `src/library`
-  yet.** Every component that needed one minted a local copy: `.ac-motion__btn` in
-  `motion-preferences`, and the addon buttons in `input-group`, `modal`, `drawer` and `tooltip`.
-  Those stay — components are deliberately not DRY — so list them in the roster row the way `field`,
-  `visually-hidden` and `fieldset-group` list theirs.
-- The two things this page exists to say: **always set `type`** (a bare `<button>` in a form submits
-  it), and **`disabled` is unfocusable and announces nothing** — when the user needs to know *why*,
-  `aria-disabled="true"` plus a blocked handler is the pattern. `switch`, `motion-preferences` and
-  `fieldset-group` all ship that already; lift the argument rather than re-deriving it, and remember
-  Playwright needs `{ force: true }` to click a soft-disabled control.
-- The press transform is motion-gated through `--ac-press-y` / `--ac-press-s`, which
-  `tokens.css` already defines. Targets ≥24×24 (SC 2.5.8), 44px preferred.
-- `icon-button` → `loading-button` → `chip-toggle` follow, and all three extend `.ac-btn`. Decide
-  the modifier surface here with that in mind.
+- Spec entry: `component-specs.md` → buttons-actions → `icon-button`.
+  `<button class="ac-btn-icon" aria-label="Settings">` with an `aria-hidden focusable="false"` SVG.
+- **The modifier surface is already settled by `button` — extend it, do not invent a parallel one.**
+  `.ac-btn` base + `--solid` / `--outline` / `--ghost` (weight) + `--pink` / `--green` / `--blue` /
+  `--purple` (accent) + `--sm` (size). The accent is a **local custom property**, `--ac-btn-accent` /
+  `--ac-btn-on-accent`, that the three weight rules read; an icon button that wants the same four
+  accents needs no new rules at all, only the base class. Read `[CORE]` and `[WEIGHTS]` in
+  `button/component.css` before writing anything.
+- The one thing this page exists to say: **the accessible name is the only name.** With no
+  `aria-label` an icon-only button announces as "button" and nothing else. `visually-hidden` already
+  owns the argument that `aria-label` is a *different tool* rather than a shorter spelling (it needs
+  a role that supports naming, replaces the whole name per SC 2.5.3, and is invisible to translation
+  and find-in-page) — link to it rather than re-deriving it, and make the case for visible-text-plus-
+  clipping where the label can be real text.
+- `focusable="false"` on the SVG for IE-era Edge and some AT; `aria-hidden="true"` on it always.
+- Square target, so `min-width` matters as much as `min-height`. `--sm` is 24px in both dimensions
+  and there is nothing below it — `button`'s example 5 measures that live and its `--tiny` is the
+  live failure. Reuse the readout shape rather than re-deriving the spacing-exception argument.
+- `loading-button` → `chip-toggle` follow, and both also extend `.ac-btn`.
 
 ---
 
 ## The road to done
 
-Fifteen components and four infrastructure items. Every remaining component already has a spec entry
+The unticked rows in the roster below, plus four infrastructure items. Every remaining component has a spec entry
 in `component-specs.md` — `disclosure` is the only slug in the repo without one, and backfilling it is
 part of item 1 below. **Read the entry, do not redesign it.**
 
@@ -56,7 +58,7 @@ Build in this order. The order is the dependency graph, not a preference.
 | Batch | Slugs | Why here |
 | --- | --- | --- |
 | ~~**A**~~ | ~~`effects`~~ | **Done.** Closed `foundations` |
-| **B** | `button` → `icon-button` → `loading-button` → `chip-toggle` | `button` is canonical `.ac-btn` and the other three extend it |
+| **B** | ~~`button`~~ → `icon-button` → `loading-button` → `chip-toggle` | `button` is **done** and is the canonical `.ac-btn`; the other three extend it |
 | **C** | `notice` → `status-text` → `badge` → `result-panel` | all four are small, and three of them restate `live-region`'s argument in a new shape |
 | **D** | `tabs` → `jump-nav` | `tabs` is the largest behavior left; `jump-nav` reuses its `aria-current` thinking |
 | **E** | `data-table` → `prose-surface` | `prose-surface` is the scroll-region pattern `data-table` establishes |
@@ -64,11 +66,9 @@ Build in this order. The order is the dependency graph, not a preference.
 
 Cross-batch notes that will otherwise be rediscovered:
 
-- **There is no `.ac-btn` anywhere in `src/library` yet.** Every component that needed a button minted
-  a local one (`.ac-motion__btn`, and the addon buttons in `input-group`, `modal`, `drawer`,
-  `tooltip`). Those stay — components are deliberately not DRY. When `button` lands it becomes the
-  canonical home, so list the local copies in its roster row the way `field`, `visually-hidden` and
-  `fieldset-group` list theirs.
+- **`.ac-btn` now lives in `button` and the local copies stay.** `.ac-motion__btn` in
+  `motion-preferences` and the addon buttons in `input-group`, `modal`, `drawer` and `tooltip` are
+  deliberate duplicates — components are not DRY here. A change to `.ac-btn` is a change in all five.
 - **`result-panel`'s copy button is `input-group`'s copy button.** Same clipboard write, same
   pre-existing empty `role="status"`, same rule against renaming the button. Lift it.
 - **`status-text` and `notice` are the same SC 1.4.1 point twice** — the glyph is `aria-hidden` and the
@@ -177,7 +177,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 21 / 35
+## Component roster — 22 / 35
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -304,7 +304,29 @@ take their logic and not their layout. See item 1 under remaining work.
 **`foundations` is complete.**
 
 ### buttons-actions
-- [ ] `button`
+- [x] `button` — done. 22/22 tests in Chromium. **Canonical home for `.ac-btn`**; `.ac-motion__btn` and
+  the addon buttons in `input-group`, `modal`, `drawer` and `tooltip` are deliberate local copies, so a
+  change here is a change in five places. **The modifier surface `icon-button`, `loading-button` and
+  `chip-toggle` all extend:** weight (`--solid` / `--outline` / `--ghost`), accent (`--pink` / `--green`
+  / `--blue` / `--purple`), size (`--sm`, and nothing below it). The two axes are independent, so the
+  accent is a **local custom property** — `--ac-btn-accent` / `--ac-btn-on-accent`, set by four one-line
+  rules and read by the three weight rules. Twelve combinations out of seven rules, and one property to
+  override for a brand color. Example 1 is the specimen; examples 2–5 are each half wrong on purpose and
+  live: the bare `<button>` that submits the form, `disabled` beside `aria-disabled`, a `<div>` carrying
+  the same classes as a real button, and a target under the 24px floor with the readout measuring all
+  three. Four findings. **`event.submitter` is *not* null on implicit submission** — Enter in a text
+  field runs through the form's *default button*, the first submit button in DOM order, and the browser
+  nominates it as the submitter although nobody pressed it; on example 2's form that is the bare one,
+  which makes the demo stronger than the version that was written first. **The `aria-disabled` guard
+  belongs on a container, in the capture phase** — bound on the button itself it runs in the target
+  phase beside every other handler and only wins if it was registered first; on an ancestor in capture
+  it always runs first and `stopImmediatePropagation` ends the event, and one listener also covers
+  buttons added later. `preventDefault` gets the keyboard for free, since a native button fires a
+  *click* for Enter and Space. **Under `forced-colors` the three weights collapse** into `ButtonFace`
+  inside a `ButtonBorder`, and ghost — no fill, no border of its own — stops reading as a control at
+  all, which is the whole reason its `@media` block is not optional. **A hard-`disabled` button
+  dispatches no click at all**, so there is nothing to report from and nothing to explain with; that is
+  the argument for `aria-disabled` in one sentence.
 - [ ] `icon-button`
 - [ ] `loading-button`
 - [ ] `chip-toggle`
@@ -638,7 +660,14 @@ It must match `npm run preview` exactly, base path included.
   being true. Only visible at 320px, because that is where the two specimens stack and can be compared
   by eye. A utility class that claims to own appearance has to declare the properties a host is likely
   to set, not just the ones it cares about.
-- **Screenshot the finished page before ticking the row.** It has caught a real bug twice, and both
+- **`document.body.focus()` is a no-op, not a blur.** Chrome ignores `focus()` on an element that is
+  not focusable rather than moving focus to it, so the usual "save `document.activeElement`, focus
+  something, put it back" shape **silently fails at page load**, where `activeElement` is `<body>`.
+  `button`'s example 3 probes two buttons to find out which one the keyboard can reach, and left focus
+  parked on the second one: a keyboard reader arrived in the middle of the page and Tab continued from
+  there. Every test was green — it was the screenshot that showed the ring. Call `el.blur()` first and
+  only then restore, and assert `document.activeElement` is `<body>` after load.
+- **Screenshot the finished page before ticking the row.** It has caught a real bug three times, and all
   times every test was green. The recipe, because it fails two ways otherwise: a throwaway script that
   imports `{ chromium } from '@playwright/test'` **must sit in the repo root** — from the scratchpad it
   dies with `ERR_MODULE_NOT_FOUND`, since ESM resolves `node_modules` upward from the script's own
@@ -646,6 +675,11 @@ It must match `npm run preview` exactly, base path included.
   after. Shoot the component root (`.ac-demo-grid`) at 1280 and 320, and print
   `document.documentElement.scrollWidth - clientWidth` while you are in there. Delete the script from
   the repo root afterwards; `git status` should come back with only the component folder.
+  **Shoot `.ac-demo-grid > .ac-demo` one at a time as well.** A single tall element screenshot stitches
+  while it scrolls, so the sticky header paints across the middle of it and hides an example — that is
+  an artifact, not a bug, but it is also where a real one goes unnoticed. And print
+  `document.activeElement.tagName` in the same pass; it is one line and it is what caught the focus
+  probe above.
 - **`[WARN] [glob-loader] Duplicate id "<slug>" found` is a stale content cache, not a real
   duplicate.** It appears on the first build after a scaffolded `docs.md` is filled in, because the
   entry was already indexed in `.astro/`. Nothing is wrong and the page builds; `rm -rf .astro` and

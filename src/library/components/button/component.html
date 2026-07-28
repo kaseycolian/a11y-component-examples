@@ -1,0 +1,266 @@
+<!-- ===========================================================================
+     BUTTON — the canonical .ac-btn, and the four ways it gets broken
+
+     WHAT TO COPY
+       Example 1 is the component. Everything after it is a decision you have to
+       make anyway, shown with the wrong answer live beside the right one.
+       Each example names the component.css and component.js sections it needs.
+
+     THE CONTRACT
+       .ac-btn                          the base. Works on <button> and <a href>.
+       --solid --outline --ghost        weight. Pick one.
+       --pink --green --blue --purple   accent. Optional; pink is the default.
+       --sm                             the compact size, still over the 24px floor.
+       type="button"                    on every <button> not submitting a form.
+       aria-disabled="true"             unavailable AND explained. Needs the guard.
+
+     THERE IS NO ARIA HERE. A <button> already has the role, the tab stop, the
+     Enter and Space handling and the name from its own text. Every example after
+     the first is about what happens when something else is used instead, or when
+     a native button is switched off in the wrong way.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the grid and the
+     per-example headings. Never copy it into your app.
+     =========================================================================== -->
+
+<div class="ac-demo-grid" data-ac-button>
+  <!-- ======================================================================
+       EXAMPLE 1 · The weights and the accents
+       CSS [CORE] + [WEIGHTS] + [ACCENTS]. No JavaScript.
+
+       Weight and accent are two independent axes that combine freely, so the
+       accent is a local custom property the three weights read: twelve
+       combinations out of seven rules, and one place to override for a brand.
+
+       The accent is decoration. It is never allowed to be the only thing saying
+       what a button does — "the green one" is not a name (SC 1.4.1), and the
+       labels are what a reader who cannot tell the four apart still has.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">1 &middot; Weights and accents</h3>
+
+    <p class="ac-btn-caption">Weight, at the default accent</p>
+    <div class="ac-btn-row">
+      <button class="ac-btn ac-btn--solid" type="button">Solid</button>
+      <button class="ac-btn ac-btn--outline" type="button">Outline</button>
+      <button class="ac-btn ac-btn--ghost" type="button">Ghost</button>
+    </div>
+
+    <p class="ac-btn-caption">Accent, at the solid weight</p>
+    <div class="ac-btn-row">
+      <button class="ac-btn ac-btn--solid ac-btn--pink" type="button">Pink</button>
+      <button class="ac-btn ac-btn--solid ac-btn--green" type="button">Green</button>
+      <button class="ac-btn ac-btn--solid ac-btn--blue" type="button">Blue</button>
+      <button class="ac-btn ac-btn--solid ac-btn--purple" type="button">Purple</button>
+    </div>
+
+    <p class="ac-btn-caption">Any accent, any weight</p>
+    <div class="ac-btn-row">
+      <button class="ac-btn ac-btn--outline ac-btn--green" type="button">Outline green</button>
+      <button class="ac-btn ac-btn--ghost ac-btn--blue" type="button">Ghost blue</button>
+    </div>
+
+    <p class="ac-btn__note">
+      Tab through them. The ring is the same on all three weights and owes
+      nothing to the fill &mdash; a ghost button has no border of its own to
+      thicken, so a focus style built out of the border shows nothing here.
+    </p>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 2 · type is not optional
+       CSS [CORE] + [WEIGHTS] + [PANEL]. JS [CORE] + [FORM].
+
+       A <button> with no type attribute is type="submit". Outside a form that is
+       harmless, which is exactly why the habit survives until the day someone
+       wraps the markup in a <form> and unrelated controls start submitting it.
+
+       The first button is bare, on purpose, and live. Press it and read the
+       status line: it submits, and its label says it queues a track.
+
+       Enter in the text field submits too, and it does not go to the green
+       button. Implicit submission runs through the form's DEFAULT button — the
+       first submit button in DOM order — which here is the bare one. The status
+       line names it, and event.submitter is not null for it.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">2 &middot; type is not optional</h3>
+
+    <form class="ac-btn-panel" data-ac-btn-form>
+      <div class="ac-btn-panel__field">
+        <label class="ac-btn-panel__label" for="ac-btn-track">Track</label>
+        <input class="ac-btn-panel__input" type="text" id="ac-btn-track" name="track"
+               value="Sink With Kalifornija" />
+      </div>
+
+      <div class="ac-btn-row">
+        <!-- BROKEN ON PURPOSE — no type, so this is a submit button. -->
+        <button class="ac-btn ac-btn--solid">Add to queue</button>
+        <button class="ac-btn ac-btn--outline" type="button">Clear the queue</button>
+        <button class="ac-btn ac-btn--solid ac-btn--green" type="submit">Save the set list</button>
+      </div>
+
+      <!-- Rendered empty and already in the accessibility tree. A live region
+           created at the moment it has something to say announces nothing. -->
+      <p class="ac-btn__log" role="status" data-ac-btn-form-log></p>
+    </form>
+
+    <p class="ac-btn__note">
+      Submitting is prevented here so the page stays put. In a real form the bare
+      button would have reloaded it.
+    </p>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 3 · Unavailable, two ways
+       CSS [CORE] + [WEIGHTS] + [DISABLED] + [PANEL]. JS [CORE] + [LOCK].
+
+       disabled takes the button out of the tab order, so a keyboard or screen
+       reader user never lands on it and never finds whatever explanation was
+       written beside it. That is the right answer only when there is nothing to
+       explain.
+
+       aria-disabled="true" keeps the tab stop and announces "unavailable", so
+       the reason can travel with it in aria-describedby. It is an announcement
+       and not an enforcement — the browser still fires the click, which is what
+       the [CORE] guard in component.js is for.
+
+       Both are live. The soft-disabled one reports that it was blocked; the
+       hard-disabled one says nothing, because a disabled control does not
+       dispatch the click in the first place, so there is nothing to report from
+       and nothing to explain with. The table measures which of the two the
+       keyboard can reach by trying it, at load.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">3 &middot; Unavailable, two ways</h3>
+
+    <div class="ac-btn-panel" data-ac-btn-lock>
+      <div class="ac-btn-row">
+        <button class="ac-btn ac-btn--outline" type="button" disabled>Print the flyer</button>
+
+        <button class="ac-btn ac-btn--outline ac-btn--green" type="button"
+                aria-disabled="true" aria-describedby="ac-btn-lock-why">
+          Publish the set
+        </button>
+      </div>
+
+      <p class="ac-btn__note" id="ac-btn-lock-why">
+        Add at least one track before publishing.
+      </p>
+
+      <!-- Not a live region: it is a table you look at, and it changes only when
+           the script measures at load. -->
+      <dl class="ac-btn-readout" data-ac-btn-lock-readout>
+        <div class="ac-btn-readout__row">
+          <dt>Print the flyer</dt>
+          <dd><code data-ac-btn-out="hard">&mdash;</code></dd>
+        </div>
+        <div class="ac-btn-readout__row">
+          <dt>Publish the set</dt>
+          <dd><code data-ac-btn-out="soft">&mdash;</code></dd>
+        </div>
+      </dl>
+
+      <p class="ac-btn__log" role="status" data-ac-btn-lock-log></p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 4 · Not everything that looks like a button is one
+       CSS [CORE] + [WEIGHTS] + [PANEL] + [BROKEN]. JS [CORE] + [FAKE].
+
+       Three controls, one stylesheet, three different things.
+
+       The link navigates, so it is a link. Styling it as a button is fine; it
+       announces as "link", and Enter activates it while Space scrolls the page.
+       That difference is the reason not to reach for role="button" here — the
+       role promises Space, and you would then have to write it.
+
+       The <div> is the failure, live: no role, no tab stop, no keyboard, and no
+       accessible name at all. It works with a mouse, which is why it ships.
+
+       The third is the fix, and it is not a pile of ARIA. It is a <button>.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">4 &middot; Not everything that looks like a button is one</h3>
+
+    <div class="ac-btn-panel" data-ac-btn-fake>
+      <div class="ac-btn-cases">
+        <div class="ac-btn-case">
+          <a class="ac-btn ac-btn--outline ac-btn--blue" href="#ac-btn-dates">Tour dates</a>
+          <p class="ac-btn-case__label">&lt;a href&gt; &mdash; it navigates</p>
+        </div>
+
+        <div class="ac-btn-case">
+          <!-- BROKEN ON PURPOSE — a div with a click handler. -->
+          <div class="ac-btn ac-btn--solid" data-ac-btn-div>Buy tickets</div>
+          <p class="ac-btn-case__label">&lt;div&gt; &mdash; mouse only</p>
+        </div>
+
+        <div class="ac-btn-case">
+          <button class="ac-btn ac-btn--solid" type="button" data-ac-btn-real>Buy tickets</button>
+          <p class="ac-btn-case__label">&lt;button&gt; &mdash; the fix</p>
+        </div>
+      </div>
+
+      <p class="ac-btn__log" role="status" data-ac-btn-fake-log></p>
+
+      <!-- tabindex="-1" so the fragment jump can move focus here and not just
+           the viewport. Without it the page scrolls and the keyboard stays
+           where it was (SC 2.4.3). -->
+      <p class="ac-btn__note" id="ac-btn-dates" tabindex="-1">
+        <strong>Tour dates:</strong> the 12th, the 19th, and a matinee on the
+        26th. Now tab from the start of this example &mdash; you get two stops,
+        not three, and the one you skipped is the one selling tickets.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 5 · Target size, and the press
+       CSS [CORE] + [WEIGHTS] + [SIZE] + [PANEL] + [BROKEN]. JS [CORE] + [SIZES].
+
+       SC 2.5.8 asks for 24×24 CSS pixels. The default here is 44, which is what
+       a finger wants; --sm is the compact one and still clears the floor. The
+       third is under it on purpose, and the readout measures all three live
+       rather than claiming anything.
+
+       Under the floor there is one way out and it is spacing, not apology: a
+       24px circle centered on the target must not overlap the circle of any
+       other target. These three are spaced far enough apart to pass that, so
+       the failure you can see is the size and only the size.
+
+       The press moves the button by --ac-press-y and scales it by --ac-press-s,
+       both multiplied by the motion gate, and is deliberately not transitioned:
+       a press that eases in does not read as a press.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">5 &middot; Target size, and the press</h3>
+
+    <div class="ac-btn-panel" data-ac-btn-sizes>
+      <div class="ac-btn-row ac-btn-row--spaced">
+        <button class="ac-btn ac-btn--solid" type="button">Doors at 8</button>
+        <button class="ac-btn ac-btn--solid ac-btn--sm" type="button">Small</button>
+        <!-- BROKEN ON PURPOSE — under the 24px floor. -->
+        <button class="ac-btn ac-btn--solid ac-btn--tiny" type="button">Tiny</button>
+      </div>
+
+      <dl class="ac-btn-readout" data-ac-btn-sizes-readout>
+        <div class="ac-btn-readout__row">
+          <dt>Doors at 8</dt>
+          <dd><code data-ac-btn-out="default">&mdash;</code></dd>
+        </div>
+        <div class="ac-btn-readout__row">
+          <dt>Small</dt>
+          <dd><code data-ac-btn-out="sm">&mdash;</code></dd>
+        </div>
+        <div class="ac-btn-readout__row">
+          <dt>Tiny</dt>
+          <dd><code data-ac-btn-out="tiny">&mdash;</code></dd>
+        </div>
+      </dl>
+
+      <p class="ac-btn__verdict" role="status" data-ac-btn-sizes-verdict></p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,454 @@
+/* ===========================================================================
+   BUTTON
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) lives in
+   the site's own stylesheet, not this file.
+
+     [CORE]      every example. The box, the ring, the press. Required.
+     [WEIGHTS]   every example. solid / outline / ghost. Needs [CORE].
+     [ACCENTS]   example 1. Four one-line rules. Delete the ones you don't use.
+     [SIZE]      example 5. The compact modifier.
+     [DISABLED]  example 3. Both kinds of unavailable.
+     [PANEL]     the frame around each example on this page. Not component code
+                 in the sense the rest of the file is — delete it.
+     [BROKEN]    examples 4 and 5. Delete them — they are the failures.
+     [FORCED]    always ship this. High Contrast collapses the three weights.
+
+   Copy the file whole for the library version.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [CORE] --------------------------------------------------------------
+   Weight and accent are independent axes, so the accent is a local custom
+   property the weights read rather than twelve combination rules. Setting
+   --ac-btn-accent on the element (or on any ancestor) is how you get a brand
+   color without touching this file.
+
+   Three declarations here are not styling and are easy to lose:
+
+     font-family: inherit   form controls do not inherit type from the page.
+                            Without it a button renders in the UA's own font.
+     appearance: none       iOS Safari draws its own button chrome otherwise,
+                            and ignores most of what follows.
+     text-decoration: none  because .ac-btn also has to work on an <a href>,
+                            which is example 4. */
+
+.ac-btn {
+  --ac-btn-accent: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  --ac-btn-on-accent: var(--ac-on-pink, var(--on-pink, #22001a));
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  box-sizing: border-box;
+  /* SC 2.5.8 asks for 24px. 44 is what a finger wants, and --sm is the way
+     down from it. */
+  min-height: var(--ac-target, 44px);
+  min-width: var(--ac-target, 44px);
+  padding: 0.5rem 1.1rem;
+  border: 2px solid transparent;
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: transparent;
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  appearance: none;
+  transition:
+    background-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease,
+    border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease,
+    color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+/* One ring, identical on all three weights, and owing nothing to the border —
+   a ghost button has no border to thicken, so a focus style built out of one
+   shows nothing there. Not transitioned: a ring that fades in is late. */
+.ac-btn:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+/* The press. Both terms are multiplied by the motion gate, so at 0 the button
+   holds still. Deliberately not in the transition above: a press that eases in
+   does not read as a press. */
+.ac-btn:active {
+  translate: 0 calc(var(--ac-motion, var(--motion, 1)) * var(--ac-press-y, var(--press-y, 1px)));
+  scale: calc(1 - (1 - var(--ac-press-s, var(--press-s, 0.98))) * var(--ac-motion, var(--motion, 1)));
+}
+
+/* --- [WEIGHTS] every example ----------------------------------------------
+   These read --ac-btn-accent, which [CORE] defines, so the two sections do not
+   separate. Hover mixes the accent toward the theme's text color: that is
+   darker in a light theme and lighter in a dark one, so one declaration is a
+   visible change in both, and in both directions it moves *away* from the
+   label color rather than toward it. */
+
+.ac-btn--solid {
+  border-color: var(--ac-btn-accent);
+  background: var(--ac-btn-accent);
+  color: var(--ac-btn-on-accent);
+}
+
+.ac-btn--solid:hover {
+  border-color: color-mix(in srgb, var(--ac-btn-accent) 88%, var(--ac-text, var(--text, #f3ecff)));
+  background: color-mix(in srgb, var(--ac-btn-accent) 88%, var(--ac-text, var(--text, #f3ecff)));
+}
+
+.ac-btn--outline {
+  border-color: var(--ac-btn-accent);
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  color: var(--ac-btn-accent);
+}
+
+.ac-btn--outline:hover {
+  background: color-mix(in srgb, var(--ac-btn-accent) 14%, var(--ac-surface, var(--bg-panel, #110620)));
+}
+
+/* No border and no fill at rest, so the label is the whole control. Use it for
+   the third-most-important action on a screen, never for the only one — with
+   nothing around it there is no cue that it can be pressed at all. */
+.ac-btn--ghost {
+  border-color: transparent;
+  background: transparent;
+  color: var(--ac-btn-accent);
+}
+
+/* Mixed with transparent rather than a surface color, so the tint works over
+   whatever the ghost is sitting on. */
+.ac-btn--ghost:hover {
+  background: color-mix(in srgb, var(--ac-btn-accent) 14%, transparent);
+}
+
+/* --- [ACCENTS] example 1 -------------------------------------------------
+   Decoration, and never the thing carrying the meaning. "Press the green one"
+   is not an instruction (SC 1.4.1) and is not an accessible name. Each accent
+   ships with the text color that is legible on top of it, because the solid
+   weight puts one directly on the other. */
+
+.ac-btn--pink {
+  --ac-btn-accent: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  --ac-btn-on-accent: var(--ac-on-pink, var(--on-pink, #22001a));
+}
+
+.ac-btn--green {
+  --ac-btn-accent: var(--ac-accent-green, var(--accent-green, #5bff3a));
+  --ac-btn-on-accent: var(--ac-on-green, var(--on-green, #062600));
+}
+
+.ac-btn--blue {
+  --ac-btn-accent: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  --ac-btn-on-accent: var(--ac-on-blue, var(--on-blue, #00212b));
+}
+
+.ac-btn--purple {
+  --ac-btn-accent: var(--ac-accent-purple, var(--accent-purple, #b57fff));
+  --ac-btn-on-accent: var(--ac-on-purple, var(--on-purple, #1a0838));
+}
+
+/* --- [SIZE] example 5 -----------------------------------------------------
+   The compact one. It is still over the 24px floor with room to spare, and the
+   readout on that example measures it rather than taking this comment's word
+   for it. There is no size below this one. */
+
+.ac-btn--sm {
+  min-height: var(--ac-target-min, 24px);
+  min-width: var(--ac-target-min, 24px);
+  padding: 0.25rem 0.7rem;
+  font-size: 0.8rem;
+}
+
+/* --- [DISABLED] example 3 ------------------------------------------------
+   Both kinds get the same paint, because to a sighted reader they are the same
+   thing. The difference is entirely in the accessibility tree and the tab
+   order, and it is the whole of example 3.
+
+   Drawn rather than dimmed. opacity reads as "ignore this" instead of "you
+   cannot use this", and it costs contrast on the way — SC 1.4.3 exempts a
+   disabled control from the ratio, which is permission to stop measuring, not
+   permission to stop being readable. */
+
+.ac-btn:disabled,
+.ac-btn:disabled:hover,
+.ac-btn[aria-disabled="true"],
+.ac-btn[aria-disabled="true"]:hover {
+  border-color: var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-style: dashed;
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  cursor: not-allowed;
+}
+
+/* The browser will happily fire :active on a soft-disabled button, and a
+   control that presses but does nothing reads as a broken control rather than
+   an unavailable one. component.js blocks the click; this blocks the tell. */
+.ac-btn[aria-disabled="true"]:active {
+  translate: none;
+  scale: none;
+}
+
+/* --- [PANEL] the frame around each example -------------------------------
+   Page furniture: the rows, the captions, the status lines and the two
+   readout tables. None of it is part of a button. Delete the section. */
+
+.ac-btn-panel,
+.ac-btn-caption,
+.ac-btn__note {
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-btn-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+}
+
+.ac-btn-panel__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.ac-btn-panel__label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-btn-panel__input {
+  min-width: 0;
+  min-height: var(--ac-target, 44px);
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+.ac-btn-panel__input:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+/* Example 5 only. SC 2.5.8's spacing exception is measured between the centers
+   of the targets, so the gap has to be real — this one keeps the undersized
+   button clear of its neighbor, leaving its size as the only thing wrong. */
+.ac-btn-row--spaced {
+  gap: 1.5rem;
+}
+
+.ac-btn-caption {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-btn__note {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+/* Example 4's link target. :focus and not :focus-visible, because a fragment
+   jump focuses this programmatically and a programmatic focus does not reliably
+   match the latter — the same call skip-link makes. The class is doubled to
+   clear the shell's global :focus:not(:focus-visible) { outline: none }, which
+   is at (0,2,0) and loads after every component stylesheet. */
+.ac-btn__note.ac-btn__note:focus {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-btn__log,
+.ac-btn__verdict {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+  overflow-wrap: break-word;
+}
+
+/* Collapsed while empty so the layout does not reserve a gap for a message
+   nobody has caused yet. The element itself stays in the DOM and in the
+   accessibility tree — :empty is not display: none. */
+.ac-btn__log:empty,
+.ac-btn__verdict:empty {
+  display: none;
+}
+
+.ac-btn__log[data-ac-btn-bad="true"],
+.ac-btn__verdict[data-ac-btn-bad="true"] {
+  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+}
+
+.ac-btn-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  font-size: 0.8rem;
+}
+
+/* Wraps to two lines rather than shrinking the value away: at 320px a label and
+   a value do not both fit, and the value is the point. */
+.ac-btn-readout__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.5rem;
+  min-width: 0;
+}
+
+.ac-btn-readout dt {
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-btn-readout dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.ac-btn-readout code,
+.ac-btn__note code {
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
+  font-size: 0.95em;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-btn-cases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.ac-btn-case {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.ac-btn-case__label {
+  margin: 0;
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
+  font-size: 0.7rem;
+  line-height: 1.4;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+/* --- [BROKEN] example 5 — delete this -------------------------------------
+   Under the SC 2.5.8 floor in both dimensions. Written out because "24px" is
+   easier to believe next to something that is not.
+
+   Example 4's failure needs no CSS at all, which is its point: the <div> there
+   carries the same .ac-btn classes as the working button and is identical to
+   look at. The only visible tell is that its label can be selected like body
+   text — everything a button gives you was in the element, not the stylesheet. */
+
+.ac-btn--tiny {
+  min-height: 20px;
+  min-width: 20px;
+  padding: 0 0.4rem;
+  border-width: 1px;
+  font-size: 0.7rem;
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------
+   forced-colors drops color-mix and replaces every color we set, so the three
+   weights collapse into one: solid and outline are both ButtonFace with a
+   ButtonBorder edge, and ghost — which has neither a fill nor a border of its
+   own — stops looking like a control at all. Giving it a border here is the
+   whole reason this block is not optional.
+
+   The press survives untouched. translate and scale are not colors. */
+
+@media (forced-colors: active) {
+  .ac-btn {
+    border-color: ButtonBorder;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  .ac-btn--ghost {
+    border-color: ButtonBorder;
+  }
+
+  .ac-btn:hover {
+    border-color: Highlight;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  .ac-btn:focus-visible {
+    outline-color: CanvasText;
+  }
+
+  /* GrayText is the system's own "unavailable", so a reader who has set a high
+     contrast theme gets the color they chose for it. */
+  .ac-btn:disabled,
+  .ac-btn:disabled:hover,
+  .ac-btn[aria-disabled="true"],
+  .ac-btn[aria-disabled="true"]:hover {
+    border-color: GrayText;
+    background: ButtonFace;
+    color: GrayText;
+  }
+
+  .ac-btn-panel,
+  .ac-btn-readout {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+
+  .ac-btn-panel__input {
+    border-color: ButtonBorder;
+    background: Field;
+    color: FieldText;
+  }
+
+  /* The failure line loses its color here, which is why it was never only a
+     color — the sentence says the same thing. */
+  .ac-btn__log[data-ac-btn-bad="true"],
+  .ac-btn__verdict[data-ac-btn-bad="true"] {
+    color: CanvasText;
+  }
+}
