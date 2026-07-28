@@ -1,0 +1,285 @@
+/* ===========================================================================
+   SWITCH
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) lives in
+   the site's own stylesheet, not this file.
+
+     [GROUP]          example 1. The fieldset shell. Canonical in the Fieldset
+                      Group component; repeated so this file stands alone.
+     [CORE]           all examples. The row, the hidden input, the track, the thumb.
+     [STATUS]         examples 2 and 4. The note line and the live region.
+     [SOFT-DISABLED]  example 4.
+     [FORCED]         always ship this. High Contrast rebuilds every cue.
+
+   Copy the file whole for the library version.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [GROUP] the fieldset shell ------------------------------------------
+   min-width: 0 because a fieldset's default min-inline-size is min-content, so
+   one long unbreakable child would push the page sideways at 320px. The
+   contents are wrapped in a <div> because a <legend> cannot be a flex item and
+   older Safari refuses to make a fieldset a flex container at all. */
+
+.ac-group {
+  min-width: 0;
+  margin: 0;
+  padding: 0.85rem 1rem 1rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+}
+
+.ac-group__legend {
+  padding: 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-group__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+/* --- [CORE] one switch --------------------------------------------------
+   The whole row is the <label>, so the target is the text as well as the pill.
+   A 2.4rem track is a 38px-wide target on its own; the row clears 44px. */
+
+.ac-switch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  /* SC 2.5.8 floor is 24px; 44px is the comfortable touch size. */
+  min-height: var(--ac-target, 44px);
+  padding: 0.25rem 0.4rem;
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.9rem;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.ac-switch:hover {
+  background: color-mix(
+    in srgb,
+    var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 10%,
+    transparent
+  );
+}
+
+/* The real input stays in the DOM, in the tab order, and in the accessibility
+   tree. opacity: 0 — never display: none or visibility: hidden, either of which
+   removes it from the tree and takes the keyboard with it.
+
+   It is also kept the size of the track and stacked over it, so a pointer still
+   lands on a real control if the label wiring ever breaks. */
+.ac-switch__input {
+  position: absolute;
+  top: 50%;
+  left: 0.4rem;
+  width: 2.4rem;
+  height: 1.35rem;
+  margin: 0;
+  transform: translateY(-50%);
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Two cues, never one: the fill says on in color, the thumb says it again in
+   position. Color alone would fail SC 1.4.1 for anyone who cannot tell the two
+   fills apart — and a switch is the control where that mistake is most common. */
+.ac-switch__track {
+  position: relative;
+  flex: none;
+  display: block;
+  box-sizing: border-box;
+  width: 2.4rem;
+  height: 1.35rem;
+  padding: 2px;
+  border: 2px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: 999px;
+  background: var(--ac-track-off, var(--bg, #070110));
+  transition:
+    background-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms)))
+      ease,
+    border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-switch__thumb {
+  display: block;
+  width: calc(1.35rem - 8px);
+  height: calc(1.35rem - 8px);
+  border-radius: 50%;
+  background: var(--ac-border-strong, var(--border-strong, #8064c0));
+  /* A transform, not a switch of sides: the thumb is laid out once, so it cannot
+     land half a pixel off in one of the two states. */
+  transform: translateX(0);
+  transition: transform
+    calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 200ms))) ease;
+}
+
+.ac-switch__input:checked + .ac-switch__track {
+  border-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  background: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+}
+
+.ac-switch__input:checked + .ac-switch__track .ac-switch__thumb {
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  transform: translateX(calc(2.4rem - 1.35rem));
+}
+
+/* The ring has to appear on the track, since the input it belongs to is
+   transparent. :focus-visible, so it does not fire on a mouse click. */
+.ac-switch__input:focus-visible + .ac-switch__track {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-switch__text {
+  min-width: 0;
+}
+
+/* The on row is bolder as well as differently colored — again, not hue alone. */
+.ac-switch:has(.ac-switch__input:checked) .ac-switch__text {
+  font-weight: 700;
+}
+
+/* --- [STATUS] examples 2 and 4 ------------------------------------------- */
+
+.ac-switch-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.ac-switch__note {
+  margin: 0 0 0 0.4rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* An empty note would otherwise leave a gap before the script has run. */
+.ac-switch__note:empty {
+  display: none;
+}
+
+/* Clipped off screen, not display: none — a region that is not rendered is also
+   not in the accessibility tree, and announces nothing. The component owns this
+   rule rather than borrowing a site utility class, so a paste into a bare app
+   still speaks. */
+.ac-switch__status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- [SOFT-DISABLED] example 4 ------------------------------------------
+   aria-disabled is an announcement, not an enforcement: the control stays
+   focusable and stays in the tab order, which is the whole point. The script in
+   component.js is what actually blocks the change. */
+
+.ac-switch:has(.ac-switch__input[aria-disabled="true"]),
+.ac-switch:has(.ac-switch__input:disabled) {
+  cursor: not-allowed;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-switch:has(.ac-switch__input[aria-disabled="true"]):hover,
+.ac-switch:has(.ac-switch__input:disabled):hover {
+  background: none;
+}
+
+/* Dimming alone is a contrast problem, and low opacity reads as "ignore this"
+   rather than "you cannot change this" — so unavailable is drawn as well: the
+   border goes dashed and the fill is dropped. */
+.ac-switch__input[aria-disabled="true"] + .ac-switch__track,
+.ac-switch__input:disabled + .ac-switch__track {
+  border-style: dashed;
+  border-color: var(--ac-border, var(--border, #34205a));
+  background: var(--ac-track-off, var(--bg, #070110));
+}
+
+.ac-switch__input[aria-disabled="true"] + .ac-switch__track .ac-switch__thumb,
+.ac-switch__input:disabled + .ac-switch__track .ac-switch__thumb {
+  background: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------
+   color-mix, tinted fills and our accent are all discarded here, which would
+   leave the track a blank pill in both states. The thumb's position still
+   reads; these rules put the fill back, in the user's own palette. */
+
+@media (forced-colors: active) {
+  .ac-group {
+    border-color: CanvasText;
+  }
+
+  .ac-switch:hover {
+    background: none;
+  }
+
+  .ac-switch__track {
+    border-color: ButtonBorder;
+    background: Canvas;
+  }
+
+  /* forced-color-adjust keeps our geometry on this one small part; the colors
+     are system keywords, so the user's palette still wins. */
+  .ac-switch__thumb {
+    forced-color-adjust: none;
+    background: ButtonBorder;
+  }
+
+  .ac-switch__input:checked + .ac-switch__track {
+    forced-color-adjust: none;
+    border-color: Highlight;
+    background: Highlight;
+  }
+
+  .ac-switch__input:checked + .ac-switch__track .ac-switch__thumb {
+    background: Canvas;
+  }
+
+  .ac-switch__input:focus-visible + .ac-switch__track {
+    outline-color: CanvasText;
+  }
+
+  /* GrayText is the system's own "unavailable"; the dashed border survives too,
+     so both cues are kept. */
+  .ac-switch:has(.ac-switch__input[aria-disabled="true"]),
+  .ac-switch:has(.ac-switch__input:disabled) {
+    color: GrayText;
+  }
+
+  .ac-switch__input[aria-disabled="true"] + .ac-switch__track,
+  .ac-switch__input:disabled + .ac-switch__track {
+    border-color: GrayText;
+    background: Canvas;
+  }
+
+  .ac-switch__input[aria-disabled="true"] + .ac-switch__track .ac-switch__thumb,
+  .ac-switch__input:disabled + .ac-switch__track .ac-switch__thumb {
+    background: GrayText;
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "slug": "switch",
+  "name": "Switch",
+  "group": "forms-inputs",
+  "order": 80,
+  "summary": "A checkbox that takes effect the moment you flip it — drawn as a track and a thumb, so state reads from position as well as color, with the role=\"switch\" variant alongside it.",
+  "tags": ["switch", "toggle", "checkbox", "role-switch", "aria-disabled", "live-region"],
+  "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/switch/",
+  "wcag": ["1.3.1", "1.4.1", "1.4.11", "2.1.1", "2.4.7", "2.5.8", "3.2.2", "4.1.2", "4.1.3"],
+  "status": "stable",
+  "files": ["html", "css", "js"],
+  "demoNote": "Flip example 2 and the confirmation arrives politely, without renaming the control. Example 4's locked switch still takes focus and still says why — that is the difference between aria-disabled and disabled."
+}

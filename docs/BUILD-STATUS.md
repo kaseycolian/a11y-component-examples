@@ -81,7 +81,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 10 / 34
+## Component roster — 11 / 34
 
 ### foundations
 - [ ] `skip-link`
@@ -140,7 +140,17 @@ take their logic and not their layout. See item 1 under remaining work.
   `aria-checked="mixed"` on a native input. `indeterminate` survives a change to `checked`, so it is
   cleared explicitly. Documents the keyboard difference from radios — a checkbox set is one tab stop
   *per box* and has no arrow keys.
-- [ ] `switch`
+- [x] `switch` — done. 23/23 tests in Chromium. A labeled native checkbox is the default, with
+  `role="switch"` as example 3: older JAWS announces the role inconsistently, and the browser keeps
+  every checkbox behavior either way (never hand-write `aria-checked` alongside it). State is carried by
+  the **thumb's position as well as the track fill** — the fill alone is the usual SC 1.4.1 failure here.
+  The thumb moves by `transform`, so it is laid out once and cannot land a half-pixel off in one state.
+  Confirmation goes to a pre-existing, clipped `role="status"`, never to the label: renaming the control
+  someone just operated tells them a different control is under their finger. Example 4 promotes the
+  header's Reduce motion pattern — `aria-disabled` is an announcement, so `component.js` prevents the
+  click, which covers Space too. Gotcha found: **Playwright treats `aria-disabled="true"` as
+  unactionable**, so `toBeEnabled()` fails and the click needs `{ force: true }`; assert `el.disabled`
+  directly instead.
 - [ ] `fieldset-group`
 
 ### overlays-disclosure

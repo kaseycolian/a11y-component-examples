@@ -1,0 +1,162 @@
+<!-- ===========================================================================
+     SWITCH — a checkbox that takes effect the moment you flip it
+
+     WHAT TO COPY
+       Any one example below is self-contained. Take its section plus the
+       matching sections of component.css, and of component.js for 2 and 4.
+       Copy the file whole for the library-grade version.
+
+     THE CONTRACT
+       input[type=checkbox]   the real control; the track and thumb are decoration
+       label[for]             the thing being switched, named in plain words
+       .ac-switch__track      aria-hidden — it is paint, not semantics
+
+     WHEN NOT TO USE ONE
+       A switch promises the change is already applied. If the setting only takes
+       effect after a Save button, use a checkbox — the shape of the control is a
+       promise about behavior, and this one is easy to break.
+
+     WHY A CHECKBOX AND NOT role="switch"
+       role="switch" is legal and reads well in current NVDA and VoiceOver, but
+       older JAWS announces it inconsistently, and a checkbox with a clear label
+       loses nothing: "Reduce motion, checkbox, checked" is unambiguous. Example 3
+       shows the role version for when your audience is known.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     =========================================================================== -->
+
+<div class="ac-demo-grid">
+  <!-- ======================================================================
+       EXAMPLE 1 · The baseline
+       CSS [GROUP] + [CORE]. No JavaScript.
+
+       The label names the thing being switched, not the action: "Stage lights",
+       not "Turn stage lights on". State is what checked/unchecked is for, and a
+       label that changes with the state announces twice.
+
+       State is signaled twice over: the thumb moves, and the track fills. Color
+       alone would fail SC 1.4.1 for anyone who cannot tell the two fills apart.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">1 &middot; The baseline</h3>
+
+    <fieldset class="ac-group">
+      <legend class="ac-group__legend">Monitoring</legend>
+      <div class="ac-group__body">
+        <label class="ac-switch" for="ac-sw-lights">
+          <input class="ac-switch__input" type="checkbox" id="ac-sw-lights" name="lights" checked />
+          <span class="ac-switch__track" aria-hidden="true"><span class="ac-switch__thumb"></span></span>
+          <span class="ac-switch__text">Stage lights</span>
+        </label>
+
+        <label class="ac-switch" for="ac-sw-smoke">
+          <input class="ac-switch__input" type="checkbox" id="ac-sw-smoke" name="smoke" />
+          <span class="ac-switch__track" aria-hidden="true"><span class="ac-switch__thumb"></span></span>
+          <span class="ac-switch__text">Smoke machine</span>
+        </label>
+      </div>
+    </fieldset>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 2 · Applied immediately, and said out loud
+       CSS [GROUP] + [CORE] + [STATUS]. JS [CORE] + [STATUS].
+
+       The switch has already done the thing, so the confirmation is a polite
+       role="status" — not an alert, which interrupts, and not a label change,
+       which renames the control under the user's finger.
+
+       The visible line is aria-hidden and mirrors the same words, so the state is
+       readable on screen without being announced twice.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">2 &middot; Applied immediately</h3>
+
+    <div class="ac-switch-field" data-ac-switch>
+      <label class="ac-switch" for="ac-sw-notify">
+        <input class="ac-switch__input" type="checkbox" id="ac-sw-notify" name="notify"
+               data-ac-switch-input
+               data-ac-on-text="Door alerts on. You will hear every scan."
+               data-ac-off-text="Door alerts off." />
+        <span class="ac-switch__track" aria-hidden="true"><span class="ac-switch__thumb"></span></span>
+        <span class="ac-switch__text">Door alerts</span>
+      </label>
+
+      <p class="ac-switch__note" data-ac-switch-note aria-hidden="true"></p>
+      <!-- Present and empty from the start: a live region inserted along with its
+           text has no change for a screen reader to notice. -->
+      <p class="ac-switch__status" role="status" data-ac-switch-status></p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 3 · The role="switch" version
+       CSS [GROUP] + [CORE]. No JavaScript.
+
+       Same markup, one attribute added. The browser keeps the checkbox behavior —
+       Space toggles, the label still works, the state still comes from `checked`
+       — and only the announced role changes: "on/off" instead of
+       "checked/unchecked".
+
+       Use it when you know your users are on current screen readers. Older JAWS
+       is the reason it is not the default here.
+
+       Do not add aria-checked alongside it. The browser maps `checked` for you,
+       and a hand-written value can only disagree.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">3 &middot; role="switch"</h3>
+
+    <label class="ac-switch" for="ac-sw-role">
+      <input class="ac-switch__input" type="checkbox" id="ac-sw-role" name="stream"
+             role="switch" checked />
+      <span class="ac-switch__track" aria-hidden="true"><span class="ac-switch__thumb"></span></span>
+      <span class="ac-switch__text">Stream the set</span>
+    </label>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 4 · Unavailable, two ways
+       CSS [GROUP] + [CORE] + [SOFT-DISABLED]. JS [CORE] + [SOFT-DISABLED].
+
+       `disabled`      out of the tab order, announces nothing, not submitted.
+                       Right when the control is simply irrelevant.
+
+       `aria-disabled` still focusable, still announced, still explains itself.
+                       Right when the user needs to know *why* — which is most of
+                       the time.
+
+       The second one needs a script: aria-disabled is an announcement, not an
+       enforcement, so the click has to be prevented. Space fires a click too, so
+       one handler covers the keyboard.
+
+       This is the pattern the site header uses for "Reduce motion" when the OS
+       already asks for it: the control cannot honestly be changed, but the reason
+       has to be reachable.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">4 &middot; Unavailable, two ways</h3>
+
+    <div class="ac-switch-field" data-ac-switch>
+      <label class="ac-switch" for="ac-sw-locked">
+        <input class="ac-switch__input" type="checkbox" id="ac-sw-locked" name="curfew"
+               checked aria-disabled="true" aria-describedby="ac-sw-locked-note" />
+        <span class="ac-switch__track" aria-hidden="true"><span class="ac-switch__thumb"></span></span>
+        <span class="ac-switch__text">Curfew alarm</span>
+      </label>
+      <p class="ac-switch__note" id="ac-sw-locked-note">
+        The venue sets this, so it stays on &mdash; but you can still reach it and
+        hear why.
+      </p>
+    </div>
+
+    <div class="ac-switch-field">
+      <label class="ac-switch" for="ac-sw-dead">
+        <input class="ac-switch__input" type="checkbox" id="ac-sw-dead" name="pyro" disabled />
+        <span class="ac-switch__track" aria-hidden="true"><span class="ac-switch__thumb"></span></span>
+        <span class="ac-switch__text">Pyrotechnics</span>
+      </label>
+      <p class="ac-switch__note">Disabled: skipped by Tab, and not submitted.</p>
+    </div>
+  </div>
+</div>
