@@ -11,6 +11,33 @@ Last updated: 2026-07-28
 
 ---
 
+## START HERE — next component is `visually-hidden`
+
+Everything before it is committed and the tree is clean at `2fc271f`. Run the loop below with:
+
+```sh
+node scripts/new-component.mjs visually-hidden --group foundations --name "Visually Hidden"
+```
+
+Decided in advance, so do not re-derive:
+
+- **CSS-only**, like `skip-link` / `text-input` / `native-select` / `radio-group`: `files: ["html","css"]`,
+  tag `no-js`, delete the scaffolded `component.js`. Its spec entry is `component-specs.md` → foundations
+  → `visually-hidden`.
+- It is the **canonical home for the clipping technique**. `skip-link`, `switch`, `textarea` and
+  `tooltip` each carry a local copy on purpose (a paste into a bare app must not need a second file) —
+  say that in both directions: here, that the copies exist; there, nothing to change.
+- The `--focusable` variant is the same idea as `skip-link` but generalized. Cross-link, don't restate.
+- Worth an example each: the utility on a **label** vs a **live region** (a live region also has to be
+  in the DOM first — see `live-region`), the `display: none` / `visibility: hidden` failure shown live,
+  and `aria-label` as the alternative that does *not* work on every element.
+- `.ac-visually-hidden` may already appear in `src/site/styles/site.css` or another component — grep
+  before authoring and reconcile rather than shipping a second definition.
+
+Then `focus-ring`, `live-region`, `typography`, `motion-preferences`, `effects` finish `foundations`.
+
+---
+
 ## The loop for building one component
 
 Designed so a session can do one component without reading anything else:
@@ -31,9 +58,10 @@ npm run new:component -- <slug> --group <group-id> --name "Display Name"
 
 The **definition of done** is the checklist at the bottom of `component-specs.md`.
 
-**Reference implementation: `field`.** It is the only component that follows the current
-copyability and writing-style conventions in `CLAUDE.md` — numbered example sections across all three
-files, a copy map in each header, the framework caveat in `docs.md`. Copy its shape.
+**Reference implementations.** Every component below except `disclosure` follows the current
+copyability and writing-style conventions in `CLAUDE.md` — numbered example sections across all files,
+a copy map in each header, the framework caveat in `docs.md`. Copy the shape of `field` for a form
+component, `tooltip` for a hard-behavior one, `skip-link` for a **CSS-only** one.
 
 `dropdown` is still the best reference for *hard behavior* (popover positioning, roving focus,
 type-ahead, 14 tests) and `disclosure` for a minimal factory — but both predate the conventions, so
@@ -365,6 +393,14 @@ It must match `npm run preview` exactly, base path included.
 - **npm 11 gates install scripts.** `allowScripts` in `package.json` already approves esbuild and
   sharp; re-approve with `npm approve-scripts <pkg>` if a new one appears.
 - **Git is 2.24** — no `git init -b`, no interactive flags.
+- **Playwright does not walk up to find its config.** `npm` finds `package.json` from any
+  subdirectory, so an earlier `cd` into a component folder leaves tests failing with
+  `Project(s) "chromium" not found. Available projects: ""`. Prefix the call:
+  `Set-Location D:\sources\a11y-component-examples; npx playwright test --project=chromium <slug>`.
+- **One unidentified flaky test exists in a pre-existing spec.** A full Chromium run once reported
+  `1 failed, 306 passed`; two subsequent full runs were `307 passed`, and `tooltip skip-link
+  --repeat-each=3` was 123/123. It is not in `tooltip` or `skip-link`. If a lone unexplained failure
+  appears, re-run before chasing it — but capture the test name, which is what was missed.
 - **`astro preview` does not rebuild, and Playwright reuses it.** `reuseExistingServer` only checks
   that the port answers, so a preview server left running from an earlier step will serve a stale
   build and tests will pass or fail against the wrong bytes. Kill it before a test run.
