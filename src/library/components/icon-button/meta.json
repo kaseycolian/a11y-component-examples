@@ -1,0 +1,22 @@
+{
+  "slug": "icon-button",
+  "name": "Icon Button",
+  "group": "buttons-actions",
+  "order": 20,
+  "summary": "A button with a glyph and no words, where the accessible name is the only name — the four ways it goes missing, the case for clipped real text over aria-label, the word voice control has to be able to say, and the target that is the padding rather than the icon.",
+  "tags": [
+    "button",
+    "icon",
+    "aria-label",
+    "accessible-name",
+    "svg",
+    "label-in-name",
+    "target-size",
+    "forced-colors"
+  ],
+  "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/button/",
+  "wcag": ["1.1.1", "2.5.3", "2.5.8", "4.1.2"],
+  "status": "stable",
+  "files": ["html", "css", "js"],
+  "demoNote": "Examples 3 to 5 are live and half wrong on purpose. Two of example 3's four buttons have no accessible name at all, and the readout under each one says where its name came from; example 4's second button cannot be reached by saying the word printed under it; example 5's third button is shrink-wrapped to its glyph and lands under the 24px floor."
+}

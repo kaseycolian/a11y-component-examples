@@ -11,39 +11,41 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-28 (button)
+Last updated: 2026-07-28 (icon-button)
 
 ---
 
-## START HERE — next component is `icon-button`
+## START HERE — next component is `loading-button`
 
-`button` landed (22/22 Chromium) and **`.ac-btn` now has a canonical home**. Run the loop below with:
+`icon-button` landed (16/16 Chromium). Run the loop below with:
 
 ```sh
-node scripts/new-component.mjs icon-button --group buttons-actions --name "Icon Button"
+node scripts/new-component.mjs loading-button --group buttons-actions --name "Loading Button"
 ```
 
 Decided in advance, so do not re-derive:
 
-- Spec entry: `component-specs.md` → buttons-actions → `icon-button`.
-  `<button class="ac-btn-icon" aria-label="Settings">` with an `aria-hidden focusable="false"` SVG.
-- **The modifier surface is already settled by `button` — extend it, do not invent a parallel one.**
-  `.ac-btn` base + `--solid` / `--outline` / `--ghost` (weight) + `--pink` / `--green` / `--blue` /
-  `--purple` (accent) + `--sm` (size). The accent is a **local custom property**, `--ac-btn-accent` /
-  `--ac-btn-on-accent`, that the three weight rules read; an icon button that wants the same four
-  accents needs no new rules at all, only the base class. Read `[CORE]` and `[WEIGHTS]` in
-  `button/component.css` before writing anything.
-- The one thing this page exists to say: **the accessible name is the only name.** With no
-  `aria-label` an icon-only button announces as "button" and nothing else. `visually-hidden` already
-  owns the argument that `aria-label` is a *different tool* rather than a shorter spelling (it needs
-  a role that supports naming, replaces the whole name per SC 2.5.3, and is invisible to translation
-  and find-in-page) — link to it rather than re-deriving it, and make the case for visible-text-plus-
-  clipping where the label can be real text.
-- `focusable="false"` on the SVG for IE-era Edge and some AT; `aria-hidden="true"` on it always.
-- Square target, so `min-width` matters as much as `min-height`. `--sm` is 24px in both dimensions
-  and there is nothing below it — `button`'s example 5 measures that live and its `--tiny` is the
-  live failure. Reuse the readout shape rather than re-deriving the spacing-exception argument.
-- `loading-button` → `chip-toggle` follow, and both also extend `.ac-btn`.
+- Spec entry: `component-specs.md` → buttons-actions → `loading-button`. `aria-busy="true"` while
+  pending, the spinner `aria-hidden`, and a polite live region that announces "Saving…" then "Saved".
+- **Extend `.ac-btn`, do not invent a parallel surface.** Copy `[BTN]` out of
+  `icon-button/component.css` — it is already the trimmed copy (base + weights + `--sm`, no `[SIZE]`
+  section of its own) and the accent stays the `--ac-btn-accent` custom property. That copy now
+  exists in six places; a change to `.ac-btn` is a change in all six.
+- The one thing this page exists to say: **a spinner is silent.** Its state lives in `aria-busy` and
+  in a live region, never in the animation. `live-region` owns the announcer argument (two rAFs, the
+  region pre-existing and empty, the repeat problem) — lift `AC.speak`'s shape and link rather than
+  re-deriving it.
+- **Never `disabled` while loading.** Focus is lost the moment it is set, the reader is dropped back
+  to the body with no explanation, and they cannot hear the state they caused. `aria-disabled` plus
+  `button`'s capture-phase guard is the answer, and that guard is already written — lift `[CORE]`
+  from `button/component.js`.
+- **The accessible name must not change.** Swapping "Save" for "Saving…" re-announces the control as
+  a new one and loses the reader's place; the status goes in the live region. This is the same rule
+  `switch` and `input-group` already follow for their confirmations.
+- The spinner is a motion-gated animation and SC 2.2.2 is independent of the preference — see
+  `motion-preferences`. At `--ac-motion: 0` the spinner must still show that something is pending
+  without rotating.
+- `chip-toggle` follows, and also extends `.ac-btn`.
 
 ---
 
@@ -58,7 +60,7 @@ Build in this order. The order is the dependency graph, not a preference.
 | Batch | Slugs | Why here |
 | --- | --- | --- |
 | ~~**A**~~ | ~~`effects`~~ | **Done.** Closed `foundations` |
-| **B** | ~~`button`~~ → `icon-button` → `loading-button` → `chip-toggle` | `button` is **done** and is the canonical `.ac-btn`; the other three extend it |
+| **B** | ~~`button`~~ → ~~`icon-button`~~ → `loading-button` → `chip-toggle` | `button` is the canonical `.ac-btn`; the other three extend it |
 | **C** | `notice` → `status-text` → `badge` → `result-panel` | all four are small, and three of them restate `live-region`'s argument in a new shape |
 | **D** | `tabs` → `jump-nav` | `tabs` is the largest behavior left; `jump-nav` reuses its `aria-current` thinking |
 | **E** | `data-table` → `prose-surface` | `prose-surface` is the scroll-region pattern `data-table` establishes |
@@ -67,8 +69,10 @@ Build in this order. The order is the dependency graph, not a preference.
 Cross-batch notes that will otherwise be rediscovered:
 
 - **`.ac-btn` now lives in `button` and the local copies stay.** `.ac-motion__btn` in
-  `motion-preferences` and the addon buttons in `input-group`, `modal`, `drawer` and `tooltip` are
-  deliberate duplicates — components are not DRY here. A change to `.ac-btn` is a change in all five.
+  `motion-preferences`, the addon buttons in `input-group`, `modal`, `drawer` and `tooltip`, and
+  `icon-button`'s `[BTN]` are deliberate duplicates — components are not DRY here. A change to
+  `.ac-btn` is a change in all six. `icon-button`'s copy is the one to lift for the rest of batch B:
+  it is base + weights + accents + `--sm` with nothing else.
 - **`result-panel`'s copy button is `input-group`'s copy button.** Same clipboard write, same
   pre-existing empty `role="status"`, same rule against renaming the button. Lift it.
 - **`status-text` and `notice` are the same SC 1.4.1 point twice** — the glyph is `aria-hidden` and the
@@ -173,11 +177,11 @@ take their logic and not their layout. See item 1 under remaining work.
 - **Playwright** — `playwright.config.mjs`, three browser projects, `webServer` runs
   `npm run build && npm run preview`. **Only Chromium is installed**, so `npm run verify` currently
   *fails* at the test step: every Firefox and WebKit test errors with "Executable doesn't exist".
-  Chromium is **434/434**. Run `npx playwright install firefox webkit` to get a green `verify`.
+  Chromium is **472/472**. Run `npx playwright install firefox webkit` to get a green `verify`.
 
 ---
 
-## Component roster — 22 / 35
+## Component roster — 23 / 35
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -327,7 +331,29 @@ take their logic and not their layout. See item 1 under remaining work.
   all, which is the whole reason its `@media` block is not optional. **A hard-`disabled` button
   dispatches no click at all**, so there is nothing to report from and nothing to explain with; that is
   the argument for `aria-disabled` in one sentence.
-- [ ] `icon-button`
+- [x] `icon-button` — done. 16/16 tests in Chromium. **Canonical home for `.ac-btn-icon`**, which is
+  four rules on top of a local copy of `button`'s base: `gap: 0`, `padding: 0`, a
+  `--ac-btn-icon-glyph` size, and an inline `<svg>` stroked with `currentColor`. Organized around one
+  sentence — a text button gets its name for free from the word on it and its *width* for free from
+  the same word, and an icon button has neither. Example 3 is four identical-looking buttons whose
+  names come from four different places, with a **live readout naming the source**: `resolveName()`
+  walks `aria-labelledby` → `aria-label` → own text minus `aria-hidden` subtrees → `title`, and two of
+  the four resolve to nothing. The second is the surprising one — `aria-label` sits on the wrapping
+  `<span>` and is discarded, and nothing has to special-case it, because the resolver asks the button.
+  Example 4 is **SC 2.5.3** made operable: two captioned buttons and a mock voice-control lookup that
+  matches typed text against the accessible name, so "click Share" finds nothing while "click Queue"
+  finds one. Example 2 is the `aria-label`-versus-clipped-text table, live: all three announce the
+  same and only two contain the words, and `--labeled` is the third one with a class added — the
+  payoff being that text can be un-clipped at a breakpoint and an attribute cannot. Three findings.
+  **`box-sizing: border-box` counts the border into the target**, so the shrink-wrapped failure at a
+  20px glyph came out at exactly 24×24 — on the floor, not under it — until its `border-width` went
+  to 0; any SC 2.5.8 demo built by removing `min-width` has to remove the border too. **`.ac-btn--sm`
+  and `.ac-btn-icon` are both one class deep**, so which `padding` wins is decided by source order
+  and nothing else — `[BTN]` is declared before `[ICON]` for that reason, and it is the file's one
+  ordering constraint. **An inline SVG on `currentColor` is the only icon that survives forced
+  colors**: it becomes `ButtonText` with the label and `HighlightText` on hover with no rule of its
+  own, while an `<img>` keeps the color it was drawn in on a background the system just replaced and
+  a `background-image` is dropped outright.
 - [ ] `loading-button`
 - [ ] `chip-toggle`
 
@@ -679,7 +705,18 @@ It must match `npm run preview` exactly, base path included.
   while it scrolls, so the sticky header paints across the middle of it and hides an example — that is
   an artifact, not a bug, but it is also where a real one goes unnoticed. And print
   `document.activeElement.tagName` in the same pass; it is one line and it is what caught the focus
-  probe above.
+  probe above. **The stitching is avoidable: open the page at `{ width, height: 3000 }`.** With a
+  viewport taller than the demo, an element screenshot never scrolls and the header cannot paint into
+  it — the per-example shots come back clean at both widths with no second pass.
+- **`box-sizing: border-box` counts the border into a target's measured size.** An SC 2.5.8 failure
+  built by removing `min-width`/`min-height` from a 20px glyph lands at exactly 24×24 — on the floor
+  rather than under it — because the 2px border on each side is inside the box. The `border-width`
+  has to go too. `icon-button`'s `--tiny` is the precedent, and its readout is what caught it.
+- **Two single-class rules are ordered by source, not by which is more specific.** `.ac-btn--sm` and
+  `.ac-btn-icon` are both (0,1,0) and both set `padding`, so an icon button laid out before the size
+  modifier silently keeps the text button's padding and stops being square. Declaring `[BTN]` before
+  `[ICON]` is the fix and it is worth a comment, because there is nothing in either rule to suggest
+  it matters.
 - **`[WARN] [glob-loader] Duplicate id "<slug>" found` is a stale content cache, not a real
   duplicate.** It appears on the first build after a scaffolded `docs.md` is filled in, because the
   entry was already indexed in `.astro/`. Nothing is wrong and the page builds; `rm -rf .astro` and
