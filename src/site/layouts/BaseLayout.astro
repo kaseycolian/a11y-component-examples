@@ -15,9 +15,11 @@ import '../styles/site.css';
  * preference. See src/site/lib/themes.mjs.
  */
 import { SITE_THEME } from '../lib/themes.mjs';
+import { pageTitle } from '../lib/site.mjs';
 
 interface Props {
-  title: string;
+  /** The page's own name. Omit on the home page, which the site name covers. */
+  title?: string;
   description?: string;
   /** Set false on pages that supply their own <h1> layout wrapper. */
   wide?: boolean;
@@ -26,7 +28,7 @@ interface Props {
 const { title, description = 'Accessible, themeable UI components in vanilla HTML, CSS, and JavaScript.', wide = false } = Astro.props;
 
 const base = import.meta.env.BASE_URL;
-const fullTitle = `${title} · Accessible & Stylized Components`;
+const fullTitle = pageTitle(title);
 ---
 
 <!doctype html>

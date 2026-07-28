@@ -1,6 +1,7 @@
 ---
 import { THEME_GROUPS } from '../lib/themes.mjs';
 import { COMPONENTS_BY_GROUP } from '../lib/registry.mjs';
+import { SITE_NAME, SITE_TAGLINE } from '../lib/site.mjs';
 
 const base = import.meta.env.BASE_URL;
 const indexHref = `${base}components/`;
@@ -12,8 +13,8 @@ const here = Astro.url.pathname;
 <header class="site-header">
   <div class="site-header__inner">
     <a class="site-brand" href={base}>
-      <span class="site-brand__mark">The A11Y Way</span>
-      <span class="site-brand__sub">WCAG 2.2 AA Compliant Development Guide for Humans and Agents</span>
+      <span class="site-brand__mark">{SITE_NAME}</span>
+      <span class="site-brand__sub">{SITE_TAGLINE}</span>
     </a>
 
     {

@@ -12,6 +12,19 @@ import { test, expect } from '@playwright/test';
 const picker = (page) => page.locator('[data-theme-control] .ac-dropdown');
 const jump = (page) => page.locator('[data-jump-control] .ac-dropdown');
 
+test('every tab title leads with the site name', async ({ page }) => {
+  // A row of open tabs truncates, so the name a visitor recognizes comes first.
+  await page.goto('components/disclosure/');
+  await expect(page).toHaveTitle('The A11Y Way · Disclosure');
+
+  await page.goto('components/');
+  await expect(page).toHaveTitle('The A11Y Way · All components');
+
+  // Not doubled on the home page, which the site name already names.
+  await page.goto('./');
+  await expect(page).toHaveTitle('The A11Y Way');
+});
+
 test('the header theme picker is the library Dropdown and applies a theme', async ({ page }) => {
   await page.goto('components/disclosure/');
 
