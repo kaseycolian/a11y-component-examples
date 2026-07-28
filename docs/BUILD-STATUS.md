@@ -81,7 +81,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 13 / 35
+## Component roster — 14 / 35
 
 ### foundations
 - [ ] `skip-link`
@@ -196,7 +196,28 @@ take their logic and not their layout. See item 1 under remaining work.
   on `<body>` once per Tab cycle before wrapping back in, which the test now asserts honestly rather
   than pretending. `data-ac-backdrop-close` is opt-in and checks both `pointerdown` and `click` targets,
   or a text-selection drag ending on the backdrop dismisses the dialog.
-- [ ] `tooltip`
+- [x] `tooltip` — done. 25/25 tests in Chromium. Organized entirely around **SC 1.4.13**, which needs
+  three things at once: dismissible (Esc, and the dismissal is *remembered* until the pointer leaves or
+  focus moves, or it reappears instantly under an unmoved pointer), hoverable (closing is delayed
+  ~180ms and the bubble's own `pointerenter` cancels the pending close — `pointer-events: none` on a
+  bubble is the usual failure), persistent (nothing times out). Opens on `focus` only when
+  `:focus-visible` matches, so a mouse click does not fire a tooltip at the person who clicked; `touch`
+  `pointerType` is filtered out, or a tap leaves a bubble stuck open with no `pointerleave` coming.
+  **`aria-describedby` is never toggled** — a directly referenced element is folded into the description
+  even while hidden, so the text is announced on focus before anything appears; the test asserts that.
+  Ships a **toggletip** (example 4) as the touch-reachable alternative: click-opened, announced by
+  inserting text into a pre-existing `role="status"`, and deliberately no `aria-expanded` and no
+  `aria-describedby` — it is a message, not a region the button controls. Example 2 is the one case where
+  the bubble is the **name** (`aria-labelledby`, on an icon-only trigger); example 3 keeps a native
+  `title` on the page as the comparison; example 5 is the SC 3.3.2 point — the requirement is visible
+  text and the tooltip only adds the reason, with both ids in one `aria-describedby`. Bubble is
+  `position: fixed` with JS coordinates so an `overflow: hidden` ancestor cannot clip it, flipping above
+  only when there is room, clamping to the viewport, and re-aiming the arrow after the clamp. Two CSS
+  gotchas worth keeping: any author `display` on `.ac-tooltip` would beat the UA's
+  `[hidden] { display: none }` and pin the bubble open, so the guard is declared explicitly; and
+  `display: contents` on the toggletip's live region would drop it from the accessibility tree.
+
+**`overlays-disclosure` is complete** apart from the `disclosure` retrofit in item 1.
 
 ### navigation
 - [ ] `tabs` — a working reference already exists in `src/site/components/CodePanel.astro`

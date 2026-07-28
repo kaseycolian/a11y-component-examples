@@ -1,0 +1,312 @@
+/* ===========================================================================
+   TOOLTIP
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) lives in
+   the site's own stylesheet, not this file.
+
+     [CORE]        examples 1, 2, 4, 5. The host, the bubble, the arrow.
+     [BUTTON]      examples 1 and 3. A plain button, so the demo has one. The
+                   Button component owns the canonical version.
+     [ICON]        examples 2, 4, 5. The square icon-only trigger.
+     [TOGGLETIP]   example 4.
+     [FIELD]       example 5. A label, a hint and an input, kept minimal. The
+                   Field and Text Input components own the canonical versions.
+     [FORCED]      always ship this. High Contrast rebuilds every cue.
+
+   Copy the file whole for the library version.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [CORE] the host -----------------------------------------------------
+   inline-flex so the trigger sits on the text baseline next to a label, and so
+   the wrapper is never wider than what it holds. It is not the positioning
+   context: the bubble is position: fixed, for the reason below. */
+
+.ac-tooltip-host {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+/* --- [CORE] the bubble ---------------------------------------------------
+   position: fixed, and component.js writes the coordinates. Absolute
+   positioning inside the host is one line shorter and breaks the moment a
+   trigger sits inside anything with overflow: hidden — a toolbar, a table
+   scroller, a card with a clipped corner — because the bubble is then clipped
+   too. Fixed escapes all of them.
+
+   The one case fixed does not escape is an ancestor with `transform`, `filter`
+   or `contain`, each of which makes itself the containing block for fixed
+   descendants. There, reach for the popover API or CSS anchor positioning. */
+
+.ac-tooltip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  /* Must clear your app's own chrome. This site's sticky header is 900. */
+  z-index: 1000;
+  box-sizing: border-box;
+  /* min() so a long tooltip still fits a 320px viewport without widening the
+     page (SC 1.4.10). */
+  max-width: min(20rem, calc(100vw - 2rem));
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.45;
+  /* start, not left: an RTL page would otherwise ragged-edge the wrong side. */
+  text-align: start;
+  /* Never pointer-events: none. That is the usual tooltip shortcut and it makes
+     the bubble unhoverable, which is half of SC 1.4.13. */
+  pointer-events: auto;
+  opacity: 1;
+  transition: opacity calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms)))
+    ease;
+}
+
+/* The one rule people delete by accident. Adding any `display` value to
+   .ac-tooltip above would beat the UA's `[hidden] { display: none }`, because an
+   author declaration always wins — and the tooltip would then be permanently
+   visible. Declaring it here keeps the guard explicit and safe to build on. */
+.ac-tooltip[hidden] {
+  display: none;
+}
+
+/* The arrow. --ac-tooltip-arrow-x is written by component.js so the point still
+   lands on the trigger after the bubble has been clamped to the viewport.
+
+   Default placement is below the trigger, so the arrow sits on the top edge and
+   only the two sides facing the trigger keep their border — that is what makes
+   the seam with the bubble disappear. */
+.ac-tooltip::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: var(--ac-tooltip-arrow-x, 50%);
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-width: 1px 0 0 1px;
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  transform: rotate(45deg);
+}
+
+.ac-tooltip--above::after {
+  top: auto;
+  bottom: -5px;
+  border-width: 0 1px 1px 0;
+}
+
+/* --- [BUTTON] examples 1 and 3 -------------------------------------------
+   Nothing tooltip-specific. Here so the two examples have a real button
+   without depending on another component's stylesheet. */
+
+.ac-tooltip-btn {
+  /* SC 2.5.8 floor is 24px; 44px is the comfortable touch size. */
+  min-height: var(--ac-target, 44px);
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-surface-2, var(--bg-elev, #1b0c30));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms)))
+      ease,
+    border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-tooltip-btn:hover {
+  border-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  background: color-mix(
+    in srgb,
+    var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 14%,
+    var(--ac-surface-2, var(--bg-elev, #1b0c30))
+  );
+}
+
+.ac-tooltip-btn:focus-visible,
+.ac-tooltip-icon:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+/* --- [ICON] examples 2, 4, 5 --------------------------------------------
+   A square target, not a bare glyph. A 16px question mark is a 16px hit area,
+   which fails SC 2.5.8 and is miserable on a phone regardless. */
+
+.ac-tooltip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  /* Both axes, so the box is square at the 24px SC 2.5.8 floor and comfortable
+     above it. */
+  width: var(--ac-target, 44px);
+  height: var(--ac-target, 44px);
+  padding: 0;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: 50%;
+  background: var(--ac-surface-2, var(--bg-elev, #1b0c30));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms)))
+      ease,
+    border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-tooltip-icon:hover {
+  border-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  background: color-mix(
+    in srgb,
+    var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 14%,
+    var(--ac-surface-2, var(--bg-elev, #1b0c30))
+  );
+}
+
+.ac-tooltip-icon svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+/* Example 4's name is real text, kept off screen rather than moved into an
+   aria-label, so translation tools and the DOM both still see it. Clipped, not
+   display: none — the latter would take it out of the accessibility tree and
+   the button would have no name at all. */
+.ac-tooltip-icon__name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- [TOGGLETIP] example 4 ----------------------------------------------
+   There is deliberately no rule for .ac-toggletip__live. It is an empty inline
+   span whose only job is to already exist, so that inserting text into it counts
+   as a change a screen reader will announce — an inline element with no content
+   takes up no space, so it needs no styling to stay out of the way.
+
+   Do not give it `display: contents` to flatten it either: browsers have dropped
+   display: contents elements from the accessibility tree, and a live region that
+   is not in the tree announces nothing.
+
+   The bubble component.js builds inside it reuses .ac-tooltip for the paint, so
+   [CORE] is required with this section. */
+
+/* --- [FIELD] example 5 --------------------------------------------------
+   Minimal on purpose. Field owns .ac-field* and Text Input owns .ac-input;
+   these are local so this file stands alone. */
+
+.ac-tooltip-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+}
+
+.ac-tooltip-field__row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.ac-tooltip-field__label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-tooltip-field__input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--ac-target, 44px);
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+.ac-tooltip-field__input:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-tooltip-field__hint {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------
+   color-mix and our accent are both discarded here, so hover loses its fill and
+   the arrow loses the surface color that hides its seam. These rules rebuild
+   both from system colors. */
+
+@media (forced-colors: active) {
+  .ac-tooltip {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  /* Our geometry, the user's palette: without forced-color-adjust the arrow
+     would be filled with the forced background and read as a notch. */
+  .ac-tooltip::after {
+    forced-color-adjust: none;
+    border-color: CanvasText;
+    background: Canvas;
+  }
+
+  .ac-tooltip-btn,
+  .ac-tooltip-icon,
+  .ac-tooltip-field__input {
+    border-color: ButtonBorder;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  .ac-tooltip-btn:hover,
+  .ac-tooltip-icon:hover {
+    border-color: Highlight;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  .ac-tooltip-btn:focus-visible,
+  .ac-tooltip-icon:focus-visible,
+  .ac-tooltip-field__input:focus-visible {
+    outline-color: CanvasText;
+  }
+
+  .ac-tooltip-field__hint {
+    color: CanvasText;
+  }
+}
