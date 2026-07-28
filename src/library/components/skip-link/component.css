@@ -1,0 +1,329 @@
+/* ===========================================================================
+   SKIP LINK
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) lives in
+   the site's own stylesheet, not this file.
+
+     [FRAME]     the demo's stand-in for your <body>. DELETE IT — in your app
+                 the link is the first child of <body> and needs no wrapper.
+     [CORE]      examples 1, 2, 3, 4. The link, hidden and revealed, and the
+                 target it lands on.
+     [LIST]      example 2. Two or three destinations at once.
+     [VISIBLE]   examples 3 and 4. The modifier that never hides.
+     [MOCK]      the fake page furniture in every example. DELETE IT.
+     [BROKEN]    example 5. Deliberately wrong. Never copy this one.
+     [FORCED]    always ship this. High Contrast rebuilds every cue.
+
+   Copy [CORE] + [FORCED] for the whole component. There is no JavaScript.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [FRAME] delete this ------------------------------------------------
+   The link below is position: absolute, and in a real page its containing block
+   is the viewport-anchored <body>, so it lands at the top of the document. Here
+   each example needs its own, or all five links would stack in one corner of
+   this page. This is the only rule in the file you do not want. */
+
+.ac-skip-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px dashed var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+}
+
+/* --- [CORE] the link ----------------------------------------------------
+   Clipped, not hidden. `display: none`, `visibility: hidden` and the `hidden`
+   attribute all take it out of the tab order, and being reachable by Tab is the
+   only thing this component does.
+
+   width/height of 1px with overflow: hidden is the same technique as a
+   visually-hidden utility class, and it is spelled out here rather than borrowed
+   so that a paste into a bare app still works. */
+
+.ac-skip-link {
+  position: absolute;
+  z-index: 1000; /* must clear your app's sticky header — this site's is 900 */
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  /* Without nowrap the text wraps inside the 1px box, and some screen readers
+     then read it one letter per line. */
+  white-space: nowrap;
+  clip-path: inset(50%);
+  box-sizing: border-box;
+  padding: 0;
+  /* No border in the clipped state. box-sizing: border-box cannot shrink a box
+     below its own borders, so a 2px border would make this 4px rather than 1px —
+     small, but a 4px box is a 4px box, and the point is to occupy nothing. The
+     border belongs to the revealed states below. */
+  border: 0;
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-decoration: underline;
+}
+
+/* :focus, not :focus-visible. A skip link is reached by Tab, so the two agree
+   almost always — but if anything focuses it programmatically, :focus-visible
+   may not match and the link would be focused and still invisible. That failure
+   is silent, and it is the whole component. */
+.ac-skip-link:focus {
+  width: auto;
+  height: auto;
+  /* SC 2.5.8, and the whole point of it: this is now a real target you can also
+     click. */
+  min-height: var(--ac-target, 44px);
+  overflow: visible;
+  clip-path: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  /* Squared off against the two page edges it is pinned to. */
+  border-radius: 0 0 var(--ac-radius-sm, var(--radius-sm, 6px)) 0;
+  /* Inside the box, so the ring cannot be the thing that overflows the viewport. */
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: -3px;
+}
+
+/* No transition on the reveal. An animated skip link is a link that is still
+   arriving when the user presses Enter, and there is nothing to animate *from* —
+   it was 1px a moment ago. */
+
+/* --- [CORE] the target -------------------------------------------------
+   tabindex="-1" goes in the markup, because focus has to actually move; the
+   fragment alone scrolls the page and leaves the tab order where it was.
+
+   The ring is deliberate. It is the only confirmation a sighted keyboard user
+   gets that the jump landed, and this is the exact spot where `outline: none`
+   is tempting and wrong. */
+
+.ac-skip-main {
+  min-width: 0;
+  /* SC 2.4.11: clears a sticky header, so the heading you jumped to is not
+     underneath it. Set --ac-sticky-h to your own header's height. */
+  scroll-margin-top: var(--ac-sticky-h, 5rem);
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.85rem;
+}
+
+.ac-skip-main:focus {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-skip-main p {
+  margin: 0;
+}
+
+/* --- [LIST] example 2 ---------------------------------------------------
+   The group reveals together on :focus-within, so arriving at the first link
+   shows the set rather than making the others a discovery. Stacked vertically,
+   because two absolutely positioned links side by side collide the moment one
+   of them has longer text. */
+
+.ac-skip-list {
+  position: absolute;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  clip-path: inset(50%);
+}
+
+.ac-skip-list:focus-within {
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Inside the list the links are laid out by the list, so they drop their own
+   positioning and their own clipping. */
+.ac-skip-list .ac-skip-link,
+.ac-skip-list .ac-skip-link:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--ac-target, 44px);
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  border-radius: 0;
+}
+
+/* Only the focused one takes the ring, or the group would look like four
+   simultaneously focused links. */
+.ac-skip-list .ac-skip-link:not(:focus) {
+  outline: none;
+}
+
+/* --- [VISIBLE] examples 3 and 4 -----------------------------------------
+   Never hidden, so there is no clipping to get wrong, no z-index to lose, and
+   no sticky header to disappear under. Mouse and touch users get it too. */
+
+.ac-skip-link--visible,
+.ac-skip-link--visible:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  min-height: var(--ac-target, 44px);
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+}
+
+.ac-skip-link--visible:not(:focus) {
+  outline: none;
+}
+
+/* --- [MOCK] delete this -------------------------------------------------
+   Fake page furniture, so each example has something to skip. None of it is
+   part of the component. */
+
+.ac-skip-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.6rem;
+  min-width: 0;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.85rem;
+}
+
+.ac-skip-nav a,
+.ac-skip-lineup a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--ac-target, 44px);
+  padding: 0 0.2rem;
+  color: var(--ac-link, var(--accent-blue, #3ceaff));
+}
+
+.ac-skip-nav a:focus-visible,
+.ac-skip-lineup a:focus-visible,
+.ac-skip-input:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-skip-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.ac-skip-label,
+.ac-skip-note {
+  margin: 0;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.78rem;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-skip-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--ac-target, 44px);
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.ac-skip-lineup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.6rem;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  list-style: none;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.85rem;
+}
+
+/* --- [BROKEN] example 5 — never copy this -------------------------------
+   `display: none` is how most broken skip links are broken. The markup looks
+   right, the link is in the document, and it can never be focused, so it can
+   never appear. `visibility: hidden` and the `hidden` attribute fail the same
+   way. */
+
+.ac-skip-link--broken {
+  display: none;
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------
+   Our accent is discarded here, so the link would arrive as unstyled text on
+   the forced background with nothing marking it as the thing that just
+   appeared. */
+
+@media (forced-colors: active) {
+  .ac-skip-link {
+    border-color: LinkText;
+    background: Canvas;
+    color: LinkText;
+  }
+
+  .ac-skip-link:focus,
+  .ac-skip-main:focus {
+    outline-color: CanvasText;
+  }
+
+  .ac-skip-main,
+  .ac-skip-input {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .ac-skip-frame {
+    border-color: CanvasText;
+  }
+
+  .ac-skip-nav a,
+  .ac-skip-lineup a {
+    color: LinkText;
+  }
+
+  .ac-skip-label,
+  .ac-skip-note {
+    color: CanvasText;
+  }
+}

@@ -20,10 +20,12 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
 ## foundations
 
 ### skip-link
-- **Markup** `<a class="ac-skip-link" href="#main">Skip to main content</a>` as the first focusable element in `<body>`.
+- **Markup** `<a class="ac-skip-link" href="#main">Skip to main content</a>` as the first focusable element in `<body>`. Target is `.ac-skip-main` with `tabindex="-1"`. Variants: `--visible` (never hides) and a `.ac-skip-list` for two or three destinations.
 - **ARIA** None. A link is a link.
-- **CSS** Visually hidden until `:focus`, then pinned top-left. Must be *visible*, not just focusable.
-- **Gotcha** The target needs `tabindex="-1"`, or focus does not actually move in Safari and Chrome — the page scrolls but the next Tab resumes from the top. Do not use `display: none` to hide it; that makes it unfocusable.
+- **CSS** Clipped until `:focus` — **`:focus`, not `:focus-visible`**, because a programmatic focus may not match the latter and a focused-but-invisible skip link fails silently. Then pinned top-left, `z-index` above your sticky header, and a real ≥44px target. No border in the clipped state: `box-sizing: border-box` cannot shrink a box below its own borders, so a 2px border makes the "1px" box 4px.
+- **Keep the ring on the target.** It is the only confirmation a sighted keyboard user gets that the jump landed, and this is the exact place `outline: none` gets added.
+- **Gotcha** The target needs `tabindex="-1"`, or focus does not actually move — the page scrolls but the next Tab resumes from the top. Do not use `display: none` to hide the link; that makes it unfocusable, and it is the most common broken skip link there is. Also needs `white-space: nowrap` (text wrapping inside a 1px box gets read a letter at a time) and `scroll-margin-top` on the target (SC 2.4.11). Nothing focusable may precede it — cookie banners in particular.
+- **Always-visible is a legitimate choice**, not a fallback: it removes every failure mode this component has and costs one line of chrome.
 
 ### visually-hidden
 - **Markup** `<span class="ac-visually-hidden">` utility class, plus a `.ac-visually-hidden--focusable` variant.

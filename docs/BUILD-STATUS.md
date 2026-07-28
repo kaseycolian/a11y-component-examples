@@ -81,10 +81,22 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 14 / 35
+## Component roster — 15 / 35
 
 ### foundations
-- [ ] `skip-link`
+- [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
+  two destinations revealed together on `:focus-within` (no landmark around them — a `<nav>` adds a
+  region for two links nobody reaches by landmark), an **always-visible** modifier, a mid-page link that
+  skips a *block* rather than jumping to main (SC 2.4.1 is about blocks), and example 5 which is
+  **broken on purpose, live**: a `display: none` link that can never be focused, and a target with no
+  `tabindex="-1"` that scrolls without moving focus. Deliberately `:focus`, not `:focus-visible` — a
+  programmatic focus may not match the latter, and a focused-but-invisible skip link is a silent
+  failure. The focus ring on the target is **kept**: it is the only confirmation a sighted keyboard user
+  gets that the jump landed, and this is the exact spot `outline: none` gets added. Gotcha found:
+  `box-sizing: border-box` cannot shrink a box below its own borders, so a 2px border made the "1px"
+  clipped link 4px — the border moved into the three revealed states instead. The shell's own
+  `.skip-link` in `site.css` predates this and is still hand-rolled; making `BaseLayout` a consumer of
+  `.ac-skip-link` the way the header consumes Dropdown is an open, unforced option.
 - [ ] `visually-hidden`
 - [ ] `focus-ring`
 - [ ] `live-region`

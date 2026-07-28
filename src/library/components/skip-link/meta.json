@@ -1,0 +1,13 @@
+{
+  "slug": "skip-link",
+  "name": "Skip Link",
+  "group": "foundations",
+  "order": 10,
+  "summary": "The first focusable thing in the document and the shortest route past everything a keyboard user would otherwise Tab through — clipped rather than hidden, because being reachable is the only thing it does.",
+  "tags": ["skip-link", "bypass-blocks", "2.4.1", "tabindex", "focus", "visually-hidden", "no-js"],
+  "apg": null,
+  "wcag": ["2.4.1", "2.4.7", "2.4.11", "2.5.8", "4.1.2"],
+  "status": "stable",
+  "files": ["html", "css"],
+  "demoNote": "No JavaScript on this page. Click inside a frame and press Shift+Tab to reach its link. Example 5 is broken on purpose — both of its failures are live, so you can Tab through them and watch."
+}

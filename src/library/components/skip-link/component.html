@@ -1,0 +1,219 @@
+<!-- ===========================================================================
+     SKIP LINK — the first thing in the document, and the shortest route past
+     everything a keyboard user would otherwise Tab through
+
+     WHAT TO COPY
+       Any one example below is self-contained. Take its section plus the
+       matching sections of component.css. There is no JavaScript: a skip link
+       that needs a script is a skip link that breaks when the script fails.
+
+     THE CONTRACT
+       <a href="#main">        a plain link. No role, no ARIA, no attributes
+       first in <body>         before the header, before the banner, before
+                               anything else focusable
+       #main                   the target, carrying tabindex="-1"
+
+     WHY tabindex="-1" ON THE TARGET
+       Following a fragment scrolls the page, but it does not put focus on a
+       non-focusable element. Without it, a screen reader's cursor may not move,
+       and in some browsers the next Tab resumes from the top of the page — the
+       user lands back in the navigation they just skipped. Example 5 has that
+       failure live, so you can Tab through it and watch.
+
+     THE ONE IT SATISFIES
+       SC 2.4.1 Bypass Blocks. SC 2.4.11 is the companion: a focused skip link
+       must not be covered by a sticky header, and neither must the target.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     =========================================================================== -->
+
+<div class="ac-demo-grid">
+  <!-- ======================================================================
+       EXAMPLE 1 · The baseline
+       CSS [FRAME] + [CORE].
+
+       The link is clipped rather than hidden, because `display: none` and
+       `visibility: hidden` both make it unfocusable — the one thing it has to
+       be. On focus it un-clips and pins itself to the top of the page.
+
+       The text names where you are going, not what you are leaving. "Skip
+       navigation" tells you what you avoid; "Skip to main content" tells you
+       where you land, which is the useful half.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">1 &middot; The baseline</h3>
+
+    <!-- .ac-skip-frame is this page's stand-in for your <body>. In your app the
+         link is the first child of <body> and needs no wrapper.
+
+         The fake nav links all point at the same panel because the demo has
+         nowhere else to send them. They are here to be Tab stops. -->
+    <div class="ac-skip-frame">
+      <a class="ac-skip-link" href="#sl-main-1">Skip to main content</a>
+
+      <nav class="ac-skip-nav" aria-label="Example one">
+        <a href="#sl-main-1">Dates</a>
+        <a href="#sl-main-1">Lineup</a>
+        <a href="#sl-main-1">Merch</a>
+        <a href="#sl-main-1">Contact</a>
+      </nav>
+
+      <div class="ac-skip-main" id="sl-main-1" tabindex="-1">
+        <p><strong>Berkeley, Saturday.</strong> Doors at 19:30.</p>
+      </div>
+    </div>
+
+    <p class="ac-demo__legend">
+      Click inside the frame, then press <kbd>Shift</kbd>+<kbd>Tab</kbd> until the
+      link appears. The ring that lands on the panel is deliberate &mdash; it is
+      the only confirmation a sighted keyboard user gets that the jump worked.
+    </p>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 2 · More than one destination
+       CSS [FRAME] + [CORE] + [LIST].
+
+       Two or three is the useful range. The whole group reveals on
+       :focus-within, so someone arriving at the first link can see the set
+       rather than discovering the others one Tab at a time.
+
+       No landmark around them. A <nav> here would add a region to the landmark
+       list for the sake of two links, and a screen reader user reaches these by
+       Tab, never by landmark.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">2 &middot; More than one destination</h3>
+
+    <div class="ac-skip-frame">
+      <ul class="ac-skip-list">
+        <li><a class="ac-skip-link" href="#sl-main-2">Skip to main content</a></li>
+        <li><a class="ac-skip-link" href="#sl-search-2">Skip to search</a></li>
+      </ul>
+
+      <nav class="ac-skip-nav" aria-label="Example two">
+        <a href="#sl-main-2">Dates</a>
+        <a href="#sl-main-2">Lineup</a>
+      </nav>
+
+      <div class="ac-skip-row">
+        <label class="ac-skip-label" for="sl-search-2">Search the lineup</label>
+        <input class="ac-skip-input" id="sl-search-2" type="search" name="q" />
+      </div>
+
+      <div class="ac-skip-main" id="sl-main-2" tabindex="-1">
+        <p><strong>Stranger than the fiction.</strong> 99 rooms, one night.</p>
+      </div>
+    </div>
+
+    <p class="ac-demo__legend">
+      The second link points at a real form control, which is already focusable
+      &mdash; so that one needs no <code>tabindex</code>.
+    </p>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 3 · Always visible
+       CSS [FRAME] + [CORE] + [VISIBLE].
+
+       One modifier, and every "did it appear?" bug goes away with it: no
+       clipping to get wrong, no z-index to lose, no sticky header to hide it
+       under, and mouse and touch users can use it too.
+
+       It costs one line of chrome. On a documentation site or an app with long
+       repeated navigation, that is a good trade — and it is the version to
+       reach for when you cannot test the hidden one properly.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">3 &middot; Always visible</h3>
+
+    <div class="ac-skip-frame">
+      <a class="ac-skip-link ac-skip-link--visible" href="#sl-main-3">Skip to main content</a>
+
+      <nav class="ac-skip-nav" aria-label="Example three">
+        <a href="#sl-main-3">Dates</a>
+        <a href="#sl-main-3">Lineup</a>
+      </nav>
+
+      <div class="ac-skip-main" id="sl-main-3" tabindex="-1">
+        <p><strong>Sink, Florida, sink.</strong> Load-out runs 99 minutes.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 4 · Skipping past a block, not to the top of it
+       CSS [FRAME] + [CORE] + [VISIBLE].
+
+       SC 2.4.1 is about *blocks*, and "main content" is only the most common
+       one. A link before a long list that lands after it is the same pattern,
+       and it is the one people forget: 462 names is 462 Tab presses for anyone
+       who wanted the next paragraph.
+
+       Visible here on purpose — a hidden link mid-page is a link nobody knows
+       to look for.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">4 &middot; Skipping past a block</h3>
+
+    <div class="ac-skip-frame">
+      <p class="ac-skip-note">The full lineup runs to 462 names.</p>
+
+      <a class="ac-skip-link ac-skip-link--visible" href="#sl-after-4">Skip the lineup</a>
+
+      <ul class="ac-skip-lineup">
+        <li><a href="#sl-after-4">Basket Case</a></li>
+        <li><a href="#sl-after-4">Self Esteem</a></li>
+        <li><a href="#sl-after-4">Linoleum</a></li>
+        <li><a href="#sl-after-4">Timebomb</a></li>
+      </ul>
+
+      <div class="ac-skip-main" id="sl-after-4" tabindex="-1">
+        <p><strong>After the lineup.</strong> Curfew is 23:00, and it is not negotiable.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 5 · The two ways it breaks
+       CSS [FRAME] + [BROKEN].
+
+       Both of these are live. Tab through them.
+
+       The first uses `display: none` to hide the link, so it is not in the tab
+       order at all and can never appear. This is the most common broken skip
+       link on the web, and it looks correct in the markup.
+
+       The second has no `tabindex="-1"` on its target. Follow it and the page
+       scrolls, but focus never moves — the next Tab resumes from the top and
+       walks you straight back into the navigation you asked to skip.
+
+       ac-skip-link--broken exists so that copying it is obviously a mistake.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">5 &middot; The two ways it breaks</h3>
+
+    <div class="ac-skip-frame">
+      <a class="ac-skip-link ac-skip-link--broken" href="#sl-main-5">
+        Hidden with display: none &mdash; unreachable
+      </a>
+
+      <nav class="ac-skip-nav" aria-label="Example five">
+        <a href="#sl-main-5">Dates</a>
+        <a href="#sl-main-5">Lineup</a>
+      </nav>
+
+      <div class="ac-skip-main" id="sl-main-5">
+        <p><strong>No tabindex on this panel.</strong> Focus never arrives here.</p>
+      </div>
+    </div>
+
+    <p class="ac-demo__legend">
+      Broken on purpose, both of them. Tab from the frame: the first link is
+      never reached, and following the visible link below scrolls without moving
+      focus.
+    </p>
+
+    <p><a class="ac-skip-link ac-skip-link--visible" href="#sl-main-5">Try the second failure</a></p>
+  </div>
+</div>
