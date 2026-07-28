@@ -81,7 +81,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 8 / 34
+## Component roster — 9 / 34
 
 ### foundations
 - [ ] `skip-link`
@@ -126,7 +126,14 @@ take their logic and not their layout. See item 1 under remaining work.
   disabled state — and under `forced-colors` it sets `appearance: auto` and lets the UA draw its own,
   since `background-image` is dropped there. `option`/`optgroup` get their own colors (Windows inherits
   the control's into the popup). `multiple` is left native with the keyboard table spelled out.
-- [ ] `radio-group`
+- [x] `radio-group` — done, **CSS-only** (`--no-js`), 18/18 tests in Chromium. Canonical home for
+  `.ac-choice`. The shared `name` is the component: one tab stop, arrows that move *and* select. No
+  `role="radiogroup"`. The error id is repeated on **every** radio's `aria-describedby`, because a
+  fieldset's own description is read inconsistently and never again once focus is on the third option.
+  Nothing pre-checked. Two fieldset quirks documented: `min-width: 0` (default `min-inline-size` is
+  `min-content`, which overflows at 320px) and the inner `<div>` wrapper. Gotcha found: `input.disabled`
+  is `false` for inputs inside a disabled fieldset — the IDL property reflects only the control's own
+  attribute, so test and style on `:disabled`.
 - [ ] `checkbox`
 - [ ] `switch`
 - [ ] `fieldset-group`

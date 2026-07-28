@@ -1,0 +1,305 @@
+/* ===========================================================================
+   RADIO GROUP
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) lives in
+   the site's own stylesheet, not this file.
+
+     [GROUP]        all examples. The fieldset shell. Canonical in the
+                    Fieldset Group component; repeated so this file stands alone.
+     [CORE]         all examples. .ac-choice — a row, its input, its label text.
+     [INVALID]      example 2.
+     [OPTION-HINT]  example 3.
+     [DISABLED]     example 4.
+     [CUSTOM]       example 5. Only needed if the browser's dot is not enough.
+     [FORCED]       always ship this. High Contrast rebuilds every cue.
+
+   Copy the file whole for the library version.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [GROUP] the fieldset shell ------------------------------------------
+   Two fieldset-specific quirks, both worth knowing:
+
+   min-width: 0 — a fieldset's default min-inline-size is min-content, so a long
+   unbreakable child pushes it wider than its container and the page scrolls
+   sideways at 320px. This one line is the fix.
+
+   The contents are wrapped in a <div>, because a <legend> cannot be a flex item
+   and older Safari refuses to make a fieldset a flex container at all. */
+
+.ac-group {
+  min-width: 0;
+  margin: 0;
+  padding: 0.85rem 1rem 1rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+}
+
+/* The group's accessible name. A real <legend>, first child of the fieldset —
+   a <div> styled to look like one names nothing. */
+.ac-group__legend {
+  padding: 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-group__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.ac-group__hint {
+  margin: 0.6rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* --- [CORE] one choice --------------------------------------------------
+   The whole row is the <label>, so the target is the text as well as the dot —
+   a 1rem circle is a 16px target, which fails SC 2.5.8 on its own. */
+
+.ac-choice {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  /* SC 2.5.8 floor is 24px; 44px is the comfortable touch size. */
+  min-height: var(--ac-target, 44px);
+  padding: 0.25rem 0.4rem;
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-size: 0.9rem;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.ac-choice:hover {
+  background: color-mix(
+    in srgb,
+    var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 10%,
+    transparent
+  );
+}
+
+/* accent-color instead of a drawn control: the browser keeps the dot, the
+   keyboard, the forced-colors handling and the platform's own animation, and
+   we only change the hue. Example 5 is the version for when that is not
+   enough. */
+.ac-choice__input {
+  flex: none;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+  accent-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  cursor: pointer;
+}
+
+.ac-choice__input:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-choice__text {
+  min-width: 0;
+}
+
+/* The checked row is bolder as well as differently colored, so selection is not
+   carried by hue alone (SC 1.4.1). The dot itself is the primary cue. */
+.ac-choice:has(.ac-choice__input:checked) .ac-choice__text {
+  font-weight: 700;
+}
+
+/* --- [INVALID] example 2 -------------------------------------------------
+   The border thickens on the group, not on each radio: the answer is missing
+   from the question, and the question is the fieldset. */
+
+.ac-group--invalid {
+  border-width: 2px;
+  border-color: var(--ac-danger, var(--accent-pink, #ff2ec4));
+}
+
+.ac-group__error {
+  position: relative;
+  margin: 0.5rem 0 0;
+  padding-left: 1.3rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  font-weight: 700;
+  color: var(--ac-danger, var(--accent-pink, #ff2ec4));
+}
+
+.ac-group__error::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.28em;
+  width: 0.85rem;
+  height: 0.85rem;
+  background: currentColor;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.ac-group__error:empty {
+  padding-left: 0;
+}
+
+.ac-group__error:empty::before {
+  content: none;
+}
+
+/* --- [OPTION-HINT] example 3 -------------------------------------------
+   Inside the label, so it is part of the radio's accessible name rather than a
+   separate description that can be skipped. */
+
+.ac-choice__note {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.76rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* Two lines of text need the row to grow rather than center awkwardly. */
+.ac-choice:has(.ac-choice__note) {
+  align-items: flex-start;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.ac-choice:has(.ac-choice__note) .ac-choice__input {
+  margin-top: 0.15rem;
+}
+
+/* --- [DISABLED] example 4 ----------------------------------------------- */
+
+/* :disabled covers both cases: the radio's own attribute, and a disabled
+   <fieldset>, which disables everything inside it. */
+.ac-choice:has(.ac-choice__input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.ac-choice:has(.ac-choice__input:disabled):hover {
+  background: none;
+}
+
+/* A disabled fieldset keeps its legend at full strength: it is what tells
+   someone what the locked group was for. */
+.ac-group:disabled {
+  border-style: dashed;
+}
+
+/* --- [CUSTOM] example 5 ------------------------------------------------
+   The real input stays in the DOM, in the tab order, and in the accessibility
+   tree. opacity: 0 — never display: none or visibility: hidden, which remove it
+   from the tree and take the keyboard with it.
+
+   It is also kept the size of the drawn dot and stacked over it, so a pointer
+   still lands on a real control if the label wiring ever breaks. */
+
+.ac-choice--card {
+  position: relative;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+}
+
+.ac-choice__input--drawn {
+  position: absolute;
+  left: 0.7rem;
+  width: 1.15rem;
+  height: 1.15rem;
+  opacity: 0;
+}
+
+.ac-choice__dot {
+  flex: none;
+  display: block;
+  width: 1.15rem;
+  height: 1.15rem;
+  border: 2px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: 50%;
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  transition: border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+/* The inner dot is drawn with an inset shadow rather than a pseudo-element, so
+   the ring and the fill are one box and cannot drift apart. */
+.ac-choice__input--drawn:checked + .ac-choice__dot {
+  border-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  box-shadow: inset 0 0 0 3px var(--ac-surface, var(--bg-panel, #110620)),
+    inset 0 0 0 1rem var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+}
+
+/* The ring has to appear on the drawn control, since the input it belongs to is
+   transparent. :focus-visible, so it does not fire on a mouse click. */
+.ac-choice__input--drawn:focus-visible + .ac-choice__dot {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-choice--card:has(.ac-choice__input--drawn:checked) {
+  border-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this -------------------- */
+
+@media (forced-colors: active) {
+  .ac-group {
+    border-color: CanvasText;
+  }
+
+  /* The hover wash and the opacity both disappear here. */
+  .ac-choice:hover {
+    background: none;
+  }
+
+  .ac-choice:has(.ac-choice__input:disabled) {
+    opacity: 1;
+    color: GrayText;
+  }
+
+  .ac-choice__input:focus-visible,
+  .ac-choice__input--drawn:focus-visible + .ac-choice__dot {
+    outline-color: CanvasText;
+  }
+
+  /* The accent collapses to the user's text color, so hue can no longer
+     distinguish invalid — width has to carry it. */
+  .ac-group--invalid {
+    border-width: 3px;
+    border-color: CanvasText;
+  }
+
+  .ac-group__error {
+    color: CanvasText;
+  }
+
+  /* color-mix and box-shadow are dropped, so the drawn dot would lose its fill
+     entirely. forced-color-adjust: none keeps our own colors on this one small
+     part, and the system colors are used so it still respects the user's
+     palette. */
+  .ac-choice__dot {
+    border-color: ButtonBorder;
+    background: Canvas;
+  }
+
+  .ac-choice__input--drawn:checked + .ac-choice__dot {
+    forced-color-adjust: none;
+    border-color: Highlight;
+    background: Highlight;
+    box-shadow: inset 0 0 0 3px Canvas, inset 0 0 0 1rem Highlight;
+  }
+}

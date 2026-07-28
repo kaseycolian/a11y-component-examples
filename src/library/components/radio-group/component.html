@@ -1,0 +1,245 @@
+<!-- ===========================================================================
+     RADIO GROUP — a fieldset, a legend, and native radios
+
+     WHAT TO COPY
+       Any one example below is self-contained. Take its section plus the
+       matching sections of component.css. There is no JavaScript: the arrow-key
+       behavior people reimplement is already in the browser.
+       Copy the file whole for the library-grade version.
+
+     THE CONTRACT
+       <fieldset>          the group
+       <legend>            the group's accessible name — first child, always
+       input[type=radio]   one shared `name`, or it is not a group at all
+       label[for]          one per radio, pointing at its id
+
+     Two things do all the work here:
+
+       the shared `name` makes the browser treat them as one control. Tab enters
+       and leaves the whole group as a single stop, and the arrow keys move
+       between options *and select as they go*. Miss the name and you get three
+       unrelated radios and dead arrow keys.
+
+       the <legend> is the group's name. Not a <div> above it, not aria-label on
+       the fieldset — a real legend, first child of the fieldset, so a screen
+       reader announces "Pressing format, group" on the way in.
+
+     No role="radiogroup". A fieldset with a legend already is one, and adding it
+     replaces working semantics with hand-written ones.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     =========================================================================== -->
+
+<div class="ac-demo-grid">
+  <!-- ======================================================================
+       EXAMPLE 1 · The baseline
+       CSS [GROUP] + [CORE].
+
+       Nothing is checked to start with, on purpose: a pre-checked default is an
+       answer the user did not give. Check one only when it genuinely is the
+       expected choice, and never on a question with consequences.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">1 &middot; The baseline</h3>
+
+    <fieldset class="ac-group">
+      <legend class="ac-group__legend">Pressing format</legend>
+      <div class="ac-group__body">
+        <label class="ac-choice" for="ac-rg-fmt-7">
+          <input class="ac-choice__input" type="radio" id="ac-rg-fmt-7"
+                 name="ac-rg-format" value="7in" />
+          <span class="ac-choice__text">7-inch, 45 rpm</span>
+        </label>
+        <label class="ac-choice" for="ac-rg-fmt-12">
+          <input class="ac-choice__input" type="radio" id="ac-rg-fmt-12"
+                 name="ac-rg-format" value="12in" />
+          <span class="ac-choice__text">12-inch, 33 rpm</span>
+        </label>
+        <label class="ac-choice" for="ac-rg-fmt-tape">
+          <input class="ac-choice__input" type="radio" id="ac-rg-fmt-tape"
+                 name="ac-rg-format" value="tape" />
+          <span class="ac-choice__text">Cassette</span>
+        </label>
+      </div>
+    </fieldset>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 2 · Required, and invalid
+       CSS [GROUP] + [CORE] + [INVALID].
+
+       The error id is on **every radio's** aria-describedby, not only on the
+       fieldset. A fieldset's own description is announced inconsistently — NVDA
+       and JAWS read it on the way into the group, VoiceOver often does not, and
+       nobody reads it again if focus lands on the third option. Repeating it per
+       input is the version that always speaks.
+
+       `required` goes on every radio in the group. One is enough for the browser,
+       but marking all of them keeps them consistent when the markup is generated.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">2 &middot; Required and invalid</h3>
+
+    <fieldset class="ac-group ac-group--invalid" aria-describedby="ac-rg-guest-hint">
+      <legend class="ac-group__legend">Guest list policy</legend>
+      <div class="ac-group__body">
+        <label class="ac-choice" for="ac-rg-guest-open">
+          <input class="ac-choice__input" type="radio" id="ac-rg-guest-open"
+                 name="ac-rg-guest" value="open" required aria-invalid="true"
+                 aria-describedby="ac-rg-guest-hint ac-rg-guest-error" />
+          <span class="ac-choice__text">Open list, 24 names</span>
+        </label>
+        <label class="ac-choice" for="ac-rg-guest-band">
+          <input class="ac-choice__input" type="radio" id="ac-rg-guest-band"
+                 name="ac-rg-guest" value="band" required aria-invalid="true"
+                 aria-describedby="ac-rg-guest-hint ac-rg-guest-error" />
+          <span class="ac-choice__text">Two per person</span>
+        </label>
+        <label class="ac-choice" for="ac-rg-guest-none">
+          <input class="ac-choice__input" type="radio" id="ac-rg-guest-none"
+                 name="ac-rg-guest" value="none" required aria-invalid="true"
+                 aria-describedby="ac-rg-guest-hint ac-rg-guest-error" />
+          <span class="ac-choice__text">No list</span>
+        </label>
+      </div>
+      <p class="ac-group__hint" id="ac-rg-guest-hint">The promoter needs this by Friday.</p>
+      <p class="ac-group__error" id="ac-rg-guest-error" role="alert">
+        Choose a policy &mdash; the contract cannot be sent without one.
+      </p>
+    </fieldset>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 3 · An option that needs explaining
+       CSS [GROUP] + [CORE] + [OPTION-HINT].
+
+       The per-option text is inside the <label>, so it is part of that radio's
+       accessible name: "Door deal, 99% of the door after costs". A separate
+       aria-describedby per option also works, but a name that already says the
+       whole thing is read in one go and cannot come apart.
+
+       Keep it short if you do this. It is announced every time the user arrows
+       past the option, not only when they land on it.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">3 &middot; Options that need explaining</h3>
+
+    <fieldset class="ac-group">
+      <legend class="ac-group__legend">Payout</legend>
+      <div class="ac-group__body">
+        <label class="ac-choice" for="ac-rg-pay-split">
+          <input class="ac-choice__input" type="radio" id="ac-rg-pay-split"
+                 name="ac-rg-pay" value="split" checked />
+          <span class="ac-choice__text">
+            Split evenly
+            <span class="ac-choice__note">Four ways, after the van.</span>
+          </span>
+        </label>
+        <label class="ac-choice" for="ac-rg-pay-door">
+          <input class="ac-choice__input" type="radio" id="ac-rg-pay-door"
+                 name="ac-rg-pay" value="door" />
+          <span class="ac-choice__text">
+            Door deal
+            <span class="ac-choice__note">99% of the door after costs.</span>
+          </span>
+        </label>
+        <label class="ac-choice" for="ac-rg-pay-flat">
+          <input class="ac-choice__input" type="radio" id="ac-rg-pay-flat"
+                 name="ac-rg-pay" value="flat" />
+          <span class="ac-choice__text">
+            Guarantee
+            <span class="ac-choice__note">Flat 462, whatever the room does.</span>
+          </span>
+        </label>
+      </div>
+    </fieldset>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 4 · Unavailable options, and a locked group
+       CSS [GROUP] + [CORE] + [DISABLED].
+
+       A disabled radio stays in the group and is announced as unavailable, so
+       the user learns the option exists. The reason goes in its label, because a
+       disabled control cannot explain itself.
+
+       `disabled` on the <fieldset> disables every control inside it — one
+       attribute, no loop. The legend stays readable, which is what tells someone
+       what the locked group was for.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">4 &middot; Unavailable and locked</h3>
+
+    <fieldset class="ac-group">
+      <legend class="ac-group__legend">Merch table</legend>
+      <div class="ac-group__body">
+        <label class="ac-choice" for="ac-rg-merch-front">
+          <input class="ac-choice__input" type="radio" id="ac-rg-merch-front"
+                 name="ac-rg-merch" value="front" checked />
+          <span class="ac-choice__text">By the front doors</span>
+        </label>
+        <label class="ac-choice" for="ac-rg-merch-bar">
+          <input class="ac-choice__input" type="radio" id="ac-rg-merch-bar"
+                 name="ac-rg-merch" value="bar" disabled />
+          <span class="ac-choice__text">Next to the bar &mdash; taken by support</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset class="ac-group" disabled>
+      <legend class="ac-group__legend">Load-in window</legend>
+      <div class="ac-group__body">
+        <label class="ac-choice" for="ac-rg-load-early">
+          <input class="ac-choice__input" type="radio" id="ac-rg-load-early"
+                 name="ac-rg-load" value="early" checked />
+          <span class="ac-choice__text">16:00, fixed by the venue</span>
+        </label>
+        <label class="ac-choice" for="ac-rg-load-late">
+          <input class="ac-choice__input" type="radio" id="ac-rg-load-late"
+                 name="ac-rg-load" value="late" />
+          <span class="ac-choice__text">18:00</span>
+        </label>
+      </div>
+    </fieldset>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 5 · Drawn from scratch, still native underneath
+       CSS [GROUP] + [CORE] + [CUSTOM].
+
+       When the browser's dot is not enough, the input stays in the DOM and in
+       the tab order — `opacity: 0` over the drawn control, never
+       `display: none` or `visibility: hidden`, either of which removes it from
+       the accessibility tree and takes the keyboard with it.
+
+       Everything visible is a sibling that reacts to :checked and :focus-visible
+       on the real input. Nothing about the semantics changes.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">5 &middot; Drawn from scratch</h3>
+
+    <fieldset class="ac-group">
+      <legend class="ac-group__legend">Encore</legend>
+      <div class="ac-group__body">
+        <label class="ac-choice ac-choice--card" for="ac-rg-enc-yes">
+          <input class="ac-choice__input ac-choice__input--drawn" type="radio"
+                 id="ac-rg-enc-yes" name="ac-rg-encore" value="yes" checked />
+          <span class="ac-choice__dot" aria-hidden="true"></span>
+          <span class="ac-choice__text">Planned</span>
+        </label>
+        <label class="ac-choice ac-choice--card" for="ac-rg-enc-read">
+          <input class="ac-choice__input ac-choice__input--drawn" type="radio"
+                 id="ac-rg-enc-read" name="ac-rg-encore" value="read" />
+          <span class="ac-choice__dot" aria-hidden="true"></span>
+          <span class="ac-choice__text">Read the room</span>
+        </label>
+        <label class="ac-choice ac-choice--card" for="ac-rg-enc-no">
+          <input class="ac-choice__input ac-choice__input--drawn" type="radio"
+                 id="ac-rg-enc-no" name="ac-rg-encore" value="no" />
+          <span class="ac-choice__dot" aria-hidden="true"></span>
+          <span class="ac-choice__text">Straight off</span>
+        </label>
+      </div>
+    </fieldset>
+  </div>
+</div>

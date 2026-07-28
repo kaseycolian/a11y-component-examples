@@ -1,0 +1,13 @@
+{
+  "slug": "radio-group",
+  "name": "Radio Group",
+  "group": "forms-inputs",
+  "order": 60,
+  "summary": "A fieldset, a legend, and native radios sharing one name — which is what makes Tab treat them as a single stop and the arrow keys move between them. No role=\"radiogroup\", and no JavaScript.",
+  "tags": ["radio", "fieldset", "legend", "no-js", "keyboard", "required"],
+  "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/radio/",
+  "wcag": ["1.3.1", "1.4.1", "2.1.1", "2.4.7", "2.5.8", "3.3.1", "3.3.2", "4.1.2"],
+  "status": "stable",
+  "files": ["html", "css"],
+  "demoNote": "Tab into any group and press the arrow keys: they move and select in one action, and Tab leaves the whole group as one stop. All of that comes from the shared name attribute — there is no script on this page."
+}
