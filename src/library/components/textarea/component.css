@@ -1,0 +1,252 @@
+/* ===========================================================================
+   TEXTAREA
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) lives in
+   the site's own stylesheet, not this file.
+
+     [FIELD]      all examples. The label/hint/error wrapper. Canonical in the
+                  Field component; repeated so this file stands alone.
+     [CORE]       all examples. .ac-textarea itself.
+     [COUNTER]    example 2.
+     [GROW]       example 3.
+     [INVALID]    example 4.
+     [READONLY]   example 5.
+     [FORCED]     always ship this. High Contrast rebuilds every cue.
+
+   Copy the file whole for the library version.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [FIELD] the wrapper — canonical in the Field component ---------------- */
+
+.ac-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  min-width: 0;
+}
+
+.ac-field__label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-field__hint {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* --- [CORE] the textarea --------------------------------------------------
+   resize: vertical, never none. A fixed four-line window onto a long value is
+   the reflow problem SC 1.4.4 describes, and the handle is the only control the
+   user has over it. Horizontal resize is left off because widening past the
+   column is what breaks a layout sideways. */
+
+.ac-textarea {
+  width: 100%;
+  min-width: 0;
+  resize: vertical;
+  /* Two lines of readable text, whatever `rows` says, so a rows="1" never
+     collapses to an unusable sliver. */
+  min-height: 4.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  color: var(--ac-text, var(--text, #f3ecff));
+  /* `font: inherit` matters: an unstyled textarea drops to 13px monospace in
+     most browsers, which also defeats a page-level font-size preference. */
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  transition:
+    border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-textarea:hover:enabled:not([readonly]) {
+  border-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+}
+
+.ac-textarea:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-textarea::placeholder {
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  opacity: 1;
+}
+
+.ac-textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  border-style: dashed;
+  /* The handle is inert anyway; leaving it on advertises something that does
+     not work. */
+  resize: none;
+}
+
+/* --- [COUNTER] example 2 -------------------------------------------------
+   The visible count is aria-hidden and updates on every keystroke; the status
+   below is what a screen reader gets, and it only speaks on a pause. */
+
+.ac-textarea__count {
+  margin: 0;
+  align-self: flex-end;
+  font-size: 0.74rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* Over the limit is not signaled by color alone (SC 1.4.1): the script also
+   writes "over by N" and sets aria-invalid, which thickens the border. */
+.ac-textarea__count[data-ac-over="true"] {
+  font-weight: 800;
+  color: var(--ac-danger, var(--accent-pink, #ff2ec4));
+}
+
+/* The live region. Off screen but in the accessibility tree -- display: none or
+   `hidden` would take it out and nothing would ever be announced. */
+.ac-textarea__status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- [GROW] example 3 ---------------------------------------------------
+   The cap belongs in CSS, not the script: past this the value scrolls instead of
+   growing the page without end. */
+
+.ac-textarea--grow {
+  max-height: 18rem;
+  overflow-y: auto;
+}
+
+/* --- [INVALID] example 4 -------------------------------------------------
+   Driven by aria-invalid so the styling cannot disagree with what is announced.
+   Two cues, never color alone (SC 1.4.1): the border thickens, and there is a
+   message to read. */
+
+.ac-field__error {
+  position: relative;
+  margin: 0;
+  padding-left: 1.3rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  font-weight: 700;
+  color: var(--ac-danger, var(--accent-pink, #ff2ec4));
+}
+
+.ac-field__error::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.28em;
+  width: 0.85rem;
+  height: 0.85rem;
+  background: currentColor;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.ac-field__error:empty {
+  padding-left: 0;
+}
+
+.ac-field__error:empty::before {
+  content: none;
+}
+
+.ac-field__error code {
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", Consolas, ui-monospace, monospace));
+  font-size: 0.95em;
+  padding: 0.05em 0.3em;
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: color-mix(in srgb, currentColor 15%, transparent);
+  color: inherit;
+}
+
+.ac-field--invalid .ac-textarea,
+[aria-invalid="true"].ac-textarea {
+  border-width: 2px;
+  border-color: var(--ac-danger, var(--accent-pink, #ff2ec4));
+}
+
+/* --- [READONLY] example 5 ------------------------------------------------
+   Distinct from both editable and disabled: no hover cue, tinted surface, full
+   contrast text because it is there to be read, and the handle stays -- a long
+   read-only value is exactly the case someone needs more lines for.
+
+   A tint of the text color rather than --bg-elevated: in the light themes
+   elevated and panel are both white, so that would be no cue at all. */
+
+.ac-textarea[readonly] {
+  background: color-mix(
+    in srgb,
+    var(--ac-text, var(--text, #f3ecff)) 8%,
+    var(--ac-surface, var(--bg-panel, #110620))
+  );
+  border-color: var(--ac-border, var(--border, #34205a));
+  border-style: dotted;
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this -------------------- */
+
+/* forced-colors drops color-mix, glows and opacity, so every cue built from them
+   has to be rebuilt from system colors. */
+@media (forced-colors: active) {
+  .ac-textarea {
+    border-color: ButtonBorder;
+  }
+
+  .ac-textarea:focus-visible {
+    outline-color: CanvasText;
+  }
+
+  /* opacity is ignored here, leaving the dashed border as the only cue. */
+  .ac-textarea:disabled {
+    color: GrayText;
+    border-color: GrayText;
+    opacity: 1;
+  }
+
+  /* Both surfaces collapse to Canvas, so read-only would be indistinguishable
+     from editable. GrayText on the border keeps them apart without implying the
+     value cannot be read. */
+  .ac-textarea[readonly] {
+    border-color: GrayText;
+  }
+
+  /* The accent collapses to the user's text color, so hue can no longer
+     distinguish invalid or over-limit — width and weight have to. */
+  .ac-field--invalid .ac-textarea,
+  [aria-invalid="true"].ac-textarea {
+    border-width: 3px;
+    border-color: CanvasText;
+  }
+
+  .ac-field__error,
+  .ac-textarea__count[data-ac-over="true"] {
+    color: CanvasText;
+  }
+
+  .ac-field__error code {
+    background: Canvas;
+    border: 1px solid CanvasText;
+  }
+}

@@ -81,7 +81,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 6 / 34
+## Component roster — 7 / 34
 
 ### foundations
 - [ ] `skip-link`
@@ -113,7 +113,13 @@ take their logic and not their layout. See item 1 under remaining work.
   button. Gotcha found: changing an input's `type` resets its selection **asynchronously**, after the
   field has lost focus — snapshot the caret on `blur` and restore both synchronously and in a
   `requestAnimationFrame`.
-- [ ] `textarea`
+- [x] `textarea` — done. 22/22 tests in Chromium. Built around the three things that *remove*
+  accessibility from a native textarea: `resize: none`, `maxlength`, and a counter wired straight to a
+  live region. The counter is three separate things — the limit in the described hint, a visible
+  `aria-hidden` count per keystroke, and an off-screen `role="status"` that speaks only on a 1s pause
+  and only from 90% of the limit (cleared below it, so crossing back is a change). No `maxlength`:
+  over-typing is allowed and reported. Autogrow collapses the height before reading `scrollHeight`
+  (otherwise it can only ever grow) and a `ResizeObserver` makes a hand-dragged height final.
 - [ ] `native-select`
 - [ ] `radio-group`
 - [ ] `checkbox`
