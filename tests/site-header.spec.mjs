@@ -18,11 +18,12 @@ test('every tab title leads with the site name', async ({ page }) => {
   await expect(page).toHaveTitle('The A11Y Way · Disclosure');
 
   await page.goto('components/');
-  await expect(page).toHaveTitle('The A11Y Way · All components');
+  await expect(page).toHaveTitle('The A11Y Way · All Components');
 
-  // Not doubled on the home page, which the site name already names.
+  // The home page has no name of its own, so it takes the tagline rather than
+  // saying "The A11Y Way · The A11Y Way".
   await page.goto('./');
-  await expect(page).toHaveTitle('The A11Y Way');
+  await expect(page).toHaveTitle('The A11Y Way · WCAG 2.2 AA Development Guide');
 });
 
 test('the header theme picker is the library Dropdown and applies a theme', async ({ page }) => {
@@ -96,7 +97,7 @@ test('the components picker is grouped, labeled, and says what choosing does', a
   await toggle.click();
   // Grouped exactly like the sidebar rather than one flat list.
   await expect(jump(page).getByRole('group', { name: 'Overlays & Disclosure' })).toBeVisible();
-  await expect(jump(page).getByRole('option', { name: 'All components' })).toBeVisible();
+  await expect(jump(page).getByRole('option', { name: 'All Components' })).toBeVisible();
 });
 
 test('choosing a component navigates, and the picker shows where you landed', async ({ page }) => {
