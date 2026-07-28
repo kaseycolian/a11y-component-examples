@@ -1,0 +1,299 @@
+/* ===========================================================================
+   EFFECTS
+
+   THE SUBJECT OF THIS FILE IS ANOTHER FILE. fx-grid, fx-bar-top,
+   fx-bar-bottom, fx-scroll and fx-pulse all live in theme-service's
+
+     src/site/theme/effects.css
+
+   Copy that. Nothing below reimplements any of it — two copies of a recipe is
+   how the copies drift, and example 2 is what that costs.
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+
+     [PATCH]     example 4, and the forced-colors block. Two rules effects.css
+                 does not have, both of them accessibility rules. Ship them
+                 alongside it. This is the only real code in the file.
+     [BROKEN]    examples 2, 3. Wrong on purpose and live on the page.
+                 Never copy these.
+     [MOCK]      the demo's page furniture. DELETE IT.
+     [FORCED]    Windows High Contrast. Its .fx-* rules belong to [PATCH]; its
+                 ac-fx-* rules are mock.
+
+   The [PATCH] rules are written against theme-service's own class names rather
+   than this library's ac- prefix. That is deliberate: a patch has to match the
+   selector it patches.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [PATCH] example 4 — a scroll region is a tab stop ---------------------
+   fx-scroll recolors a scrollbar, and a scroll container is reachable by
+   keyboard: Chromium gives a scrollable box a tab stop with no tabindex at all,
+   and every other route to it (tabindex="0", or a link inside it) ends in the
+   same place. So it can be focused, and effects.css draws no focus indicator.
+
+   The UA one is not enough. On the auto-focusable box Chromium computes
+   `rgb(16, 16, 16) auto 1px` — a 1px black hairline, which on a dark theme is
+   an indicator you cannot see (SC 2.4.7). This is the library's standard ring,
+   the one Focus Ring documents.
+
+   :focus-visible rather than :focus, so a click into the region to scroll it
+   does not draw a ring at somebody who is using a mouse. */
+
+.fx-scroll:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+/* --- [BROKEN] examples 2, 3 — never copy these -----------------------------
+   Two failures, live, so they can be looked at rather than described.
+
+   1. A backdrop with no stacking context. Both panels in example 2 carry
+      fx-grid, so both get an identical ::before from effects.css; this rule
+      then removes the one line that keeps it inside the panel. A z-index: -1
+      pseudo-element paints in the negative layer of the nearest *ancestor*
+      stacking context, so without isolation: isolate the backdrop goes behind
+      the panel's own opaque background and is never seen again. The computed
+      style of the pseudo-element is unchanged, which is why no tool reports it.
+
+   2. A gradient whose middle is a contrast failure. Same shape as fx-bar-top
+      with the accent turned up from 22% to 70%: 16.79:1 at both ends, 2.18:1 at
+      the 55% stop, and 6.27:1 at that stop in the light theme — a pass. The
+      ends are what a color picker on the edge of the element reports. */
+
+.ac-fx-broken-grid {
+  isolation: auto;
+}
+
+.ac-fx-broken-bar {
+  background: linear-gradient(
+    135deg,
+    var(--ac-surface, var(--bg-panel, #110620)) 0%,
+    color-mix(
+        in srgb,
+        var(--ac-accent-green, var(--accent-green, #5bff3a)) 70%,
+        var(--ac-surface, var(--bg-panel, #110620))
+      )
+      55%,
+    var(--ac-surface, var(--bg-panel, #110620)) 100%
+  );
+  border-bottom: 2px solid var(--ac-accent-green, var(--accent-green, #5bff3a));
+}
+
+/* --- [MOCK] delete this ---------------------------------------------------
+   The panels, the mocked-up frame, the scroll regions and the two pulse
+   swatches. None of it is part of anything; it exists so the five effects have
+   something to sit on. */
+
+.ac-fx-panel {
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+}
+
+.ac-fx-prose {
+  margin: 0;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+/* 7rem, so the two specimens sit side by side inside a demo column rather than
+   stacking — examples 2 and 5 are comparisons, and a stacked comparison is two
+   things rather than one pair. A demo column is 224px at a 320px viewport, so
+   they do stack there, which is the one width where the difference has to be
+   held in your head. */
+.ac-fx-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.ac-fx-note,
+.ac-fx-key {
+  margin: 0;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.72rem;
+  line-height: 1.6;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  /* The notes are code, and code has no spaces to break at. Without this a
+     declaration wider than a 7rem specimen scrolls the whole page (SC 1.4.10). */
+  overflow-wrap: anywhere;
+}
+
+.ac-fx-key {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+  padding: 0;
+  list-style: decimal inside;
+}
+
+/* Example 3's mocked-up page: a bar, some copy, a bar. The frame is what makes
+   the two gradients read as a header and a footer rather than as swatches. */
+.ac-fx-frame {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+}
+
+.ac-fx-bar {
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+  overflow-wrap: break-word;
+}
+
+/* The broken bar stands alone, so it gets the frame's corners itself. */
+.ac-fx-broken-bar {
+  border-radius: var(--ac-radius, var(--radius, 10px));
+}
+
+.ac-fx-body {
+  margin: 0;
+  padding: 1.4rem 0.9rem;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.85rem;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* Tall enough that the thumb is a thumb rather than a full-height block, and
+   short enough that both regions fit on a phone. */
+.ac-fx-scroller {
+  min-width: 0;
+  max-height: 9rem;
+  overflow-y: auto;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+}
+
+.ac-fx-list {
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.85rem;
+  line-height: 2.2;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+/* Tinted rather than flat: brightness() multiplies, so it does nothing visible
+   to a near-black surface. Example 5 is only a demonstration if the pulse can
+   be seen pulsing. */
+.ac-fx-swatch {
+  display: flex;
+  align-items: flex-end;
+  min-width: 0;
+  min-height: 5rem;
+  padding: 0.7rem;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: color-mix(
+    in srgb,
+    var(--ac-accent-purple, var(--accent-purple, #b57fff)) 42%,
+    var(--ac-surface, var(--bg-panel, #110620))
+  );
+}
+
+/* The same 1.8s brightness loop as fx-pulse, gated the way the rest of this
+   library gates motion: a duration multiplied by --ac-motion. At 0 the
+   animation has no active duration, so the element renders at its base style
+   and Chromium reports it as not running at all.
+
+   The difference example 5 is about is reach, not effect. effects.css sets
+   --motion: 0 with [data-motion="off"], which matches the element carrying the
+   attribute and is inherited from there; its [data-motion="off"] .fx-pulse rule
+   is a descendant combinator and needs the attribute one level up. Same file,
+   two reaches. */
+@keyframes ac-fx-pulse {
+  from {
+    filter: brightness(1);
+  }
+  to {
+    filter: brightness(1.12);
+  }
+}
+
+.ac-fx-pulse-token {
+  animation: ac-fx-pulse calc(var(--ac-motion, var(--motion, 1)) * 1.8s) ease-in-out infinite
+    alternate;
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------
+   Chromium already drops every gradient background-image and every box-shadow
+   in forced colors, so four of the five effects disappear on their own and the
+   two grid panels in example 2 become indistinguishable. That is the right
+   outcome — decoration that survives forced colors is decoration painting over
+   colors the reader chose — and it is the reason none of it may ever be the
+   only carrier of information.
+
+   Three things are still ours to do. The first two are [PATCH]:
+
+     1. Say it rather than inherit it. background-image is not in the list of
+        properties the spec forces, and Chromium's behavior here is not a
+        guarantee from every engine.
+     2. The scrollbar thumb is a gradient with a 2px border and
+        background-clip: padding-box. Drop the gradient and the thumb is a
+        transparent hole, so the scrollbar loses the only part of it the reader
+        aims at. Repaint it in a system color.
+     3. Mock furniture: the panels and the frame keep their borders. */
+
+@media (forced-colors: active) {
+  .fx-grid::before {
+    display: none;
+  }
+
+  .fx-bar-top,
+  .fx-bar-bottom {
+    background-image: none;
+  }
+
+  .fx-scroll::-webkit-scrollbar-thumb {
+    background: ButtonBorder;
+    border-color: Canvas;
+  }
+
+  .fx-scroll::-webkit-scrollbar-track {
+    background: Canvas;
+  }
+
+  .fx-scroll:focus-visible {
+    outline-color: CanvasText;
+  }
+
+  .ac-fx-broken-bar {
+    background-image: none;
+    border-bottom-color: CanvasText;
+  }
+
+  .ac-fx-panel,
+  .ac-fx-frame,
+  .ac-fx-scroller,
+  .ac-fx-swatch {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+
+  .ac-fx-prose,
+  .ac-fx-note,
+  .ac-fx-key,
+  .ac-fx-bar,
+  .ac-fx-body,
+  .ac-fx-list {
+    color: CanvasText;
+  }
+}

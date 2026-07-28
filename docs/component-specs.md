@@ -74,8 +74,13 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
 - **Testing gotcha** Playwright honors `aria-disabled` in its actionability checks, so clicking the locked switch needs `{ force: true }` — the `preventDefault` is what the test is actually exercising.
 
 ### effects
-- **Markup** Demonstrates `fx-grid`, `fx-scroll`, `fx-bar-top`, `fx-bar-bottom`, `fx-pulse` from the vendored `effects.css`.
-- **Gotcha** `fx-grid` renders on a `::before` at `z-index:-1`, so its host needs `isolation: isolate`. `fx-pulse` must be motion-gated. These are theme decoration, not library components — label the page accordingly.
+- **Markup** Demonstrates `fx-grid`, `fx-scroll`, `fx-bar-top`, `fx-bar-bottom`, `fx-pulse` from the vendored `effects.css`. **CSS-only.**
+- **The subject is another file.** These are theme decoration, not library components. `component.css` is a `[PATCH]` — the two accessibility rules `effects.css` lacks — and never a reimplementation. Two copies of a recipe is how the copies drift.
+- **Gotcha** `fx-grid` renders on a `::before` at `z-index:-1`, so its host needs `isolation: isolate`; without it the backdrop paints behind the host's own background and disappears. The pseudo-element's computed style is unchanged, so nothing reports it. Demonstrate it by putting `fx-grid` on **both** panels and adding `isolation: auto` to one — then the `::before` provably comes from the same rule.
+- **Gotcha** A gradient has a contrast ratio at every point. Sample the **stops**, not the endpoints: a 135° gradient's endpoints are two corners nobody puts text in.
+- **A scroll container is a control.** Chromium gives it a tab stop with no `tabindex`, no role, no name and a 1px near-black UA outline. Ship `tabindex="0"` + `role="region"` + a name anyway (Safari does not), and supply the focus ring. Thumb needs 3:1 against its track (SC 1.4.11).
+- **Gotcha** `effects.css` has two motion gates with different reach — `[data-motion="off"] { --motion: 0 }` matches the element carrying the attribute, `[data-motion="off"] .fx-pulse` needs an ancestor. Gate through the token. `motion-preferences` is the canonical explanation; link to it rather than re-arguing the cascade.
+- **Forced colors deletes all of it** — Chromium drops gradient `background-image`s and every `box-shadow`. That is the right outcome, and it is the argument for never letting decoration carry meaning on its own.
 
 ---
 
@@ -248,4 +253,7 @@ A component is not finished until **all** of these are true:
 - [ ] Interactive targets ≥24×24px
 - [ ] Demo shows the awkward states too: disabled, empty, error, long text
 - [ ] `npm run build` passes and the demo actually works in a browser
+- [ ] **Looked at, at 1280 and at 320** — a screenshot, not a passing test. Both bugs the suites missed
+      (typography's inherited `text-transform`, motion-preferences' banner-wide button) were visible in
+      one glance and invisible to every assertion. See the recipe in `BUILD-STATUS.md` → Gotchas.
 - [ ] Row updated in `BUILD-STATUS.md`

@@ -1,0 +1,25 @@
+{
+  "slug": "effects",
+  "name": "Effects",
+  "group": "foundations",
+  "order": 70,
+  "summary": "The theme's decoration — a grid backdrop, two gradient bars, a recolored scrollbar and a slow pulse — and the four obligations that arrive the moment text, a control or a loop lands on one of them.",
+  "tags": [
+    "effects",
+    "theme-service",
+    "decoration",
+    "gradient",
+    "contrast",
+    "stacking-context",
+    "isolation",
+    "scrollbar",
+    "forced-colors",
+    "motion",
+    "no-js"
+  ],
+  "apg": null,
+  "wcag": ["1.4.3", "1.4.11", "2.1.1", "2.2.2", "2.4.7", "4.1.2"],
+  "status": "stable",
+  "files": ["html", "css"],
+  "demoNote": "The one page here whose subject is not a component this library owns: these five classes ship in theme-service's effects.css. No JavaScript. Examples 2 and 3 are broken on purpose and live, and example 5 is about the header's Reduce motion toggle."
+}

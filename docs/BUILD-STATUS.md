@@ -4,41 +4,105 @@
 ordered next steps. `component-specs.md` has the pre-decided ARIA contract for every remaining
 component — read the one entry you need, not the whole file.
 
+Read in this order and nothing else is needed to start: **START HERE** for the next component,
+**The road to done** for the route and what depends on what, **The loop** for how to build one.
+**Gotchas already solved** is worth a skim before debugging anything.
+
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-28 (motion-preferences)
+Last updated: 2026-07-28 (effects)
 
 ---
 
-## START HERE — next component is `effects`, and it finishes `foundations`
+## START HERE — next component is `button`, and it opens `buttons-actions`
 
-`motion-preferences` landed (25/25 Chromium). Run the loop below with:
+`effects` landed (16/16 Chromium) and **`foundations` is complete**. Run the loop below with:
 
 ```sh
-node scripts/new-component.mjs effects --group foundations --name "Effects"
+node scripts/new-component.mjs button --group buttons-actions --name "Button"
 ```
 
 Decided in advance, so do not re-derive:
 
-- Spec entry: `component-specs.md` → foundations → `effects`. It demonstrates `fx-grid`, `fx-scroll`,
-  `fx-bar-top`, `fx-bar-bottom` and `fx-pulse` from the **vendored** `src/site/theme/effects.css`.
-- **This is the one page whose subject is not a library component.** These classes belong to
-  theme-service; the library rebuilds the components around them but not these. Say so at the top of
-  `docs.md` and on the page — the copy map should point at `effects.css`, not at a `component.css`
-  that reimplements it.
-- `fx-grid` paints on a `::before` at `z-index: -1`, so its host needs `isolation: isolate` or the
-  backdrop escapes to the nearest stacking context and lands on top of unrelated content. That is the
-  finding worth an example of its own.
-- `fx-pulse` must be motion-gated, and `motion-preferences` is now the canonical explanation — link
-  to it rather than re-arguing the cascade. `effects.css` already ships
-  `[data-motion="off"] .fx-pulse { animation: none }` plus the media query; check whether that is
-  enough or whether the demo needs the `--motion` multiplier form the rest of the library uses.
-- Decoration has a contrast obligation the moment text sits on it. `fx-grid` behind body copy is the
-  case to test, and `@media (forced-colors: active)` should drop the whole backdrop rather than
-  recolor it.
+- Spec entry: `component-specs.md` → buttons-actions → `button`. Native `<button type="button">`
+  with `.ac-btn`, the three weights (`--solid` / `--outline` / `--ghost`) and the four accents
+  (`--pink` / `--green` / `--blue` / `--purple`). No ARIA — it is a button.
+- **This is the canonical home for `.ac-btn`, and there is no `.ac-btn` anywhere in `src/library`
+  yet.** Every component that needed one minted a local copy: `.ac-motion__btn` in
+  `motion-preferences`, and the addon buttons in `input-group`, `modal`, `drawer` and `tooltip`.
+  Those stay — components are deliberately not DRY — so list them in the roster row the way `field`,
+  `visually-hidden` and `fieldset-group` list theirs.
+- The two things this page exists to say: **always set `type`** (a bare `<button>` in a form submits
+  it), and **`disabled` is unfocusable and announces nothing** — when the user needs to know *why*,
+  `aria-disabled="true"` plus a blocked handler is the pattern. `switch`, `motion-preferences` and
+  `fieldset-group` all ship that already; lift the argument rather than re-deriving it, and remember
+  Playwright needs `{ force: true }` to click a soft-disabled control.
+- The press transform is motion-gated through `--ac-press-y` / `--ac-press-s`, which
+  `tokens.css` already defines. Targets ≥24×24 (SC 2.5.8), 44px preferred.
+- `icon-button` → `loading-button` → `chip-toggle` follow, and all three extend `.ac-btn`. Decide
+  the modifier surface here with that in mind.
 
-That closes `foundations`. `buttons-actions` is next, starting with `button`.
+---
+
+## The road to done
+
+Fifteen components and four infrastructure items. Every remaining component already has a spec entry
+in `component-specs.md` — `disclosure` is the only slug in the repo without one, and backfilling it is
+part of item 1 below. **Read the entry, do not redesign it.**
+
+Build in this order. The order is the dependency graph, not a preference.
+
+| Batch | Slugs | Why here |
+| --- | --- | --- |
+| ~~**A**~~ | ~~`effects`~~ | **Done.** Closed `foundations` |
+| **B** | `button` → `icon-button` → `loading-button` → `chip-toggle` | `button` is canonical `.ac-btn` and the other three extend it |
+| **C** | `notice` → `status-text` → `badge` → `result-panel` | all four are small, and three of them restate `live-region`'s argument in a new shape |
+| **D** | `tabs` → `jump-nav` | `tabs` is the largest behavior left; `jump-nav` reuses its `aria-current` thinking |
+| **E** | `data-table` → `prose-surface` | `prose-surface` is the scroll-region pattern `data-table` establishes |
+| **F** | `app-url-maker` → `app-page-to-markdown` | **last.** They compose the others and cannot be built before them |
+
+Cross-batch notes that will otherwise be rediscovered:
+
+- **There is no `.ac-btn` anywhere in `src/library` yet.** Every component that needed a button minted
+  a local one (`.ac-motion__btn`, and the addon buttons in `input-group`, `modal`, `drawer`,
+  `tooltip`). Those stay — components are deliberately not DRY. When `button` lands it becomes the
+  canonical home, so list the local copies in its roster row the way `field`, `visually-hidden` and
+  `fieldset-group` list theirs.
+- **`result-panel`'s copy button is `input-group`'s copy button.** Same clipboard write, same
+  pre-existing empty `role="status"`, same rule against renaming the button. Lift it.
+- **`status-text` and `notice` are the same SC 1.4.1 point twice** — the glyph is `aria-hidden` and the
+  *word* carries the meaning. Make that argument on `notice` and point at it from `status-text`, or
+  the two pages read as duplicates.
+- **`tabs` has a working reference in `src/site/components/CodePanel.astro`.** Roving tabindex,
+  automatic activation, panel at `tabindex="0"`.
+- **Batch F composes with `effects`** — `app-page-to-markdown` is specified around `fx-bar-top`,
+  `fx-scroll` and `fx-bar-bottom`, which are now documented and patched. Its scrollable preview is
+  the `fx-scroll` case: `tabindex="0"` + `role="region"` + a name, and the focus ring from
+  `effects`' `[PATCH]`.
+
+Then the four items under **Remaining non-component work**, in this order:
+
+1. **`disclosure` retrofit + spec backfill** — any time, and best as a session warm-up rather than
+   squeezed onto the end of one. It is the only component off-convention.
+2. **The shared a11y gate (item 2) — land it before batch F, not after all the components.** Its value
+   is catching a regression across the twenty already built, and every batch after it is checked for
+   free. Doing it last means it only ever runs once.
+3. **Docs (item 3)** — after the gate, because `wcag-mapping.md` should be generated against something
+   that is actually being enforced.
+4. **Final verification and deploy (item 4)** — last. Two known blockers are already written up below:
+   Firefox and WebKit are not installed, so `npm run verify` fails at the test step until
+   `npx playwright install firefox webkit`; and GitHub Pages **Source** must be set to **GitHub
+   Actions** by hand or a green deploy publishes nothing.
+
+**Close every session by updating this file** — tick the roster row with what was found (not just
+that it passed), replace the START HERE block with the next component and its pre-decided
+constraints, and add anything that cost more than ten minutes to the gotchas list. A session that
+does not do this makes the next one redo its work. Then:
+
+```sh
+npm run check:tokens && npm run build && npx playwright test --project=chromium
+```
 
 ---
 
@@ -109,11 +173,11 @@ take their logic and not their layout. See item 1 under remaining work.
 - **Playwright** — `playwright.config.mjs`, three browser projects, `webServer` runs
   `npm run build && npm run preview`. **Only Chromium is installed**, so `npm run verify` currently
   *fails* at the test step: every Firefox and WebKit test errors with "Executable doesn't exist".
-  Chromium is 45/45. Run `npx playwright install firefox webkit` to get a green `verify`.
+  Chromium is **434/434**. Run `npx playwright install firefox webkit` to get a green `verify`.
 
 ---
 
-## Component roster — 20 / 35
+## Component roster — 21 / 35
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -213,7 +277,31 @@ take their logic and not their layout. See item 1 under remaining work.
   `aria-pressed` — doing both announces the change twice and the two can disagree. **Test gotcha:**
   Playwright honors `aria-disabled` in actionability, so clicking the locked switch needs
   `{ force: true }`; the `preventDefault` is what the assertion is really about.
-- [ ] `effects`
+- [x] `effects` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. **The one page whose subject
+  is not a component this library owns.** `fx-grid`, `fx-bar-top`, `fx-bar-bottom`, `fx-scroll` and
+  `fx-pulse` ship in the vendored `src/site/theme/effects.css` and nothing here reimplements them, so
+  `component.css` is a `[PATCH]` — a `:focus-visible` ring for `.fx-scroll`, which `effects.css` has
+  none of, plus a forced-colors block it also lacks — and then `[BROKEN]`, `[MOCK]`, `[FORCED]`.
+  Example 2 is the cleanest live failure in the library so far: **both panels carry `fx-grid`**, so
+  their `::before` comes from the same rule and the spec asserts the two computed pseudo-element
+  styles are identical; the broken one adds `isolation: auto` and its backdrop paints behind its own
+  opaque panel, invisible in every theme at every width, with nothing invalid for a tool to report.
+  Example 3 is the gradient-contrast point with numbers: `fx-bar-top` is 16.79:1 at its ends and
+  11.35:1 at the 55% stop, `fx-bar-bottom` 10:1, and the over-tinted copy is **2.18:1** in the middle
+  while still reading 16.79:1 at two corners nobody puts text in — and it **passes in the light theme
+  at 6.27:1**, so the header's theme picker flips the verdict live. Three findings: **Chromium 151
+  gives any scrollable box a tab stop with no `tabindex`**, with no role, no name and a 1px near-black
+  UA outline — which is what example 4 and the `[PATCH]` are about, and `tabindex="0"` +
+  `role="region"` + a name is still the answer because Safari does not do it at all; **forced colors
+  drops gradient `background-image`s and every `box-shadow`**, so four of the five effects delete
+  themselves and example 2's two panels become identical, which is correct and is the reason
+  decoration may never be the only carrier of anything; and **`effects.css` ships two motion gates
+  with different reach** — `[data-motion="off"] { --motion: 0 }` matches the element carrying the
+  attribute and is inherited from there, `[data-motion="off"] .fx-pulse` is a descendant combinator
+  and needs an ancestor, so example 5's left box resolves `--motion` to `0` and keeps animating. Gate
+  on the token and the question never comes up.
+
+**`foundations` is complete.**
 
 ### buttons-actions
 - [ ] `button`
@@ -518,6 +606,30 @@ It must match `npm run preview` exactly, base path included.
   the page, so every assertion in the block is made against the ordinary stylesheet and **passes for
   the wrong reason**. Use `await page.emulateMedia({ forcedColors: 'active' })` in a `beforeEach`,
   which is the same API the reduced-motion tests already use. `focus-ring`'s spec is the precedent.
+  **`test.use({ reducedMotion: 'reduce' })` has the identical problem** — accepted, ignored, and the
+  test passes against a page that is still animating. `page.emulateMedia` for both, always.
+- **`src/library/tokens/tokens.css` is not loaded by the site.** It is an optional layer and no page
+  links it, deliberately: a component has to work from the fallback chain alone. So
+  `getPropertyValue('--ac-motion')` in a test on a component page returns `""`, not `1` or `0`, and
+  the value that resolved is theme-service's `--motion`. Assert on the *effect* (a computed duration,
+  `getAnimations().length`) or read the theme token, never the `--ac-*` name.
+- **Headless Chromium paints overlay scrollbars.** `offsetWidth - clientWidth` is `0`, no scrollbar
+  is drawn, and a screenshot of an `fx-scroll` region shows nothing at all — so the styling looks
+  broken when it is not. A headed launch (`chromium.launch({ headless: false })`) shows the 12px
+  gutter and the gradient thumb. `getComputedStyle(el, '::-webkit-scrollbar-thumb')` resolves in both
+  modes, so assert scrollbar *colors*, never scrollbar geometry.
+- **Chromium 151 makes any scrollable box a tab stop with no `tabindex`.** It gets no role and no
+  accessible name, and its focus indicator is the UA default — `rgb(16, 16, 16) auto 1px`, a black
+  hairline that is invisible on a dark theme. So a scroll region is reachable and silent by default;
+  `tabindex="0"` + `role="region"` + a name is still required (Safari does not do this at all), and
+  the ring has to be supplied. `effects`' `[PATCH]` is the one to lift.
+- **Forced colors drops gradient `background-image`s and every `box-shadow`** in Chromium, which is
+  why `fx-grid`, both `fx-bar-*` and the glow tokens vanish there without anyone writing a rule.
+  `background-image` is not in the spec's forced list, so declare `none` yourself rather than relying
+  on it — and remember that whatever the decoration was distinguishing is now undistinguished.
+- **The header's motion toggle cannot be `.check()`ed.** The real input is `opacity: 0` under
+  `.switch__track`, which intercepts the pointer, and Playwright retries for the full timeout. Click
+  `.switch__track` the way a person clicks the label, or focus the input and press Space.
 - **A host page's own `h1`–`h6` rules cascade into anything you put a class on.** A class beats a bare
   element selector only for the properties it actually declares; everything it stays quiet about still
   comes from the host. `.ac-t-h2` on an `<h4>` inherited the shell's `text-transform: uppercase`, its
@@ -526,6 +638,14 @@ It must match `npm run preview` exactly, base path included.
   being true. Only visible at 320px, because that is where the two specimens stack and can be compared
   by eye. A utility class that claims to own appearance has to declare the properties a host is likely
   to set, not just the ones it cares about.
+- **Screenshot the finished page before ticking the row.** It has caught a real bug twice, and both
+  times every test was green. The recipe, because it fails two ways otherwise: a throwaway script that
+  imports `{ chromium } from '@playwright/test'` **must sit in the repo root** — from the scratchpad it
+  dies with `ERR_MODULE_NOT_FOUND`, since ESM resolves `node_modules` upward from the script's own
+  directory — and `npm run preview` has to already be running, started as a background job and stopped
+  after. Shoot the component root (`.ac-demo-grid`) at 1280 and 320, and print
+  `document.documentElement.scrollWidth - clientWidth` while you are in there. Delete the script from
+  the repo root afterwards; `git status` should come back with only the component folder.
 - **`[WARN] [glob-loader] Duplicate id "<slug>" found` is a stale content cache, not a real
   duplicate.** It appears on the first build after a scaffolded `docs.md` is filled in, because the
   entry was already indexed in `.astro/`. Nothing is wrong and the page builds; `rm -rf .astro` and
