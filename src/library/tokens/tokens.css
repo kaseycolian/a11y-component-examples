@@ -40,6 +40,12 @@
 
   /* --- Focus -------------------------------------------------------------- */
   --ac-focus: var(--focus-ring, #3ceaff);
+  /* The two tones of the background-independent ring (see the Focus Ring
+     component). They are the theme's text and background colors because those
+     are the one pair it already guarantees contrast with each other, so the
+     ring inverts by itself when the theme does. */
+  --ac-focus-inner: var(--text, #f3ecff);
+  --ac-focus-outer: var(--bg, #070110);
 
   /* --- Accents, each with the text color that is legible on top of it ------ */
   /* Semantic use: pink = primary/danger, green = success, blue = info/links,
@@ -91,6 +97,8 @@
     --ac-border: var(--border, #e0d3f0);
     --ac-border-strong: var(--border-strong, #9070c0);
     --ac-focus: var(--focus-ring, #7b2ff0);
+    --ac-focus-inner: var(--text, #1c0f2e);
+    --ac-focus-outer: var(--bg, #f6f1fc);
     --ac-accent-pink: var(--accent-pink, #b60f86);
     --ac-on-pink: var(--on-pink, #ffffff);
     --ac-accent-green: var(--accent-green, #1f7d2f);

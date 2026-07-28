@@ -11,35 +11,29 @@ Last updated: 2026-07-28
 
 ---
 
-## START HERE — next component is `focus-ring`
+## START HERE — next component is `live-region`
 
-Everything before it is committed and the tree is clean. Full Chromium suite is **324 passed** with no
-known flakes. Run the loop below with:
+`focus-ring` landed (22/22 Chromium). Run the loop below with:
 
 ```sh
-node scripts/new-component.mjs focus-ring --group foundations --name "Focus Ring"
+node scripts/new-component.mjs live-region --group foundations --name "Live Region"
 ```
 
 Decided in advance, so do not re-derive:
 
-- **A docs component**, like `typography` will be — the deliverable is the *explanation*, and the demo
-  is the argument. Spec entry: `component-specs.md` → foundations → `focus-ring`.
-- **CSS-only.** `files: ["html","css"]`, tag `no-js`, delete the scaffolded `component.js`.
-- **Show the failure alongside the fix**, the way `visually-hidden` example 4 and `skip-link` example 5
-  do. `outline: none` with no replacement is the thing this component exists to argue against, and it
-  has to be on the page and live, not described.
-- The examples that carry their weight: `:focus` vs `:focus-visible` (why the library defaults to the
-  latter, and the one place — `skip-link` — that deliberately does not); `outline-offset`; the
-  **two-tone ring** that survives any background (an outline plus a contrasting `box-shadow`, so it is
-  visible on both light and dark); and `@media (forced-colors: active)`, where the ring must become a
-  system color or it disappears.
-- **SC 2.4.11 Focus Not Obscured** and **SC 2.4.13 Focus Appearance** are the criteria to cite. 2.4.13
-  is AAA — say so rather than implying it is required.
-- `site.css` already has a global `:focus:not(:focus-visible) { outline: none }` and every component
-  ships its own `:focus-visible` rule. This component documents that convention; grep before authoring
-  so the page describes what the library actually does.
+- Spec entry: `component-specs.md` → foundations → `live-region`. It is the **first foundations
+  component with real JavaScript** — `AC.createAnnouncer()` → `{ announce(text, { assertive }),
+  destroy() }`.
+- `visually-hidden` example 3 already renders the empty `role="status"` wrapper and says *this
+  component owns the other half*, and `focus-ring`'s docs link to it. Both links are `../live-region/`,
+  so the slug is fixed.
+- The three failures that have to be on the page and live, not described: a region **injected already
+  populated** (announces nothing), a region hidden with `display: none` (silent), and clear-then-set in
+  the same tick (needs a frame gap).
+- `textarea`, `input-group`, `switch` and `tooltip` each already drive a `role="status"`. Read what
+  they do before inventing a fourth pattern — this component should describe them, not contradict them.
 
-Then `live-region`, `typography`, `motion-preferences`, `effects` finish `foundations`.
+Then `typography`, `motion-preferences`, `effects` finish `foundations`.
 
 ---
 
@@ -114,7 +108,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 16 / 35
+## Component roster — 17 / 35
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -144,7 +138,22 @@ take their logic and not their layout. See item 1 under remaining work.
   making `BaseLayout` consume `.ac-visually-hidden` is the same open option as with `skip-link`.
   **Test gotcha:** `innerText` *includes* clipped text — it only drops `display:none` and
   `visibility:hidden`. Assert geometry for "off screen" and `toHaveAccessibleName` for "still announced".
-- [ ] `focus-ring`
+- [x] `focus-ring` — done, **CSS-only** (`--no-js`), 22/22 tests in Chromium. A docs component whose
+  deliverable is the argument, so every claim on it is live and Tab-able rather than described.
+  `.ac-focus-ring` is the ring every other component already ships, extracted: `3px solid` on
+  `:focus-visible` at `2px` offset, no transition. Modifiers are **complete on their own** — one class
+  on the element, not base plus modifier. `--always` (`:focus`, the skip-link case), `--flush` (offset
+  0), `--inset` (offset `-3px`, for an `overflow: hidden` ancestor — example 2 has the clipped ring
+  live beside it), `--two-tone`. Example 4 is broken on purpose and live: `outline: none` alone
+  (SC 2.4.7), `outline: none` plus a background tint (SC 1.4.1 — the one that gets written by someone
+  *trying*), and the honest `box-shadow` replacement. Example 5 is **SC 2.4.11**, and it is the reason
+  the demo says Shift+Tab: scrolling *forward* aligns an element's bottom edge, so a sticky bar only
+  eats the focused element when you move **backwards** and the browser lines its top edge up with the
+  scrollport's. Three findings: `border-radius: inherit` on a focus rule is wrong (it inherits the
+  *parent's* radius; an outline already follows the element's own); the two-tone ring's tones are the
+  theme's own `--text` and `--bg`, because that is the one pair a theme already guarantees contrasts;
+  and the two `--ac-focus-inner` / `--ac-focus-outer` tokens this added to `tokens.css` are the only
+  edit outside the component folder.
 - [ ] `live-region`
 - [ ] `typography`
 - [ ] `motion-preferences`
@@ -438,6 +447,18 @@ It must match `npm run preview` exactly, base path included.
   to prove a control is still focusable. Assert on the `disabled` attribute directly.
 - **A row's `textContent` includes decoration.** A dropdown option reads `"Acid Arcade✓"`, so anchored
   `hasText` regexes fail; match on the accessible name instead.
+- **`test.use({ forcedColors: 'active' })` silently does nothing** in this setup — Playwright 1.62,
+  Chromium. It is accepted, and `matchMedia('(forced-colors: active)')` still reports `false` inside
+  the page, so every assertion in the block is made against the ordinary stylesheet and **passes for
+  the wrong reason**. Use `await page.emulateMedia({ forcedColors: 'active' })` in a `beforeEach`,
+  which is the same API the reduced-motion tests already use. `focus-ring`'s spec is the precedent.
+- **Astro's bundled `site.css` loads *after* every `component.css`.** Head order is theme, effects,
+  dropdown, the page's component, then the `_astro/*.css` bundle. So a shell rule at **equal**
+  specificity wins over a component's. This bites exactly one rule shape: `site.css` ships a global
+  `:focus:not(:focus-visible) { outline: none }` at (0,2,0), which cancels any component's
+  `.thing:focus { outline: … }`. `focus-ring`'s `--always` variant carries a deliberately doubled
+  selector for this, with the reason in the CSS; `skip-link` never hit it because its rings are only
+  ever reached by keyboard, where `:focus-visible` matches and the reset does not apply.
 
 ---
 

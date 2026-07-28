@@ -1,0 +1,393 @@
+/* ===========================================================================
+   FOCUS RING
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+
+     [CORE]      all examples. The class. Three declarations, on
+                 :focus-visible, and it is the whole component.
+     [ALWAYS]    example 1. The :focus variant, for a control that must show a
+                 ring however it was reached.
+     [OFFSET]    example 2. --flush and --inset, for the two places 2px of
+                 offset cannot work.
+     [TWO-TONE]  example 3. The ring that survives any background.
+     [BROKEN]    example 4. Deliberately wrong. Never copy these.
+     [OBSCURED]  example 5. scroll-margin-top, so a sticky bar cannot hide the
+                 focused element (SC 2.4.11).
+     [MOCK]      the demo's page furniture. DELETE IT.
+     [FORCED]    always ship this.
+
+   Copy [CORE] and you have the component. Each modifier is complete on its own
+   — put one class on the element, not the base plus a modifier.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [CORE] the ring ------------------------------------------------------
+   :focus-visible, not :focus. The browser draws the distinction between "this
+   element has focus" and "the person needs to be told where focus is": a Tab
+   or an arrow key matches, a mouse click on a button does not, and a click into
+   a text field does, because a caret needs a home. That judgement accounts for
+   input methods nobody has thought of yet, and it is right more often than a
+   hand-written rule.
+
+   3px, not 1px. SC 2.4.11 says the indicator must not be hidden; SC 2.4.13
+   (AAA) puts numbers on what it takes to see it, and a hairline against a busy
+   surface is not it.
+
+   2px of offset separates the ring from the element's own border, so it reads
+   as a state and not as a heavier edge.
+
+   No transition. An indicator that fades in is an indicator that is not there
+   yet, and the person is already deciding whether they pressed the right key.
+   Motion is gated everywhere else in this file for exactly that contrast. */
+
+.ac-focus-ring:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+/* --- [ALWAYS] example 1 ---------------------------------------------------
+   :focus, so the ring appears however the element was reached — a click
+   included. Use it where the element only exists once it has focus and there is
+   no other cue that it arrived: a skip link is the case, and close to the only
+   one. Everywhere else this is noise a mouse user did not ask for. */
+
+.ac-focus-ring--always:focus,
+/* The same selector twice. A global `:focus:not(:focus-visible) { outline:
+   none }` — this site ships one, and so do most design systems — is exactly as
+   specific as the selector above and usually loads after it, so it wins and the
+   variant silently does nothing. Repeating the class outranks it. Drop this
+   second selector if your app has no such reset. */
+.ac-focus-ring--always.ac-focus-ring--always:focus {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+/* --- [OFFSET] example 2 ---------------------------------------------------
+   Two cases where 2px cannot be right.
+
+   --flush: zero offset, when the ring would otherwise overlap the next control
+   in a tight row, or spill past the edge of the viewport. It reads as a heavier
+   border rather than as a state, so it is a last resort, not a style choice.
+
+   --inset: a negative offset draws the ring inside the element. This is the
+   answer when an ancestor has overflow: hidden — an outline is paint like any
+   other and gets clipped, with no error and nothing to see until someone Tabs
+   there. It costs 3px of the element's own area, so the element has to be big
+   enough to spare it. */
+
+.ac-focus-ring--flush:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 0;
+}
+
+.ac-focus-ring--inset:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: -3px;
+}
+
+/* --- [TWO-TONE] example 3 -------------------------------------------------
+   One accent ring is fine over a surface you control. Over a photo, a light
+   card and a dark footer it will contrast with one of them and disappear
+   against another.
+
+   Two adjacent rings of opposite lightness fix that: whatever is behind them,
+   one of the two has something to contrast with. The two colors the theme
+   already guarantees contrast with each other are its text and its background,
+   so those are the tones — no third value to keep in sync, and it inverts by
+   itself when the theme does.
+
+   The inner ring is a box-shadow with a 3px spread, filling exactly the gap the
+   outline's 3px offset opens, so the two are contiguous rather than a ring and
+   a halo.
+
+   Order matters for forced colors: Windows High Contrast drops box-shadow
+   entirely, so the tone that has to survive is the one drawn as an outline.
+   See [FORCED].
+
+   This is SC 2.4.13 Focus Appearance, which is AAA — not required at AA. It is
+   two declarations. */
+
+.ac-focus-ring--two-tone:focus-visible {
+  outline: 2px solid var(--ac-focus-outer, var(--bg, #070110));
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px var(--ac-focus-inner, var(--text, #f3ecff));
+}
+
+/* --- [BROKEN] example 4 — never copy these --------------------------------
+   The first two are the two ways focus gets removed in real code. Both are on
+   the page, live, so the failure can be Tabbed through rather than described.
+
+   1. `outline: none` and nothing else. SC 2.4.7 Focus Visible, and it is
+      invisible to whoever wrote it, because they were using a mouse.
+   2. `outline: none` plus a background tint. It looks handled. It is color
+      alone (SC 1.4.1), it is a contrast change of well under what SC 2.4.13
+      asks for, and forced colors replaces the tint outright, leaving nothing.
+
+   The third is not broken: box-shadow is a real alternative to an outline, it
+   follows border-radius, and it can be layered. It is here as the honest
+   version of "we cannot use outline". Its one cost is the same as the tint's —
+   forced colors drops it — so [FORCED] gives it an outline back. */
+
+.ac-fr-broken-none:focus {
+  outline: none;
+}
+
+.ac-fr-broken-tint:focus {
+  outline: none;
+  background: var(--ac-elevated, var(--bg-elevated, #1b0c30));
+}
+
+.ac-fr-shadow:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ac-focus, var(--focus-ring, #3ceaff));
+}
+
+/* --- [OBSCURED] example 5 -------------------------------------------------
+   SC 2.4.11 Focus Not Obscured, new in WCAG 2.2: when an element receives
+   focus, author content must not hide it entirely.
+
+   A sticky bar breaks this on its own. The browser scrolls a focused element
+   only just into view, and moving *backwards* through a list is where that
+   bites: the target is above the scrollport, so its top edge is lined up with
+   the scrollport's top edge — which is exactly where the bar is parked. Nothing
+   is wrong with the ring; it is behind something.
+
+   scroll-margin-top makes the browser treat the element as taller than it is
+   while scrolling it into view, so it comes to rest below the bar. It goes on
+   the focusable element, not on the bar, and it needs to be at least the bar's
+   height. Do the same at page scale for a sticky site header — this library
+   sets it globally on anything with an id. */
+
+.ac-fr-cleared {
+  scroll-margin-top: 3rem;
+}
+
+/* --- [MOCK] delete this ---------------------------------------------------
+   Page furniture: something to put a ring on, and the backgrounds and frames
+   the examples argue against. None of it is part of the component. */
+
+.ac-fr-row,
+.ac-fr-pair,
+.ac-fr-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.ac-fr-btn,
+.ac-fr-track {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* SC 2.5.8 asks for 24px; 44px is the comfortable touch size. */
+  min-height: var(--ac-target, 44px);
+  min-width: var(--ac-target-min, 24px);
+  padding: 0 0.9rem;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.82rem;
+  color: var(--ac-text, var(--text, #f3ecff));
+  cursor: pointer;
+  /* Gated, never hardcoded: --ac-motion resolves to 0 under
+     prefers-reduced-motion or [data-motion="off"]. The ring itself is
+     deliberately outside this — see [CORE]. */
+  transition: border-color
+    calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-fr-btn:hover,
+.ac-fr-track:hover {
+  border-color: var(--ac-focus, var(--focus-ring, #3ceaff));
+}
+
+.ac-fr-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.82rem;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-fr-input {
+  min-width: 0;
+  min-height: var(--ac-target, 44px);
+  padding: 0 0.7rem;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  font: inherit;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+/* An ancestor that clips. The buttons sit flush against its edges so the
+   clipping is the thing you see, not something you have to look for. */
+.ac-fr-clip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px dashed var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+}
+
+.ac-fr-swatches {
+  flex-direction: column;
+}
+
+.ac-fr-swatch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  min-width: 0;
+  padding: 0.7rem;
+  border-radius: var(--ac-radius, var(--radius, 10px));
+}
+
+.ac-fr-swatch--dark {
+  background: var(--ac-bg, var(--bg, #070110));
+}
+
+/* The theme's text color as a background is the one value guaranteed to be the
+   opposite lightness from the page, in every theme. */
+.ac-fr-swatch--light {
+  background: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-fr-swatch--light .ac-fr-btn {
+  background: var(--ac-bg, var(--bg, #070110));
+}
+
+.ac-fr-swatch--accent {
+  background: var(--ac-accent-purple, var(--accent-purple, #b57fff));
+}
+
+.ac-fr-swatch--accent .ac-fr-btn {
+  background: var(--ac-on-purple, var(--on-purple, #1a0838));
+}
+
+.ac-fr-key {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: decimal inside;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.82rem;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-fr-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+}
+
+.ac-fr-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+  height: 9rem;
+  padding: 0 0.5rem 0.5rem;
+  overflow-y: auto;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-bg, var(--bg, #070110));
+}
+
+/* Opaque, or it would not obscure anything and the example would prove
+   nothing. */
+.ac-fr-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 0 -0.5rem 0;
+  padding: 0.6rem 0.5rem;
+  background: var(--ac-elevated, var(--bg-elevated, #1b0c30));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-fr-track {
+  flex: none;
+  justify-content: flex-start;
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------
+   Every color above is replaced by the user's own palette, and three things
+   this component depends on are dropped outright: box-shadow, background
+   tints, and any color-mix. What is left has to carry the state.
+
+   The ring itself needs only a system color. The two-tone variant loses its
+   inner tone, so the outline is all there is and it must be the visible one.
+   The tint in [BROKEN] loses everything, which is the point of it. */
+
+@media (forced-colors: active) {
+  .ac-focus-ring:focus-visible,
+  .ac-focus-ring--always:focus,
+  .ac-focus-ring--always.ac-focus-ring--always:focus,
+  .ac-focus-ring--flush:focus-visible,
+  .ac-focus-ring--inset:focus-visible {
+    outline-color: CanvasText;
+  }
+
+  /* box-shadow is gone here, so the outline is the whole ring: it goes back to
+     3px and to the offset the single-tone version uses. */
+  .ac-focus-ring--two-tone:focus-visible {
+    outline: 3px solid CanvasText;
+    outline-offset: 2px;
+  }
+
+  /* The honest box-shadow replacement in example 4 has nothing left either, so
+     it gets a real outline back. Without this block it is as broken as the two
+     above it. */
+  .ac-fr-shadow:focus-visible {
+    outline: 3px solid CanvasText;
+    outline-offset: 2px;
+  }
+
+  .ac-fr-btn,
+  .ac-fr-track,
+  .ac-fr-input {
+    border-color: ButtonBorder;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  .ac-fr-btn:hover,
+  .ac-fr-track:hover {
+    border-color: Highlight;
+  }
+
+  .ac-fr-clip,
+  .ac-fr-scroll {
+    border-color: CanvasText;
+  }
+
+  .ac-fr-swatch {
+    border: 1px solid CanvasText;
+    background: Canvas;
+  }
+
+  .ac-fr-sticky {
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .ac-fr-label,
+  .ac-fr-key {
+    color: CanvasText;
+  }
+}

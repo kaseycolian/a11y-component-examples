@@ -1,0 +1,13 @@
+{
+  "slug": "focus-ring",
+  "name": "Focus Ring",
+  "group": "foundations",
+  "order": 30,
+  "summary": "The one indicator that says where the keyboard is — why the library draws it on :focus-visible, what the offset is for, the two-tone version that survives any background, and what `outline: none` actually costs.",
+  "tags": ["focus-ring", "focus-visible", "outline", "outline-offset", "scroll-margin-top", "forced-colors", "no-js"],
+  "apg": null,
+  "wcag": ["1.4.1", "1.4.11", "2.4.7", "2.4.11", "2.4.13"],
+  "status": "stable",
+  "files": ["html", "css"],
+  "demoNote": "No JavaScript on this page, and it is meant to be Tabbed through rather than read. Example 4 is broken on purpose and live: three buttons, and only one of them can be followed with a keyboard."
+}

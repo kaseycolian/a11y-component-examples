@@ -37,8 +37,11 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
 - **Testing gotcha** `innerText` **includes** clipped text — it only drops `display:none` and `visibility:hidden`. Use geometry for "off screen" and `toHaveAccessibleName` for "still announced".
 
 ### focus-ring
-- **Docs component.** Demonstrates `:focus-visible` vs `:focus`, offset, and the two-tone ring that survives any background.
-- **Gotcha** Never `outline: none` without an equal-or-better replacement. Show the failure alongside the fix so the page teaches rather than asserts.
+- **Docs component.** Demonstrates `:focus-visible` vs `:focus`, offset, and the two-tone ring that survives any background. **CSS-only.**
+- **Shipped contract** `.ac-focus-ring` (`3px solid` accent on `:focus-visible`, `outline-offset: 2px`, no transition) plus four modifiers that are each **complete on their own** — `--always` (`:focus`), `--flush` (offset 0), `--inset` (offset `-3px`), `--two-tone`.
+- **The two tones are the theme's own `--text` and `--bg`**, because that is the one pair a theme already guarantees contrast between. Added `--ac-focus-inner` / `--ac-focus-outer` to `tokens.css`.
+- **Gotcha** Never `outline: none` without an equal-or-better replacement. Show the failure alongside the fix so the page teaches rather than asserts. No `border-radius` in a focus rule — an outline already follows the element's own, and `inherit` takes the *parent's*.
+- **Gotcha** `outline-offset` is positive by default, so an `overflow: hidden` ancestor clips the ring with no error and nothing to see. And a sticky bar only obscures the focused element when focus moves **backwards** (SC 2.4.11): moving forward aligns the element's bottom edge, not its top.
 
 ### live-region
 - **Markup** `<div class="ac-visually-hidden" role="status" aria-live="polite">` and an `role="alert"` / `aria-live="assertive"` sibling.
