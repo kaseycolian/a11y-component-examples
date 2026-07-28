@@ -1,0 +1,13 @@
+{
+  "slug": "native-select",
+  "name": "Native Select",
+  "group": "forms-inputs",
+  "order": 50,
+  "summary": "A plain select, styled with appearance: none and a CSS caret. The better default on a phone, where it opens the OS picker — reach for the Dropdown only when you need styled rows.",
+  "tags": ["select", "optgroup", "no-js", "appearance-none", "os-picker", "multiple"],
+  "apg": null,
+  "wcag": ["1.3.1", "1.4.1", "1.4.11", "2.1.1", "2.5.8", "3.3.1", "4.1.2"],
+  "status": "stable",
+  "files": ["html", "css"],
+  "demoNote": "No JavaScript on this page. Open one on a phone and you get the OS picker: full height, scrollable, with the platform's own screen reader behavior. That is the thing a custom listbox gives up."
+}

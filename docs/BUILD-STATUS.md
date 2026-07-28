@@ -81,7 +81,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 7 / 34
+## Component roster — 8 / 34
 
 ### foundations
 - [ ] `skip-link`
@@ -120,7 +120,12 @@ take their logic and not their layout. See item 1 under remaining work.
   and only from 90% of the limit (cleared below it, so crossing back is a change). No `maxlength`:
   over-typing is allowed and reported. Autogrow collapses the height before reading `scrollHeight`
   (otherwise it can only ever grow) and a `ResizeObserver` makes a hand-dragged height final.
-- [ ] `native-select`
+- [x] `native-select` — done, **CSS-only** (`--no-js`), 17/17 tests in Chromium. The recommendation
+  component: prefer this over the custom Dropdown unless you need styled rows, because on a phone it
+  opens the OS picker. Caret is two `currentColor` gradients, so no image and no second rule for the
+  disabled state — and under `forced-colors` it sets `appearance: auto` and lets the UA draw its own,
+  since `background-image` is dropped there. `option`/`optgroup` get their own colors (Windows inherits
+  the control's into the popup). `multiple` is left native with the keyboard table spelled out.
 - [ ] `radio-group`
 - [ ] `checkbox`
 - [ ] `switch`

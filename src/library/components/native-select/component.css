@@ -1,0 +1,232 @@
+/* ===========================================================================
+   NATIVE SELECT
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) lives in
+   the site's own stylesheet, not this file.
+
+     [FIELD]      all examples. The label/hint/error wrapper. Canonical in the
+                  Field component; repeated so this file stands alone.
+     [CORE]       all examples. .ac-select and its caret.
+     [DISABLED]   example 3.
+     [INVALID]    example 4.
+     [MULTI]      example 5.
+     [FORCED]     always ship this. High Contrast rebuilds every cue.
+
+   Copy the file whole for the library version.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [FIELD] the wrapper — canonical in the Field component ---------------- */
+
+.ac-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  min-width: 0;
+}
+
+.ac-field__label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-field__hint {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* --- [CORE] the select ---------------------------------------------------
+   appearance: none drops the OS control so the border and surface can match the
+   rest of the form. Everything the browser does *behind* the control -- the
+   popup, the OS picker on a phone, type-ahead, the whole keyboard model -- is
+   untouched, because it is not styleable and does not need to be. */
+
+.ac-select {
+  width: 100%;
+  min-width: 0;
+  /* SC 2.5.8 floor is 24px; 44px is the comfortable touch size. */
+  min-height: var(--ac-target, 44px);
+  /* Right padding clears the caret, so a long option never runs under it. */
+  padding: 0.5rem 2.2rem 0.5rem 0.75rem;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  color: var(--ac-text, var(--text, #f3ecff));
+  /* `font: inherit` matters: an unstyled select drops to 13px in most browsers,
+     which also defeats a page-level font-size preference. */
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  cursor: pointer;
+  appearance: none;
+
+  /* The caret, drawn as two gradient wedges rather than a background image:
+     no file to ship, and it inherits `color`, so it tracks the theme and the
+     disabled state without a second rule. */
+  background-color: var(--ac-surface, var(--bg-panel, #110620));
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: right 1.15rem center, right 0.85rem center;
+  background-size: 0.34rem 0.34rem;
+  background-repeat: no-repeat;
+
+  transition:
+    border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-select:hover:enabled {
+  border-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+}
+
+.ac-select:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+/* The dropped-open list is the OS's, not ours -- but Windows and some Linux
+   builds inherit the control's colors into it, so an unstyled option can end up
+   light text on a light background. Setting both is the fix. */
+.ac-select option,
+.ac-select optgroup {
+  background-color: var(--ac-elevated, var(--bg-elevated, #1b0c30));
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+/* --- [DISABLED] example 3 ------------------------------------------------- */
+
+.ac-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  border-style: dashed;
+}
+
+/* Kept in the list, dimmed, and announced as unavailable by the browser. Not
+   removed: the user has to be able to learn the option exists. */
+.ac-select option:disabled {
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* --- [INVALID] example 4 -------------------------------------------------
+   Driven by aria-invalid so the styling cannot disagree with what is announced.
+   Two cues, never color alone (SC 1.4.1): the border thickens, and there is a
+   message to read. */
+
+.ac-field__error {
+  position: relative;
+  margin: 0;
+  padding-left: 1.3rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  font-weight: 700;
+  color: var(--ac-danger, var(--accent-pink, #ff2ec4));
+}
+
+.ac-field__error::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.28em;
+  width: 0.85rem;
+  height: 0.85rem;
+  background: currentColor;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.ac-field__error:empty {
+  padding-left: 0;
+}
+
+.ac-field__error:empty::before {
+  content: none;
+}
+
+.ac-field--invalid .ac-select,
+[aria-invalid="true"].ac-select {
+  border-width: 2px;
+  border-color: var(--ac-danger, var(--accent-pink, #ff2ec4));
+}
+
+/* --- [MULTI] example 5 ---------------------------------------------------
+   A multiple select is a list box, not a button: no caret to draw, and the
+   height comes from `size`. */
+
+.ac-select--multi {
+  padding: 0.35rem;
+  background-image: none;
+  cursor: default;
+}
+
+.ac-select--multi option {
+  /* SC 2.5.8: rows are click targets too, and the UA default is about 16px. */
+  min-height: var(--ac-target-min, 24px);
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+}
+
+/* checked, not :selected -- the latter is not a thing. Chrome and Safari paint
+   the OS highlight here, which forced-colors then overrides for us. */
+.ac-select--multi option:checked {
+  background: color-mix(
+    in srgb,
+    var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 22%,
+    var(--ac-elevated, var(--bg-elevated, #1b0c30))
+  );
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this -------------------- */
+
+@media (forced-colors: active) {
+  /* forced-colors drops background-image, which is where our caret lives -- so
+     hand the control back to the UA and let it draw its own. Losing the styling
+     is the correct trade: the arrow is what tells the user this is a select. */
+  .ac-select {
+    appearance: auto;
+    padding-right: 0.75rem;
+    background-image: none;
+    border-color: ButtonBorder;
+  }
+
+  .ac-select:focus-visible {
+    outline-color: CanvasText;
+  }
+
+  /* opacity is ignored here, leaving the dashed border as the only cue. */
+  .ac-select:disabled {
+    color: GrayText;
+    border-color: GrayText;
+    opacity: 1;
+  }
+
+  .ac-select option:disabled {
+    color: GrayText;
+  }
+
+  /* The accent collapses to the user's text color, so hue can no longer
+     distinguish invalid — width has to carry it. */
+  .ac-field--invalid .ac-select,
+  [aria-invalid="true"].ac-select {
+    border-width: 3px;
+    border-color: CanvasText;
+  }
+
+  .ac-field__error {
+    color: CanvasText;
+  }
+
+  /* color-mix is gone; the system highlight is the only reliable selected cue. */
+  .ac-select--multi option:checked {
+    background: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+}

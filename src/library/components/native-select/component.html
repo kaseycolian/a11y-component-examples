@@ -1,0 +1,191 @@
+<!-- ===========================================================================
+     NATIVE SELECT — a plain <select>, styled, with nothing added
+
+     WHAT TO COPY
+       Any one example below is self-contained. Take its section plus the
+       matching sections of component.css. There is no JavaScript, and that is
+       the entire point of this component.
+       Copy the file whole for the library-grade version.
+
+     THE CONTRACT
+       label[for]  ->  select.id       the first option is never the label
+       select      ->  aria-describedby="<hint id>"
+       optgroup    ->  label="…"       grouping is native; do not fake it
+
+     PICK THIS ONE FIRST. On a phone this opens the OS picker — a full-height,
+     scrollable, screen-reader-native wheel with the platform's own gestures.
+     Nothing in this library can beat that. Reach for the Dropdown when you
+     genuinely need styled rows (icons, swatches, a second line); reach for this
+     the rest of the time.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     =========================================================================== -->
+
+<div class="ac-demo-grid">
+  <!-- ======================================================================
+       EXAMPLE 1 · The baseline
+       CSS [FIELD] + [CORE].
+
+       appearance: none removes the OS control so the border and surface match
+       the rest of the form; the caret is drawn with two CSS gradients, so it
+       inherits `color` and needs no image file.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">1 &middot; The baseline</h3>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-ns-venue">Venue</label>
+      <select class="ac-select" id="ac-ns-venue" name="venue"
+              aria-describedby="ac-ns-venue-hint">
+        <option value="brixton">Brixton Academy</option>
+        <option value="olympia" selected>Olympia Ballroom</option>
+        <option value="gilman">Gilman Street</option>
+      </select>
+      <p class="ac-field__hint" id="ac-ns-venue-hint">
+        Opens the OS picker on a phone, which is the reason to prefer this.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 2 · Groups, and a placeholder that is not a label
+       CSS [FIELD] + [CORE].
+
+       <optgroup> is announced as a group by every screen reader that matters.
+       There is nothing to build.
+
+       The empty first option is a prompt, not a label: it carries value="" so
+       `required` rejects it, and the real label is still the <label>. "Choose a
+       tour" as the only label disappears the moment something is chosen.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">2 &middot; Groups and a placeholder</h3>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-ns-tour">Tour leg</label>
+      <select class="ac-select" id="ac-ns-tour" name="tour" required
+              aria-describedby="ac-ns-tour-hint">
+        <option value="">Choose a leg</option>
+        <optgroup label="Spring">
+          <option value="west">West coast, 99 dates</option>
+          <option value="midwest">Midwest, 46 dates</option>
+        </optgroup>
+        <optgroup label="Summer">
+          <option value="eu">Europe, 24 dates</option>
+          <option value="festivals">Festivals only</option>
+        </optgroup>
+      </select>
+      <p class="ac-field__hint" id="ac-ns-tour-hint">Required. Groups come from optgroup.</p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 3 · Unavailable options, and an unavailable select
+       CSS [FIELD] + [CORE] + [DISABLED].
+
+       A disabled <option> stays in the list and is announced as unavailable, so
+       the user learns the choice exists. Removing it instead leaves them
+       wondering whether they missed it.
+
+       A disabled <select> is a blunter instrument: it is skipped by Tab and
+       explains nothing. A native select has no readonly, and aria-disabled on it
+       is a lie the browser will not honor — it stays operable. So if the reason
+       matters, keep the control enabled and say why in the hint, or render the
+       value as text instead of a dead control.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">3 &middot; Unavailable</h3>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-ns-slot">Set time</label>
+      <select class="ac-select" id="ac-ns-slot" name="slot"
+              aria-describedby="ac-ns-slot-hint">
+        <option value="doors">Doors, 19:00</option>
+        <option value="support" disabled>Support, 20:00 — taken</option>
+        <option value="headline" selected>Headline, 21:30</option>
+      </select>
+      <p class="ac-field__hint" id="ac-ns-slot-hint">
+        The taken slot stays listed, marked unavailable.
+      </p>
+    </div>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-ns-label">Label</label>
+      <select class="ac-select" id="ac-ns-label" name="label" disabled
+              aria-describedby="ac-ns-label-hint">
+        <option value="olympia" selected>Olympia Records</option>
+      </select>
+      <p class="ac-field__hint" id="ac-ns-label-hint">
+        Disabled: skipped by Tab, and not submitted.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 4 · Invalid
+       CSS [FIELD] + [CORE] + [INVALID].
+
+       Same contract as Field: aria-invalid drives the styling and the message
+       lives in a role="alert" that is always present. Server-rendered here — the
+       page arrives with the error already on it, which is the case that has to
+       work without any script.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">4 &middot; Invalid</h3>
+
+    <div class="ac-field ac-field--invalid">
+      <label class="ac-field__label" for="ac-ns-merch">Merch size</label>
+      <select class="ac-select" id="ac-ns-merch" name="size" required aria-invalid="true"
+              aria-describedby="ac-ns-merch-hint ac-ns-merch-error">
+        <option value="" selected>Choose a size</option>
+        <option value="s">Small</option>
+        <option value="m">Medium</option>
+        <option value="l">Large</option>
+      </select>
+      <p class="ac-field__hint" id="ac-ns-merch-hint">Runs small.</p>
+      <p class="ac-field__error" id="ac-ns-merch-error" role="alert">
+        Choose a size &mdash; the order cannot ship without one.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 5 · Multiple, left native on purpose
+       CSS [FIELD] + [CORE] + [MULTI].
+
+       This is the one case where the styled-listbox approach is a downgrade, so
+       the Dropdown refuses to enhance it. Multi-select has its own keyboard
+       model, and browsers already implement it:
+
+         ↑ ↓                move and select one
+         Shift + ↑ ↓        extend the selection
+         Ctrl + ↑ ↓         move without selecting
+         Ctrl + Space       add or remove the focused option
+         Ctrl + A           select all
+
+       `size` is set so several rows are visible at once; without it a multiple
+       select is a four-row box that looks like a bug.
+
+       For more than a handful of options, a set of checkboxes is usually kinder
+       than any of this — the modifier keys above are not discoverable, and on
+       touch a multiple select is close to unusable.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">5 &middot; Multiple (left native)</h3>
+
+    <div class="ac-field">
+      <label class="ac-field__label" for="ac-ns-riders">Rider</label>
+      <select class="ac-select ac-select--multi" id="ac-ns-riders" name="riders" multiple size="5"
+              aria-describedby="ac-ns-riders-hint">
+        <option value="water" selected>Water, 24 bottles</option>
+        <option value="towels">Towels</option>
+        <option value="strings" selected>Spare strings</option>
+        <option value="parking">Parking for two vans</option>
+        <option value="pizza">Pizza, 4 large</option>
+      </select>
+      <p class="ac-field__hint" id="ac-ns-riders-hint">
+        Ctrl and click, or Ctrl with the arrow keys, to pick more than one.
+      </p>
+    </div>
+  </div>
+</div>
