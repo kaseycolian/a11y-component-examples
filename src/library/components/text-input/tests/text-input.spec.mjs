@@ -111,7 +111,7 @@ test('read-only stays focusable, copyable and submitted', async ({ page }) => {
 
   // In the accessibility tree, with its value, unlike a disabled control.
   await expect(key).toHaveAccessibleName('API key');
-  await expect(key).toHaveValue(/^sk_live_/);
+  await expect(key).toHaveValue(/^sk_test_/);
 
   // The value can be selected, which is the whole reason it is readonly.
   const selected = await key.evaluate((el) => {

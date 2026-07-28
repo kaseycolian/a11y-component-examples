@@ -137,11 +137,11 @@ body {
   gap: 0.6rem;
   text-decoration: none;
   color: inherit;
-  margin-right: auto;
 }
 
 .site-brand__mark {
-  font-size: 1.1rem;
+  /* The app name carries the header; the tagline beside it stays small. */
+  font-size: clamp(1.35rem, 1.15rem + 0.9vw, 1.7rem);
   font-weight: 900;
   font-style: italic;
   letter-spacing: 0.08em;
@@ -162,11 +162,23 @@ body {
   }
 }
 
+/* A sticky header earns its height. Tighter padding and gaps on a phone so the
+   brand row and the components row are all it costs. */
+@media (max-width: 760px) {
+  .site-header__inner {
+    gap: 0.5rem 0.75rem;
+    padding: 0.6rem 1rem;
+  }
+}
+
+/* Settings sit at the far right, whether or not the components picker is there
+   to sit between them and the brand. */
 .site-header__controls {
   display: flex;
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
+  margin-left: auto;
 }
 
 /* --- Layout ------------------------------------------------------------------ */

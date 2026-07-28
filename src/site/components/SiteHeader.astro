@@ -1,18 +1,71 @@
 ---
 import { THEME_GROUPS } from '../lib/themes.mjs';
+import { COMPONENTS_BY_GROUP } from '../lib/registry.mjs';
 
 const base = import.meta.env.BASE_URL;
+const indexHref = `${base}components/`;
+
+/** So the picker opens showing the page you are already on. */
+const here = Astro.url.pathname;
 ---
 
 <header class="site-header">
   <div class="site-header__inner">
     <a class="site-brand" href={base}>
       <span class="site-brand__mark">The A11Y Way</span>
-      <span class="site-brand__sub">Copy & Pastable WCAG 2.2 AA Compliant Components</span>
+      <span class="site-brand__sub">Copy &amp; Pastable WCAG 2.2 AA Compliant Components</span>
     </a>
 
+    {
+      COMPONENTS_BY_GROUP.length > 0 && (
+        <div class="control control--jump" data-jump-control>
+          <label class="control__label control__label--strong" for="component-jump">
+            Components
+          </label>
+          {/*
+            The same Dropdown the library ships, grouped exactly like the sidebar.
+            Navigating on `change` is safe here because the Dropdown commits a
+            choice only on click or Enter -- it does not fire while you arrow
+            through the list -- and the hint says what choosing does before you
+            choose (SC 3.2.2). If the Dropdown never enhances this select, the
+            script shows the Go button instead rather than leaving a native
+            select that navigates on every arrow key.
+          */}
+          <select
+            id="component-jump"
+            data-ac-dropdown
+            data-component-jump
+            aria-describedby="component-jump-hint"
+          >
+            <option value="">Jump to a component</option>
+            <optgroup label="Overview">
+              <option value={indexHref} selected={here === indexHref}>
+                All components
+              </option>
+            </optgroup>
+            {COMPONENTS_BY_GROUP.map((group) => (
+              <optgroup label={group.name}>
+                {group.components.map((component) => (
+                  <option
+                    value={`${base}components/${component.slug}/`}
+                    selected={here === `${base}components/${component.slug}/`}
+                  >
+                    {component.name}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+          <p class="visually-hidden" id="component-jump-hint">
+            Choosing a component opens its page.
+          </p>
+          <button class="control__go" type="button" data-component-jump-go hidden>Go</button>
+        </div>
+      )
+    }
+
     <div class="site-header__controls">
-      <div class="control">
+      <div class="control control--quiet" data-theme-control>
         <label class="control__label" for="theme-select">Theme</label>
         {/*
           The picker is the library's own Dropdown (data-ac-dropdown), which is
@@ -32,7 +85,9 @@ const base = import.meta.env.BASE_URL;
             rather than as a missing one.
           */}
           <optgroup label="System">
-            <option value="">Auto (match system)</option>
+            {/* Short on purpose: the trigger has to show its value without
+                truncating it, and the "System" group above says what it means. */}
+            <option value="">Auto</option>
           </optgroup>
           {
             THEME_GROUPS.map((group) => (
@@ -48,8 +103,13 @@ const base = import.meta.env.BASE_URL;
         </select>
       </div>
 
-      <div class="control">
-        <span class="control__label" id="motion-label">Animation</span>
+      <div class="control control--quiet">
+        {/*
+          Hidden visually, not from the accessibility tree: the switch's own
+          "Reduce motion" text is the visible label, so a second heading over it
+          was noise on screen while still being useful as a description.
+        */}
+        <span class="control__label visually-hidden" id="motion-label">Animation</span>
         <label class="switch">
           <input type="checkbox" data-motion-toggle aria-describedby="motion-label" />
           <span class="switch__track" aria-hidden="true"><span class="switch__thumb"></span></span>
@@ -77,11 +137,20 @@ const base = import.meta.env.BASE_URL;
   }
 
   .control__label {
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 0.1em;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--text-muted);
+  }
+
+  /* The components picker is the one thing in the header people came for, so it
+     is the only control that gets full-strength label text. */
+  .control__label--strong {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: var(--text);
   }
 
   .control__note {
@@ -96,14 +165,98 @@ const base = import.meta.env.BASE_URL;
     display: none;
   }
 
-  /* --- Theme picker --------------------------------------------------------
+  /* Only used on the fallback path below, where the Dropdown did not load. */
+  .control__go {
+    align-self: flex-start;
+    min-height: 2.25rem;
+    margin-top: 0.35rem;
+    padding: 0 0.9rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--bg-elevated);
+    color: var(--text);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .control__go[hidden] {
+    display: none;
+  }
+
+  /* --- Sizing the Dropdown -------------------------------------------------
      The Dropdown builds its own wrapper at runtime, so it never carries Astro's
-     scoping attribute -- hence :global(). Giving the component a width is the
-     consumer's job and the only thing done here; nothing reaches into its
-     internals. */
-  .control :global(.ac-dropdown) {
+     scoping attribute -- hence :global(). Nothing here reaches into its
+     internals: width is the consumer's job, and everything else is done by
+     setting the --ac-* tokens the component already reads. */
+
+  .control--jump {
+    /* Prominent: the accent border and the wider trigger are what make this read
+       as the primary control rather than a setting. */
+    --ac-border-strong: var(--accent-blue);
+    --ac-surface: var(--bg-elevated);
+  }
+
+  .control--jump :global(.ac-dropdown) {
+    width: 17rem;
+    max-width: 100%;
+  }
+
+  .control--quiet {
+    /* Quiet: a plain border rather than an accent one. */
+    --ac-border-strong: var(--border);
+  }
+
+  .control--quiet :global(.ac-dropdown) {
+    /* Wide enough for the longest theme name: a trigger that truncates its own
+       value tells you least exactly when you are choosing. */
     width: 12.5rem;
     max-width: 100%;
+  }
+
+  /* Smaller with a mouse, full 44px on touch. The 24px floor (SC 2.5.8) is what
+     must never move; 44px is only the comfortable size, and comfort is what a
+     finger needs and a cursor does not. */
+  @media (pointer: fine) {
+    .control--quiet {
+      --ac-target: 36px;
+    }
+  }
+
+  /* --- Header layout at narrow widths --------------------------------------
+     Brand and settings share the first row; the components picker takes a full
+     row of its own underneath, because it is the control people are reaching
+     for and a 10rem trigger in a wrapped row is not a target. */
+  @media (max-width: 760px) {
+    .control--jump {
+      order: 2;
+      flex-basis: 100%;
+    }
+
+    .control--jump :global(.ac-dropdown) {
+      width: 100%;
+    }
+
+    /* The settings squeeze up beside the brand rather than taking a third row of
+       a sticky header. The label goes visually hidden, not away: the trigger
+       already shows the current theme, and the accessible name is untouched. */
+    .control--quiet .control__label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    /* Shrinks instead of wrapping, so the settings stay on the brand's row and
+       the sticky header keeps to two rows on a phone. */
+    .control--quiet :global(.ac-dropdown) {
+      width: 8.5rem;
+      min-width: 0;
+    }
   }
 
   /* --- Motion switch ------------------------------------------------------
@@ -116,8 +269,8 @@ const base = import.meta.env.BASE_URL;
     gap: 0.5rem;
     min-height: 2.25rem;
     cursor: pointer;
-    font-size: 0.85rem;
-    color: var(--text);
+    font-size: 0.8rem;
+    color: var(--text-muted);
   }
 
   .switch input {
@@ -220,6 +373,43 @@ const base = import.meta.env.BASE_URL;
 */}
 <script>
   const root = document.documentElement;
+
+  /* --- Components picker ---------------------------------------------------
+     Two paths, decided by whether the Dropdown enhanced the select.
+
+     Enhanced: choosing an option is an explicit commit (click or Enter), so
+     navigating on `change` is a user action, not a side effect of arrowing
+     through a list (SC 3.2.2).
+
+     Not enhanced: a bare native select fires `change` on every arrow key on
+     Windows, which would navigate away mid-browse. So the Go button appears and
+     the change handler stays off. */
+  const jump = document.querySelector<HTMLSelectElement>('[data-component-jump]');
+  const jumpGo = document.querySelector<HTMLButtonElement>('[data-component-jump-go]');
+
+  if (jump) {
+    const enhanced = () => !!(jump as HTMLSelectElement & { _acDropdown?: unknown })._acDropdown;
+
+    const goTo = () => {
+      if (jump.value) window.location.href = jump.value;
+    };
+
+    // Checked when the event fires rather than at startup: the Dropdown's own
+    // script may initialize before or after this one, and an ordering assumption
+    // here would decide the wrong path half the time.
+    jump.addEventListener('change', () => {
+      if (enhanced()) goTo();
+    });
+
+    // By `load` the Dropdown has definitely had its chance, so a still-native
+    // select means it is not coming.
+    window.addEventListener('load', () => {
+      if (!enhanced() && jumpGo) {
+        jumpGo.hidden = false;
+        jumpGo.addEventListener('click', goTo);
+      }
+    });
+  }
 
   /* --- Theme --------------------------------------------------------------- */
   const select = document.querySelector<HTMLSelectElement>('[data-theme-select]');

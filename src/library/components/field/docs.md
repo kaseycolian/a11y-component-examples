@@ -100,7 +100,7 @@ Browser messages say what is wrong but never what to do, so override per control
 ```html
 <input type="email" required
        data-ac-error-missing="Enter the email address you use at work."
-       data-ac-error-invalid="Enter an address in the form name@example.com." />
+       data-ac-error-invalid="Enter an address in the form ruby.soho@example.com." />
 ```
 
 `missing` covers `validity.valueMissing`, `invalid` covers the rest; `control.validationMessage` is

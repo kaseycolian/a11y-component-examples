@@ -56,10 +56,22 @@ take their logic and not their layout. See item 1 under remaining work.
 - **Scripts** — `sync-library.mjs`, `check-tokens.mjs`, `new-component.mjs`. All three verified working.
 - **Site shell** — `BaseLayout` (with `head` + `end` slots), `SiteHeader`, `CodePanel`,
   `ComponentNav`, `registry.mjs`, `themes.mjs`, `content.config.ts`, `site.css`, home, index, `[slug]`.
+- **Header** — brand, a **components picker**, then the settings. The picker is the library's own
+  Dropdown over a `<select>` grouped exactly like the sidebar, with the current page preselected; it
+  navigates on `change`, which is safe because the Dropdown commits only on click or Enter and the
+  described hint says so in advance (SC 3.2.2). A `Go` button, hidden by default, appears at `load` if
+  the Dropdown never enhanced the select — a bare native select fires `change` on every arrow key.
+  Prominence is set with `--ac-*` tokens on the wrapper (accent border, wider trigger) rather than by
+  reaching into the component's internals. Two rows on a phone: brand + settings, then the picker
+  full-width.
 - **Header theme picker** — is the library's own Dropdown, loaded site-wide from
   `public/library/components/dropdown/` by `BaseLayout`. The shell is a *consumer* of the library, so
   a regression in the dropdown breaks the site, not just a test. Covered by
   `tests/site-header.spec.mjs`.
+- **Home hero** — two columns from 68rem up, prose left at its own measure, a real `Field` markup
+  excerpt right (`tabindex="0"` + `role="group"`, because it scrolls sideways). No component counts
+  anywhere: see the **Writing style** rules in `CLAUDE.md` — never count, and demo content is 90s punk
+  song/album references with `462` and `99` as the arbitrary numbers.
 - **Markdown tables** — `scripts/rehype-scrollable-tables.mjs` wraps every `docs.md` table in a
   focusable `.table-scroll` region. Without it every component page overflowed sideways at 320px.
 - **Playwright** — `playwright.config.mjs`, three browser projects, `webServer` runs
@@ -167,8 +179,8 @@ Each retrofit target needs:
 | --- | --- |
 | ~~`dropdown`~~ | **Done.** Also lost its bottom sheet to `drawer`. |
 | `disclosure` | Small, but same problem, and still has **no spec** — backfill that at the same time. |
-| `src/site/pages/index.astro` (home) | Prose predates the style rules. |
-| `src/site/pages/components/index.astro` | Same. |
+| ~~`src/site/pages/index.astro`~~ | **Done** with the header redesign below. |
+| ~~`src/site/pages/components/index.astro`~~ | **Done.** |
 
 **Settled:** demo scaffolding (`.ac-demo-grid`, `.ac-demo`, `.ac-demo__title`, `.ac-demo__legend`)
 lives in `src/site/styles/site.css`, not in any `component.css`. It was duplicated per component, and

@@ -89,7 +89,7 @@ test('a format error and a missing error use their own messages', async ({ page 
 
   await control.fill('not-an-address');
   await control.blur();
-  await expect(error).toHaveText('Enter an address in the form name@example.com.');
+  await expect(error).toHaveText('Enter an address in the form ruby.soho@example.com.');
 
   // And the hint survived the second message too.
   await expect(control).toHaveAccessibleDescription(/Used only for your sign-in link/);
@@ -162,14 +162,14 @@ test('replacing one message with another leaves a frame between them', async ({ 
 
   await control.fill('nope');
   await control.blur();
-  await expect(error).toHaveText('Enter an address in the form name@example.com.');
+  await expect(error).toHaveText('Enter an address in the form ruby.soho@example.com.');
 
   // Cleared, then set -- not swapped in one tick, which some screen readers
   // coalesce into no change at all.
   const states = await page.evaluate(() => window.__states);
   expect(states).toContain('');
   expect(states.indexOf('')).toBeLessThan(
-    states.indexOf('Enter an address in the form name@example.com.'),
+    states.indexOf('Enter an address in the form ruby.soho@example.com.'),
   );
 
   // aria-invalid never lied about the control being valid in between.

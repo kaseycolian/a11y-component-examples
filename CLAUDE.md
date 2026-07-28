@@ -93,6 +93,19 @@ served by each file standing alone.
 **American English.** `color`, `behavior`, `labeled`, `initialize`, `center`, `organization`,
 `gray`, `signaled`. The only exceptions are ARIA's own spellings — `aria-labelledby` is spec.
 
+**Never count the components.** No "5 components", no derived totals in prose or on a card. The
+roster changes every session and the copy shouldn't need editing when it does. Say what the library
+*is*, not how much of it there is.
+
+**The voice is a11y-as-the-main-road.** `a11y` reads like *alley* — the side street accessibility
+usually gets pushed down, visited late and in a hurry. This library's position is that it belongs on
+the main road and that it can be fun. Make that point where it lands naturally; never twice on a page.
+
+**Demo content is 90s punk, obliquely.** Song and album titles, place names and lyric fragments —
+never the band names themselves. Nothing vulgar. Prefer `462` and `99` when a number is arbitrary.
+Fake credentials look obviously fake but keep a valid shape (`sk_test_` prefix, right length, right
+character set) so the example still teaches the format.
+
 **Say it once, in as few words as carry the information.** Comments and docs here are load-bearing:
 they explain *why* a non-obvious accessibility decision was made, and that's the bar. Cut restated
 context, cut the same point made twice in prose and again in a table, cut adjectives. Never cut the

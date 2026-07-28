@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { COMPONENTS, COMPONENTS_BY_GROUP } from '../lib/registry.mjs';
+import { COMPONENTS_BY_GROUP } from '../lib/registry.mjs';
 
 const base = import.meta.env.BASE_URL;
 
@@ -27,24 +27,53 @@ const promises = [
 <BaseLayout title="The A11Y Way">
   <div class="layout layout--full">
     <div class="hero">
-      <h1>Accessible components that don't look it</h1>
-      <p class="lede">
-        A reference library of UI components meeting <strong>WCAG 2.2 AA</strong> as a floor, written
-        in plain HTML, CSS, and JavaScript so you can lift them into React, Angular, Vue, or nothing
-        at all.
-      </p>
-      <p class="lede">
-        Accessibility has a reputation for producing gray boxes. It shouldn't. Every component here
-        ships with sixteen themes &mdash; switch one in the header and watch the whole page change
-        without a single contrast failure.
-      </p>
+      <div class="hero__copy">
+        <h1>Accessible components that don't look it</h1>
+        <p class="lede">
+          A reference library of UI components meeting <strong>WCAG 2.2 AA</strong> as a floor,
+          written in plain HTML, CSS, and JavaScript so you can lift them into React, Angular, Vue,
+          or nothing at all.
+        </p>
+        <p class="lede">
+          <em>A11y</em> sounds like <em>alley</em>, and that is exactly where accessibility usually
+          ends up &mdash; a side street off the design process, visited late and in a hurry. It
+          belongs on the main road. Every component here ships with sixteen themes: switch one in the
+          header and watch the whole page change without a single contrast failure.
+        </p>
 
-      <p class="hero__actions">
-        <a class="button-primary" href={`${base}components/`}>Browse {COMPONENTS.length} components</a>
-        <a class="button-secondary" href="https://github.com/kaseycolian/a11y-component-examples">
-          Source on GitHub
-        </a>
-      </p>
+        <p class="hero__actions">
+          <a class="button-primary" href={`${base}components/`}>Browse the library</a>
+          <a class="button-secondary" href="https://github.com/kaseycolian/a11y-component-examples">
+            Source on GitHub
+          </a>
+        </p>
+      </div>
+
+      {/*
+        Not decoration: this is a real excerpt of what the Field component serves,
+        so the promise on the left is visible on the right before anyone clicks.
+      */}
+      <figure class="hero__peek panel">
+        <figcaption class="hero__peek-head panel__head">What you copy</figcaption>
+        {/*
+          tabindex + a group name because the block scrolls sideways: a scrollable
+          region that only a mouse can reach is a keyboard trap in reverse
+          (SC 2.1.1). Same treatment the docs tables get.
+        */}
+        <pre class="code-block" tabindex="0" role="group" aria-label="Field markup excerpt"><code>{`<div class="ac-field">
+  <label class="ac-field__label" for="email">Email</label>
+  <input class="ac-input" id="email" type="email"
+         autocomplete="email" aria-invalid="true"
+         aria-describedby="email-hint email-error" />
+  <p class="ac-field__hint" id="email-hint">Work address.</p>
+  <p class="ac-field__error" id="email-error" role="alert">
+    Add the @ — try ruby.soho@example.com
+  </p>
+</div>`}</code></pre>
+        <p class="hero__peek-foot">
+          Three files per component, no build step, no dependency to track.
+        </p>
+      </figure>
     </div>
 
     <section aria-labelledby="promises-title">
@@ -72,9 +101,6 @@ const promises = [
                   {group.name}
                 </a>
                 <p class="card__summary">{group.summary}</p>
-                <p class="card__count">
-                  {group.components.length} component{group.components.length === 1 ? '' : 's'}
-                </p>
               </li>
             ))}
           </ul>
@@ -85,9 +111,55 @@ const promises = [
 </BaseLayout>
 
 <style>
+  /* Two columns from 68rem up, so the hero uses the width instead of leaving
+     half the row empty. The prose keeps its own measure -- a 90rem line of body
+     text is unreadable (SC 1.4.8 is AAA, but the reason it exists holds here). */
   .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+    align-items: start;
+    margin: 1rem 0 3.5rem;
+  }
+
+  @media (min-width: 68rem) {
+    .hero {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 3rem;
+    }
+  }
+
+  .hero__copy {
     max-width: 60ch;
-    margin: 1rem 0 3rem;
+  }
+
+  .hero__peek {
+    margin: 0;
+    /* Sticky-free and self-contained: it is an excerpt, not a control. */
+    min-width: 0;
+  }
+
+  .hero__peek-head {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .hero__peek .code-block {
+    max-height: none;
+    /* Long lines scroll inside the card rather than pushing the page sideways. */
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .hero__peek-foot {
+    margin: 0;
+    padding: 0.7rem 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--text-muted);
   }
 
   .hero__actions {
@@ -146,15 +218,6 @@ const promises = [
     font-size: 1rem;
     color: var(--text);
     text-shadow: none;
-  }
-
-  .card__count {
-    margin: auto 0 0;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--text-muted);
   }
 
   @media (forced-colors: active) {

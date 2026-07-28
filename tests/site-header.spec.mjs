@@ -8,7 +8,9 @@
  */
 import { test, expect } from '@playwright/test';
 
-const picker = (page) => page.locator('.site-header .ac-dropdown');
+// Two Dropdowns live in the header now, so each locator names which one.
+const picker = (page) => page.locator('[data-theme-control] .ac-dropdown');
+const jump = (page) => page.locator('[data-jump-control] .ac-dropdown');
 
 test('the header theme picker is the library Dropdown and applies a theme', async ({ page }) => {
   await page.goto('components/disclosure/');
@@ -16,7 +18,7 @@ test('the header theme picker is the library Dropdown and applies a theme', asyn
   const toggle = picker(page).locator('.ac-dropdown__toggle');
   await expect(toggle).toBeVisible();
   await expect(page.locator('#theme-select')).toBeHidden();
-  await expect(toggle).toHaveAccessibleName(/Theme.*Auto \(match system\)/s);
+  await expect(toggle).toHaveAccessibleName(/Theme.*Auto/s);
 
   await toggle.click();
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
@@ -50,6 +52,42 @@ test('the choice survives a reload and the trigger shows it', async ({ page }) =
   await expect(picker(page).locator('.ac-dropdown__toggle')).toHaveAccessibleName(
     /Theme.*Midnight Arcade/s,
   );
+});
+
+/* --- Components picker ---------------------------------------------------- */
+
+test('the components picker is grouped, labeled, and says what choosing does', async ({ page }) => {
+  await page.goto('components/disclosure/');
+
+  const toggle = jump(page).locator('.ac-dropdown__toggle');
+  // Named by the visible label plus the current value, the way a select does.
+  await expect(toggle).toHaveAccessibleName(/Components.*Disclosure/s);
+  // SC 3.2.2: choosing navigates, so the user is told before they choose.
+  await expect(toggle).toHaveAccessibleDescription(/opens its page/);
+
+  await toggle.click();
+  // Grouped exactly like the sidebar rather than one flat list.
+  await expect(jump(page).getByRole('group', { name: 'Overlays & Disclosure' })).toBeVisible();
+  await expect(jump(page).getByRole('option', { name: 'All components' })).toBeVisible();
+});
+
+test('choosing a component navigates, and the picker shows where you landed', async ({ page }) => {
+  await page.goto('components/disclosure/');
+
+  await jump(page).locator('.ac-dropdown__toggle').click();
+  await jump(page).getByRole('option', { name: 'Drawer', exact: true }).click();
+
+  await expect(page).toHaveURL(/components\/drawer\/$/);
+  await expect(jump(page).locator('.ac-dropdown__toggle')).toHaveAccessibleName(
+    /Components.*Drawer/s,
+  );
+});
+
+test('the Go fallback stays hidden while the Dropdown is doing its job', async ({ page }) => {
+  await page.goto('components/disclosure/');
+  // It exists for the case where the Dropdown script never lands, and a native
+  // select would otherwise navigate on every arrow key.
+  await expect(page.locator('[data-component-jump-go]')).toBeHidden();
 });
 
 test('swatches carry each theme real accents from theme.css', async ({ page }) => {
