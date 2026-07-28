@@ -1,0 +1,13 @@
+{
+  "slug": "modal",
+  "name": "Modal",
+  "group": "overlays-disclosure",
+  "order": 25,
+  "summary": "A dialog centered over a dimmed page, built on native <dialog>.showModal() — which hands you the top layer, the backdrop, inertness, Tab kept inside and focus returned, and leaves you four things it does not do.",
+  "tags": ["dialog", "modal", "alertdialog", "focus-trap", "top-layer", "scroll-lock", "live-region"],
+  "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/",
+  "wcag": ["1.3.1", "1.4.1", "1.4.10", "1.4.11", "2.1.1", "2.1.2", "2.4.3", "2.4.7", "2.5.8", "3.2.2", "4.1.2", "4.1.3"],
+  "status": "stable",
+  "files": ["html", "css", "js"],
+  "demoNote": "Open example 1 and Tab past the last button: focus comes back around, because the browser does that for a dialog opened with showModal(). Example 3 lands focus on the safe answer, never on Delete — Enter is the key people press to make a dialog go away."
+}

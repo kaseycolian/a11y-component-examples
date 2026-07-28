@@ -1,0 +1,254 @@
+<!-- ===========================================================================
+     MODAL — a dialog in the middle of the page that has to be dealt with first
+
+     WHAT TO COPY
+       Any one example below is self-contained. Take its section plus the
+       matching sections of component.css and component.js.
+       Copy all three files whole for the library-grade version.
+
+     THE CONTRACT
+       <dialog>                the element. Opened with .showModal(), never by
+                               setting the `open` attribute — that gives a
+                               non-modal dialog with no backdrop and no trap.
+       aria-labelledby         points at the visible <h2>. The dialog's name.
+       role="alertdialog"      example 3 only, and then aria-describedby is
+                               required as well.
+       <button data-ac-modal-close>  a visible way out. Touch has no Esc key.
+
+     Nothing else. `role="dialog"` and `aria-modal="true"` are already implied by
+     showModal(), and aria-modal on a native <dialog> has made VoiceOver skip the
+     dialog's own content — so they are deliberately absent.
+
+     The trigger is a plain <button> with no aria-expanded. A disclosure reports
+     whether the thing it controls is open; a modal moves the user inside it, so
+     there is nothing to report from out here. See docs.md.
+
+     Everything native <dialog> gives us and a <div role="dialog"> would owe by
+     hand: the top layer (no ancestor can clip it, no z-index can beat it),
+     ::backdrop, inertness for the rest of the page, Tab kept inside, Esc, and
+     focus returned to the opener on close.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the grid and the
+     per-example headings. Never copy it into your app.
+     =========================================================================== -->
+
+<div class="ac-demo-grid">
+  <!-- ======================================================================
+       EXAMPLE 1 · The baseline
+       CSS [CORE] + [ACTIONS]. JS [CORE] + [BACKDROP].
+
+       Focus lands on the dialog itself, not on a button, because the content is
+       mostly words: a screen reader then reads the name and the body. Land on a
+       control instead and the person hears "Got it, button" and has to go
+       looking for what they are agreeing to.
+
+       data-ac-backdrop-close="true" opts this one in to click-outside. It is off
+       by default — a stray click should not be able to throw away work — and it
+       is never the only way out.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">1 &middot; The baseline</h3>
+
+    <button class="ac-modal__trigger" type="button" data-ac-modal-open="ac-modal-doors">
+      Ticket details
+    </button>
+
+    <dialog class="ac-modal" id="ac-modal-doors" data-ac-modal
+            data-ac-backdrop-close="true" aria-labelledby="ac-modal-doors-title">
+      <div class="ac-modal__head">
+        <h2 class="ac-modal__title" id="ac-modal-doors-title">Doors at 19:30</h2>
+        <!-- aria-label, because the visible content is an icon. A bare X button
+             announces as "button" and nothing else. -->
+        <button class="ac-modal__close" type="button" data-ac-modal-close
+                aria-label="Close ticket details">
+          <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </button>
+      </div>
+      <div class="ac-modal__body">
+        <p>Advance is 9, on the door 12. The room holds 462 and the last two nights sold out.</p>
+        <p>Support starts at 20:00. Curfew is hard &mdash; the desk needs the room by 23:30.</p>
+      </div>
+      <div class="ac-modal__foot">
+        <button class="ac-modal__action ac-modal__action--primary" type="button"
+                data-ac-modal-close>
+          Got it
+        </button>
+      </div>
+    </dialog>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 2 · A form in a modal
+       CSS [CORE] + [ACTIONS] + [FORM]. JS [CORE] + [STATUS].
+
+       data-ac-focus points at the first field: when a dialog exists to be filled
+       in, the caret belongs in it. The dialog's name is still announced first,
+       because focus moving into a dialog is what triggers that.
+
+       <form method="dialog"> is the native trick: a submit button inside it
+       closes the dialog and sets dialog.returnValue to its `value`. Constraint
+       validation still runs, so an empty required field keeps the dialog open.
+
+       The confirmation is written **after** the dialog closes, into a
+       role="status" that lives outside it. While a modal is open everything
+       behind it is inert, and a live region in inert content does not announce —
+       so a message posted on the click would be lost. See docs.md.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">2 &middot; A form in a modal</h3>
+
+    <button class="ac-modal__trigger" type="button" data-ac-modal-open="ac-modal-guest">
+      Add to the door list
+    </button>
+
+    <p class="ac-modal__status" data-ac-modal-status="ac-modal-guest" role="status"></p>
+
+    <dialog class="ac-modal" id="ac-modal-guest" data-ac-modal
+            data-ac-focus="#ac-modal-guest-name" aria-labelledby="ac-modal-guest-title">
+      <form method="dialog">
+        <div class="ac-modal__head">
+          <h2 class="ac-modal__title" id="ac-modal-guest-title">Add to the door list</h2>
+          <button class="ac-modal__close" type="button" data-ac-modal-close
+                  aria-label="Close without adding a name">
+            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+              <path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="ac-modal__body">
+          <label class="ac-modal__label" for="ac-modal-guest-name">Name on the door</label>
+          <input class="ac-modal__input" type="text" id="ac-modal-guest-name" name="name"
+                 autocomplete="name" aria-describedby="ac-modal-guest-hint" required />
+          <p class="ac-modal__hint" id="ac-modal-guest-hint">
+            As it appears on their ID. One name per line at the box office.
+          </p>
+        </div>
+        <div class="ac-modal__foot">
+          <!-- type="button", or it would submit the form it sits in. -->
+          <button class="ac-modal__action ac-modal__action--safe" type="button"
+                  data-ac-modal-close>
+            Cancel
+          </button>
+          <button class="ac-modal__action ac-modal__action--primary" type="submit" value="add"
+                  data-ac-said="Name added to the door list.">
+            Add name
+          </button>
+        </div>
+      </form>
+    </dialog>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 3 · Confirming something destructive
+       CSS [CORE] + [ACTIONS] + [ALERT]. JS [CORE] + [STATUS].
+
+       role="alertdialog" is the one role that legitimately overrides a native
+       <dialog>. It says the dialog is interrupting because of something the user
+       needs to answer, and it **requires** aria-describedby pointing at the
+       consequence — the name alone ("Delete this setlist?") does not say what is
+       lost.
+
+       Focus lands on Cancel, never on Delete. Enter is the key people press to
+       get rid of a dialog, and the safe answer has to be the one under it.
+
+       Both buttons say what they do. "Yes" and "No" answer a question the person
+       may not have heard.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">3 &middot; Confirming something destructive</h3>
+
+    <button class="ac-modal__trigger" type="button" data-ac-modal-open="ac-modal-setlist">
+      Delete the setlist
+    </button>
+
+    <p class="ac-modal__status" data-ac-modal-status="ac-modal-setlist" role="status"></p>
+
+    <dialog class="ac-modal ac-modal--alert" id="ac-modal-setlist" data-ac-modal
+            role="alertdialog" aria-labelledby="ac-modal-setlist-title"
+            aria-describedby="ac-modal-setlist-desc"
+            data-ac-focus=".ac-modal__action--safe">
+      <div class="ac-modal__head">
+        <h2 class="ac-modal__title" id="ac-modal-setlist-title">Delete this setlist?</h2>
+      </div>
+      <div class="ac-modal__body">
+        <p id="ac-modal-setlist-desc">
+          Nineteen songs, in the order you played them in Camden. Deleting it removes the
+          timings the desk is working from, and nobody else has a copy.
+        </p>
+      </div>
+      <div class="ac-modal__foot">
+        <button class="ac-modal__action ac-modal__action--safe" type="button"
+                data-ac-modal-close>
+          Keep the setlist
+        </button>
+        <button class="ac-modal__action ac-modal__action--danger" type="button"
+                data-ac-modal-close data-ac-said="Setlist deleted.">
+          Delete setlist
+        </button>
+      </div>
+    </dialog>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 4 · Long content
+       CSS [CORE] + [ACTIONS] + [SCROLL]. JS [CORE].
+
+       The body scrolls, the page does not. Three rules make that work and each
+       one is a bug if it is missing: the dialog is a flex column so the body can
+       take the leftover height; the body has `min-height: 0`, or a long child
+       refuses to shrink and overflows; and the page itself is scroll-locked
+       while the dialog is open, because showModal() does not do that for you.
+
+       The head and the foot stay put, so the way out is reachable from anywhere
+       in the text. At 200% zoom that matters more than it looks.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">4 &middot; Long content</h3>
+
+    <button class="ac-modal__trigger" type="button" data-ac-modal-open="ac-modal-rules">
+      House rules
+    </button>
+
+    <dialog class="ac-modal" id="ac-modal-rules" data-ac-modal
+            aria-labelledby="ac-modal-rules-title">
+      <div class="ac-modal__head">
+        <h2 class="ac-modal__title" id="ac-modal-rules-title">House rules</h2>
+        <button class="ac-modal__close" type="button" data-ac-modal-close
+                aria-label="Close house rules">
+          <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </button>
+      </div>
+      <div class="ac-modal__body">
+        <p><strong>Load-in</strong> is through the yard, not the front. The gate is locked at
+          16:00 and the sound engineer has the only key.</p>
+        <p><strong>Backline</strong> stays where it is. The house kit is shared and the kick
+          pedal is not ours to lend.</p>
+        <p><strong>Stage volume</strong> is capped at the desk. If the meter goes red twice the
+          engineer pulls the wedges, and everyone has a worse night.</p>
+        <p><strong>Strobes and haze</strong> have to be declared before doors, and there is a
+          sign at the entrance either way. Someone in the room always needs to know.</p>
+        <p><strong>Merch</strong> is yours, minus nothing. The table is by the front doors and
+          the float is 99 in coins, counted back at the end.</p>
+        <p><strong>Guest list</strong> closes at 19:00. After that it is the box office and a
+          conversation you will lose.</p>
+        <p><strong>Curfew</strong> is 23:00 and it is a licence condition, not a preference.
+          The room has to be empty by 23:30.</p>
+        <p><strong>Parking</strong> is one van in the yard. Anything else is on the street and
+          the wardens start at 08:00.</p>
+      </div>
+      <div class="ac-modal__foot">
+        <button class="ac-modal__action ac-modal__action--primary" type="button"
+                data-ac-modal-close>
+          Close
+        </button>
+      </div>
+    </dialog>
+  </div>
+</div>
