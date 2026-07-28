@@ -1,0 +1,13 @@
+{
+  "slug": "drawer",
+  "name": "Drawer",
+  "group": "overlays-disclosure",
+  "order": 30,
+  "summary": "A panel that slides in from an edge of the screen. Almost entirely focus management: focus moves in, is trapped while modal, and returns to the trigger on close.",
+  "tags": ["dialog", "sheet", "modal", "focus-trap", "popover", "top-layer", "scroll-lock"],
+  "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/",
+  "wcag": ["1.4.13", "2.1.1", "2.1.2", "2.4.3", "2.5.8", "4.1.2"],
+  "status": "stable",
+  "files": ["html", "css", "js"],
+  "demoNote": "Same behavior on a phone and on a desktop — that is what separates it from the Dropdown, which anchors to its trigger at every width. Open one and press Tab repeatedly: in the first three, focus cannot leave."
+}

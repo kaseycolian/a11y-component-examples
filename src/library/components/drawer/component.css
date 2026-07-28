@@ -1,0 +1,312 @@
+/* ===========================================================================
+   DRAWER
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) is in the
+   site's own stylesheet, not this file.
+
+     [CORE]        all examples. Panel, header, body, trigger, close.
+     [EDGES]       all examples. Where it comes from, and the slide.
+     [BACKDROP]    modal drawers (examples 1-3).
+     [NON-MODAL]   example 4.
+     [FORCED]      always ship this. High Contrast rebuilds every cue.
+
+   Copy the file whole for the library version.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [CORE] the panel ------------------------------------------------------
+   position:fixed and, where supported, promoted to the top layer by the Popover
+   API, so no ancestor with overflow:hidden or a transform can clip it. The
+   [popover] rules undo the UA defaults, which center it in the viewport with a
+   border and padding. */
+
+.ac-drawer,
+.ac-drawer[popover] {
+  position: fixed;
+  inset: auto;
+  /* Above the backdrop, which in turn has to clear your app's sticky chrome —
+     see the backdrop's note. Only used where the top layer is unavailable. */
+  z-index: 901;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  max-width: 100%;
+  max-height: 100%;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  background: var(--ac-elevated, var(--bg-elevated, #1b0c30));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  box-shadow: 0 -8px 40px color-mix(in srgb, var(--ac-bg, var(--bg, #070110)) 75%, transparent);
+}
+
+.ac-drawer[hidden] {
+  display: none;
+}
+
+.ac-drawer:not([popover]):not([hidden]) {
+  display: flex;
+}
+
+/* --- [CORE] header --------------------------------------------------------
+   Outside the scrolling body on purpose: the title and the close button stay
+   reachable however far down the content you are. */
+
+.ac-drawer__head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--ac-border, var(--border, #34205a));
+}
+
+.ac-drawer__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-drawer__body {
+  /* min-height:0 is load-bearing: a flex item's default min-height:auto floors it
+     at content height, so a long body would overflow the panel and be clipped
+     with no way to scroll to it. */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  /* Stops a scroll gesture inside the drawer from chaining to the page behind. */
+  overscroll-behavior: contain;
+  padding: 1rem;
+  /* iOS safe area, so a bottom drawer's last row is not under the home bar. */
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0));
+}
+
+.ac-drawer__body > :first-child {
+  margin-top: 0;
+}
+
+/* --- [CORE] the close button ----------------------------------------------
+   Not optional. On touch there is no Escape key, so a drawer without a visible
+   close control is a trap. It carries aria-label in the markup because its
+   content is an icon. */
+
+.ac-drawer__close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* SC 2.5.8 floor is 24px; 44px is the comfortable touch size. */
+  width: var(--ac-target, 44px);
+  height: var(--ac-target, 44px);
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: none;
+  color: var(--ac-text, var(--text, #f3ecff));
+  cursor: pointer;
+  transition: border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-drawer__close svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.ac-drawer__close:hover {
+  border-color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+}
+
+.ac-drawer__close:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+/* --- [CORE] the trigger --------------------------------------------------- */
+
+.ac-drawer__trigger {
+  align-self: flex-start;
+  min-height: var(--ac-target, 44px);
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-drawer__trigger:hover {
+  border-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+}
+
+.ac-drawer__trigger:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+/* --- [CORE] content inside ------------------------------------------------ */
+
+.ac-drawer__row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--ac-target, 44px);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.ac-drawer__row input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+  accent-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  cursor: pointer;
+}
+
+.ac-drawer__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ac-drawer__list a {
+  display: flex;
+  align-items: center;
+  min-height: var(--ac-target, 44px);
+  color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+}
+
+/* --- [EDGES] which side it comes from -------------------------------------
+   One data attribute rather than four components, because nothing but the
+   geometry changes. The slide is motion-gated, so with reduced motion the panel
+   simply appears — which is the correct behavior, not a degraded one. */
+
+/* height/width are set explicitly on both groups because the UA stylesheet gives
+   [popover] width:fit-content and height:fit-content. Leave either out and a side
+   drawer shrinks to its content instead of spanning the edge it is pinned to. */
+
+.ac-drawer[data-ac-edge="bottom"],
+.ac-drawer[data-ac-edge="top"] {
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: fit-content;
+  max-height: min(80vh, 34rem);
+}
+
+.ac-drawer[data-ac-edge="bottom"] {
+  bottom: 0;
+  border-width: 1px 0 0;
+  border-radius: var(--ac-radius, var(--radius, 10px)) var(--ac-radius, var(--radius, 10px)) 0 0;
+  transform: translateY(calc(var(--ac-motion, var(--motion, 1)) * 100%));
+}
+
+.ac-drawer[data-ac-edge="top"] {
+  top: 0;
+  border-width: 0 0 1px;
+  border-radius: 0 0 var(--ac-radius, var(--radius, 10px)) var(--ac-radius, var(--radius, 10px));
+  transform: translateY(calc(var(--ac-motion, var(--motion, 1)) * -100%));
+}
+
+.ac-drawer[data-ac-edge="right"],
+.ac-drawer[data-ac-edge="left"] {
+  top: 0;
+  bottom: 0;
+  width: min(22rem, 92vw);
+  height: 100%;
+  max-height: 100%;
+}
+
+.ac-drawer[data-ac-edge="right"] {
+  right: 0;
+  border-width: 0 0 0 1px;
+  border-radius: var(--ac-radius, var(--radius, 10px)) 0 0 var(--ac-radius, var(--radius, 10px));
+  transform: translateX(calc(var(--ac-motion, var(--motion, 1)) * 100%));
+}
+
+.ac-drawer[data-ac-edge="left"] {
+  left: 0;
+  border-width: 0 1px 0 0;
+  border-radius: 0 var(--ac-radius, var(--radius, 10px)) var(--ac-radius, var(--radius, 10px)) 0;
+  transform: translateX(calc(var(--ac-motion, var(--motion, 1)) * -100%));
+}
+
+.ac-drawer[data-ac-open="true"] {
+  transform: none;
+  transition: transform calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur-slow, var(--dur-slow, 240ms)))
+    ease-out;
+}
+
+/* --- [BACKDROP] modal drawers, examples 1-3 -------------------------------
+   Built by the script rather than authored, so a non-modal drawer cannot ship
+   one by mistake. */
+
+.ac-drawer__backdrop {
+  position: fixed;
+  inset: 0;
+  /* Deliberately high. The panel itself is in the top layer, which beats every
+     z-index, but the backdrop is not — and if your sticky header outranks it, the
+     header stays clickable while a modal is open. Raise this above your chrome. */
+  z-index: 900;
+  background: color-mix(in srgb, var(--ac-bg, var(--bg, #070110)) 70%, transparent);
+}
+
+.ac-drawer__backdrop[hidden] {
+  display: none;
+}
+
+/* Scroll lock. scrollbar-gutter reserves the space the scrollbar occupied, so
+   locking does not shift the whole page sideways as it disappears. */
+:root[data-ac-drawer-lock] {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
+/* --- [NON-MODAL] example 4 -----------------------------------------------
+   role="region" instead of dialog, no aria-modal, no backdrop, no trap. A
+   lighter shadow, because there is no dimmed page to lift it off. */
+
+.ac-drawer[data-ac-modal="false"] {
+  box-shadow: 0 -4px 18px color-mix(in srgb, var(--ac-bg, var(--bg, #070110)) 55%, transparent);
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this ------------------- */
+
+/* forced-colors drops color-mix, glows and shadows, so the panel would lose its
+   edge against the page entirely. Borders have to carry it. */
+@media (forced-colors: active) {
+  .ac-drawer,
+  .ac-drawer[popover] {
+    border: 1px solid CanvasText;
+    box-shadow: none;
+  }
+
+  .ac-drawer__close,
+  .ac-drawer__trigger {
+    border-color: ButtonBorder;
+  }
+
+  .ac-drawer__close:focus-visible,
+  .ac-drawer__trigger:focus-visible {
+    outline-color: CanvasText;
+  }
+
+  /* The dimmed backdrop disappears, so it must not be the only thing telling the
+     user the page behind is unavailable — the border above does that. */
+  .ac-drawer__backdrop {
+    background: Canvas;
+    opacity: 0.85;
+  }
+}

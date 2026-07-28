@@ -69,7 +69,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 4 / 34
+## Component roster — 5 / 34
 
 ### foundations
 - [ ] `skip-link`
@@ -109,9 +109,14 @@ take their logic and not their layout. See item 1 under remaining work.
   it anchors to its trigger at every viewport width, flips above when there is no room below, and
   sizes rows by `@media (pointer: coarse)` rather than a width breakpoint. The sheet behavior moved to
   `drawer`.
-- [ ] `drawer` — the panel that rises from the edge of the screen, on **both** mobile and desktop.
-  Carved out of `dropdown`, where it was a second personality with a second keyboard story. Needs a
-  real dismissal model (backdrop, focus trap or not, Escape) — see `component-specs.md`.
+- [x] `drawer` — done. 18/18 tests in Chromium. Carved out of `dropdown`, where it was a second
+  personality with a second keyboard story. Same behavior at every viewport width. Modal and non-modal
+  are separate behaviors driven by one flag: modal gets `role="dialog"` + `aria-modal` + backdrop +
+  scroll lock + trap, non-modal gets `role="region"` and none of them. Three real bugs the tests
+  caught: the backdrop sat under the sticky header's `z-index` (raised to 900, documented as needing to
+  clear your app's chrome); the body lacked `min-height: 0`, so long content overflowed the panel and
+  was clipped; and a side drawer inherited the UA's `[popover] { height: fit-content }`, so it never
+  spanned its edge.
 - [ ] `tooltip`
 
 ### navigation
