@@ -11,30 +11,35 @@ Last updated: 2026-07-28
 
 ---
 
-## START HERE — next component is `visually-hidden`
+## START HERE — next component is `focus-ring`
 
-Everything before it is committed and the tree is clean at `2fc271f`. Run the loop below with:
+Everything before it is committed and the tree is clean. Full Chromium suite is **324 passed** with no
+known flakes. Run the loop below with:
 
 ```sh
-node scripts/new-component.mjs visually-hidden --group foundations --name "Visually Hidden"
+node scripts/new-component.mjs focus-ring --group foundations --name "Focus Ring"
 ```
 
 Decided in advance, so do not re-derive:
 
-- **CSS-only**, like `skip-link` / `text-input` / `native-select` / `radio-group`: `files: ["html","css"]`,
-  tag `no-js`, delete the scaffolded `component.js`. Its spec entry is `component-specs.md` → foundations
-  → `visually-hidden`.
-- It is the **canonical home for the clipping technique**. `skip-link`, `switch`, `textarea` and
-  `tooltip` each carry a local copy on purpose (a paste into a bare app must not need a second file) —
-  say that in both directions: here, that the copies exist; there, nothing to change.
-- The `--focusable` variant is the same idea as `skip-link` but generalized. Cross-link, don't restate.
-- Worth an example each: the utility on a **label** vs a **live region** (a live region also has to be
-  in the DOM first — see `live-region`), the `display: none` / `visibility: hidden` failure shown live,
-  and `aria-label` as the alternative that does *not* work on every element.
-- `.ac-visually-hidden` may already appear in `src/site/styles/site.css` or another component — grep
-  before authoring and reconcile rather than shipping a second definition.
+- **A docs component**, like `typography` will be — the deliverable is the *explanation*, and the demo
+  is the argument. Spec entry: `component-specs.md` → foundations → `focus-ring`.
+- **CSS-only.** `files: ["html","css"]`, tag `no-js`, delete the scaffolded `component.js`.
+- **Show the failure alongside the fix**, the way `visually-hidden` example 4 and `skip-link` example 5
+  do. `outline: none` with no replacement is the thing this component exists to argue against, and it
+  has to be on the page and live, not described.
+- The examples that carry their weight: `:focus` vs `:focus-visible` (why the library defaults to the
+  latter, and the one place — `skip-link` — that deliberately does not); `outline-offset`; the
+  **two-tone ring** that survives any background (an outline plus a contrasting `box-shadow`, so it is
+  visible on both light and dark); and `@media (forced-colors: active)`, where the ring must become a
+  system color or it disappears.
+- **SC 2.4.11 Focus Not Obscured** and **SC 2.4.13 Focus Appearance** are the criteria to cite. 2.4.13
+  is AAA — say so rather than implying it is required.
+- `site.css` already has a global `:focus:not(:focus-visible) { outline: none }` and every component
+  ships its own `:focus-visible` rule. This component documents that convention; grep before authoring
+  so the page describes what the library actually does.
 
-Then `focus-ring`, `live-region`, `typography`, `motion-preferences`, `effects` finish `foundations`.
+Then `live-region`, `typography`, `motion-preferences`, `effects` finish `foundations`.
 
 ---
 
@@ -109,7 +114,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 15 / 35
+## Component roster — 16 / 35
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -125,7 +130,20 @@ take their logic and not their layout. See item 1 under remaining work.
   clipped link 4px — the border moved into the three revealed states instead. The shell's own
   `.skip-link` in `site.css` predates this and is still hand-rolled; making `BaseLayout` a consumer of
   `.ac-skip-link` the way the header consumes Dropdown is an open, unforced option.
-- [ ] `visually-hidden`
+- [x] `visually-hidden` — done, **CSS-only** (`--no-js`), 17/17 tests in Chromium. **Canonical home for the
+  clipping technique**; `skip-link`, `switch`, `textarea` and `tooltip` each keep a local copy on purpose,
+  so a change here is a change in all five. Organized around the fact that *hiding is not one thing*:
+  example 4 is four identical icon-only buttons whose labels are hidden four different ways, and three of
+  them have **no accessible name at all**. Two findings from building it: `visibility: hidden` removes the
+  element from the accessibility tree but **keeps its layout box**, so that button is visibly wider than
+  the others — the only one of these failures you can see with no tooling; and `aria-label` is a different
+  tool rather than a shorter spelling (needs a role that supports naming, replaces the whole name per
+  SC 2.5.3, and is invisible to translation tools and find-in-page). `--focusable` uses `:focus-within`
+  because the focusable thing is usually *inside* the wrapper — unlike `skip-link`, which needs plain
+  `:focus`. The shell's own unprefixed `.visually-hidden` in `site.css` predates this and is untouched;
+  making `BaseLayout` consume `.ac-visually-hidden` is the same open option as with `skip-link`.
+  **Test gotcha:** `innerText` *includes* clipped text — it only drops `display:none` and
+  `visibility:hidden`. Assert geometry for "off screen" and `toHaveAccessibleName` for "still announced".
 - [ ] `focus-ring`
 - [ ] `live-region`
 - [ ] `typography`
@@ -397,10 +415,15 @@ It must match `npm run preview` exactly, base path included.
   subdirectory, so an earlier `cd` into a component folder leaves tests failing with
   `Project(s) "chromium" not found. Available projects: ""`. Prefix the call:
   `Set-Location D:\sources\a11y-component-examples; npx playwright test --project=chromium <slug>`.
-- **One unidentified flaky test exists in a pre-existing spec.** A full Chromium run once reported
-  `1 failed, 306 passed`; two subsequent full runs were `307 passed`, and `tooltip skip-link
-  --repeat-each=3` was 123/123. It is not in `tooltip` or `skip-link`. If a lone unexplained failure
-  appears, re-run before chasing it — but capture the test name, which is what was missed.
+- **The intermittent full-suite failure was found and fixed.** It was `modal.spec.mjs` → "the page is
+  scroll-locked while it is open, and released after", failing about one run in four. A test bug, not
+  a component bug: the `close` event is **queued, not dispatched synchronously**, so reading
+  `document.documentElement.overflow` immediately after Escape races the unlock. Now
+  `await expect.poll(...)`. **Any assertion about state after a dialog closes needs polling** — this
+  is the second bug that queued `close` event has caused.
+- **`innerText` includes clipped text.** It only drops `display: none` and `visibility: hidden`, so it
+  cannot prove something is off screen. Use geometry (`boundingBox`, a `getBoundingClientRect` diff)
+  for "not visible" and `toHaveAccessibleName` for "still announced".
 - **`astro preview` does not rebuild, and Playwright reuses it.** `reuseExistingServer` only checks
   that the port answers, so a preview server left running from an earlier step will serve a stale
   build and tests will pass or fail against the wrong bytes. Kill it before a test run.

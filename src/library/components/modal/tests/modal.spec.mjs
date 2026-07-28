@@ -120,7 +120,11 @@ test('the page is scroll-locked while it is open, and released after', async ({ 
   ).toBe('stable');
 
   await page.keyboard.press('Escape');
-  expect(await overflow()).not.toBe('hidden');
+  // Polled, not read once: the `close` event is queued rather than dispatched
+  // synchronously, so the unlock runs a tick after Escape. Asserting
+  // immediately here is a race, and it failed roughly one run in four.
+  await expect(page.locator('#ac-modal-doors')).toBeHidden();
+  await expect.poll(overflow).not.toBe('hidden');
 });
 
 test('the backdrop dismisses this one, because it opted in', async ({ page }) => {

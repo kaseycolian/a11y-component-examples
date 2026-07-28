@@ -1,0 +1,237 @@
+/* ===========================================================================
+   VISUALLY HIDDEN
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+
+     [CORE]       all examples. The class. Nine declarations, and every one of
+                  them is load-bearing.
+     [FOCUSABLE]  example 2. The variant that appears when something inside it
+                  takes focus.
+     [BROKEN]     examples 4 and 5. Deliberately wrong. Never copy these.
+     [MOCK]       the demo's page furniture. DELETE IT.
+     [FORCED]     always ship this.
+
+   Copy [CORE] and you have the component.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [CORE] the class ---------------------------------------------------
+   Removed from the screen, kept in the accessibility tree and in the page's
+   text. Every declaration is here for a reason:
+
+     position: absolute    takes it out of flow, so it cannot push layout
+     width/height: 1px     not 0 — some browsers treat a zero-size box as not
+                           rendered and drop it from the accessibility tree
+     margin: -1px          pulls the 1px box out of the parent's own box, so a
+                           line of text does not gain a pixel of height
+     overflow: hidden      clips the content to that 1px
+     clip-path: inset(50%) the actual removal. Modern replacement for the
+                           deprecated `clip: rect(...)`
+     white-space: nowrap   without it the text wraps inside the 1px box, and
+                           some screen readers then read it one letter per line
+     padding/border: 0     box-sizing: border-box cannot shrink a box below its
+                           own borders, so a border here makes the box bigger
+                           than the 1px it claims to be
+
+   No color and no font: this is never seen, and inheriting whatever the
+   context has is correct. */
+
+.ac-visually-hidden {
+  position: absolute;
+  box-sizing: border-box;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- [FOCUSABLE] example 2 ----------------------------------------------
+   Hidden text containing a focusable element is a trap for a sighted keyboard
+   user: they Tab to something that is not there. This variant un-hides at the
+   moment it is reached.
+
+   :focus-within, not :focus — the focusable thing is usually *inside* the
+   wrapper rather than being it. It matches both.
+
+   Every property in [CORE] is undone, because a half-revealed element is worse
+   than either state. */
+
+.ac-visually-hidden--focusable:focus-within {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip-path: none;
+  white-space: normal;
+}
+
+/* No transition on the reveal. There is nothing to animate from — it was a 1px
+   box a moment ago — and an element still arriving is an element the user is
+   already trying to press. */
+
+/* --- [BROKEN] examples 4 and 5 — never copy these ------------------------
+   Both of these hide the element from the screen *and* from the accessibility
+   tree, so the text reaches nobody. They are here so the difference is visible
+   in the demo rather than asserted in prose.
+
+   The `hidden` attribute (the fourth button in example 4) is the same failure
+   and needs no CSS: it is display: none from the UA stylesheet. */
+
+.ac-vh-broken-display {
+  display: none;
+}
+
+.ac-vh-broken-visibility {
+  visibility: hidden;
+}
+
+/* An empty span carrying an aria-label. The width only keeps it inspectable in
+   devtools; the failure is that a span has no role that supports naming. */
+.ac-vh-broken-arialabel {
+  display: inline-block;
+  width: 1px;
+}
+
+/* --- [MOCK] delete this -------------------------------------------------
+   Page furniture, so each example has something to hide text inside. None of
+   it is part of the component. */
+
+.ac-vh-list,
+.ac-vh-key {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.85rem;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-vh-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem 0.8rem;
+  min-width: 0;
+}
+
+.ac-vh-item {
+  font-weight: 700;
+}
+
+.ac-vh-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--ac-target, 44px);
+  padding: 0 0.2rem;
+  color: var(--ac-link, var(--accent-blue, #3ceaff));
+}
+
+.ac-vh-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: 0.7rem 0.9rem;
+  border: 1px dashed var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+}
+
+.ac-vh-frame a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--ac-target, 44px);
+  color: var(--ac-link, var(--accent-blue, #3ceaff));
+}
+
+.ac-vh-body {
+  min-width: 0;
+  margin: 0;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.85rem;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-vh-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.ac-vh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* SC 2.5.8. An icon-only button is the case where the target is easiest to
+     lose and the label is easiest to forget. */
+  min-width: var(--ac-target, 44px);
+  min-height: var(--ac-target, 44px);
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  color: var(--ac-text, var(--text, #f3ecff));
+  cursor: pointer;
+}
+
+.ac-vh-btn svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.ac-vh-key {
+  list-style: decimal inside;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-vh-link:focus-visible,
+.ac-vh-frame a:focus-visible,
+.ac-vh-btn:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------
+   The class itself needs nothing here: it is already invisible, and forced
+   colors do not change that. The demo furniture does. */
+
+@media (forced-colors: active) {
+  .ac-vh-btn {
+    border-color: ButtonBorder;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  .ac-vh-link,
+  .ac-vh-frame a {
+    color: LinkText;
+  }
+
+  .ac-vh-frame {
+    border-color: CanvasText;
+  }
+
+  .ac-vh-list,
+  .ac-vh-body,
+  .ac-vh-key {
+    color: CanvasText;
+  }
+
+  .ac-vh-link:focus-visible,
+  .ac-vh-frame a:focus-visible,
+  .ac-vh-btn:focus-visible {
+    outline-color: CanvasText;
+  }
+}

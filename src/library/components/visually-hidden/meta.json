@@ -1,0 +1,13 @@
+{
+  "slug": "visually-hidden",
+  "name": "Visually Hidden",
+  "group": "foundations",
+  "order": 20,
+  "summary": "One class that takes text off the screen and leaves it in the accessibility tree — the difference between hiding something from sight and hiding it from everyone.",
+  "tags": ["visually-hidden", "sr-only", "clip-path", "accessible-name", "aria-label", "focus", "no-js"],
+  "apg": null,
+  "wcag": ["1.1.1", "1.3.1", "2.4.4", "2.5.3", "4.1.2"],
+  "status": "stable",
+  "files": ["html", "css"],
+  "demoNote": "No JavaScript on this page. Example 4 is four identical-looking buttons where three have no accessible name at all — inspect the accessibility tree, or listen to them."
+}

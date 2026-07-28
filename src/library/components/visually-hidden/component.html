@@ -1,0 +1,220 @@
+<!-- ===========================================================================
+     VISUALLY HIDDEN — text for screen readers that never reaches the screen
+
+     WHAT TO COPY
+       One class, nine declarations. Take the [CORE] section of component.css
+       and you have the whole component; take [FOCUSABLE] as well if anything
+       inside it can receive focus. There is no JavaScript.
+
+     THE CONTRACT
+       class="ac-visually-hidden"   removed from view, kept in the
+                                    accessibility tree and in the page's text
+       nothing else                 no role, no ARIA, no attributes
+
+     THE RULE IT EXISTS FOR
+       Hiding is not one thing. `display: none`, `visibility: hidden` and the
+       `hidden` attribute remove an element from the accessibility tree along
+       with the screen — a screen reader gets nothing. This class removes it
+       from the screen only. Example 4 has all four side by side, live.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     =========================================================================== -->
+
+<div class="ac-demo-grid">
+  <!-- ======================================================================
+       EXAMPLE 1 · Finishing a name that the design left ambiguous
+       CSS [CORE].
+
+       Four "Read more" links are four identical links to a screen reader user
+       listing the links on the page. The visible text stays short because the
+       design needs it short; the hidden half says which one it is.
+
+       Inside the <a>, so it is part of the link's accessible name. A sibling
+       would read as separate text and the link would still be called "Read
+       more".
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">1 &middot; Finishing an ambiguous name</h3>
+
+    <ul class="ac-vh-list">
+      <li>
+        <span class="ac-vh-item">Basket Case</span>
+        <a class="ac-vh-link" href="#vh-note-1">
+          Read more<span class="ac-visually-hidden"> about Basket Case</span>
+        </a>
+      </li>
+      <li>
+        <span class="ac-vh-item">Linoleum</span>
+        <a class="ac-vh-link" href="#vh-note-1">
+          Read more<span class="ac-visually-hidden"> about Linoleum</span>
+        </a>
+      </li>
+    </ul>
+
+    <p class="ac-demo__legend" id="vh-note-1">
+      Both links read &ldquo;Read more&rdquo; on screen and
+      &ldquo;Read more about Basket Case&rdquo; to a screen reader. Note the
+      leading space inside the span &mdash; without it the two halves run
+      together into one word.
+    </p>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 2 · The focusable variant
+       CSS [CORE] + [FOCUSABLE].
+
+       Hidden text that contains a focusable element is a trap: a sighted
+       keyboard user Tabs to something they cannot see, and the ring lands on
+       nothing. --focusable un-hides on :focus-within so the element appears at
+       the moment it is reached.
+
+       :focus-within, not :focus, because the focusable thing is usually inside
+       the hidden wrapper rather than being it.
+
+       This is the general form of what a skip link does.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">2 &middot; The focusable variant</h3>
+
+    <div class="ac-vh-frame">
+      <p class="ac-vh-body">Load-out runs 99 minutes.</p>
+      <span class="ac-visually-hidden ac-visually-hidden--focusable">
+        <a href="#vh-note-2">Edit the schedule</a>
+      </span>
+    </div>
+
+    <p class="ac-demo__legend" id="vh-note-2">
+      Click the panel, then press <kbd>Tab</kbd>. The link is there the whole
+      time &mdash; for a screen reader, and for you once you reach it.
+    </p>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 3 · The wrapper a live region is announced from
+       CSS [CORE].
+
+       A status message that has nowhere to go on screen still needs somewhere
+       to live, and this is it. Two things carry over from the class itself:
+
+       - the region has to be in the DOM *before* the text is inserted, so it
+         is rendered here empty. Injecting an already-populated live region
+         announces nothing.
+       - it must not be `display: none`. That is the same failure as example 4,
+         and it is the usual reason a live region is silent.
+
+       Populating it needs script — see the Live Region component, which owns
+       that half. This one only shows where it goes.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">3 &middot; Where a live region lives</h3>
+
+    <p class="ac-vh-body">
+      Tickets for Berkeley: <strong>99 left</strong>.
+    </p>
+    <p class="ac-visually-hidden" role="status" aria-live="polite"></p>
+
+    <p class="ac-demo__legend">
+      Rendered empty and left that way. The element is the component; the
+      announcement is not.
+    </p>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 4 · The four ways of hiding, side by side and live
+       CSS [CORE] + [BROKEN].
+
+       Four icon-only buttons. Each one's only label is a span hidden a
+       different way, and three of them therefore have no accessible name at
+       all — a screen reader announces "button" and nothing else.
+
+       Check it yourself: open a screen reader, or inspect the accessibility
+       tree in devtools. The markup looks identical in all four.
+
+       Watch the third button's width. `visibility: hidden` removes the element
+       from the screen and from the accessibility tree but *keeps its layout
+       box*, so the button is stretched by a label nobody can read — the one
+       failure here you can see without any tooling at all.
+
+       ac-vh-broken-* exists so that copying one is obviously a mistake.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">4 &middot; Four ways of hiding</h3>
+
+    <div class="ac-vh-row">
+      <button class="ac-vh-btn" type="button">
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" fill="none" />
+        </svg>
+        <span class="ac-visually-hidden">Add a date</span>
+      </button>
+
+      <button class="ac-vh-btn" type="button">
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" fill="none" />
+        </svg>
+        <span class="ac-vh-broken-display">Add a date</span>
+      </button>
+
+      <button class="ac-vh-btn" type="button">
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" fill="none" />
+        </svg>
+        <span class="ac-vh-broken-visibility">Add a date</span>
+      </button>
+
+      <button class="ac-vh-btn" type="button">
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" fill="none" />
+        </svg>
+        <span hidden>Add a date</span>
+      </button>
+    </div>
+
+    <ol class="ac-vh-key">
+      <li><code>.ac-visually-hidden</code> &mdash; named &ldquo;Add a date&rdquo;</li>
+      <li><code>display: none</code> &mdash; <strong>no name</strong></li>
+      <li>
+        <code>visibility: hidden</code> &mdash; <strong>no name</strong>, and it
+        keeps its layout box, so this button is wider than the others
+      </li>
+      <li><code>hidden</code> attribute &mdash; <strong>no name</strong></li>
+    </ol>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 5 · aria-label is not the same tool
+       CSS [CORE].
+
+       aria-label is the right answer on the button above, and it is the wrong
+       answer here. It only applies to elements that have a role that supports
+       naming — on a plain <span> or <div> it is ignored, and the text you wrote
+       reaches nobody.
+
+       Two more differences worth knowing, both of which apply even where
+       aria-label does work:
+
+       - it replaces the whole accessible name, so any visible text inside is
+         discarded. If the replacement does not start with the visible text you
+         have broken SC 2.5.3 Label in Name for speech-input users.
+       - it is an attribute, so page translation tools often skip it and text
+         search and select-to-copy never see it. Hidden *text* is real text.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">5 &middot; Why not <code>aria-label</code></h3>
+
+    <p class="ac-vh-body">
+      Curfew<span class="ac-visually-hidden"> at the Berkeley show</span>: 23:00.
+    </p>
+
+    <p class="ac-vh-body">
+      Doors<span class="ac-vh-broken-arialabel" aria-label=" at the Berkeley show"></span>: 19:30.
+    </p>
+
+    <p class="ac-demo__legend">
+      The first line reads &ldquo;Curfew at the Berkeley show: 23:00&rdquo;. The
+      second reads &ldquo;Doors: 19:30&rdquo; &mdash; the <code>aria-label</code>
+      on an empty span with no role is discarded, and the markup gives no hint
+      that it was.
+    </p>
+  </div>
+</div>

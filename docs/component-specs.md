@@ -28,9 +28,13 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
 - **Always-visible is a legitimate choice**, not a fallback: it removes every failure mode this component has and costs one line of chrome.
 
 ### visually-hidden
-- **Markup** `<span class="ac-visually-hidden">` utility class, plus a `.ac-visually-hidden--focusable` variant.
-- **CSS** `position:absolute; width:1px; height:1px; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap;`
-- **Gotcha** `white-space: nowrap` matters — without it text wraps inside the 1px box and some screen readers read it letter by letter. Never use `display:none` or `visibility:hidden`; both remove it from the accessibility tree, defeating the purpose.
+- **Markup** `<span class="ac-visually-hidden">` utility class, plus a `.ac-visually-hidden--focusable` variant. **CSS-only.**
+- **CSS** `position:absolute; box-sizing:border-box; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; border:0; clip-path:inset(50%); white-space:nowrap;` — nine declarations, all load-bearing. `1px` not `0` (a zero-size box can drop out of the accessibility tree); `margin:-1px` so a line of text does not gain a pixel; `padding`/`border` at 0 because `border-box` cannot shrink a box below its own borders.
+- **`--focusable` uses `:focus-within`**, not `:focus` — the focusable thing is usually inside the wrapper, and `:focus-within` matches both. (`skip-link` deliberately uses plain `:focus`; the reason is in its entry.)
+- **Canonical home for the technique.** `skip-link`, `switch`, `textarea` and `tooltip` each carry a local copy on purpose — a paste into a bare app must not need a second file. A change here is a change in all five.
+- **Gotcha** `white-space: nowrap` matters — without it text wraps inside the 1px box and some screen readers read it letter by letter. Never `display:none`, `visibility:hidden` or the `hidden` attribute; all three take it out of the accessibility tree. `visibility:hidden` additionally **keeps its layout box**, so an icon button labeled that way is visibly stretched by a label nobody can read.
+- **`aria-label` is a different tool**, not a shorter spelling: it needs a role that supports naming (ignored on a bare `<span>`), it replaces the whole name (SC 2.5.3 Label in Name), and it is an attribute, so translation tools and find-in-page never see it.
+- **Testing gotcha** `innerText` **includes** clipped text — it only drops `display:none` and `visibility:hidden`. Use geometry for "off screen" and `toHaveAccessibleName` for "still announced".
 
 ### focus-ring
 - **Docs component.** Demonstrates `:focus-visible` vs `:focus`, offset, and the two-tone ring that survives any background.
