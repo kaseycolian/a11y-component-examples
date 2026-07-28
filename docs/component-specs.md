@@ -63,8 +63,15 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
 - **SC 1.4.12 belongs here.** A fixed `height` on a box of text is the failure; `min-height` is the fix. A demo of it needs the box's **width** pinned too, or it clips at some viewport widths and not others.
 
 ### motion-preferences
-- **Markup** A switch bound to `data-motion` on `<html>`, plus a demo animation that visibly stops.
+- **Markup** A switch bound to `data-motion` on `.ac-motion-scope` (`<html>` in a real app), plus a demo animation that visibly stops.
 - **Gotcha** This is the component that explains the asymmetry: the toggle can only *add* the restriction, never override an OS `prefers-reduced-motion`. Show the token chain (`--ac-motion` → `--motion` → 1) and the cascade order that makes the OS win.
+- **The mechanism is source order at equal specificity.** `[data-motion="off"]` and the `@media (prefers-reduced-motion)` rule are both one class/attribute deep, so the later one wins and the media query is later. Keep them at equal specificity or the lesson becomes a specificity accident.
+- **There are only two states.** "On" is the *absence* of the attribute. A `[data-motion="on"]` rule does two kinds of damage: it beats the media query, and it leaves the toggle unable to describe the page — `on` and *absent* both mean "not reducing", so the control unchecks itself and the reader's earlier answer is unrecoverable.
+- **Two knobs, two right answers.** Gate the **duration** and the animation is gone (decoration). Gate the **distance** inside the keyframe and the cross-fade survives (state changes, where a jump-cut loses the reader). `prefers-reduced-motion` is about vestibular triggers — movement, parallax, zoom — not about opacity.
+- **JS reads the token, not `matchMedia`.** `getComputedStyle(scope).getPropertyValue('--ac-motion')` is the only value that knows about both the OS and the page toggle. Keep `matchMedia` for its `change` event.
+- **SC 2.2.2 is independent of the preference.** A loop that runs past five seconds needs a pause control whether or not motion is allowed. A pause button changes its label *or* carries `aria-pressed` — never both.
+- **`aria-disabled`, not `disabled`,** on the toggle once the OS has spoken, with a visible note (not `title`) referenced by `aria-describedby`. Referencing it while `hidden` is safe: a hidden element contributes nothing to the tree.
+- **Testing gotcha** Playwright honors `aria-disabled` in its actionability checks, so clicking the locked switch needs `{ force: true }` — the `preventDefault` is what the test is actually exercising.
 
 ### effects
 - **Markup** Demonstrates `fx-grid`, `fx-scroll`, `fx-bar-top`, `fx-bar-bottom`, `fx-pulse` from the vendored `effects.css`.

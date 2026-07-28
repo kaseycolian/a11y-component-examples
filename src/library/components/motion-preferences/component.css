@@ -1,0 +1,602 @@
+/* ===========================================================================
+   MOTION PREFERENCES
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) lives in
+   the site's own stylesheet, not this file.
+
+     [GATE]      every example, and the reason the file exists. Three rules.
+     [CORE]      shared furniture — the note line, the buttons, the panel.
+     [SWITCH]    example 2. The track and thumb. Canonical in the Switch
+                 component; repeated so this file stands alone.
+     [READOUT]   example 2. The signal table and the spoken verdict.
+     [SPIN]      example 1.
+     [TICKER]    example 3.
+     [REVEAL]    example 4. The two knobs, side by side.
+     [BROKEN]    example 5. Delete it — it is the failure, on purpose.
+     [FORCED]    always ship this. High Contrast rebuilds every cue.
+
+   Copy the file whole for the library version.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [GATE] the whole component, in three rules ---------------------------
+   Put .ac-motion-scope on <html> in your app. It is on the demo grid here only
+   so this page's toggle does not fight the site header's own.
+
+   --ac-motion is a 1/0 multiplier, not a duration. Multiply durations by it to
+   remove an animation, and distances by it to keep the fade and drop the
+   travel. Both uses are below.
+
+   Read the three rules in order, because the order is the mechanism:
+
+     1  the default, deferring to a host token if there is one
+     2  the page's opt-out, written by the toggle
+     3  the reader's operating system
+
+   Rules 2 and 3 have the same specificity, so the later one wins, and 3 is
+   later. That is the asymmetry the rest of this library depends on: a page
+   control can add the restriction and can never lift it.
+
+   Notice what is missing. There is no [data-motion="on"] rule, and adding one
+   is the entire bug in example 5. "On" is the absence of an opinion — so
+   turning motion back on means removing the attribute, which leaves rule 3
+   holding the field. */
+
+.ac-motion-scope {
+  --ac-motion: var(--motion, 1);
+}
+
+[data-motion="off"] {
+  --ac-motion: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ac-motion-scope {
+    --ac-motion: 0;
+  }
+}
+
+/* --- [CORE] shared furniture --------------------------------------------- */
+
+.ac-motion-field,
+.ac-motion-stage,
+.ac-motion-ticker,
+.ac-motion-reveals,
+.ac-motion-override {
+  min-width: 0;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-motion__note {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-motion__note:empty {
+  display: none;
+}
+
+.ac-motion__note code,
+.ac-motion-readout code {
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
+  font-size: 0.95em;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-motion__btn {
+  /* SC 2.5.8 floor is 24px; 44px is the comfortable touch size. */
+  min-height: var(--ac-target, 44px);
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color
+    calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-motion__btn:hover {
+  background: color-mix(
+    in srgb,
+    var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 14%,
+    var(--ac-surface, var(--bg-panel, #110620))
+  );
+}
+
+.ac-motion__btn:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-motion__btn--warn {
+  border-color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+}
+
+/* --- [SWITCH] example 2 ---------------------------------------------------
+   Canonical in the Switch component. Repeated here rather than imported: a
+   paste of this one file into a bare page has to render a working switch. */
+
+.ac-motion-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.ac-switch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: var(--ac-target, 44px);
+  padding: 0.25rem 0.4rem;
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-size: 0.9rem;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+/* The real input stays in the DOM, in the tab order, and in the accessibility
+   tree. opacity: 0 — never display: none or visibility: hidden, either of which
+   removes it from the tree and takes the keyboard with it. */
+.ac-switch__input {
+  position: absolute;
+  top: 50%;
+  left: 0.4rem;
+  width: 2.4rem;
+  height: 1.35rem;
+  margin: 0;
+  transform: translateY(-50%);
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Two cues, never one: the fill says on in color, the thumb says it again in
+   position. Color alone would fail SC 1.4.1. */
+.ac-switch__track {
+  position: relative;
+  flex: none;
+  display: block;
+  box-sizing: border-box;
+  width: 2.4rem;
+  height: 1.35rem;
+  padding: 2px;
+  border: 2px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: 999px;
+  background: var(--ac-bg, var(--bg, #070110));
+  transition: background-color
+    calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-switch__thumb {
+  display: block;
+  width: calc(1.35rem - 8px);
+  height: calc(1.35rem - 8px);
+  border-radius: 50%;
+  background: var(--ac-border-strong, var(--border-strong, #8064c0));
+  transform: translateX(0);
+  transition: transform
+    calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 200ms))) ease;
+}
+
+.ac-switch__input:checked + .ac-switch__track {
+  border-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  background: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+}
+
+.ac-switch__input:checked + .ac-switch__track .ac-switch__thumb {
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  transform: translateX(calc(2.4rem - 1.35rem));
+}
+
+/* The ring has to appear on the track, since the input it belongs to is
+   transparent. */
+.ac-switch__input:focus-visible + .ac-switch__track {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-switch__text {
+  min-width: 0;
+}
+
+.ac-switch:has(.ac-switch__input:checked) .ac-switch__text {
+  font-weight: 700;
+}
+
+/* Unavailable is drawn, not dimmed — low opacity reads as "ignore this" rather
+   than "you cannot change this", and costs contrast on the way. */
+.ac-switch:has(.ac-switch__input[aria-disabled="true"]) {
+  cursor: not-allowed;
+}
+
+.ac-switch__input[aria-disabled="true"] + .ac-switch__track {
+  border-style: dashed;
+  border-color: var(--ac-border, var(--border, #34205a));
+}
+
+/* --- [READOUT] example 2 -------------------------------------------------- */
+
+.ac-motion-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0.9rem 0 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  font-size: 0.8rem;
+}
+
+/* The rows wrap to two lines rather than shrinking the value out of sight: at
+   320px a label and a value do not both fit, and the value is the point. */
+.ac-motion-readout__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.5rem;
+  min-width: 0;
+}
+
+.ac-motion-readout dt {
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-motion-readout dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.ac-motion__verdict {
+  margin: 0.6rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-motion__verdict:empty {
+  display: none;
+}
+
+/* The one state the page can reach that is genuinely wrong, so it is colored
+   and also worded — see the verdict text in component.js. */
+.ac-motion__verdict[data-ac-motion-wrong="true"] {
+  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+}
+
+/* --- [SPIN] example 1 ----------------------------------------------------- */
+
+.ac-motion-stage {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0;
+}
+
+.ac-motion-record {
+  display: grid;
+  place-items: center;
+  width: 7.5rem;
+  height: 7.5rem;
+  border-radius: 50%;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  background:
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      var(--ac-bg, var(--bg, #070110)) 0 3px,
+      var(--ac-surface, var(--bg-panel, #110620)) 3px 5px
+    );
+  /* Gating the DURATION, because a turning disc is decoration and has nothing
+     to say when it stops. At 0 the duration is zero and the disc holds still.
+     The animation is still declared, so nothing has to be re-declared to turn
+     it back on. */
+  animation: ac-motion-spin calc(var(--ac-motion, var(--motion, 1)) * 4s) linear infinite;
+}
+
+.ac-motion-record__label {
+  display: grid;
+  place-items: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 50%;
+  background: var(--ac-accent-purple, var(--accent-purple, #b57fff));
+  color: var(--ac-on-purple, var(--on-purple, #1a0838));
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+@keyframes ac-motion-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* --- [TICKER] example 3 --------------------------------------------------- */
+
+.ac-motion-ticker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.9rem;
+}
+
+.ac-motion-ticker__now {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.5rem;
+  margin: 0;
+  min-width: 0;
+}
+
+.ac-motion-ticker__label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-motion-ticker__item {
+  font-size: 1rem;
+  font-weight: 700;
+  overflow-wrap: break-word;
+}
+
+/* Full-width on its own row, so the button never wraps under a sentence and
+   leaves the ticker looking like two unrelated controls. */
+.ac-motion-ticker .ac-motion__note {
+  flex: 1 0 100%;
+  margin-top: 0;
+}
+
+/* --- [REVEAL] example 4 --------------------------------------------------
+   Two knobs, and they answer differently.
+
+   --distance multiplies the travel and leaves the duration alone, so under a
+   reduced-motion preference the panel still cross-fades in over 320ms. Use it
+   for anything that tells the reader where something came from.
+
+   --duration multiplies the time, so the panel is simply there. Use it for
+   decoration, which is what example 1 does.
+
+   Both start from the same declaration; only the multiplied term differs. */
+
+.ac-motion-reveals {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.8rem;
+}
+
+/* The panels are the width of the column; the button is the width of its
+   label. Without this the flex column stretches it edge to edge and it reads
+   as a banner rather than a control. */
+.ac-motion-reveals .ac-motion-pair {
+  align-self: stretch;
+}
+
+.ac-motion-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.ac-motion-panel {
+  min-width: 0;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+}
+
+.ac-motion-panel__title {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  text-shadow: none;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-motion-reveal {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+}
+
+/* The played state is added by the script; the resting state is the from-frame,
+   so the panels are readable before anything runs and after it finishes. */
+.ac-motion-reveal[data-ac-motion-playing] {
+  animation-fill-mode: both;
+  animation-timing-function: ease-out;
+}
+
+.ac-motion-reveal--distance[data-ac-motion-playing] {
+  animation-name: ac-motion-rise;
+  animation-duration: 320ms;
+}
+
+.ac-motion-reveal--duration[data-ac-motion-playing] {
+  animation-name: ac-motion-rise-fixed;
+  animation-duration: calc(var(--ac-motion, var(--motion, 1)) * 320ms);
+}
+
+@keyframes ac-motion-rise {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--ac-motion, var(--motion, 1)) * 1.25rem));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ac-motion-rise-fixed {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* --- [BROKEN] example 5 — delete this ------------------------------------
+   Same specificity as the [GATE] media query, declared after it, so it wins on
+   source order and the reader's operating system loses. Written out only
+   because "do not add an on state" is easier to believe when you can watch it
+   happen. */
+
+[data-motion="on"] {
+  --ac-motion: 1;
+}
+
+.ac-motion-override {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.7rem;
+}
+
+.ac-motion-override__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.ac-motion-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
+  border-radius: var(--ac-radius-pill, var(--radius-pill, 999px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Opacity only, 2.4s, no movement and nowhere near the three-per-second that
+   SC 2.3.1 is about. A demonstration of a preference being ignored should not
+   also be the thing the preference exists to prevent. */
+.ac-motion-chip__dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  animation: ac-motion-fade calc(var(--ac-motion, var(--motion, 1)) * 2.4s) ease-in-out infinite alternate;
+}
+
+@keyframes ac-motion-fade {
+  to {
+    opacity: 0.35;
+  }
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------
+   forced-colors drops color-mix, our accents and the record's gradient, which
+   would leave the switch a blank pill and the disc a blank circle. Motion is
+   untouched by forced colors — it is a separate preference and this component
+   is the one place worth saying so. */
+
+@media (forced-colors: active) {
+  .ac-motion__btn {
+    border-color: ButtonBorder;
+  }
+
+  .ac-motion__btn:hover {
+    background: Canvas;
+  }
+
+  .ac-motion__btn:focus-visible {
+    outline-color: CanvasText;
+  }
+
+  .ac-motion__btn--warn {
+    border-color: CanvasText;
+    color: CanvasText;
+  }
+
+  .ac-switch__track {
+    border-color: ButtonBorder;
+    background: Canvas;
+  }
+
+  /* forced-color-adjust keeps our geometry on this one small part; the colors
+     are system keywords, so the reader's palette still wins. */
+  .ac-switch__thumb {
+    forced-color-adjust: none;
+    background: ButtonBorder;
+  }
+
+  .ac-switch__input:checked + .ac-switch__track {
+    forced-color-adjust: none;
+    border-color: Highlight;
+    background: Highlight;
+  }
+
+  .ac-switch__input:checked + .ac-switch__track .ac-switch__thumb {
+    background: Canvas;
+  }
+
+  .ac-switch__input:focus-visible + .ac-switch__track {
+    outline-color: CanvasText;
+  }
+
+  .ac-switch__input[aria-disabled="true"] + .ac-switch__track {
+    border-color: GrayText;
+  }
+
+  .ac-motion-readout,
+  .ac-motion-panel,
+  .ac-motion-chip {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+
+  /* The wrong-state verdict loses its color here, which is why it was never
+     only a color — the sentence says the same thing. */
+  .ac-motion__verdict[data-ac-motion-wrong="true"] {
+    color: CanvasText;
+  }
+
+  /* The grooves are a gradient and vanish, so the disc needs an edge of its
+     own or it disappears into the page. */
+  .ac-motion-record {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+
+  .ac-motion-record__label {
+    forced-color-adjust: none;
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .ac-motion-chip__dot {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+}

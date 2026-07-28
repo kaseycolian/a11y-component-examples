@@ -7,34 +7,38 @@ component — read the one entry you need, not the whole file.
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-28
+Last updated: 2026-07-28 (motion-preferences)
 
 ---
 
-## START HERE — next component is `motion-preferences`
+## START HERE — next component is `effects`, and it finishes `foundations`
 
-`typography` landed (21/21 Chromium; full suite 393). Run the loop below with:
+`motion-preferences` landed (25/25 Chromium). Run the loop below with:
 
 ```sh
-node scripts/new-component.mjs motion-preferences --group foundations --name "Motion Preferences"
+node scripts/new-component.mjs effects --group foundations --name "Effects"
 ```
 
 Decided in advance, so do not re-derive:
 
-- Spec entry: `component-specs.md` → foundations → `motion-preferences`. A switch bound to
-  `data-motion` on `<html>`, plus a demo animation that visibly stops.
-- **This is the component that explains the asymmetry** the whole library already relies on: the page
-  toggle can only *add* the restriction, never override an OS `prefers-reduced-motion`. Show the token
-  chain (`--ac-motion` → `--motion` → 1) and the cascade order in `tokens.css` that makes the OS win.
-  It is documented in three places already and demonstrated in none.
-- The site header's own motion toggle is the working reference — including the part worth stealing:
-  under an OS preference it goes `aria-disabled`, not `disabled`, so it keeps its tab stop and the
-  visible note explaining why is actually announced. `tests/site-header.spec.mjs` covers it; that spec
-  is not the component's spec, so assert it again here.
-- Reuse `switch`'s markup rather than inventing one. Its example 4 already promotes this exact
-  pattern.
+- Spec entry: `component-specs.md` → foundations → `effects`. It demonstrates `fx-grid`, `fx-scroll`,
+  `fx-bar-top`, `fx-bar-bottom` and `fx-pulse` from the **vendored** `src/site/theme/effects.css`.
+- **This is the one page whose subject is not a library component.** These classes belong to
+  theme-service; the library rebuilds the components around them but not these. Say so at the top of
+  `docs.md` and on the page — the copy map should point at `effects.css`, not at a `component.css`
+  that reimplements it.
+- `fx-grid` paints on a `::before` at `z-index: -1`, so its host needs `isolation: isolate` or the
+  backdrop escapes to the nearest stacking context and lands on top of unrelated content. That is the
+  finding worth an example of its own.
+- `fx-pulse` must be motion-gated, and `motion-preferences` is now the canonical explanation — link
+  to it rather than re-arguing the cascade. `effects.css` already ships
+  `[data-motion="off"] .fx-pulse { animation: none }` plus the media query; check whether that is
+  enough or whether the demo needs the `--motion` multiplier form the rest of the library uses.
+- Decoration has a contrast obligation the moment text sits on it. `fx-grid` behind body copy is the
+  case to test, and `@media (forced-colors: active)` should drop the whole backdrop rather than
+  recolor it.
 
-Then `effects` finishes `foundations`.
+That closes `foundations`. `buttons-actions` is next, starting with `button`.
 
 ---
 
@@ -109,7 +113,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 19 / 35
+## Component roster — 20 / 35
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -190,7 +194,25 @@ take their logic and not their layout. See item 1 under remaining work.
   rendered uppercase with a glow and on a `<div>` did not, silently destroying example 2. The class
   now declares `letter-spacing`, `text-transform` and `text-shadow` for that reason, and the spec
   compares all three.
-- [ ] `motion-preferences`
+- [x] `motion-preferences` — done. 25/25 tests in Chromium. The gate the whole library already reads,
+  finally demonstrated: three CSS rules on `.ac-motion-scope` (`<html>` in a real app; the demo grid
+  here, so the page toggle does not fight the site header's), a switch that writes `data-motion="off"`
+  and removes it again, and a **readout naming all three signals** — the OS, the attribute, and the
+  resolved `--ac-motion` — with a `role="status"` sentence that states the verdict. Example 5 is
+  broken on purpose and live: `[data-motion="on"] { --ac-motion: 1 }` after the media query, so a
+  reader who asked their OS for reduced motion watches a button overrule it while the readout says so.
+  Findings: **there are only two states, and the second cost of a third one is not the override** —
+  `on` and *absent* both mean "not reducing", so the toggle cannot describe the page, unchecks itself,
+  and the reader's earlier answer is unrecoverable; **two knobs, two right answers**, gate the
+  *duration* to remove decoration and the *distance inside the keyframe* to keep a cross-fade, because
+  the preference is about vestibular triggers and opacity is not one; **JS must read the token, not
+  `matchMedia`**, which is blind to the page toggle (`matchMedia` is still needed for its `change`
+  event, since the OS setting can change while the page is open); and SC 2.2.2 is an obligation
+  *independent* of the preference, which is why example 1's record has the toggle as its pause
+  mechanism and example 3's ticker has its own button. That button changes its label and carries no
+  `aria-pressed` — doing both announces the change twice and the two can disagree. **Test gotcha:**
+  Playwright honors `aria-disabled` in actionability, so clicking the locked switch needs
+  `{ force: true }`; the `preventDefault` is what the assertion is really about.
 - [ ] `effects`
 
 ### buttons-actions
@@ -504,6 +526,16 @@ It must match `npm run preview` exactly, base path included.
   being true. Only visible at 320px, because that is where the two specimens stack and can be compared
   by eye. A utility class that claims to own appearance has to declare the properties a host is likely
   to set, not just the ones it cares about.
+- **`[WARN] [glob-loader] Duplicate id "<slug>" found` is a stale content cache, not a real
+  duplicate.** It appears on the first build after a scaffolded `docs.md` is filled in, because the
+  entry was already indexed in `.astro/`. Nothing is wrong and the page builds; `rm -rf .astro` and
+  rebuild if you want to confirm. Do not go looking for a second `docs.md`.
+- **Playwright honors `aria-disabled` in its actionability checks.** A click on a control that is only
+  *soft* disabled hangs for the full 30s timeout with "element is not enabled" — including a click on
+  a `<label>` or a decorative `<span>` inside one, because it resolves to the associated input. That
+  is correct behavior and the same reason a screen reader says "unavailable", so do not weaken the
+  markup: pass `{ force: true }` and say in a comment that the `preventDefault` in the component is
+  what the assertion is actually about. `motion-preferences` and `switch` both need this.
 - **Astro's bundled `site.css` loads *after* every `component.css`.** Head order is theme, effects,
   dropdown, the page's component, then the `_astro/*.css` bundle. So a shell rule at **equal**
   specificity wins over a component's. This bites exactly one rule shape: `site.css` ships a global
