@@ -64,11 +64,14 @@ test('the close button has a real name and clears 44px', async ({ page }) => {
   await page.getByRole('button', { name: 'Ticket details', exact: true }).click();
 
   const close = page.getByRole('button', { name: 'Close ticket details' });
-  const box = await close.boundingBox();
 
   // Touch has no Escape key, so this is the only way out there.
-  expect(box.width).toBeGreaterThanOrEqual(44);
-  expect(box.height).toBeGreaterThanOrEqual(44);
+  //
+  // Polled, because the dialog has a motion-gated entrance: a boundingBox()
+  // read a frame after the click measures the button mid-scale and reports it
+  // under 44px. That was an intermittent full-suite failure, not a real one.
+  await expect.poll(async () => (await close.boundingBox()).width).toBeGreaterThanOrEqual(44);
+  await expect.poll(async () => (await close.boundingBox()).height).toBeGreaterThanOrEqual(44);
 
   await close.click();
   await expect(page.locator('#ac-modal-doors')).toBeHidden();

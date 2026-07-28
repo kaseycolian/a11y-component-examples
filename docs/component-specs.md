@@ -44,9 +44,13 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
 - **Gotcha** `outline-offset` is positive by default, so an `overflow: hidden` ancestor clips the ring with no error and nothing to see. And a sticky bar only obscures the focused element when focus moves **backwards** (SC 2.4.11): moving forward aligns the element's bottom edge, not its top.
 
 ### live-region
-- **Markup** `<div class="ac-visually-hidden" role="status" aria-live="polite">` and an `role="alert"` / `aria-live="assertive"` sibling.
-- **JS** `AC.createAnnouncer()` → `{ announce(text, { assertive }), destroy() }`.
-- **Gotcha** The region must be **in the DOM before** the text is inserted — injecting a populated live region announces nothing. Clearing then setting in the same tick also fails; use a frame gap. Reserve `assertive` for genuine interruptions.
+- **Markup** `<p class="ac-lr-clipped" role="status">`, rendered empty beside the thing it describes, plus a `role="alert"` sibling. Prefer the **role** over bare `aria-live`: it carries `aria-atomic="true"` and gives the element a name in the tree. `role="log"` is the append-only third one, and deliberately has no `aria-atomic`.
+- **Shipped contract** `AC.speak(el, text)` — clear, wait **two** frames, write — and `AC.createAnnouncer({ root, clearMs })` → `{ announce(text, { assertive }), element, assertiveElement, destroy() }`. Idempotent per root, regions minted at construction, message cleared after 7s.
+- **The only component with no `create<Name>(root)`** — its product is a message, not an element.
+- **Gotcha** The region must be **in the accessibility tree before** the text is inserted. Three ways to break that, all live in example 3: injected already populated, `display: none`, and cleared-then-set in the same tick. All three leave the right text in the DOM, so axe and the element inspector both say the page is fine.
+- **Gotcha** Two `requestAnimationFrame`s, not one — rAF runs *before* paint, so a single one can still batch the clear and the write into one reported state.
+- **Gotcha** `textContent = <same string>` **does** mutate the DOM (old text node out, new one in), so a MutationObserver cannot tell the working case from the silent one. The thing to assert is that the region is *observed empty* in between.
+- Reserve `assertive` for messages that stop being useful in a few seconds — not for messages that are merely important.
 
 ### typography
 - **Markup** `.ac-t-h1`–`.ac-t-h4`, `.ac-t-body`, `.ac-t-muted`, `.ac-t-mono`, `.ac-t-link`.

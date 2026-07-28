@@ -11,29 +11,31 @@ Last updated: 2026-07-28
 
 ---
 
-## START HERE — next component is `live-region`
+## START HERE — next component is `typography`
 
-`focus-ring` landed (22/22 Chromium). Run the loop below with:
+`live-region` landed (26/26 Chromium; full suite 372). Run the loop below with:
 
 ```sh
-node scripts/new-component.mjs live-region --group foundations --name "Live Region"
+node scripts/new-component.mjs typography --group foundations --name "Typography"
 ```
 
 Decided in advance, so do not re-derive:
 
-- Spec entry: `component-specs.md` → foundations → `live-region`. It is the **first foundations
-  component with real JavaScript** — `AC.createAnnouncer()` → `{ announce(text, { assertive }),
-  destroy() }`.
-- `visually-hidden` example 3 already renders the empty `role="status"` wrapper and says *this
-  component owns the other half*, and `focus-ring`'s docs link to it. Both links are `../live-region/`,
-  so the slug is fixed.
-- The three failures that have to be on the page and live, not described: a region **injected already
-  populated** (announces nothing), a region hidden with `display: none` (silent), and clear-then-set in
-  the same tick (needs a frame gap).
-- `textarea`, `input-group`, `switch` and `tooltip` each already drive a `role="status"`. Read what
-  they do before inventing a fourth pattern — this component should describe them, not contradict them.
+- Spec entry: `component-specs.md` → foundations → `typography`. `.ac-t-h1`–`.ac-t-h4`, `.ac-t-body`,
+  `.ac-t-muted`, `.ac-t-mono`, `.ac-t-link`. **CSS-only** — no `component.js`, so `files` is
+  `["html", "css"]` and the scaffolded JS file gets deleted.
+- The whole point is that these are **visual** classes carrying no semantics. An `<h2>` styled
+  `.ac-t-h4` is fine; a `<div class="ac-t-h1">` is not a heading and is missing from the heading list
+  every screen reader user navigates by. Put that failure on the page, live, the way `focus-ring`
+  example 4 and `live-region` example 3 do — an accessibility-tree readout beside two things that look
+  identical.
+- `.ac-t-muted` still needs 4.5:1 (SC 1.4.3). `--ac-text-muted` is `#bcadde` on `#110620`, which
+  passes; say the number rather than asserting the class is safe, because a consumer who retints the
+  token breaks it silently.
+- Reflow (SC 1.4.4 / 1.4.10) and `text-spacing` (SC 1.4.12) belong here and nowhere else: line-height
+  ≥1.5, no fixed `height` on a text box, and nothing that clips at 200% zoom.
 
-Then `typography`, `motion-preferences`, `effects` finish `foundations`.
+Then `motion-preferences` and `effects` finish `foundations`.
 
 ---
 
@@ -108,7 +110,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 17 / 35
+## Component roster — 18 / 35
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -154,7 +156,23 @@ take their logic and not their layout. See item 1 under remaining work.
   theme's own `--text` and `--bg`, because that is the one pair a theme already guarantees contrasts;
   and the two `--ac-focus-inner` / `--ac-focus-outer` tokens this added to `tokens.css` are the only
   edit outside the component folder.
-- [ ] `live-region`
+- [x] `live-region` — done. 26/26 tests in Chromium. The **only component with no
+  `create<Name>(root)`**: its product is a message, not an element, so it exports `AC.speak(el, text)`
+  (clear, wait two frames, write) and `AC.createAnnouncer({ root, clearMs })` →
+  `{ announce(text, { assertive }), element, assertiveElement, destroy() }`, idempotent per root, both
+  regions minted at construction and cleared after 7s. Describes rather than replaces the four
+  `role="status"` regions `switch`, `input-group`, `textarea` and `tooltip` already own. The regions
+  are drawn **visible** on this page instead of clipped, so the text can be watched landing in the
+  actual element — `.ac-lr-clipped` is the real recipe and is a local copy of `visually-hidden`'s.
+  Example 3 is broken on purpose and live: injected already populated, `display: none`, and
+  cleared-then-set in the same tick, each with a mirror printing what it left in the DOM, because
+  *the DOM being correct* is the whole reason this bug survives review. Example 5 pairs the repeat
+  problem (same string twice announces nothing) with `role="log"`, which is append-only and carries no
+  `aria-atomic`. Two findings: **two** `requestAnimationFrame`s are needed, not one, because rAF runs
+  before paint and a single one can still batch the clear and the write into one reported state; and
+  `textContent = <same string>` **does** fire a MutationObserver (old text node out, new one in), so
+  the thing a test can assert is that the region is *observed empty* in between, never a mutation
+  count.
 - [ ] `typography`
 - [ ] `motion-preferences`
 - [ ] `effects`
@@ -424,7 +442,17 @@ It must match `npm run preview` exactly, base path included.
   subdirectory, so an earlier `cd` into a component folder leaves tests failing with
   `Project(s) "chromium" not found. Available projects: ""`. Prefix the call:
   `Set-Location D:\sources\a11y-component-examples; npx playwright test --project=chromium <slug>`.
-- **The intermittent full-suite failure was found and fixed.** It was `modal.spec.mjs` → "the page is
+- **`textContent = <the same string>` still mutates the DOM.** The old text node is removed and a new
+  one inserted, so a `MutationObserver` fires even though the announced value never changed. A test
+  that counts mutations therefore cannot tell a working live region from a silent one — assert that
+  the region is **observed empty** between two identical messages instead. `live-region`'s spec is the
+  precedent.
+- **A second intermittent full-suite failure, same shape as the first.** `modal.spec.mjs` → "the close
+  button has a real name and clears 44px" read `boundingBox()` a frame after the dialog opened, so it
+  measured the button mid-entrance-animation and reported it under 44px. Now `expect.poll`. **Any
+  geometry read on something with a motion-gated entrance needs polling**, the same way any state read
+  after a dialog closes does.
+- **The first intermittent full-suite failure was found and fixed.** It was `modal.spec.mjs` → "the page is
   scroll-locked while it is open, and released after", failing about one run in four. A test bug, not
   a component bug: the `close` event is **queued, not dispatched synchronously**, so reading
   `document.documentElement.overflow` immediately after Escape races the unlock. Now

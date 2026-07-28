@@ -1,0 +1,306 @@
+<!-- ===========================================================================
+     LIVE REGION — how a page says something out loud
+
+     WHAT TO COPY
+       Almost always example 4: an empty element with role="status", rendered
+       with the thing it describes, written to when something happens. That is
+       nine tenths of every live region in a real app and it needs no JavaScript
+       beyond `el.textContent = message`.
+
+       Example 2's `AC.createAnnouncer()` is for the other tenth — messages that
+       belong to no component, sent from code with no element to write to.
+
+     THE CONTRACT
+       role="status"  polite. Waits for a gap, then reads. Implies
+                      aria-live="polite" and aria-atomic="true".
+       role="alert"   assertive. Interrupts whatever is being read, including
+                      mid-word. Implies aria-live="assertive" + aria-atomic.
+
+       Both must be in the DOM, and unhidden, BEFORE the text goes in. That is
+       the whole rule, and example 3 is what happens when it is broken.
+
+     WHAT THIS PAGE DOES DIFFERENTLY
+       In an app a live region is usually clipped off screen, because the
+       information is already on screen for people who can see it. Here the
+       regions are drawn as visible boxes, so you can watch text land in the
+       actual element. Nothing else about them changes — a visible live region
+       is perfectly normal; an error message under a field is one.
+
+       This is the one component you cannot fully evaluate by looking at it.
+       Turn on a screen reader.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     =========================================================================== -->
+
+<div class="ac-demo-grid" data-ac-live-region>
+  <!-- ======================================================================
+       EXAMPLE 1 · polite and assertive
+       CSS [CORE] + [REGION]. JS [CORE] + [AUTO-INIT].
+
+       role="status" is polite: the message is queued and read when the screen
+       reader reaches a natural break. Nothing the user is doing is disturbed.
+
+       role="alert" is assertive: it cuts in, mid-sentence, and the user loses
+       their place in whatever was being read. That is occasionally the right
+       trade — a session about to expire, a payment that failed — and the rest
+       of the time it is an interruption dressed up as urgency.
+
+       Default to polite. Reach for assertive only when the message would be
+       useless a few seconds later.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">1 &middot; Polite and assertive</h3>
+
+    <div class="ac-lr-row">
+      <button
+        class="ac-lr-btn"
+        type="button"
+        data-ac-announce="Setlist saved."
+        data-ac-target="lr-polite"
+      >
+        Say it politely
+      </button>
+      <p class="ac-lr-region" id="lr-polite" role="status"></p>
+    </div>
+
+    <div class="ac-lr-row">
+      <button
+        class="ac-lr-btn"
+        type="button"
+        data-ac-announce="Your session ends in 99 seconds."
+        data-ac-target="lr-assertive"
+      >
+        Interrupt
+      </button>
+      <p class="ac-lr-region ac-lr-region--loud" id="lr-assertive" role="alert"></p>
+    </div>
+
+    <p class="ac-demo__legend">
+      Both regions were rendered empty with the page and both stay in the DOM
+      afterwards &mdash; only their text changes. With a screen reader running,
+      start reading this paragraph and then press <strong>Interrupt</strong>:
+      the alert cuts across it. The polite one waits its turn.
+    </p>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 2 · One announcer for the whole app
+       CSS [CORE] + [REGION]. JS [CORE] + [AUTO-INIT].
+
+       Some messages belong to no element on the page: a background save
+       finished, a socket dropped, a keyboard shortcut did something. There is
+       nowhere sensible to put a role="status" for those, and creating one on
+       demand does not work (example 3).
+
+       So mint one pair of regions at startup and keep them for the life of the
+       page. AC.createAnnouncer() does exactly that and nothing else:
+
+         var announcer = AC.createAnnouncer();
+         announcer.announce('Draft saved.');
+         announcer.announce('Upload failed.', { assertive: true });
+
+       Calling it twice returns the same instance, so the message can be sent
+       from wherever it happens rather than threading one object through the
+       app.
+
+       The regions it makes are clipped, because a message with no visual
+       counterpart is the case it exists for. Here they are mirrored into a
+       visible box so you can see them working.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">2 &middot; <code>AC.createAnnouncer()</code></h3>
+
+    <div class="ac-lr-row">
+      <button class="ac-lr-btn" type="button" data-ac-announcer="Draft saved.">
+        Save draft
+      </button>
+      <button
+        class="ac-lr-btn"
+        type="button"
+        data-ac-announcer="Six results for &ldquo;linoleum&rdquo;."
+      >
+        Search
+      </button>
+      <button class="ac-lr-btn" type="button" data-ac-announcer="Upload failed." data-ac-assertive>
+        Fail an upload
+      </button>
+    </div>
+
+    <p class="ac-lr-mirror" aria-hidden="true">
+      <span class="ac-lr-mirror__label">the announcer&rsquo;s region:</span>
+      <span class="ac-lr-mirror__text" data-ac-announcer-mirror></span>
+    </p>
+
+    <p class="ac-demo__legend">
+      The announcer&rsquo;s own regions are off screen, where they belong. The
+      box above is a mirror of what is in them, drawn for this page only, and it
+      is <code>aria-hidden</code> so it cannot be read twice. Notice the text
+      clears itself: a live region still holding yesterday&rsquo;s message
+      describes nothing.
+    </p>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 3 · Broken on purpose, and live
+       CSS [CORE] + [REGION] + [BROKEN]. JS [BROKEN].
+
+       Three ways to write a live region that never announces anything. All
+       three leave the right text in the DOM, so the element inspector, axe and
+       every other automated check say the page is fine.
+
+         1. Created and filled in one go. A screen reader announces a *change*
+            to a region it is already watching. An element that arrives with its
+            text already in it never changed, so there is nothing to notice.
+
+         2. Present but display: none. Not in the accessibility tree, therefore
+            not being watched. Unhiding it and setting the text together is the
+            same failure as 1.
+
+         3. Cleared and re-set in the same tick. The change is measured against
+            the last state the browser reported, so '' -> 'Sold out.' inside one
+            frame looks like no change at all. Leave a frame between them.
+
+       The mirrors print what each region actually holds afterwards. In all
+       three cases the text is there.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">3 &middot; Three silences</h3>
+
+    <!-- Each failure keeps its own region, beside the button that breaks it.
+         The last two are rendered here and empty, exactly as a working
+         component would ship them — what is wrong lives in component.js, not in
+         this markup. The first has no region at all: the script creates one,
+         and that is the failure. -->
+    <ol class="ac-lr-fails">
+      <li data-ac-fail-slot="inject">
+        <button class="ac-lr-btn" type="button" data-ac-fail="inject">
+          Inject a filled region
+        </button>
+        <span class="ac-lr-mirror" aria-hidden="true">
+          <span class="ac-lr-mirror__label">in the DOM:</span>
+          <span class="ac-lr-mirror__text" data-ac-fail-mirror="inject"></span>
+        </span>
+      </li>
+      <li>
+        <button class="ac-lr-btn" type="button" data-ac-fail="hidden">
+          Write to a hidden region
+        </button>
+        <span class="ac-lr-mirror" aria-hidden="true">
+          <span class="ac-lr-mirror__label">in the DOM:</span>
+          <span class="ac-lr-mirror__text" data-ac-fail-mirror="hidden"></span>
+        </span>
+        <p class="ac-lr-region ac-lr-region--gone" id="lr-fail-hidden" role="status"></p>
+      </li>
+      <li>
+        <button class="ac-lr-btn" type="button" data-ac-fail="sametick">
+          Clear and set in one tick
+        </button>
+        <span class="ac-lr-mirror" aria-hidden="true">
+          <span class="ac-lr-mirror__label">in the DOM:</span>
+          <span class="ac-lr-mirror__text" data-ac-fail-mirror="sametick"></span>
+        </span>
+        <p class="ac-lr-region" id="lr-fail-sametick" role="status"></p>
+      </li>
+    </ol>
+
+    <p class="ac-demo__legend">
+      Press all three with a screen reader running and you hear nothing. Press
+      them without one and every mirror fills in &mdash; which is the point.
+      This class of bug is invisible to inspection, invisible to axe, and the
+      code reads correctly. Example 1 is all three of them done right.
+    </p>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 4 · The region a component owns — the common case
+       CSS [CORE] + [REGION] + [MOCK]. JS [CORE] + [AUTO-INIT].
+
+       This is the shape to reach for by default, and it is what `switch`,
+       `input-group`, `textarea` and `tooltip` each do:
+
+         <p class="ac-visually-hidden" role="status" data-something-status></p>
+
+       rendered empty beside the control, written to on interaction, cleared
+       after a while. The region belongs to the component, so the message can be
+       specific, and it sits next to the control in the DOM, so a screen reader
+       user who arrows there finds it.
+
+       The count is written twice on purpose. The visible one is aria-hidden and
+       updates on every keystroke, because someone who can see it absorbs a
+       number changing under their fingers. The announced one waits for a pause,
+       because that does not work out loud: a live region wired to every
+       keystroke reads a stream of numbers over the top of itself and drowns out
+       the rest of the page.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">4 &middot; A component&rsquo;s own status</h3>
+
+    <div class="ac-lr-field">
+      <label class="ac-lr-label" for="lr-guests">Guest list</label>
+      <input
+        class="ac-lr-input"
+        id="lr-guests"
+        type="number"
+        min="0"
+        max="99"
+        value="0"
+        data-ac-guests
+      />
+      <span class="ac-lr-count" data-ac-guests-count aria-hidden="true">0 on the list</span>
+    </div>
+
+    <p class="ac-lr-region" role="status" data-ac-guests-status></p>
+
+    <p class="ac-demo__legend">
+      Hold the up arrow. The gray count moves on every step; the region settles
+      and speaks once, about a second after you stop. Past 20 it says something
+      different, because that is the only number here anyone needed telling
+      about. In your app this region would be clipped and the gray count would
+      be the visible half.
+    </p>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 5 · The same message twice, and role="log"
+       CSS [CORE] + [REGION] + [MOCK]. JS [CORE] + [AUTO-INIT].
+
+       Setting a region's text to the string it already holds is not a change,
+       so nothing is announced. Press "Copy" twice in most design systems and
+       the second press is silent — the confirmation the user asked for again is
+       exactly the one they do not get.
+
+       Appending a counter or a zero-width space to force a difference makes the
+       region lie to anyone who reads it directly. Clear it, wait a frame, then
+       write. That is what AC.createAnnouncer() does for you and what the left
+       button below does.
+
+       role="log" is the other answer, and it is a different pattern rather than
+       a better one. A log is append-only and reads each new entry in the order
+       it arrived, so repeats are fine by construction. Use it when the history
+       matters — chat, a build feed, a terminal. Use role="status" when only the
+       latest value matters, because a status replaces and a log accumulates.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">5 &middot; Repeats, and <code>role="log"</code></h3>
+
+    <div class="ac-lr-row">
+      <button class="ac-lr-btn" type="button" data-ac-repeat="cleared">Copy (re-announces)</button>
+      <button class="ac-lr-btn" type="button" data-ac-repeat="naive">Copy (silent on repeat)</button>
+    </div>
+
+    <p class="ac-lr-region" id="lr-repeat" role="status"></p>
+
+    <div class="ac-lr-row">
+      <button class="ac-lr-btn" type="button" data-ac-log>Add a line to the log</button>
+    </div>
+
+    <ol class="ac-lr-region ac-lr-log" id="lr-log" role="log" aria-label="Sound check"></ol>
+
+    <p class="ac-demo__legend">
+      Press either Copy button twice. Both leave the same text on screen; only
+      the left one is announced the second time. Then add several lines to the
+      log &mdash; each is read as it arrives, and the earlier ones stay where
+      they can be read back.
+    </p>
+  </div>
+</div>
