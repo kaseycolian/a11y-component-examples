@@ -1,0 +1,367 @@
+<!-- ===========================================================================
+     BADGE — a small count or tag pinned to the thing it counts
+
+     WHAT TO COPY
+       Example 1 is the component. Examples 2 to 5 are the four ways a number
+       this small goes wrong, live. Each names the CSS and JS sections it needs.
+
+     THE CONTRACT
+       .ac-badge              the pill. Two halves, and both are always there.
+       .ac-badge__num         aria-hidden. The digits you see. May be short.
+       .ac-badge__name        clipped. The whole thing in words — "3 unread
+                              messages". This is what is announced.
+       nesting                put the badge inside the control it counts, so
+                              its words join that control's name.
+       changing at runtime    the badge is not a live region. See Status Text.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     =========================================================================== -->
+
+<div class="ac-demo-grid" data-ac-badge>
+  <!-- ======================================================================
+       EXAMPLE 1 · The specimen
+       CSS [BADGE] + [CLIP] + [ACCENTS] + [CORNER] + [BTN] + [ICON] + [PANEL].
+       No JS.
+
+       A count on a control, a tag in a row, and the solid weight. Nothing
+       changes, so nothing is live.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">1 &middot; The specimen</h3>
+
+    <div class="ac-bdg-panel">
+      <div class="ac-bdg-bar">
+        <button class="ac-btn ac-btn-icon ac-badge-host" type="button">
+          <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <rect x="3" y="5" width="18" height="14" rx="2" />
+            <path d="m3 7 9 6 9-6" />
+          </svg>
+          <span class="ac-btn-icon__label">Inbox</span>
+          <span class="ac-badge ac-badge--corner">
+            <span class="ac-badge__num" aria-hidden="true">3</span>
+            <span class="ac-badge__name">3 unread messages</span>
+          </span>
+        </button>
+
+        <button class="ac-btn ac-btn-icon ac-badge-host" type="button">
+          <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          <span class="ac-btn-icon__label">Replies</span>
+          <span class="ac-badge ac-badge--corner ac-badge--green">
+            <span class="ac-badge__num" aria-hidden="true">12</span>
+            <span class="ac-badge__name">12 new replies</span>
+          </span>
+        </button>
+      </div>
+
+      <ul class="ac-bdg-list">
+        <li class="ac-bdg-row">
+          <span class="ac-bdg-row__name">Zine 462 &middot; the VFW hall issue</span>
+          <span class="ac-badge ac-badge--solid">
+            <span class="ac-badge__num" aria-hidden="true">New</span>
+            <span class="ac-badge__name">New</span>
+          </span>
+        </li>
+        <li class="ac-bdg-row">
+          <span class="ac-bdg-row__name">Thread &middot; <i>Storm Windows</i> test pressing</span>
+          <span class="ac-badge ac-badge--blue">
+            <span class="ac-badge__num" aria-hidden="true">99</span>
+            <span class="ac-badge__name">99 replies</span>
+          </span>
+        </li>
+      </ul>
+
+      <p class="ac-bdg__note">
+        The digits are for the eye. The words beside them, clipped, are what is read out.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 2 · Three is not a name
+       CSS [BADGE] + [CLIP] + [ACCENTS] + [PANEL]. JS [CORE] + [NAME] +
+       [CASES].
+
+       Four badges that all show 3. The readout prints what each one is read
+       out as.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">2 &middot; Three is not a name</h3>
+
+    <div class="ac-bdg-panel" data-ac-bdg-cases>
+      <div class="ac-bdg-cases">
+        <div class="ac-bdg-case">
+          <p class="ac-bdg-case__label">digits only &mdash; broken on purpose</p>
+          <!-- BROKEN ON PURPOSE — the number is the whole badge. "3" is not a
+               status, a quantity or a thing; it is a character. -->
+          <span class="ac-badge" data-ac-bdg-said="bare">
+            <span class="ac-badge__num">3</span>
+          </span>
+        </div>
+
+        <div class="ac-bdg-case">
+          <p class="ac-bdg-case__label">hidden outright &mdash; broken on purpose</p>
+          <!-- BROKEN ON PURPOSE — the over-correction. aria-hidden on the
+               badge removes the count from the page rather than naming it. -->
+          <span class="ac-badge" aria-hidden="true" data-ac-bdg-said="mute">
+            <span class="ac-badge__num">3</span>
+          </span>
+        </div>
+
+        <div class="ac-bdg-case">
+          <p class="ac-bdg-case__label">words added, digits kept &mdash; broken on purpose</p>
+          <!-- BROKEN ON PURPOSE — the clipped subject was added and the digits
+               were never hidden, so the count is announced twice. -->
+          <span class="ac-badge" data-ac-bdg-said="twice">
+            <span class="ac-badge__num">3</span>
+            <span class="ac-badge__name">3 unread messages</span>
+          </span>
+        </div>
+
+        <div class="ac-bdg-case">
+          <p class="ac-bdg-case__label">the specimen</p>
+          <span class="ac-badge" data-ac-bdg-said="good">
+            <span class="ac-badge__num" aria-hidden="true">3</span>
+            <span class="ac-badge__name">3 unread messages</span>
+          </span>
+        </div>
+      </div>
+
+      <dl class="ac-bdg-readout">
+        <div class="ac-bdg-readout__row">
+          <dt>digits only</dt><dd><code data-ac-bdg-out="bare">&mdash;</code></dd>
+        </div>
+        <div class="ac-bdg-readout__row">
+          <dt>hidden outright</dt><dd><code data-ac-bdg-out="mute">&mdash;</code></dd>
+        </div>
+        <div class="ac-bdg-readout__row">
+          <dt>words added, digits kept</dt><dd><code data-ac-bdg-out="twice">&mdash;</code></dd>
+        </div>
+        <div class="ac-bdg-readout__row">
+          <dt>the specimen</dt><dd><code data-ac-bdg-out="good">&mdash;</code></dd>
+        </div>
+      </dl>
+
+      <p class="ac-bdg__note">
+        All four look the same. Only one of them says what is being counted.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 3 · Attached, or merely nearby
+       CSS [BADGE] + [CLIP] + [ACCENTS] + [CORNER] + [BTN] + [ICON] + [PANEL]
+       + [BROKEN]. JS [CORE] + [NAME] + [ATTACH].
+
+       The same badge on the same button twice. One is inside it, one is
+       positioned over it. The readout prints the button's name.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">3 &middot; Attached, or merely nearby</h3>
+
+    <div class="ac-bdg-panel" data-ac-bdg-attach>
+      <div class="ac-bdg-cases">
+        <div class="ac-bdg-case">
+          <p class="ac-bdg-case__label">a sibling &mdash; broken on purpose</p>
+          <!-- BROKEN ON PURPOSE — the badge is beside the button and CSS puts
+               it on top. The button's name never mentions the count, and the
+               badge is a loose phrase after it, joined to nothing. -->
+          <span class="ac-bdg-bad-wrap">
+            <button class="ac-btn ac-btn-icon" type="button" data-ac-bdg-btn="loose">
+              <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="m3 7 9 6 9-6" />
+              </svg>
+              <span class="ac-btn-icon__label">Inbox</span>
+            </button>
+            <span class="ac-badge ac-bdg-bad-loose" data-ac-bdg-said="loose">
+              <span class="ac-badge__num" aria-hidden="true">3</span>
+              <span class="ac-badge__name">3 unread messages</span>
+            </span>
+          </span>
+        </div>
+
+        <div class="ac-bdg-case">
+          <p class="ac-bdg-case__label">the specimen &mdash; nested</p>
+          <button class="ac-btn ac-btn-icon ac-badge-host" type="button" data-ac-bdg-btn="nested">
+            <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <path d="m3 7 9 6 9-6" />
+            </svg>
+            <span class="ac-btn-icon__label">Inbox</span>
+            <span class="ac-badge ac-badge--corner">
+              <span class="ac-badge__num" aria-hidden="true">3</span>
+              <span class="ac-badge__name">3 unread messages</span>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <dl class="ac-bdg-readout">
+        <div class="ac-bdg-readout__row">
+          <dt>sibling &middot; button name</dt><dd><code data-ac-bdg-out="loose-btn">&mdash;</code></dd>
+        </div>
+        <div class="ac-bdg-readout__row">
+          <dt>sibling &middot; then this</dt><dd><code data-ac-bdg-out="loose">&mdash;</code></dd>
+        </div>
+        <div class="ac-bdg-readout__row">
+          <dt>nested &middot; button name</dt><dd><code data-ac-bdg-out="nested-btn">&mdash;</code></dd>
+        </div>
+      </dl>
+
+      <p class="ac-bdg__note">
+        A badge nested in its control is part of that control's name. Beside it, the two are
+        neighbors only on screen.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 4 · When the digits stop counting
+       CSS [BADGE] + [CLIP] + [ACCENTS] + [DOT] + [PANEL] + [BROKEN].
+       JS [CORE] + [NAME] + [SHAPES].
+
+       Four badges with no readable number in them: an abbreviation, two dots
+       and a zero.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">4 &middot; When the digits stop counting</h3>
+
+    <div class="ac-bdg-panel" data-ac-bdg-shapes>
+      <div class="ac-bdg-cases">
+        <div class="ac-bdg-case">
+          <p class="ac-bdg-case__label">an abbreviation</p>
+          <span class="ac-badge" data-ac-bdg-shape="over">
+            <span class="ac-badge__num" aria-hidden="true">99+</span>
+            <span class="ac-badge__name">99 or more unread messages</span>
+          </span>
+        </div>
+
+        <div class="ac-bdg-case">
+          <p class="ac-bdg-case__label">a bare dot &mdash; broken on purpose</p>
+          <!-- BROKEN ON PURPOSE — color and shape and nothing else. There is
+               no number to name, so there is nothing in the tree at all. -->
+          <span class="ac-badge ac-badge--dot" data-ac-bdg-shape="dot"></span>
+        </div>
+
+        <div class="ac-bdg-case">
+          <p class="ac-bdg-case__label">the specimen dot</p>
+          <span class="ac-badge ac-badge--dot ac-badge--green" data-ac-bdg-shape="named">
+            <span class="ac-badge__name">New replies</span>
+          </span>
+        </div>
+
+        <div class="ac-bdg-case">
+          <p class="ac-bdg-case__label">a count of zero</p>
+          <span class="ac-badge" data-ac-bdg-shape="zero" hidden>
+            <span class="ac-badge__num" aria-hidden="true">0</span>
+            <span class="ac-badge__name">0 unread messages</span>
+          </span>
+          <p class="ac-bdg-case__aside">Removed, not drawn empty.</p>
+        </div>
+      </div>
+
+      <dl class="ac-bdg-readout">
+        <div class="ac-bdg-readout__row">
+          <dt>abbreviation</dt><dd><code data-ac-bdg-out="over">&mdash;</code></dd>
+        </div>
+        <div class="ac-bdg-readout__row">
+          <dt>bare dot</dt><dd><code data-ac-bdg-out="dot">&mdash;</code></dd>
+        </div>
+        <div class="ac-bdg-readout__row">
+          <dt>specimen dot</dt><dd><code data-ac-bdg-out="named">&mdash;</code></dd>
+        </div>
+        <div class="ac-bdg-readout__row">
+          <dt>zero</dt><dd><code data-ac-bdg-out="zero">&mdash;</code></dd>
+        </div>
+      </dl>
+
+      <p class="ac-bdg__note">
+        <code>99+</code> shortens the drawing, never the words. A dot has no number to shorten, so
+        its words are all it has.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 5 · When the count changes
+       CSS [BADGE] + [CLIP] + [ACCENTS] + [CORNER] + [SLOT] + [BTN] + [ICON]
+       + [PANEL]. JS [CORE] + [NAME] + [SET] + [LOG] + [COUNT].
+
+       Press "New message" twice. Both counts rise the same way; the log
+       counts what a screen reader was handed.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">5 &middot; When the count changes</h3>
+
+    <div class="ac-bdg-panel" data-ac-bdg-count>
+      <div class="ac-bdg-cases">
+        <div class="ac-bdg-case">
+          <p class="ac-bdg-case__label">the badge announces &mdash; broken on purpose</p>
+          <!-- BROKEN ON PURPOSE — role="status" on the badge, inside the
+               button. Every arriving message interrupts with a fragment. -->
+          <button class="ac-btn ac-btn-icon ac-badge-host" type="button" data-ac-bdg-btn="live">
+            <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <path d="m3 7 9 6 9-6" />
+            </svg>
+            <span class="ac-btn-icon__label">Inbox</span>
+            <span class="ac-badge ac-badge--corner" role="status" data-ac-bdg-badge="live">
+              <span class="ac-badge__num" aria-hidden="true">98</span>
+              <span class="ac-badge__name">98 unread messages</span>
+            </span>
+          </button>
+        </div>
+
+        <div class="ac-bdg-case">
+          <p class="ac-bdg-case__label">the specimen</p>
+          <button class="ac-btn ac-btn-icon ac-badge-host" type="button" data-ac-bdg-btn="quiet">
+            <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <path d="m3 7 9 6 9-6" />
+            </svg>
+            <span class="ac-btn-icon__label">Inbox</span>
+            <span class="ac-badge ac-badge--corner" data-ac-bdg-badge="quiet">
+              <span class="ac-badge__num" aria-hidden="true">98</span>
+              <span class="ac-badge__name">98 unread messages</span>
+            </span>
+          </button>
+          <!-- One region for the inbox, in the markup from the start and empty
+               until there is a sentence to put in it. -->
+          <p class="ac-bdg-slot" role="status" data-ac-bdg-slot></p>
+        </div>
+      </div>
+
+      <div class="ac-bdg-controls">
+        <button class="ac-btn ac-btn--outline ac-btn--sm" type="button" data-ac-bdg-add>
+          New message
+        </button>
+        <button class="ac-btn ac-btn--outline ac-btn--sm" type="button" data-ac-bdg-reset>
+          Reset to 98
+        </button>
+      </div>
+
+      <dl class="ac-bdg-readout">
+        <div class="ac-bdg-readout__row">
+          <dt>announcing badge &middot; button name</dt>
+          <dd><code data-ac-bdg-out="live-btn">&mdash;</code></dd>
+        </div>
+        <div class="ac-bdg-readout__row">
+          <dt>specimen &middot; button name</dt>
+          <dd><code data-ac-bdg-out="quiet-btn">&mdash;</code></dd>
+        </div>
+      </dl>
+
+      <p class="ac-bdg__note">
+        The announcing badge is not in its button's name at all &mdash; a live region never is. So
+        the badge that interrupts is also the one that says nothing on arrival.
+      </p>
+
+      <p class="ac-bdg__verdict" role="status" data-ac-bdg-verdict></p>
+
+      <p class="ac-bdg-log__label" id="ac-bdg-log-5">What a screen reader was given</p>
+      <ol class="ac-bdg-log" aria-labelledby="ac-bdg-log-5" data-ac-bdg-log></ol>
+    </div>
+  </div>
+</div>

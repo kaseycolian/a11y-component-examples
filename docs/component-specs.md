@@ -197,8 +197,21 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
 - **Gotcha** Color alone fails 1.4.1 — the icon is decorative, so the *word* ("Error:") carries the meaning. Do not put `role="alert"` on notices present at page load; they fire on every render.
 
 ### badge
-- **Markup** `<span class="ac-badge">`, plus a `--solid` variant.
-- **Gotcha** A count badge needs context in its name — "3" alone is useless. Use `aria-label="3 unread messages"` on the container, or visually-hidden text.
+- **Markup** `<span class="ac-badge">` with **two halves, both always present**:
+  `.ac-badge__num` (`aria-hidden`, the digits, possibly abbreviated or empty) and
+  `.ac-badge__name` (clipped real text — "3 unread messages"). Plus `--solid`, `--dot`,
+  `--corner`, and accent modifiers setting `--ac-badge-accent` / `--ac-badge-on-accent`.
+- **ARIA** None on the badge itself. Nest it **inside** the control it counts so its words join
+  that control's accessible name; a badge merely positioned over the control is a separate node.
+- **Gotcha** A count badge needs context in its name — "3" alone is useless. Clipped text rather
+  than `aria-label`, because text composes into an ancestor's name and an attribute does not.
+  Hide the digits when you add the words, or the count is announced twice. `.ac-badge[hidden]`
+  needs an explicit `display: none` — the author `inline-flex` beats the UA's `[hidden]` rule.
+- **The subject is the number.** `notice` owns the SC 1.4.1 glyph argument and `status-text` owns
+  the scale argument; point at both rather than re-arguing either.
+- **Finding** `role="status"` on a badge does not merely interrupt — it **removes the count from
+  the enclosing control's name**, because naming from contents only folds in children whose own
+  role takes a name from content, and no live-region role does. Browser-confirmed in Chromium.
 
 ### status-text
 - **Markup** `.ac-status` with `--ok` / `--err` / `--muted`, tick/cross glyph plus a word. Also

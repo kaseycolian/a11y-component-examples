@@ -11,45 +11,47 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-28 (status-text — batch C is open; the `summary` voice changed, see item 0a)
+Last updated: 2026-07-29 (badge — `result-panel` closes batch C next; the `summary` voice changed
+on 2026-07-28, see item 0a)
 
 ---
 
-## START HERE — next component is `badge`, continuing batch C
+## START HERE — next component is `result-panel`, closing batch C
 
-`status-text` landed: 22/22, suite is **557/557** in Chromium. Nothing was left open.
+`badge` landed: 29/29, suite is **586/586** in Chromium. Nothing was left open. It turned up a
+finding worth reading before anything else that composes a name — a live region is **not** part of
+an ancestor's accessible name, so `role="status"` on a nested badge deletes the count from its
+button. It is in the gotchas list and in `component-specs.md` → `badge`.
 
 **Read the `summary` rule in `CLAUDE.md` under Writing style before writing any `meta.json`.** It
 changed on 2026-07-28: the lede is prose written to a person, two or three sentences, leading with
 the reader's problem rather than the ARIA attribute, and **never enumerating or counting the
-examples**. `status-text` is the only component written to it so far and is the reference; every
-earlier one is the sweep in item 0a. The same session tightened the on-page copy rule (item 0b).
+examples**. `status-text` and `badge` are written to it and are the references; everything earlier
+is the sweep in item 0a. The same session tightened the on-page copy rule (item 0b).
 
 ### The steps, in order
 
-**Step 1 — `badge`.** Run the loop under "The loop for building one component" with:
+**Step 1 — `result-panel`.** Run the loop under "The loop for building one component" with:
 
 ```sh
-node scripts/new-component.mjs badge --group feedback-status --name "Badge"
+node scripts/new-component.mjs result-panel --group feedback-status --name "Result Panel"
 ```
 
 Decided in advance, so do not re-derive:
 
-- Spec entry: `component-specs.md` → feedback-status → `badge`. `<span class="ac-badge">` plus a
-  `--solid` variant.
-- **The subject is the number.** `3` alone is not a status — the name has to carry what is being
-  counted, via `aria-label` on the container or clipped text inside it. That is this page's one
-  argument and it is not `status-text`'s.
-- **`notice` owns the SC 1.4.1 glyph argument, `status-text` owns the scale argument.** Point at
-  both; re-arguing either makes three pages read as one.
-- **`status-text` already established the drawn-glyph finding at label scale** (generated content
-  lands in the accessible name) and the *clipped versus removed* distinction. A badge that hides its
-  word at a breakpoint is the same case — lift it, don't re-derive it.
-- **Read `status-text` first.** It is the most recent worked example and the nearest neighbor.
+- Spec entry: `component-specs.md` → feedback-status → `result-panel`. `.ac-result` with a label, a
+  monospace value and a copy button.
+- **It composes `notice`, `status-text` and `badge`, and owns the composition.** All three arguments
+  are settled — SC 1.4.1's glyph-versus-word is `notice`'s, one-word scale is `status-text`'s, and
+  the number needing a subject is `badge`'s. Point at each once; re-arguing any of them makes four
+  pages read as one.
+- **The copy button is `input-group`'s copy button.** Same clipboard write, same pre-existing empty
+  `role="status"`, same rule against renaming the button. Lift it, do not rewrite it.
+- **Read `badge` and `status-text` first.** They are the two most recent worked examples and the
+  nearest neighbors.
 - **Keep the on-page copy short** — item 0b.
 
-**Step 2 — `result-panel`.** Closes batch C and the `feedback-status` group; it composes `notice`
-and `status-text`, so it goes last.
+That closes the `feedback-status` group.
 
 **Then** batch D (`tabs` → `jump-nav`), E (`data-table` → `prose-surface`), F (`app-url-maker` →
 `app-page-to-markdown`), and the six non-component items under "Remaining non-component work" —
@@ -73,7 +75,7 @@ Build in this order. The order is the dependency graph, not a preference.
 | --- | --- | --- |
 | ~~**A**~~ | ~~`effects`~~ | **Done.** Closed `foundations` |
 | ~~**B**~~ | ~~`button` → `icon-button` → `loading-button` → `chip-toggle`~~ | **Done.** Closed `buttons-actions` |
-| **C** | ~~`notice`~~ → ~~`status-text`~~ → `badge` → `result-panel` | all four are small, and three of them restate `live-region`'s argument in a new shape |
+| **C** | ~~`notice`~~ → ~~`status-text`~~ → ~~`badge`~~ → `result-panel` | all four are small, and three of them restate `live-region`'s argument in a new shape |
 | **D** | `tabs` → `jump-nav` | `tabs` is the largest behavior left; `jump-nav` reuses its `aria-current` thinking |
 | **E** | `data-table` → `prose-surface` | `prose-surface` is the scroll-region pattern `data-table` establishes |
 | **F** | `app-url-maker` → `app-page-to-markdown` | **last.** They compose the others and cannot be built before them |
@@ -86,10 +88,11 @@ Cross-batch notes that will otherwise be rediscovered:
   components are not DRY here. A change to `.ac-btn` is a change in all **eight**.
 - **`result-panel`'s copy button is `input-group`'s copy button.** Same clipboard write, same
   pre-existing empty `role="status"`, same rule against renaming the button. Lift it.
-- **`notice` and `status-text` split the feedback argument, and `badge` / `result-panel` must not
+- **`notice`, `status-text` and `badge` split the feedback argument, and `result-panel` must not
   re-open it.** `notice` owns SC 1.4.1's glyph-versus-word and static-versus-announced;
-  `status-text` owns what both become at one-word scale (no prefix, no container, no focus).
-  `badge` owns the *number* needing a name, `result-panel` owns composing the two.
+  `status-text` owns what both become at one-word scale (no prefix, no container, no focus);
+  `badge` owns the *number* needing a subject, and the fact that a live region is not part of an
+  ancestor's name. `result-panel` owns composing the three.
 - **`tabs` has a working reference in `src/site/components/CodePanel.astro`.** Roving tabindex,
   automatic activation, panel at `tabindex="0"`.
 - **Batch F composes with `effects`** — `app-page-to-markdown` is specified around `fx-bar-top`,
@@ -205,7 +208,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 27 / 35
+## Component roster — 28 / 35
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -594,7 +597,24 @@ take their logic and not their layout. See item 1 under remaining work.
   And **only rows that actually changed are rewritten** in example 4, or the "one region" list
   still produces four mutations; the log counts 3 announcements against 1 and that count is the
   demo.
-- [ ] `badge`
+- [x] `badge` — done. 29/29 tests in Chromium. **The subject is the number**, and it defers to
+  `notice` for SC 1.4.1 and to `status-text` for scale. The contract is two halves that are both
+  always present: `.ac-badge__num` is `aria-hidden` and may be abbreviated or empty, and
+  `.ac-badge__name` is clipped real text — `3 unread messages` — which is the badge as far as the
+  accessibility tree is concerned. `setBadge(el, count, { subject, max })` writes both in one call
+  and there is **no way to write one without the other**, because this is the one component where
+  the thing on screen is routinely an abbreviation of the thing being said. Four findings. **A live
+  region is not part of an ancestor's accessible name** — the headline, see the gotchas list; it
+  makes example 5 much stronger than the "it interrupts" version it was designed as. **Clipped text
+  beats `aria-label` for a fourth reason that is the badge's own**: text composes into the name of a
+  control the badge is nested inside and an attribute does not, which is the whole of example 3 —
+  a badge positioned *over* a button rather than inside it is a separate node joined to it by
+  nothing but CSS, and the two are pixel-identical. **The failure that actually ships is the
+  double-announce**: someone adds the clipped subject and never hides the digits, so `3` is read
+  twice and it sounds like a stutter rather than a bug. And **`.ac-badge[hidden]` needs its own
+  `display: none`** — see the gotchas list. Example 4 is the badges with no number to read (`99+`,
+  a bare dot, a named dot, a zero) and it is where the abbreviation rule lives: shorten the drawing,
+  never the words.
 - [ ] `result-panel`
 
 ### data-display
@@ -637,7 +657,7 @@ This is stricter than `CLAUDE.md`'s general "say it once" rule and it applies on
 sees on screen. `loading-button` is written to it and is the reference. Everything before it is not:
 `effects`, `motion-preferences`, `typography`, `live-region`, `focus-ring`, `button` and
 `icon-button` are the worst, because their notes carry whole paragraphs of argument.
-`chip-toggle` and `notice` are written to it as well.
+`chip-toggle`, `notice`, `status-text` and `badge` are written to it as well.
 
 Also settled while building `notice`: **a demo that repeats a case three times cannot reuse one
 button label.** Three buttons reading "Save the crate" are three identical accessible names on a
@@ -867,6 +887,27 @@ It must match `npm run preview` exactly, base path included.
   or an assertion that retries (`toHaveCSS`). This is the color sibling of the geometry-polling
   gotcha above, and it cost the best part of an hour — it looks exactly like forced colors ignoring
   the stylesheet.
+- **A live region is not part of an ancestor's accessible name.** Naming from contents only folds in
+  a child whose *own* role takes a name from its contents, and no live-region role does — so
+  `role="status"` on a badge nested inside a button removes the count from the button. Chromium
+  computes `Inbox` where the identical-looking specimen beside it computes
+  `Inbox 98 unread messages`. The attribute added to make the change *more* audible is what makes
+  the control silent on arrival. Two consequences: any component that composes a name from real
+  text has to check what roles are inside it, and **any page-side accname walk has to model this**
+  or its readout will confidently contradict the browser — `badge`'s `[NAME]` skips
+  `status`/`alert`/`log`/`marquee`/`timer` children, and its spec asserts against
+  `toHaveAccessibleName` rather than against the walk. Found by a failing test that was written
+  expecting the opposite.
+- **The UA's `[hidden] { display: none }` loses to any author `display`.** A component that declares
+  `display: inline-flex` on its root has silently disabled the `hidden` attribute, so
+  `el.hidden = true` leaves the thing on screen and in the accessibility tree. Declare
+  `.thing[hidden] { display: none }` explicitly. `tooltip` hit this first and `badge`'s zero case
+  hit it again; it costs one line and there is nothing in the failing markup to suggest a cause.
+- **A `MutationObserver` callback is a microtask, so it lands after the click handler that caused
+  it.** Clearing a mock-AT log in the same handler that resets the demo therefore empties the list
+  *before* the reset's own mutations arrive, and they reappear in it. Clear in a
+  `requestAnimationFrame` instead. Every page in the library with a "reset" button beside a mock
+  screen reader has this shape.
 - **CSS generated content is part of the accessible name.** accname folds `::before` and `::after`
   into the name of anything named from its contents, and Chromium implements it: a button reading
   "Matinee" with `::before { content: "✓" }` announces **"✓ Matinee"** (joined with a space). So the

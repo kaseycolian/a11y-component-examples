@@ -1,0 +1,22 @@
+{
+  "slug": "badge",
+  "name": "Badge",
+  "group": "feedback-status",
+  "order": 30,
+  "summary": "A badge is a number pinned to something else, and a number on its own says nothing: 3 is not a count of anything until you say of what. The fix is a few words nobody sees, kept in the badge beside the digits, so the count arrives with its subject attached.",
+  "tags": [
+    "badge",
+    "count",
+    "accessible-name",
+    "visually-hidden",
+    "live-region",
+    "icon-button",
+    "non-text-contrast",
+    "forced-colors"
+  ],
+  "apg": "https://www.w3.org/WAI/ARIA/apg/practices/names-and-descriptions/",
+  "wcag": ["1.3.1", "1.4.1", "1.4.11", "4.1.2", "4.1.3"],
+  "status": "stable",
+  "files": ["html", "css", "js"],
+  "demoNote": "Examples 2 to 5 are live. Example 2 prints what four identical-looking badges are read out as; example 3 puts the same badge inside a button and beside it and prints the button's name; example 4 has the badges with no number to read; example 5 counts messages in and logs what a screen reader was handed each time."
+}

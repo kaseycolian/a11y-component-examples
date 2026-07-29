@@ -1,0 +1,545 @@
+/* ===========================================================================
+   BADGE
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) lives in
+   the site's own stylesheet, not this file.
+
+     [BADGE]     every example. The pill, and the two halves inside it.
+     [CLIP]      every example. The words, taken off the screen and left in
+                 the accessibility tree. A local copy of Visually Hidden.
+     [ACCENTS]   every example. One custom property per accent, plus the
+                 --solid weight that swaps foreground for background.
+     [CORNER]    examples 1, 3 and 5. Pinning the badge to a control.
+     [DOT]       example 4. The badge with no number in it.
+     [SLOT]      example 5. The one region a changing count announces from.
+     [BTN]       examples 1, 3 and 5. A copy of Button and Icon Button. A
+                 badge has no buttons — delete unless you want the copy.
+     [BROKEN]    examples 3 and 4. Delete it. It reproduces two failures that
+                 otherwise have to be described rather than seen.
+     [PANEL]     the frame around each example on this page. Delete it.
+     [FORCED]    always ship this. The accent is the only thing separating the
+                 tones, and accents are what forced colors replaces.
+
+   Copy the file whole for the library version.
+
+   A badge is two elements that have to agree: digits for the eye, words for
+   everything else. Both are always present, and exactly one of them is in the
+   accessibility tree — .ac-badge__num is aria-hidden in the markup and
+   .ac-badge__name is clipped in this file. Neither is optional, because a
+   badge with only one of them is one of example 2's failures.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [BADGE] every example ------------------------------------------------
+   inline-flex, because a badge sits inside a sentence, a row or a button and
+   has to line up with whatever it landed next to.
+
+   min-width equal to the height keeps a one-digit badge round rather than
+   letting it shrink to the width of a `1`, and lets a three-character one grow
+   sideways instead of clipping.
+
+   The explicit [hidden] rule is load-bearing. `display: inline-flex` here is an
+   author declaration and the UA's `[hidden] { display: none }` is not, so
+   without this line a badge set to hidden — example 4's zero — stays on screen. */
+
+.ac-badge {
+  --ac-badge-accent: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  --ac-badge-on-accent: var(--ac-on-pink, var(--on-pink, #22001a));
+  --ac-badge-size: 1.35rem;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: var(--ac-badge-size);
+  height: var(--ac-badge-size);
+  padding: 0 0.4em;
+  border: 1px solid var(--ac-badge-accent);
+  border-radius: calc(var(--ac-badge-size) / 2);
+  background: color-mix(in srgb, var(--ac-badge-accent) 18%, var(--ac-surface, var(--bg-panel, #110620)));
+  color: var(--ac-badge-accent);
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.ac-badge[hidden] {
+  display: none;
+}
+
+/* aria-hidden in the markup rather than here, so the file you paste carries
+   the decision where a reviewer will see it. */
+.ac-badge__num {
+  display: block;
+}
+
+/* --- [CLIP] every example -------------------------------------------------
+   The words. A local copy of Visually Hidden's recipe — skip-link, switch,
+   textarea, tooltip and icon-button each keep one too, so a change to the
+   recipe is a change in all of them. Every declaration is load-bearing and the
+   reasons are on that page.
+
+   Real text, not an aria-label: it is found by find-in-page, picked up by a
+   translation tool, and it composes into the name of a control the badge is
+   nested inside. An attribute on the badge would do none of the three. */
+
+.ac-badge__name {
+  position: absolute;
+  box-sizing: border-box;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- [ACCENTS] every example ----------------------------------------------
+   Two custom properties per accent and nothing else, so the fill, the border
+   and the text can never disagree about which color they are. Button's pair,
+   at badge scale.
+
+   --solid is a weight, not an accent: it swaps the tinted fill for the accent
+   itself and takes the matching foreground with it. The two axes are
+   independent, so --solid --green is one class each and no extra rule. */
+
+.ac-badge--green {
+  --ac-badge-accent: var(--ac-accent-green, var(--accent-green, #5bff3a));
+  --ac-badge-on-accent: var(--ac-on-green, var(--on-green, #062600));
+}
+
+.ac-badge--blue {
+  --ac-badge-accent: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  --ac-badge-on-accent: var(--ac-on-blue, var(--on-blue, #00212b));
+}
+
+.ac-badge--solid {
+  background: var(--ac-badge-accent);
+  color: var(--ac-badge-on-accent);
+}
+
+/* --- [CORNER] examples 1, 3 and 5 -----------------------------------------
+   Pinned to the top-right of the control it counts. The host needs a
+   positioning context and has to stop clipping, which is the whole of
+   .ac-badge-host.
+
+   The badge is inside the control's element, not beside it: that is what puts
+   its words into the control's accessible name. Example 3 is the difference. */
+
+.ac-badge-host {
+  position: relative;
+  overflow: visible;
+}
+
+.ac-badge--corner {
+  position: absolute;
+  top: -0.35rem;
+  right: -0.35rem;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* --- [DOT] example 4 ------------------------------------------------------
+   No number, so no digits — but the words stay, because they are now the only
+   thing the badge has. A dot with an empty .ac-badge__name is example 4's
+   failure and it is silent. */
+
+.ac-badge--dot {
+  --ac-badge-size: 0.7rem;
+
+  min-width: var(--ac-badge-size);
+  padding: 0;
+  background: var(--ac-badge-accent);
+}
+
+/* --- [SLOT] example 5 -----------------------------------------------------
+   The region a changing count announces from. It belongs to the area the badge
+   describes, never to the badge: a badge nested in a button is a live region
+   inside a control, and every arriving message then interrupts. Status Text
+   has the argument, Live Region has the clear-then-write recipe. */
+
+.ac-bdg-slot {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+/* --- [BTN] examples 1, 3 and 5 --------------------------------------------
+   Copied from Button and Icon Button. A badge has no buttons of its own, so
+   delete this section unless you want the copy. This library is deliberately
+   not DRY — a change to .ac-btn is a change everywhere it landed.
+
+   .ac-btn--sm is declared before .ac-btn-icon on purpose: both are a single
+   class, both set padding, and source order is the only thing deciding which
+   wins. Icon Button has the note. */
+
+.ac-btn {
+  --ac-btn-accent: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  box-sizing: border-box;
+  min-height: var(--ac-target, 44px);
+  min-width: var(--ac-target, 44px);
+  padding: 0.5rem 1.1rem;
+  border: 2px solid transparent;
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: transparent;
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+  appearance: none;
+  transition:
+    background-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease,
+    border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease,
+    color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-btn:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-btn:active {
+  translate: 0 calc(var(--ac-motion, var(--motion, 1)) * var(--ac-press-y, var(--press-y, 1px)));
+  scale: calc(1 - (1 - var(--ac-press-s, var(--press-s, 0.98))) * var(--ac-motion, var(--motion, 1)));
+}
+
+.ac-btn--outline {
+  border-color: var(--ac-btn-accent);
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  color: var(--ac-btn-accent);
+}
+
+.ac-btn--outline:hover {
+  background: color-mix(in srgb, var(--ac-btn-accent) 14%, var(--ac-surface, var(--bg-panel, #110620)));
+}
+
+.ac-btn--sm {
+  min-height: var(--ac-target-min, 24px);
+  min-width: var(--ac-target-min, 24px);
+  padding: 0.25rem 0.7rem;
+  font-size: 0.8rem;
+}
+
+.ac-btn-icon {
+  --ac-btn-icon-glyph: 1.25rem;
+
+  gap: 0;
+  padding: 0;
+  border-color: var(--ac-border, var(--border, #34205a));
+  background: var(--ac-bg, var(--bg, #070110));
+}
+
+.ac-btn-icon:hover {
+  border-color: var(--ac-btn-accent);
+}
+
+.ac-btn-icon__glyph {
+  flex: none;
+  width: var(--ac-btn-icon-glyph, 1.25rem);
+  height: var(--ac-btn-icon-glyph, 1.25rem);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ac-btn-icon__label {
+  position: absolute;
+  box-sizing: border-box;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- [BROKEN] examples 3 and 4 — delete this ------------------------------ */
+
+/* Example 3. The badge as a sibling, dragged into place by CSS. It looks
+   identical to the nested one and it is a separate node in the tree. */
+.ac-bdg-bad-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.ac-bdg-bad-loose {
+  position: absolute;
+  top: -0.35rem;
+  right: -0.35rem;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Example 4. A dot with no words in it. Nothing here is wrong on its own —
+   the failure is the element that is missing. */
+
+/* --- [PANEL] the frame around each example --------------------------------
+   Page furniture: the panels, the captions, the readouts and the announcement
+   log. None of it is part of a badge. Delete the section. */
+
+.ac-bdg-panel,
+.ac-bdg__note {
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-bdg-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.9rem;
+  width: 100%;
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+}
+
+.ac-bdg-panel > * {
+  max-width: 100%;
+}
+
+.ac-bdg-bar,
+.ac-bdg-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.ac-bdg-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Wraps rather than shrinking the badge away: at 320px the name and the badge
+   do not fit on one line, and the badge is the point. */
+.ac-bdg-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.3rem 0.8rem;
+  min-width: 0;
+  padding-block-end: 0.5rem;
+  border-block-end: 1px solid var(--ac-border, var(--border, #34205a));
+}
+
+.ac-bdg-row:last-child {
+  padding-block-end: 0;
+  border-block-end: 0;
+}
+
+.ac-bdg-row__name {
+  min-width: 0;
+  font-size: 0.85rem;
+  overflow-wrap: break-word;
+}
+
+.ac-bdg-cases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: 1rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.ac-bdg-case {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.ac-bdg-case__label,
+.ac-bdg-case__aside,
+.ac-bdg-log__label {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-bdg__note {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-bdg__verdict {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+  overflow-wrap: break-word;
+}
+
+/* Collapsed while empty so nothing reserves a gap for a message nobody has
+   caused yet. The element stays in the DOM and in the accessibility tree —
+   :empty is not display: none. */
+.ac-bdg__verdict:empty {
+  display: none;
+}
+
+.ac-bdg-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  font-size: 0.75rem;
+}
+
+.ac-bdg-readout__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.5rem;
+  min-width: 0;
+}
+
+.ac-bdg-readout dt,
+.ac-bdg-readout dd {
+  margin: 0;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-bdg-log {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0.5rem 0.6rem 0.5rem 1.7rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-bdg-log:empty::after {
+  content: "nothing yet";
+}
+
+.ac-bdg-log b {
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-bdg-readout code,
+.ac-bdg__note code,
+.ac-bdg__verdict code,
+.ac-bdg-case__label code,
+.ac-bdg-log code {
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+/* The failing readouts are marked as well as colored — the color is gone under
+   forced colors, and it was never the thing carrying the meaning. */
+.ac-bdg-readout code[data-ac-bdg-bad="true"],
+.ac-bdg__verdict[data-ac-bdg-bad="true"],
+.ac-bdg-log li[data-ac-bdg-bad="true"] {
+  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------
+   color-mix is dropped, so the tinted fill goes; every accent becomes the same
+   CanvasText, so the tones stop being told apart. That is survivable here for
+   the same reason it is on Notice: the words were never the color's job. */
+
+@media (forced-colors: active) {
+  .ac-badge {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  /* Reversed, so the solid weight is still a filled pill rather than becoming
+     identical to the outlined one. */
+  .ac-badge--solid,
+  .ac-badge--dot {
+    background: CanvasText;
+    color: Canvas;
+  }
+
+  .ac-btn {
+    border-color: ButtonBorder;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  .ac-btn:hover {
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  .ac-btn:focus-visible {
+    outline-color: CanvasText;
+  }
+
+  .ac-bdg-panel,
+  .ac-bdg-readout,
+  .ac-bdg-log {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+
+  .ac-bdg-row {
+    border-block-end-color: CanvasText;
+  }
+
+  .ac-bdg-readout code[data-ac-bdg-bad="true"],
+  .ac-bdg__verdict[data-ac-bdg-bad="true"],
+  .ac-bdg-log li[data-ac-bdg-bad="true"] {
+    color: CanvasText;
+  }
+}
