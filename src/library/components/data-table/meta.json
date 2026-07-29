@@ -1,0 +1,23 @@
+{
+  "slug": "data-table",
+  "name": "Data Table",
+  "group": "data-display",
+  "order": 10,
+  "summary": "Everything a table means is in its markup — which cell is a header, and what the whole thing is called. Draw those instead of declaring them and there is nothing left to read: a bold first row is not a header row, and the restyle that stacks the cells onto a phone throws away the column it was trying to save.",
+  "tags": [
+    "table",
+    "caption",
+    "scope",
+    "columnheader",
+    "rowheader",
+    "scroll-region",
+    "responsive",
+    "generated-content",
+    "forced-colors"
+  ],
+  "apg": "https://www.w3.org/WAI/tutorials/tables/",
+  "wcag": ["1.3.1", "1.4.1", "1.4.10", "2.1.1", "2.4.7", "4.1.2"],
+  "status": "stable",
+  "files": ["html", "css"],
+  "demoNote": "Every readout here is written by hand and checked against the real accessibility tree by the spec, so it cannot drift. Example 2 puts the stacked-card restyle beside the table it came from; example 3 is the same two columns as plain cells, as column headers, and as both; example 4 is one wide table in two wrappers; example 5 names a table four ways, two of which are not names."
+}

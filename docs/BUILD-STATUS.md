@@ -11,49 +11,49 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-29 (jump-nav — **batch D is closed**, `navigation` is complete; the `summary`
-voice changed on 2026-07-28, see item 0a)
+Last updated: 2026-07-29 (data-table — batch E is half done; Playwright **firefox is now installed**,
+webkit still is not; the `summary` voice changed on 2026-07-28, see item 0a)
 
 ---
 
-## START HERE — next component is `data-table`, opening batch E
+## START HERE — next component is `prose-surface`, closing batch E
 
-`jump-nav` landed: 20/20, suite is **664/664** in Chromium. Nothing was left open. Two findings from
-it are in the gotchas list and the first is worth a skim before building anything that follows a
-fragment: **an unfocusable fragment target does not leave focus on the link — the browser focuses the
-document, so the next Tab starts at the top of the page.**
+`data-table` landed: 21/21, suite is **685/685** in Chromium. Nothing was left open. Two of its
+findings are in the gotchas list and both are worth a skim before building anything with a table or a
+cell-level modifier in it: **`display: block` no longer drops the table role in Chromium 151** — the
+advice outlived its reason, and the gotcha that said otherwise has been corrected — and **a base rule
+written `.ac-thing th, .ac-thing td` outranks every single-class modifier on a cell**, silently.
 
 **Read the `summary` rule in `CLAUDE.md` under Writing style before writing any `meta.json`.** It
 changed on 2026-07-28: the lede is prose written to a person, two or three sentences, leading with
 the reader's problem rather than the ARIA attribute, and **never enumerating or counting the
-examples**. `status-text`, `badge`, `result-panel`, `tabs` and `jump-nav` are written to it and are
-the references; everything earlier is the sweep in item 0a. The same session tightened the on-page
-copy rule (item 0b).
+examples**. `status-text`, `badge`, `result-panel`, `tabs`, `jump-nav` and `data-table` are written to
+it and are the references; everything earlier is the sweep in item 0a. The same session tightened the
+on-page copy rule (item 0b).
 
 ### The steps, in order
 
-**Step 1 — `data-table`.** Run the loop under "The loop for building one component" with:
+**Step 1 — `prose-surface`.** Run the loop under "The loop for building one component" with:
 
 ```sh
-node scripts/new-component.mjs data-table --group data-display --name "Data Table"
+node scripts/new-component.mjs prose-surface --group data-display --name "Prose Surface" --no-js
 ```
 
 Decided in advance, so do not re-derive:
 
-- Spec entry: `component-specs.md` → data-display → `data-table`. `<table>` with `<caption>`,
-  `<thead>`, `scope="col"` / `scope="row"`.
-- **Never `display: block` the table to make it responsive** — it drops the table role in Chrome and
-  Safari and takes the row/column relationships with it. Wrap and scroll instead. That gotcha is
-  already in the list below and `scripts/rehype-scrollable-tables.mjs` is the shell doing exactly
-  this to every `docs.md` table, so it is a working precedent to read.
-- **The scroll wrapper is `effects`' finding again**: `tabindex="0"` + `role="region"` + a name, plus
-  a focus ring, or Chromium hands it a silent tab stop. `jump-nav`'s `.ac-jn-doc` and `effects`'
-  `[PATCH]` are both lifts.
-- `<caption>` is the table's accessible name. Keep it even when it is clipped.
+- Spec entry: `component-specs.md` → data-display → `prose-surface`. `.ac-prose` scroll container,
+  `tabindex="0"`, `role="region"`, a name. Styles for nested `h1`–`h3`, `p`, `a`, `pre`,
+  `blockquote`, `hr`.
+- **The scroll region is settled** — `data-table`'s `.ac-table-scroll` is the same three attributes
+  and the same reasoning, and `effects`' `[PATCH]` is the ring. Lift it rather than re-arguing it,
+  and point at `data-table` from `docs.md` the way it points at `effects`.
+- **`pre` needs its own `overflow-x`**, or a long code line widens the surface instead of scrolling
+  inside it — and that inner scroller is a second silent tab stop unless it is named too.
+- **`typography` owns the type scale and the SC 1.4.12 argument.** This component is the *container*;
+  do not re-derive muted-text contrast or the heading-versus-class point.
+- **CSS-only, like `data-table`** — no `component.js`. Hand-write the readouts and have the spec
+  assert them against the browser; `data-table`'s spec is the pattern.
 - **Keep the on-page copy short** — item 0b.
-
-**Step 2 — `prose-surface`**, which is the scroll-region pattern `data-table` establishes, applied to
-running text.
 
 **Then** batch F (`app-url-maker` → `app-page-to-markdown`) and the six non-component items under
 "Remaining non-component work" — items 1–4 are the ones that gate deploying; 0a and 0b are copy
@@ -79,7 +79,7 @@ Build in this order. The order is the dependency graph, not a preference.
 | ~~**B**~~ | ~~`button` → `icon-button` → `loading-button` → `chip-toggle`~~ | **Done.** Closed `buttons-actions` |
 | ~~**C**~~ | ~~`notice` → `status-text` → `badge` → `result-panel`~~ | **Done.** Closed `feedback-status` |
 | ~~**D**~~ | ~~`tabs` → `jump-nav`~~ | **Done.** Closed `navigation` |
-| **E** | `data-table` → `prose-surface` | `prose-surface` is the scroll-region pattern `data-table` establishes |
+| **E** | ~~`data-table`~~ → `prose-surface` | `prose-surface` is the scroll-region pattern `data-table` establishes |
 | **F** | `app-url-maker` → `app-page-to-markdown` | **last.** They compose the others and cannot be built before them |
 
 Cross-batch notes that will otherwise be rediscovered:
@@ -106,6 +106,11 @@ Cross-batch notes that will otherwise be rediscovered:
   take it, `scroll-margin-top` against a sticky header (SC 2.4.11), and `IntersectionObserver`
   against a scroll handler. Anything later that moves someone within a page — `prose-surface`, both
   batch F apps — points at it rather than re-deriving any of the three.
+- **`data-table` owns the named scroll region.** `.ac-table-scroll` is `tabindex="0"` +
+  `role="region"` + `aria-labelledby` pointing at the caption's id, so the name is written once and
+  the region and the table agree. `prose-surface` and `app-page-to-markdown`'s preview are the same
+  three attributes; point at it rather than re-deriving them. It also owns the argument against the
+  responsive card restyle, and the fact that a `<caption>` is not only the name.
 - **Batch F composes with `effects`** — `app-page-to-markdown` is specified around `fx-bar-top`,
   `fx-scroll` and `fx-bar-bottom`, which are now documented and patched. Its scrollable preview is
   the `fx-scroll` case: `tabindex="0"` + `role="region"` + a name, and the focus ring from
@@ -121,9 +126,10 @@ Then the four items under **Remaining non-component work**, in this order:
 3. **Docs (item 3)** — after the gate, because `wcag-mapping.md` should be generated against something
    that is actually being enforced.
 4. **Final verification and deploy (item 4)** — last. Two known blockers are already written up below:
-   Firefox and WebKit are not installed, so `npm run verify` fails at the test step until
-   `npx playwright install firefox webkit`; and GitHub Pages **Source** must be set to **GitHub
-   Actions** by hand or a green deploy publishes nothing.
+   WebKit is not installed, so `npm run verify` fails at the test step until
+   `npx playwright install webkit` (Firefox was installed on 2026-07-29 but has never been run, so
+   budget for real cross-engine failures rather than none); and GitHub Pages **Source** must be set to
+   **GitHub Actions** by hand or a green deploy publishes nothing.
 
 **Close every session by updating this file** — tick the roster row with what was found (not just
 that it passed), replace the START HERE block with the next component and its pre-decided
@@ -213,13 +219,15 @@ take their logic and not their layout. See item 1 under remaining work.
 - **Markdown tables** — `scripts/rehype-scrollable-tables.mjs` wraps every `docs.md` table in a
   focusable `.table-scroll` region. Without it every component page overflowed sideways at 320px.
 - **Playwright** — `playwright.config.mjs`, three browser projects, `webServer` runs
-  `npm run build && npm run preview`. **Only Chromium is installed**, so `npm run verify` currently
-  *fails* at the test step: every Firefox and WebKit test errors with "Executable doesn't exist".
-  Chromium is **512/512**. Run `npx playwright install firefox webkit` to get a green `verify`.
+  `npm run build && npm run preview`. **Chromium and Firefox are installed; WebKit is not**, so
+  `npm run verify` still *fails* at the test step with "Executable doesn't exist" for every WebKit
+  test. Chromium is **685/685**. Firefox was installed on 2026-07-29 and **has not been run yet** —
+  expect real failures rather than none, since every spec was written against Chromium. Run
+  `npx playwright install webkit` to finish the set.
 
 ---
 
-## Component roster — 31 / 35
+## Component roster — 32 / 35
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -695,7 +703,29 @@ take their logic and not their layout. See item 1 under remaining work.
 **`feedback-status` is complete.**
 
 ### data-display
-- [ ] `data-table`
+- [x] `data-table` — done, **CSS-only** (`--no-js`), 21/21 tests in Chromium. **Canonical home for
+  `.ac-table*` and for `.ac-table-scroll`**, which is `tabindex="0"` + `role="region"` +
+  `aria-labelledby` pointing at the caption's id — so the name is written once and the region and the
+  table agree. The component has no behavior, so every readout on the page is **hand-written and
+  asserted against the real accessibility tree by the spec**, `typography`'s arrangement rather than
+  `jump-nav`'s. Example 2 is the stacked-card restyle beside the table it came from; example 3 is the
+  same two columns as plain cells, as column headers, and as both, with each label's role printed;
+  example 4 is one wide table in a bare `overflow-x` wrapper and in a named one; example 5 names a
+  table four ways and two of them are not names. Five findings, and the first two changed what the
+  page says. **`display: block` no longer drops the table role** — Chromium 151 still reports
+  `table`, `row`, `rowheader` and `cell` for the restyled table, so the reason everyone gives for not
+  doing it is out of date; the reasons that survive are that the cells of a row stop sharing a top
+  edge (measured, `[145, 177, 210]` against `[58, 58, 58]`), and that **`td::before { content:
+  attr(data-label) }` is folded into the cell's accessible name** — the cell becomes `Left: 37` while
+  still associated with the `Left` columnheader, which is clipped rather than hidden and therefore
+  still in the tree, so the column is announced twice. That is `chip-toggle`'s generated-content trap
+  arriving through a table. **A base rule written `.ac-table th, .ac-table td` is (0,1,1) and
+  outranks every single-class modifier on a cell**, so `.ac-table__num` and `.ac-table__head` were
+  silent no-ops until the tests caught them — every modifier is now written `.ac-table .thing`. And
+  two things about the caption: **a table with no caption, no `<th>` and no borders is demoted to
+  `LayoutTable`** by Chromium and is not exposed as a table at all — a `<caption>` alone promotes it
+  and `aria-label` does not — and **a `<caption>` inside a `display: block` table keeps
+  `display: table-caption`** and shrink-wraps to one word per line.
 - [ ] `prose-surface`
 
 ### compositions
@@ -918,8 +948,15 @@ It must match `npm run preview` exactly, base path included.
   fail on every live region in the library.
 - **Don't make a message container `display: flex`.** Every inline element inside becomes a flex item,
   so a `<code>` or a link in the text breaks onto its own line. Position the marker instead.
-- **`display: block` on a `<table>` drops its role** from the accessibility tree in Chrome and
-  Safari. To make a wide table scroll, wrap it — never restyle it.
+- **`display: block` on a `<table>` no longer drops its role** — corrected while building
+  `data-table`. Chromium 151 still reports `table`, `row`, `rowheader` and `cell` for a table
+  restyled into stacked cards, so the reason usually given for not doing it is out of date and an
+  axe run on the restyle comes back clean. Two reasons survive and both are measurable: the cells of
+  a row stop sharing a top edge, so the column is gone for everyone who could see it; and the
+  `td::before { content: attr(data-label) }` that always comes with the pattern is **folded into the
+  cell's accessible name**, while the clipped `<thead>` keeps the real columnheader in the tree — so
+  the column is announced twice. Still wrap and scroll rather than restyle; just do not argue it from
+  the role.
 - **Playwright's `toBeDisabled()` treats `aria-disabled="true"` as disabled**, so it cannot be used
   to prove a control is still focusable. Assert on the `disabled` attribute directly.
 - **A row's `textContent` includes decoration.** A dropdown option reads `"Acid Arcade✓"`, so anchored
@@ -1124,6 +1161,33 @@ It must match `npm run preview` exactly, base path included.
   without one, before it will call anything settled. Same family as the geometry-polling gotchas
   above, arriving from the other direction: the poll was not too early to be stable, it was stable
   too early.
+- **A base rule written `.ac-thing th, .ac-thing td` outranks every single-class modifier on a
+  cell.** The compound is (0,1,1) and `.ac-thing__num` is (0,1,0), so the modifier loses and does
+  nothing at all — no warning, no visible cause, and the base rule looks entirely innocent because it
+  is the one everybody writes first. `data-table`'s right alignment and its 2px header rule were both
+  dead until the spec caught them; every modifier there is now written `.ac-table .ac-table__num` to
+  match the base's specificity. This is the third member of the family, after `icon-button`'s two
+  single-class rules ordered by source and `jump-nav`'s two modifiers setting the same custom
+  property. The rule of thumb: **write a modifier at the same specificity as the base rule it has to
+  beat**, and never reason about it — a computed-style assertion in the spec is what finds it.
+- **Chromium demotes a `<table>` with no `<caption>`, no `<th>` and no borders to `LayoutTable`.**
+  It is not exposed as a table at all: no table navigation, no row or column announcements, and the
+  cells come back as `LayoutTableCell`. A `<caption>` on its own is enough to promote it; `<th>`
+  alone promotes it but leaves it unnamed; **`aria-label` does not promote it**, so the attribute
+  people reach for is the one that does not work. The heuristic is also defeated by ordinary cell
+  borders, which is why this is a note rather than a demo — style the table and it is a data table
+  whatever the markup says. Measured with CDP `Accessibility.getPartialAXTree`; `ariaSnapshot()`
+  computes roles from the element and does **not** report the demotion.
+- **A `<caption>` inside a `display: block` table keeps `display: table-caption`.** The parent is no
+  longer a table box, so the caption gets an anonymous one of its own and shrink-wraps — a
+  four-word caption renders as four lines of one word. Every real card restyle carries a
+  `caption { display: block }` line for this and nobody mentions why.
+- **Chromium's forced-colors emulation does not repaint author background colors.** Under
+  `page.emulateMedia({ forcedColors: 'active' })` the media query matches and the `@media` block
+  applies, but `getComputedStyle` still returns the author's own `color-mix` for anything the block
+  did not override. So a forced-colors test can assert **that the `[FORCED]` rules took effect** —
+  and cannot assert that the platform dropped a tint. Write the assertion as "the repaired element
+  differs from the one left alone", never as "the tint is gone".
 - **Astro's bundled `site.css` loads *after* every `component.css`.** Head order is theme, effects,
   dropdown, the page's component, then the `_astro/*.css` bundle. So a shell rule at **equal**
   specificity wins over a component's. This bites exactly one rule shape: `site.css` ships a global

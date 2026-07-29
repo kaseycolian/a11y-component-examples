@@ -1,0 +1,368 @@
+/* ===========================================================================
+   DATA TABLE
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything outside [PANEL] is real component code; the demo frame
+   (ac-demo-*) lives in the site's own stylesheet, not this file.
+
+     [TABLE]    every example. The grid, the header cells, the zebra.
+     [CAPTION]  every example. Including the clipped variant.
+     [SCROLL]   examples 1, 2, 4. The wrapper a wide table needs.
+     [BROKEN]   examples 2 to 5. Delete it.
+     [PANEL]    the frame around each example on this page. Delete it.
+     [FORCED]   always ship this. The zebra and the header fill are both tints,
+                and forced colors drops both.
+
+   Copy [TABLE] + [CAPTION] + [SCROLL] + [FORCED] for the component.
+
+   Nothing here restyles the table's own display. Stacking the cells into cards
+   is what example 2 is about, and it costs the column on screen — the very
+   relationship the markup was built to carry.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [TABLE] every example -------------------------------------------------
+   border-collapse, so a cell has one border rather than two touching. */
+
+.ac-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--ac-text, var(--text, #f3ecff));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+}
+
+.ac-table th,
+.ac-table td {
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  text-align: left;
+  vertical-align: top;
+}
+
+/* Every modifier below is written `.ac-table .thing` rather than `.thing`. The
+   base rule above is `.ac-table th, .ac-table td` at (0,1,1), so a bare class
+   on a cell loses to it and silently does nothing — the alignment and the
+   header rule were both dropped that way before the tests caught it. Match the
+   base's specificity and the modifier behaves like a modifier. */
+
+/* The header row is told apart by three things rather than by color alone
+   (SC 1.4.1): a heavier weight, a tinted fill, and a solid rule under it. Only
+   the fill depends on the theme. */
+.ac-table .ac-table__head {
+  border-bottom-width: 2px;
+  background: color-mix(in srgb, var(--ac-accent, var(--accent, #3ceaff)) 12%, transparent);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ac-table .ac-table__row-head {
+  font-weight: 700;
+}
+
+/* Numbers line up on the right so a column can be read down. The class goes on
+   the <th scope="col"> as well, or the label floats away from the column it
+   names. Never the `align` attribute — dropped in HTML5. */
+.ac-table .ac-table__num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.ac-table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--ac-text, var(--text, #f3ecff)) 4%, transparent);
+}
+
+/* --- [CAPTION] every example -----------------------------------------------
+   The caption is the table's accessible name, and it is the only naming route
+   that is also visible text. Keep it when the design has no room for it:
+   --clipped is off screen and still the name, which is example 5's fourth
+   case. Visually Hidden is the canonical home for the recipe; this is a local
+   copy on purpose, so the file stands alone. */
+
+.ac-table__caption {
+  padding: 0 0 0.45rem;
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: left;
+  caption-side: top;
+}
+
+.ac-table__caption--clipped {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- [SCROLL] examples 1, 2, 4 ---------------------------------------------
+   A wide table scrolls sideways inside this rather than being restyled into
+   something that is no longer a table.
+
+   Three attributes go with it in the markup and none is optional:
+
+     tabindex="0"   Chromium gives a scroll container a tab stop with no role,
+                    no name and a 1px near-black UA ring; Safari gives it no
+                    stop at all, so the table cannot be scrolled by keyboard
+                    (SC 2.1.1). Effects owns that finding.
+     role="region"  so the stop announces as something.
+     a name         aria-labelledby pointing at the caption's id, so the name
+                    is written once and the region and the table agree. */
+
+.ac-table-scroll {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  /* A scroll container's automatic minimum size is its content's, so without
+     min-width the wrapper grows to the table's width and takes the page
+     sideways at 320px instead of scrolling (SC 1.4.10). */
+  min-width: 0;
+  overflow-x: auto;
+  padding: 0.7rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+}
+
+.ac-table-scroll:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+/* --- [BROKEN] examples 2 to 5 — delete this -------------------------------
+   Four failures. Three are one declaration each; the fourth is long, and that
+   is the point — the card restyle is a lot of CSS written to undo what the
+   markup already said. */
+
+/* Example 2. display: block on every part, the header row clipped, and the
+   column name put back per cell as generated content — which accname folds
+   into the cell's name, so the column is announced from the cell *and* from
+   the header it is still associated with. Chip Toggle found the same trap on
+   a button's tick. */
+.ac-dt-cards,
+.ac-dt-cards thead,
+.ac-dt-cards tbody,
+.ac-dt-cards tr,
+.ac-dt-cards th,
+.ac-dt-cards td {
+  display: block;
+}
+
+/* A caption inside a display:block table keeps `display: table-caption` and
+   shrink-wraps to a column of single words. Every real card implementation has
+   this line, and it is not the interesting part of the failure. */
+.ac-dt-cards caption {
+  display: block;
+}
+
+.ac-dt-cards thead {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.ac-dt-cards tr {
+  margin-bottom: 0.6rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+}
+
+/* Doubled, so it beats `.ac-table .ac-table__num` — stacked, there is no column
+   for a right edge to line up against. */
+.ac-table.ac-dt-cards th,
+.ac-table.ac-dt-cards td {
+  border-width: 0 0 1px;
+  text-align: left;
+}
+
+.ac-dt-cards td::before {
+  content: attr(data-label) ": ";
+  font-weight: 700;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* Example 3. A header row drawn instead of declared: every cell is a <td> and
+   the first row is bold because a rule says so. */
+.ac-dt-fake-head tr:first-child td {
+  border-bottom-width: 2px;
+  background: color-mix(in srgb, var(--ac-accent, var(--accent, #3ceaff)) 12%, transparent);
+  font-weight: 700;
+}
+
+/* Example 4. Overflow and nothing else. */
+.ac-dt-bare-scroll {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  padding: 0.7rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+}
+
+/* Example 4's table has to actually be wider than the column, or there is
+   nothing to scroll and no tab stop to find. */
+.ac-dt-bare-scroll .ac-table,
+#dt4b-wrap .ac-table {
+  width: auto;
+  min-width: 30rem;
+}
+
+/* Example 5. A paragraph styled to look exactly like the caption two cases
+   along, naming nothing. */
+.ac-dt-fake-caption {
+  margin: 0 0 0.45rem;
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* --- [PANEL] the frame around each example --------------------------------
+   Page furniture: the case columns, the labels and the readouts. None of it is
+   part of a table. Delete the section. */
+
+.ac-dt-cases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 1rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.ac-dt-case,
+.ac-dt-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.ac-dt-case__label,
+.ac-dt__note {
+  margin: 0;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-dt-case__label {
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.ac-dt__note {
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.ac-dt-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.75rem;
+}
+
+.ac-dt-readout__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.5rem;
+  min-width: 0;
+}
+
+.ac-dt-readout dt,
+.ac-dt-readout dd {
+  margin: 0;
+  min-width: 0;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-dt-readout code,
+.ac-dt__note code,
+.ac-dt-case__label code {
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+  overflow-wrap: anywhere;
+}
+
+/* The failing readouts are marked in the markup as well as colored — the color
+   is gone under forced colors, and it was never the thing carrying it. */
+.ac-dt-readout code[data-ac-dt-bad="true"] {
+  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------
+   The header fill and the zebra are both color-mix, which forced colors drops
+   outright, so the header row would be left with weight alone. The rule under
+   it is a real border and survives; the fill comes back as a system button
+   face, which is what a column label is. */
+
+@media (forced-colors: active) {
+  .ac-table {
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .ac-table th,
+  .ac-table td {
+    border-color: CanvasText;
+  }
+
+  .ac-table .ac-table__head {
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  .ac-table tbody tr:nth-child(even) {
+    background: Canvas;
+  }
+
+  .ac-table-scroll,
+  .ac-dt-bare-scroll,
+  .ac-dt-readout {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .ac-table-scroll:focus-visible {
+    outline-color: CanvasText;
+  }
+
+  .ac-dt-cards tr,
+  .ac-dt-cards th,
+  .ac-dt-cards td {
+    border-color: CanvasText;
+  }
+
+  /* Example 3's fake header row is deliberately not given a system fill. The
+     real header row is repainted as a button face and the drawn one is not, so
+     it stops reading as a header at all — which is what a <td> pretending to be
+     a <th> is worth. A broken example its own file repairs stops being one. */
+
+  .ac-dt-readout code[data-ac-dt-bad="true"] {
+    color: CanvasText;
+  }
+}

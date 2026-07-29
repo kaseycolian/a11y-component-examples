@@ -251,7 +251,9 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
 ### data-table
 - **Markup** `<table>` with `<caption>`, `<thead>`, `scope="col"` / `scope="row"`.
 - **Responsive** Wrap in `.ac-table-scroll { overflow-x: auto }` with `tabindex="0"` and `role="region"` + `aria-label` so the scroll area is keyboard reachable (SC 2.1.1).
-- **Gotcha** Do not `display: block` the table on mobile — it destroys the row/column relationships screen readers depend on. Scroll it instead. `<caption>` is the table's accessible name; keep it even if visually hidden.
+- **Gotcha** Do not `display: block` the table on mobile. Scroll it instead. **Built and corrected:** the roles survive in Chromium 151 — what the restyle actually costs is the column on screen, plus a doubled announcement, because the `td::before { content: attr(data-label) }` that comes with it is folded into the cell's accessible name while the clipped header is still associated.
+- **Gotcha** `<caption>` is the table's accessible name; keep it even if visually hidden. It also promotes the table out of Chromium's `LayoutTable` demotion, which `aria-label` does not.
+- **Finding** A base rule written `.ac-table th, .ac-table td` is (0,1,1) and silently outranks every single-class modifier on a cell. Write modifiers as `.ac-table .ac-table__num`.
 
 ### prose-surface
 - **Markup** `.ac-prose` scroll container, `tabindex="0"`, `role="region"`, `aria-label`.
