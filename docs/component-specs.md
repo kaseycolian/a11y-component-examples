@@ -224,8 +224,25 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
   prefix, no container for a region, no focus for a tooltip.
 
 ### result-panel
-- **Markup** `.ac-result` with a label and a monospace value, plus a copy button.
-- **Gotcha** The copy button confirms via a polite live region, not just a visual label swap. A long URL needs `word-break: break-all` or it forces horizontal page scroll at 320px (SC 1.4.10).
+- **Markup** `.ac-result` with `.ac-result__head` (label + `.ac-badge` + `.ac-status`), a monospace
+  `.ac-result__value`, `.ac-result__actions` with the copy button, an optional `.ac-notice`, and
+  `.ac-result__status` — `role="status"`, in the markup from the start, empty.
+- **ARIA** None on the panel. **The composed parts carry no live role at all** — that is the
+  component. The copy button's `aria-label` names the value (`Copy share link`) and never changes.
+- **Gotcha** The copy button confirms via the panel's polite live region, not a label swap and not
+  a tick. A long value needs `overflow-wrap: anywhere` — **not `break-word`**, which wraps the text
+  and leaves the box's min-content width alone, so the page still cannot reflow to 320px
+  (SC 1.4.10). `word-break: break-all` also works and breaks even where there was room.
+- **The subject is composing.** `notice` owns SC 1.4.1's glyph-versus-word and
+  static-versus-announced, `status-text` owns scale, `badge` owns the number needing a subject.
+  Point at each once; this page owns the arrangement, which is that the panel announces and nothing
+  inside it does.
+- **Finding** `<output>` has an implicit `role="status"`, so the element that sounds most correct
+  for a computed value reads the whole value out on every change — and a live-region audit that
+  greps for `role=`/`aria-live` misses it. Use a `<code>`.
+- **Finding** A soft-disabled copy button announces nothing on the press. The reason belongs on the
+  button as `aria-describedby`, where it is read on arrival; a region reports what changed, and
+  refusing to act is not a change.
 
 ---
 

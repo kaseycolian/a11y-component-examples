@@ -1,0 +1,398 @@
+<!-- ===========================================================================
+     RESULT PANEL — a value an action produced, presented for reading and copying
+
+     WHAT TO COPY
+       Example 1 is the component. Examples 2 to 5 are the four ways a panel
+       made of other components goes wrong, live. Each names the CSS and JS
+       sections it needs.
+
+     THE CONTRACT
+       .ac-result           the panel. It owns the one live region inside it.
+       .ac-result__value    the value, monospace, wrapping. Not an <output>.
+       .ac-result__status   role="status", in the markup from the start, empty.
+       the composed parts   a Status Text verdict, a Badge count and a Notice
+                            all live here, and none of them announces. The
+                            panel does, in one sentence.
+       the copy button      its name never changes. The outcome goes to the
+                            region. Lifted from Input Group.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     =========================================================================== -->
+
+<div class="ac-demo-grid" data-ac-result-panel>
+  <!-- ======================================================================
+       EXAMPLE 1 · The specimen
+       CSS [RESULT] + [WRAP] + [STATUS] + [COMPOSED] + [BTN] + [PANEL].
+       JS [CORE] + [COPY].
+
+       A built link, a verdict, a count and a warning in one panel. Four
+       things that could each announce; one region that does.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">1 &middot; The specimen</h3>
+
+    <div class="ac-result">
+      <div class="ac-result__head">
+        <span class="ac-result__label">Share link</span>
+        <span class="ac-badge">
+          <span class="ac-badge__num" aria-hidden="true">3</span>
+          <span class="ac-badge__name">3 parameters</span>
+        </span>
+        <span class="ac-status ac-status--ok">
+          <span class="ac-status__glyph" aria-hidden="true"></span>
+          <span class="ac-status__text">Ready</span>
+        </span>
+      </div>
+
+      <!-- A <code>, deliberately not an <output>: <output> is a live region by
+           default, so the whole URL is read out every time it changes. -->
+      <code class="ac-result__value">https://matinee.example/all-ages/?set=storm-windows&amp;pressing=99&amp;t=sk_test_99RubySohoLinoleumStormWindows462</code>
+
+      <div class="ac-result__actions">
+        <!-- The visible word is "Copy" and the name says which value, because a
+             screen can hold several of these. -->
+        <button class="ac-result__btn" type="button" data-ac-rp-copy aria-label="Copy share link">
+          Copy
+        </button>
+      </div>
+
+      <div class="ac-notice ac-notice--warn">
+        <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+          <path d="M12 3.6L21.2 20H2.8z" /><path d="M12 9.5v4.6" /><path d="M12 17v.1" />
+        </svg>
+        <p class="ac-notice__text">
+          <b class="ac-notice__prefix">Warning:</b> <code>t</code> expires 24 hours after it is
+          issued.
+        </p>
+      </div>
+
+      <!-- The panel's one region. Empty, and here before anyone arrived. -->
+      <p class="ac-result__status" role="status" data-ac-rp-status></p>
+    </div>
+
+    <p class="ac-rp__note">
+      Press Copy. The button keeps its name and the region says what happened.
+    </p>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 2 · A value with nowhere to break
+       CSS [RESULT] + [WRAP] + [PANEL] + [BROKEN]. JS [CORE] + [MEASURE].
+
+       The same URL in three panels pinned to 15rem. The readout is the
+       narrowest each one is willing to be, which is what decides whether the
+       page can reflow.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">2 &middot; A value with nowhere to break</h3>
+
+    <div class="ac-rp-panel" data-ac-rp-wrap>
+      <div class="ac-rp-cases">
+        <div class="ac-rp-case">
+          <p class="ac-rp-case__label">nothing declared &mdash; broken on purpose</p>
+          <div class="ac-rp-clamp">
+            <div class="ac-result">
+              <!-- BROKEN ON PURPOSE — the token is one unbreakable word, so
+                   the panel is at least as wide as the token. -->
+              <code class="ac-result__value ac-rp-bad-nowrap" data-ac-rp-wrap-case="none">https://matinee.example/all-ages/?set=storm-windows&amp;pressing=99&amp;t=sk_test_99RubySohoLinoleumStormWindows462</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="ac-rp-case">
+          <p class="ac-rp-case__label">overflow-wrap: break-word &mdash; broken on purpose</p>
+          <div class="ac-rp-clamp">
+            <div class="ac-result">
+              <!-- BROKEN ON PURPOSE — and it looks fixed, which is the point.
+                   break-word breaks a word that has already overflowed, so the
+                   text wraps; it does not change the box's min-content width,
+                   so the panel still refuses to go under the token. -->
+              <code class="ac-result__value ac-rp-bad-breakword" data-ac-rp-wrap-case="word">https://matinee.example/all-ages/?set=storm-windows&amp;pressing=99&amp;t=sk_test_99RubySohoLinoleumStormWindows462</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="ac-rp-case">
+          <p class="ac-rp-case__label">the specimen</p>
+          <div class="ac-rp-clamp">
+            <div class="ac-result">
+              <code class="ac-result__value" data-ac-rp-wrap-case="good">https://matinee.example/all-ages/?set=storm-windows&amp;pressing=99&amp;t=sk_test_99RubySohoLinoleumStormWindows462</code>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <dl class="ac-rp-readout">
+        <div class="ac-rp-readout__row">
+          <dt>nothing declared</dt><dd><code data-ac-rp-out="wrap-none">&mdash;</code></dd>
+        </div>
+        <div class="ac-rp-readout__row">
+          <dt>break-word</dt><dd><code data-ac-rp-out="wrap-word">&mdash;</code></dd>
+        </div>
+        <div class="ac-rp-readout__row">
+          <dt>the specimen</dt><dd><code data-ac-rp-out="wrap-good">&mdash;</code></dd>
+        </div>
+      </dl>
+
+      <p class="ac-rp__note">
+        <code>break-word</code> wraps the text and leaves the minimum alone, so the second panel
+        looks fixed and still cannot reflow to 320px (SC 1.4.10). All three are clipped here so
+        this page can.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 3 · Four things that want to talk
+       CSS [RESULT] + [WRAP] + [STATUS] + [COMPOSED] + [BTN] + [PANEL].
+       JS [CORE] + [NAME] + [SET] + [LOG] + [BUILD].
+
+       Press "Build the link". Both panels show the same result; the log
+       counts what a screen reader was handed by each.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">3 &middot; Four things that want to talk</h3>
+
+    <div class="ac-rp-panel" data-ac-rp-build>
+      <div class="ac-rp-cases">
+        <div class="ac-rp-case">
+          <p class="ac-rp-case__label">every part announces &mdash; broken on purpose</p>
+          <!-- BROKEN ON PURPOSE — four live regions in one panel, and each one
+               is defensible on its own. The <output> is the one nobody wrote:
+               it is a live region by default, so the whole URL is read out. -->
+          <div class="ac-result" data-ac-rp-case="loud">
+            <div class="ac-result__head">
+              <span class="ac-result__label">Share link</span>
+              <span class="ac-badge" role="status" data-ac-rp-badge hidden>
+                <span class="ac-badge__num" aria-hidden="true">0</span>
+                <span class="ac-badge__name">0 parameters</span>
+              </span>
+              <span class="ac-status ac-status--muted" role="status" data-ac-rp-verdict>
+                <span class="ac-status__glyph" aria-hidden="true"></span>
+                <span class="ac-status__text">Waiting</span>
+              </span>
+            </div>
+
+            <output class="ac-result__value" data-ac-rp-value></output>
+
+            <!-- The notice's own region, present from the start and empty: the
+                 pattern Notice asks for. Correct on its own, and the fourth
+                 voice in a panel that already has three. -->
+            <div class="ac-rp-slot" role="alert" data-ac-rp-note></div>
+          </div>
+        </div>
+
+        <div class="ac-rp-case">
+          <p class="ac-rp-case__label">the specimen</p>
+          <div class="ac-result" data-ac-rp-case="quiet">
+            <div class="ac-result__head">
+              <span class="ac-result__label">Share link</span>
+              <span class="ac-badge" data-ac-rp-badge hidden>
+                <span class="ac-badge__num" aria-hidden="true">0</span>
+                <span class="ac-badge__name">0 parameters</span>
+              </span>
+              <span class="ac-status ac-status--muted" data-ac-rp-verdict>
+                <span class="ac-status__glyph" aria-hidden="true"></span>
+                <span class="ac-status__text">Waiting</span>
+              </span>
+            </div>
+
+            <code class="ac-result__value" data-ac-rp-value></code>
+
+            <div class="ac-rp-slot" data-ac-rp-note></div>
+
+            <p class="ac-result__status" role="status" data-ac-rp-status></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ac-rp-controls">
+        <button class="ac-result__btn" type="button" data-ac-rp-run>Build the link</button>
+        <button class="ac-result__btn" type="button" data-ac-rp-reset>Start over</button>
+      </div>
+
+      <p class="ac-rp__note">
+        One action, four announcements from the panel that lets every part speak, and one sentence
+        from the panel that does not. The longest of the four is the URL itself.
+      </p>
+
+      <p class="ac-rp-log__label" id="ac-rp-log-3">What a screen reader was given</p>
+      <ol class="ac-rp-log" aria-labelledby="ac-rp-log-3" data-ac-rp-log></ol>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 4 · What the copy button is allowed to say
+       CSS [RESULT] + [WRAP] + [STATUS] + [BTN] + [PANEL] + [BROKEN].
+       JS [CORE] + [NAME] + [COPY] + [CASES].
+
+       Three copy buttons over the same value. The readout prints each
+       button's name after the press, and what reached a live region.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">4 &middot; What the copy button is allowed to say</h3>
+
+    <div class="ac-rp-panel" data-ac-rp-copy-cases>
+      <div class="ac-rp-cases">
+        <div class="ac-rp-case">
+          <p class="ac-rp-case__label">the button renames itself &mdash; broken on purpose</p>
+          <div class="ac-result" data-ac-rp-case="rename">
+            <code class="ac-result__value">?src=zine462</code>
+            <div class="ac-result__actions">
+              <!-- BROKEN ON PURPOSE — the name of the control under your finger
+                   changes to "Copied", and there is no region, so a reader who
+                   is not watching is told nothing at all. -->
+              <button class="ac-result__btn" type="button" data-ac-rp-copy
+                      data-ac-rp-rename="Copied the src parameter"
+                      aria-label="Copy the src parameter">
+                Copy
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ac-rp-case">
+          <p class="ac-rp-case__label">a tick appears beside it &mdash; broken on purpose</p>
+          <div class="ac-result" data-ac-rp-case="tick">
+            <code class="ac-result__value">?set=storm-windows</code>
+            <div class="ac-result__actions">
+              <!-- BROKEN ON PURPOSE — the confirmation is drawn and never said.
+                   The tick is aria-hidden, correctly, and it is the only cue. -->
+              <button class="ac-result__btn" type="button" data-ac-rp-copy
+                      aria-label="Copy the set parameter">
+                Copy
+              </button>
+              <span class="ac-rp-bad-tick" aria-hidden="true" data-ac-rp-tick></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ac-rp-case">
+          <p class="ac-rp-case__label">the specimen</p>
+          <div class="ac-result" data-ac-rp-case="good">
+            <code class="ac-result__value">?pressing=99</code>
+            <div class="ac-result__actions">
+              <button class="ac-result__btn" type="button" data-ac-rp-copy
+                      aria-label="Copy the pressing parameter">
+                Copy
+              </button>
+            </div>
+            <p class="ac-result__status" role="status" data-ac-rp-status></p>
+          </div>
+        </div>
+      </div>
+
+      <dl class="ac-rp-readout">
+        <div class="ac-rp-readout__row">
+          <dt>renames itself &middot; name after</dt>
+          <dd><code data-ac-rp-out="copy-rename">&mdash;</code></dd>
+        </div>
+        <div class="ac-rp-readout__row">
+          <dt>tick beside it &middot; announced</dt>
+          <dd><code data-ac-rp-out="copy-tick">&mdash;</code></dd>
+        </div>
+        <div class="ac-rp-readout__row">
+          <dt>the specimen &middot; announced</dt>
+          <dd><code data-ac-rp-out="copy-good">&mdash;</code></dd>
+        </div>
+      </dl>
+
+      <p class="ac-rp__note">
+        All three copy the value. Only one of them reports it to somebody who is not watching.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 5 · Nothing to copy
+       CSS [RESULT] + [WRAP] + [STATUS] + [COMPOSED] + [BTN] + [PANEL].
+       JS [CORE] + [NAME] + [COPY] + [EMPTY].
+
+       Two panels before anything has been built. Press Copy on each.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">5 &middot; Nothing to copy</h3>
+
+    <div class="ac-rp-panel" data-ac-rp-empty>
+      <div class="ac-rp-cases">
+        <div class="ac-rp-case">
+          <p class="ac-rp-case__label">an empty panel &mdash; broken on purpose</p>
+          <!-- BROKEN ON PURPOSE — the value slot is empty, the button is live,
+               and copying nothing still reports success. -->
+          <div class="ac-result" data-ac-rp-case="bare">
+            <div class="ac-result__head">
+              <span class="ac-result__label">Share link</span>
+            </div>
+            <code class="ac-result__value"></code>
+            <div class="ac-result__actions">
+              <!-- data-ac-rp-unguarded turns off the "there is nothing here"
+                   check, which is the only thing standing between this panel
+                   and reporting a successful copy of nothing. -->
+              <button class="ac-result__btn" type="button" data-ac-rp-copy data-ac-rp-unguarded
+                      aria-label="Copy the empty share link">
+                Copy
+              </button>
+            </div>
+            <p class="ac-result__status" role="status" data-ac-rp-status></p>
+          </div>
+        </div>
+
+        <div class="ac-rp-case">
+          <p class="ac-rp-case__label">the specimen</p>
+          <div class="ac-result" data-ac-rp-case="told">
+            <div class="ac-result__head">
+              <span class="ac-result__label">Share link</span>
+              <!-- Zero is not a badge. It is removed, words and all. -->
+              <span class="ac-badge" hidden>
+                <span class="ac-badge__num" aria-hidden="true">0</span>
+                <span class="ac-badge__name">0 parameters</span>
+              </span>
+              <span class="ac-status ac-status--muted">
+                <span class="ac-status__glyph" aria-hidden="true"></span>
+                <span class="ac-status__text">Waiting</span>
+              </span>
+            </div>
+            <code class="ac-result__value ac-result__value--empty" id="ac-rp-5-why">Nothing
+              built yet. Pick a set and a pressing first.</code>
+            <div class="ac-result__actions">
+              <!-- aria-disabled, not disabled: the button keeps its place in
+                   the tab order, and aria-describedby hands the reason over
+                   with it. Nothing is announced on the press, because the
+                   reason arrived before the press and nothing changed. -->
+              <button class="ac-result__btn" type="button" data-ac-rp-copy
+                      aria-disabled="true" aria-describedby="ac-rp-5-why"
+                      aria-label="Copy share link">
+                Copy
+              </button>
+            </div>
+            <p class="ac-result__status" role="status" data-ac-rp-status></p>
+          </div>
+        </div>
+      </div>
+
+      <dl class="ac-rp-readout">
+        <div class="ac-rp-readout__row">
+          <dt>empty panel &middot; value read as</dt>
+          <dd><code data-ac-rp-out="empty-bare-said">&mdash;</code></dd>
+        </div>
+        <div class="ac-rp-readout__row">
+          <dt>empty panel &middot; announced on press</dt>
+          <dd><code data-ac-rp-out="empty-bare">&mdash;</code></dd>
+        </div>
+        <div class="ac-rp-readout__row">
+          <dt>specimen &middot; button reads as</dt>
+          <dd><code data-ac-rp-out="empty-told-said">&mdash;</code></dd>
+        </div>
+        <div class="ac-rp-readout__row">
+          <dt>specimen &middot; announced on press</dt>
+          <dd><code data-ac-rp-out="empty-told">&mdash;</code></dd>
+        </div>
+      </dl>
+
+      <p class="ac-rp__note">
+        The specimen says nothing on the press, and that is the point: the reason came with the
+        button and nothing has changed since.
+      </p>
+    </div>
+  </div>
+</div>

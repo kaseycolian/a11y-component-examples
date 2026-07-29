@@ -11,51 +11,53 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-29 (badge — `result-panel` closes batch C next; the `summary` voice changed
-on 2026-07-28, see item 0a)
+Last updated: 2026-07-29 (result-panel — batch C is closed, `tabs` opens batch D next; the
+`summary` voice changed on 2026-07-28, see item 0a)
 
 ---
 
-## START HERE — next component is `result-panel`, closing batch C
+## START HERE — next component is `tabs`, opening batch D
 
-`badge` landed: 29/29, suite is **586/586** in Chromium. Nothing was left open. It turned up a
-finding worth reading before anything else that composes a name — a live region is **not** part of
-an ancestor's accessible name, so `role="status"` on a nested badge deletes the count from its
-button. It is in the gotchas list and in `component-specs.md` → `badge`.
+`result-panel` landed: 29/29, suite is **615/615** in Chromium. Nothing was left open, and
+**`feedback-status` is complete**. Three findings from it are in the gotchas list and worth a skim
+before building anything with a computed value or a long string in it: `<output>` is a live region
+nobody declared, `overflow-wrap: break-word` does not do what it looks like it does, and
+`overflow: hidden` buys a tab stop where `overflow: clip` does not.
 
 **Read the `summary` rule in `CLAUDE.md` under Writing style before writing any `meta.json`.** It
 changed on 2026-07-28: the lede is prose written to a person, two or three sentences, leading with
 the reader's problem rather than the ARIA attribute, and **never enumerating or counting the
-examples**. `status-text` and `badge` are written to it and are the references; everything earlier
-is the sweep in item 0a. The same session tightened the on-page copy rule (item 0b).
+examples**. `status-text`, `badge` and `result-panel` are written to it and are the references;
+everything earlier is the sweep in item 0a. The same session tightened the on-page copy rule
+(item 0b).
 
 ### The steps, in order
 
-**Step 1 — `result-panel`.** Run the loop under "The loop for building one component" with:
+**Step 1 — `tabs`.** Run the loop under "The loop for building one component" with:
 
 ```sh
-node scripts/new-component.mjs result-panel --group feedback-status --name "Result Panel"
+node scripts/new-component.mjs tabs --group navigation --name "Tabs"
 ```
 
 Decided in advance, so do not re-derive:
 
-- Spec entry: `component-specs.md` → feedback-status → `result-panel`. `.ac-result` with a label, a
-  monospace value and a copy button.
-- **It composes `notice`, `status-text` and `badge`, and owns the composition.** All three arguments
-  are settled — SC 1.4.1's glyph-versus-word is `notice`'s, one-word scale is `status-text`'s, and
-  the number needing a subject is `badge`'s. Point at each once; re-arguing any of them makes four
-  pages read as one.
-- **The copy button is `input-group`'s copy button.** Same clipboard write, same pre-existing empty
-  `role="status"`, same rule against renaming the button. Lift it, do not rewrite it.
-- **Read `badge` and `status-text` first.** They are the two most recent worked examples and the
-  nearest neighbors.
+- Spec entry: `component-specs.md` → navigation → `tabs`. `role="tablist"` → `role="tab"`
+  (`aria-selected`, `aria-controls`) → `role="tabpanel"` (`aria-labelledby`, `tabindex="0"`).
+- **Roving tabindex with automatic activation.** Only the selected tab is `tabindex="0"`; the rest
+  are `-1`. Arrows move *and* select, since the panels are already in the DOM. Home/End jump. Tab
+  leaves the list for the panel.
+- **A working reference already exists in `src/site/components/CodePanel.astro`** — take its logic,
+  not its layout; it predates the copyability conventions.
+- `chip-toggle`'s example 5 already argues the tab-stop tradeoff (five stops against a toolbar's
+  one) and `tabs` is the other side of it. Point at it once rather than re-deriving it.
+- **This is the largest behavior left.** `dropdown` is the reference for hard behavior;
+  `result-panel` and `badge` are the two most recent worked examples for file shape.
 - **Keep the on-page copy short** — item 0b.
 
-That closes the `feedback-status` group.
-
-**Then** batch D (`tabs` → `jump-nav`), E (`data-table` → `prose-surface`), F (`app-url-maker` →
-`app-page-to-markdown`), and the six non-component items under "Remaining non-component work" —
-items 1–4 are the ones that gate deploying; 0a and 0b are copy sweeps that can land any time.
+**Then** `jump-nav` (reuses `tabs`' `aria-current` thinking), batch E (`data-table` →
+`prose-surface`), F (`app-url-maker` → `app-page-to-markdown`), and the six non-component items
+under "Remaining non-component work" — items 1–4 are the ones that gate deploying; 0a and 0b are
+copy sweeps that can land any time.
 
 One standing caveat for every step above: the header is two rows tall now, so a demo that scrolls an
 anchor into view clears `--header-h`, not 4.5rem. Nothing in the suite needed changing for it, but a
@@ -75,7 +77,7 @@ Build in this order. The order is the dependency graph, not a preference.
 | --- | --- | --- |
 | ~~**A**~~ | ~~`effects`~~ | **Done.** Closed `foundations` |
 | ~~**B**~~ | ~~`button` → `icon-button` → `loading-button` → `chip-toggle`~~ | **Done.** Closed `buttons-actions` |
-| **C** | ~~`notice`~~ → ~~`status-text`~~ → ~~`badge`~~ → `result-panel` | all four are small, and three of them restate `live-region`'s argument in a new shape |
+| ~~**C**~~ | ~~`notice` → `status-text` → `badge` → `result-panel`~~ | **Done.** Closed `feedback-status` |
 | **D** | `tabs` → `jump-nav` | `tabs` is the largest behavior left; `jump-nav` reuses its `aria-current` thinking |
 | **E** | `data-table` → `prose-surface` | `prose-surface` is the scroll-region pattern `data-table` establishes |
 | **F** | `app-url-maker` → `app-page-to-markdown` | **last.** They compose the others and cannot be built before them |
@@ -86,13 +88,14 @@ Cross-batch notes that will otherwise be rediscovered:
   `motion-preferences`, the addon buttons in `input-group`, `modal`, `drawer` and `tooltip`, and the
   `[BTN]` sections of `icon-button`, `loading-button` and `chip-toggle` are deliberate duplicates —
   components are not DRY here. A change to `.ac-btn` is a change in all **eight**.
-- **`result-panel`'s copy button is `input-group`'s copy button.** Same clipboard write, same
-  pre-existing empty `role="status"`, same rule against renaming the button. Lift it.
-- **`notice`, `status-text` and `badge` split the feedback argument, and `result-panel` must not
-  re-open it.** `notice` owns SC 1.4.1's glyph-versus-word and static-versus-announced;
-  `status-text` owns what both become at one-word scale (no prefix, no container, no focus);
-  `badge` owns the *number* needing a subject, and the fact that a live region is not part of an
-  ancestor's name. `result-panel` owns composing the three.
+- **The `feedback-status` four split one argument and none of them re-opens it.** `notice` owns
+  SC 1.4.1's glyph-versus-word and static-versus-announced; `status-text` owns what both become at
+  one-word scale (no prefix, no container, no focus); `badge` owns the *number* needing a subject,
+  and the fact that a live region is not part of an ancestor's name; `result-panel` owns the
+  arrangement — the panel announces and nothing inside it does. Anything later that shows a
+  computed value points at `result-panel` rather than re-deriving it.
+- **`.ac-result__btn` is a fifth copy of `input-group`'s addon button**, alongside the copies in
+  `modal`, `drawer` and `tooltip`. Deliberate; a change to that button is a change in all five.
 - **`tabs` has a working reference in `src/site/components/CodePanel.astro`.** Roving tabindex,
   automatic activation, panel at `tabindex="0"`.
 - **Batch F composes with `effects`** — `app-page-to-markdown` is specified around `fx-bar-top`,
@@ -208,7 +211,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 28 / 35
+## Component roster — 29 / 35
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -615,7 +618,27 @@ take their logic and not their layout. See item 1 under remaining work.
   `display: none`** — see the gotchas list. Example 4 is the badges with no number to read (`99+`,
   a bare dot, a named dot, a zero) and it is where the abbreviation rule lives: shorten the drawing,
   never the words.
-- [ ] `result-panel`
+- [x] `result-panel` — done. 29/29 tests in Chromium. **The subject is composing**, and it is the
+  first page where three of these components meet. Each of `notice`, `status-text` and `badge`
+  documents when it should carry a live role and each answer is right alone; follow all three inside
+  one panel and one button press produces four announcements. So the panel overrules them — one
+  `role="status"` at the bottom and every part above it inert — and `setResult` writes the value, the
+  verdict, the count and the notice in one call while handing exactly one sentence to the region.
+  Example 3 is that panel beside the loud one, with a mock screen reader counting 4 against 1.
+  Four findings. **`<output>` has an implicit `role="status"`** — the element that sounds most
+  correct for a computed value reads the whole value out on every change, and it is the fourth voice
+  in example 3 that nobody wrote; see the gotchas list for why `el.role` cannot detect it.
+  **`overflow-wrap: break-word` does not shrink a box's min-content width**, so it wraps the text,
+  *looks* like the fix, and leaves the panel unable to reflow to 320px — example 2 measures 479px
+  against the specimen's 32px and the two are pixel-identical on screen. **A soft-disabled copy
+  button announces nothing on the press**: the reason belongs on the button as `aria-describedby`,
+  read on arrival, and a region reports what changed — refusing to act is not a change, so
+  announcing it says the same sentence twice. And **`overflow: hidden` buys a Chromium tab stop
+  where `overflow: clip` does not**, which is what example 2's clamp uses. The copy button is
+  `input-group`'s, lifted unchanged; example 4 makes its two rules fail live (a button that renames
+  itself, a tick that is the only cue).
+
+**`feedback-status` is complete.**
 
 ### data-display
 - [ ] `data-table`
@@ -898,6 +921,29 @@ It must match `npm run preview` exactly, base path included.
   `status`/`alert`/`log`/`marquee`/`timer` children, and its spec asserts against
   `toHaveAccessibleName` rather than against the walk. Found by a failing test that was written
   expecting the opposite.
+- **`<output>` has an implicit `role="status"`, so it is a live region nobody declared.** The
+  element that sounds most correct for a computed value announces the whole value on every change —
+  a 100-character URL, every keystroke of the field feeding it. Two consequences worth keeping.
+  A live-region audit that greps for `role=` / `aria-live` **misses it**, so any selector meant to
+  find every region on a page needs `output` in it. And a test cannot detect it with `el.role`:
+  ARIA reflection returns the *attribute*, which is exactly the thing that is absent, so it reads
+  `null`. Use `locator.ariaSnapshot()` — an `<output>` snapshots as `- status: …` and a `<code>` as
+  `- code: …` — or CDP `Accessibility.getPartialAXTree`, which also reports the `live` property.
+  `result-panel`'s spec is the precedent.
+- **`overflow-wrap: break-word` does not shrink a box's min-content width.** It breaks a word that
+  has *already* overflowed, so the text wraps and the box looks fixed — but a flex or grid item's
+  automatic minimum size is its min-content width, so the panel still refuses to go under the
+  longest unbreakable run and the page cannot reflow to 320px (SC 1.4.10). `overflow-wrap: anywhere`
+  and `word-break: break-all` both do shrink it; prefer `anywhere`, which only breaks where it has
+  to. Measured on the live page: a URL with a 40-character token is **479px** minimum under
+  `break-word` and **32px** under `anywhere`, and the two are pixel-identical on screen.
+  `result-panel`'s example 2 has all three side by side and the number is what tells them apart.
+  Measure it on a clone with `width: min-content`; the real layout cannot have that width.
+- **`overflow: hidden` makes a scroll container and therefore a Chromium tab stop; `overflow: clip`
+  does not.** Clipping a demo so a broken example does not take the page sideways is otherwise a
+  silent way to add an unnamed, roleless focus stop to the page — the same Chromium 151 behavior
+  `effects` documents, arriving from a direction where nothing looks scrollable. `clip` exists for
+  precisely this and is the one to reach for whenever the intent is "cut this off", not "scroll it".
 - **The UA's `[hidden] { display: none }` loses to any author `display`.** A component that declares
   `display: inline-flex` on its root has silently disabled the `hidden` attribute, so
   `el.hidden = true` leaves the thing on screen and in the accessibility tree. Declare
