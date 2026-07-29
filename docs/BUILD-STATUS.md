@@ -11,49 +11,40 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-28 (chip-toggle, then the shell navigation tweak)
+Last updated: 2026-07-28 (notice — batch C is open)
 
 ---
 
-## START HERE — next component is `notice`, opening batch C
+## START HERE — next component is `status-text`, continuing batch C
 
-Two things landed since the last resume point, both verified, neither leaving anything open:
-
-1. `chip-toggle` — 21/21, and **`buttons-actions` is complete**.
-2. **Shell navigation tweak** (no component touched): the sidebar is gone below 901px, the header's
-   components picker moved beneath the theme/motion settings, `--header-h` is now measured per
-   breakpoint, and `tests/site-header.spec.mjs` gained three layout tests. Suite is **512/512** in
-   Chromium.
+`notice` landed: 23/23, suite is **535/535** in Chromium. Nothing was left open.
 
 ### The steps, in order
 
-**Step 1 — `notice`.** Run the loop under "The loop for building one component" with:
+**Step 1 — `status-text`.** Run the loop under "The loop for building one component" with:
 
 ```sh
-node scripts/new-component.mjs notice --group feedback-status --name "Notice"
+node scripts/new-component.mjs status-text --group feedback-status --name "Status Text"
 ```
 
 Decided in advance, so do not re-derive:
 
-- Spec entry: `component-specs.md` → feedback-status → `notice`. `.ac-notice` with `--info` /
-  `--success` / `--warn` / `--error`, each with an `aria-hidden` icon **and** a text prefix.
-- **This is the canonical home for the SC 1.4.1 glyph argument.** The icon is decoration; the
-  *word* ("Error:") carries the meaning. `status-text` restates it in a smaller shape and must
-  point here rather than re-arguing it — otherwise the two pages read as duplicates.
-- **Static versus announced is the component's real subject.** A notice rendered with the page gets
-  no live role at all; one that appears in response to an action gets `role="status"`, and
-  `role="alert"` is for errors only. A `role="alert"` present at page load fires on every render —
-  that is the live failure to ship.
-- `live-region` already owns the "the region must exist before the text" argument and the
-  clear-then-write recipe. Lift them, do not restate them.
-- **Read `chip-toggle` first, not `dropdown`.** It is the most recent worked example of the numbered
-  `EXAMPLE n ·` sections, the copy map, and shipping deliberate failures beside the correct version.
+- Spec entry: `component-specs.md` → feedback-status → `status-text`. `.ac-status` with `--ok` /
+  `--err` / `--muted`, a tick/cross glyph plus a word.
+- **`notice` now owns the SC 1.4.1 glyph argument and the static-versus-announced argument.** Point
+  at it from here — do not re-argue either, or the two pages read as duplicates. `notice`'s
+  `docs.md` already links forward to this page expecting that.
+- The thing this page owns that `notice` does not is **scale**: a status label sits inline beside
+  the thing it describes, so it has no room for a "Error:" prefix and no container of its own. That
+  tension is the component's subject.
+- The glyph is `aria-hidden` and drawn, not a character — `chip-toggle`'s finding is that CSS
+  generated content lands in the accessible name, and a `::before { content: "✓" }` on anything
+  named from its contents renames it.
+- **Read `notice` first.** It is the most recent worked example, and it is the page this one
+  defers to.
 - **Keep the on-page copy short** — see the writing note under "Remaining non-component work" item 0.
 
-**Step 2 — `status-text`.** The same argument at label scale. Points at `notice` for the glyph
-reasoning rather than repeating it.
-
-**Step 3 — `badge`.** **Step 4 — `result-panel`.** Both close batch C and the `feedback-status`
+**Step 2 — `badge`.** **Step 3 — `result-panel`.** Both close batch C and the `feedback-status`
 group; `result-panel` is the one that composes `notice` and `status-text`, so it goes last.
 
 **Then** batch D (`tabs` → `jump-nav`), E (`data-table` → `prose-surface`), F (`app-url-maker` →
@@ -78,7 +69,7 @@ Build in this order. The order is the dependency graph, not a preference.
 | --- | --- | --- |
 | ~~**A**~~ | ~~`effects`~~ | **Done.** Closed `foundations` |
 | ~~**B**~~ | ~~`button` → `icon-button` → `loading-button` → `chip-toggle`~~ | **Done.** Closed `buttons-actions` |
-| **C** | `notice` → `status-text` → `badge` → `result-panel` | all four are small, and three of them restate `live-region`'s argument in a new shape |
+| **C** | ~~`notice`~~ → `status-text` → `badge` → `result-panel` | all four are small, and three of them restate `live-region`'s argument in a new shape |
 | **D** | `tabs` → `jump-nav` | `tabs` is the largest behavior left; `jump-nav` reuses its `aria-current` thinking |
 | **E** | `data-table` → `prose-surface` | `prose-surface` is the scroll-region pattern `data-table` establishes |
 | **F** | `app-url-maker` → `app-page-to-markdown` | **last.** They compose the others and cannot be built before them |
@@ -207,7 +198,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 25 / 35
+## Component roster — 26 / 35
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -556,7 +547,26 @@ take their logic and not their layout. See item 1 under remaining work.
 - [ ] `jump-nav`
 
 ### feedback-status
-- [ ] `notice`
+- [x] `notice` — done. 23/23 tests in Chromium. **Canonical home for the SC 1.4.1 glyph argument and
+  for static-versus-announced**; `status-text` and `result-panel` point here rather than re-arguing
+  either. The tone is **one custom property** — `.ac-notice` reads `--ac-notice-accent` in four
+  places (edge, icon, prefix, tint) and the four modifiers set nothing else, so a fifth tone is one
+  rule. The tones are the theme's own accents, so there is **no red**, which is survivable exactly
+  because the word carries the tone. Example 3 is the component's real subject: the same success
+  notice added three ways, with a mock screen reader watching only the live regions that existed
+  when it ran — the specimen announces, the notice that arrives *carrying* `role="status"` is
+  silent, and the DOM afterwards is identical, which is why that bug survives review. Example 4's
+  `role="alert"` is server rendered and populated, and the log records it firing before the visitor
+  did anything. Four findings. **An empty live region is 0px tall, so Playwright calls it hidden** —
+  see the gotcha below; that is the correct state for a screen reader and `toBeVisible()` cannot
+  express it. **Under forced colors all four tones collapse into one** — every accent becomes
+  `CanvasText` and the `color-mix` tint is dropped — and the `[FORCED]` block deliberately does
+  *not* put the difference back, because nothing can; that is the prefix-word argument in one
+  screenshot. **A polite region populated at page load is not announced**, so a server-rendered
+  `role="status"` is harmless and merely pointless — only `alert` fires, which is why example 4's
+  load-time scan looks for alerts alone. And **the mock AT reports silence by watching the log, not
+  by asserting it**: the button handler checks four frames later whether anything reached the list,
+  so the "nothing was announced" line is derived from the same observer as the successful one.
 - [ ] `badge`
 - [ ] `status-text`
 - [ ] `result-panel`
@@ -585,7 +595,12 @@ This is stricter than `CLAUDE.md`'s general "say it once" rule and it applies on
 sees on screen. `loading-button` is written to it and is the reference. Everything before it is not:
 `effects`, `motion-preferences`, `typography`, `live-region`, `focus-ring`, `button` and
 `icon-button` are the worst, because their notes carry whole paragraphs of argument.
-`chip-toggle` is written to it as well.
+`chip-toggle` and `notice` are written to it as well.
+
+Also settled while building `notice`: **a demo that repeats a case three times cannot reuse one
+button label.** Three buttons reading "Save the crate" are three identical accessible names on a
+page that argues against exactly that, so each takes an `aria-label` starting with the visible text
+(SC 2.5.3) and naming its case.
 
 Do it as a sweep, one component at a time, and move anything cut into that component's `docs.md`
 rather than deleting the reasoning. **Do not touch the tests' assertions on verdict text without
@@ -744,6 +759,14 @@ It must match `npm run preview` exactly, base path included.
 - **A `role="alert"` must already be in the accessibility tree** before its text is inserted. Not
   `hidden`, not `display: none`, not created on demand — `field` keeps its error element rendered and
   empty for exactly this reason, and pays one flex `gap` for it.
+- **An empty live region is 0px tall, so `toBeVisible()` reports it hidden.** Playwright's
+  visibility check is geometric, and a correctly built `role="status"` container is empty by
+  definition until something lands in it — so the assertion that proves the pattern is right
+  *fails*, and the obvious "fix" (a `min-height`, or moving the role onto the message) breaks the
+  component. Assert the negative instead: `display` is not `none`, `visibility` is not `hidden`,
+  no `[hidden]` attribute, and `isConnected`. `notice`'s spec is the precedent. The same trap is
+  waiting in the shared a11y gate — any sweep that asserts every element it finds is visible will
+  fail on every live region in the library.
 - **Don't make a message container `display: flex`.** Every inline element inside becomes a flex item,
   so a `<code>` or a link in the text breaks onto its own line. Position the marker instead.
 - **`display: block` on a `<table>` drops its role** from the accessibility tree in Chrome and

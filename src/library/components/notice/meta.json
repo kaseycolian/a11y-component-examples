@@ -1,0 +1,22 @@
+{
+  "slug": "notice",
+  "name": "Notice",
+  "group": "feedback-status",
+  "order": 10,
+  "summary": "A message with a tone — the icon decorates, the word carries it. The live role goes on the container the notice lands in, never on the notice, and role=\"alert\" is for errors only. Four live failures: the notice with no prefix word, the role that rides in on the message, the alert that fires on every page load, and the close button that drops focus to the top of the document.",
+  "tags": [
+    "notice",
+    "alert",
+    "role-status",
+    "live-region",
+    "error-message",
+    "non-text-contrast",
+    "forced-colors",
+    "focus-management"
+  ],
+  "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/alert/",
+  "wcag": ["1.4.1", "1.4.11", "2.4.3", "2.5.8", "3.3.1", "4.1.3"],
+  "status": "stable",
+  "files": ["html", "css", "js"],
+  "demoNote": "Examples 2 to 5 are live. Example 2's notices announce one identical sentence in two tones; example 3 adds the same notice three ways and logs which one a screen reader was given; example 4's alert fired before you arrived, and again on every reload; example 5's close button leaves focus on the document body."
+}

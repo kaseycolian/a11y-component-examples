@@ -1,0 +1,479 @@
+/* ===========================================================================
+   NOTICE
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) lives in
+   the site's own stylesheet, not this file.
+
+     [NOTICE]    every example. The box, the icon slot, the text, the prefix.
+     [TONES]     every example. Four one-line rules. Delete the ones you don't
+                 use — each sets one custom property and nothing else.
+     [SLOT]      examples 3 and 4. The container a notice is announced from.
+     [DISMISS]   example 5. The close button.
+     [BTN]       the trigger buttons on this page. A notice needs none of it —
+                 delete the section unless you want a copy of .ac-btn.
+     [MONO]      example 2. Delete it — it exists to take the color away.
+     [PANEL]     the frame around each example on this page. Delete it.
+     [FORCED]    always ship this. The tone is an accent color, and accent
+                 colors are exactly what forced colors replaces.
+
+   Copy the file whole for the library version.
+
+   The tone is one custom property. .ac-notice reads --ac-notice-accent in four
+   places (the edge, the icon, the prefix, the tint) and the tone modifiers set
+   it. So a fifth tone is one rule, and rebranding to your own palette is one
+   declaration rather than four.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [NOTICE] every example -----------------------------------------------
+   A grid rather than a flex row, because the icon has to stay on the first
+   line while the text wraps under itself. Flex with `align-items: flex-start`
+   does that too — the third column for example 5's close button is what comes
+   free here and does not there.
+
+   `align-items: start` and not `center`: centered against three wrapped lines
+   the icon floats into the middle of the sentence. */
+
+.ac-notice {
+  --ac-notice-accent: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 0.15rem 0.6rem;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-inline-start: 4px solid var(--ac-notice-accent);
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: color-mix(in srgb, var(--ac-notice-accent) 8%, var(--ac-surface, var(--bg-panel, #110620)));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+}
+
+/* An inline <svg> on currentColor is the only icon that survives forced
+   colors: it is recolored along with the text. An <img> keeps the color it was
+   drawn in on a background the system just replaced, and a background-image is
+   dropped outright. Icon Button has the full argument. */
+.ac-notice__icon {
+  width: 1.35rem;
+  height: 1.35rem;
+  /* Drops the icon onto the first line's cap height rather than its box top. */
+  margin-block-start: 0.05rem;
+  color: var(--ac-notice-accent);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ac-notice__text {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+}
+
+/* The prefix is the tone, spelled out. Bold and tinted, but neither is what
+   carries it — the word does, which is why this rule could be deleted and the
+   notice would still pass SC 1.4.1. */
+.ac-notice__prefix {
+  color: var(--ac-notice-accent);
+  font-weight: 700;
+}
+
+/* --- [TONES] every example ------------------------------------------------
+   One property each. The four accents are the theme's own, so a notice
+   inherits whatever palette the host app is running, light one included.
+
+   They are not red / amber / green, and that is survivable precisely because
+   the word carries the tone. A palette with no red is a problem only for a
+   component that was relying on the red. */
+
+.ac-notice--info {
+  --ac-notice-accent: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+}
+
+.ac-notice--success {
+  --ac-notice-accent: var(--ac-accent-green, var(--accent-green, #5bff3a));
+}
+
+.ac-notice--warn {
+  --ac-notice-accent: var(--ac-accent-purple, var(--accent-purple, #b57fff));
+}
+
+.ac-notice--error {
+  --ac-notice-accent: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+}
+
+/* --- [SLOT] examples 3 and 4 ----------------------------------------------
+   The container a notice is announced from. It carries the live role, it is in
+   the markup from the start, and it stays empty until there is something to
+   say.
+
+   It must not be display: none, visibility: hidden, or [hidden] — a region a
+   screen reader is not watching cannot change. An empty box with no border
+   costs one grid gap, which is the price of the whole pattern. */
+
+.ac-nc-slot {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+/* --- [DISMISS] example 5 --------------------------------------------------
+   44px, which is taller than one line of notice text, deliberately. This is
+   the control that gets shrunk to 16px because it "looks neater", and SC
+   2.5.8's floor is 24. `box-sizing` matters here: the border counts into the
+   measured target, so a 24px button with a 2px border is 24px of box and 20px
+   of anything else. */
+
+.ac-notice--dismissible {
+  grid-template-columns: auto 1fr auto;
+}
+
+.ac-notice__dismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: var(--ac-target, 44px);
+  min-height: var(--ac-target, 44px);
+  /* Pulls the oversized target back out of the text's way without shrinking
+     it: the button still measures 44px, it just overlaps the padding. */
+  margin: -0.5rem -0.45rem -0.5rem 0;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: transparent;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  cursor: pointer;
+  appearance: none;
+  transition:
+    background-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease,
+    color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-notice__dismiss svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.ac-notice__dismiss:hover {
+  background: color-mix(in srgb, var(--ac-notice-accent) 16%, transparent);
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+/* Inset, because the button's own margin puts its edge under the notice's
+   border — a 2px offset ring would be clipped by it. */
+.ac-notice__dismiss:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: -1px;
+}
+
+/* --- [BTN] examples 3, 4 and 5 --------------------------------------------
+   The trigger buttons on this page, copied from Button. A notice has no
+   buttons of its own except the close button above, so delete this section
+   unless you want the copy. This library is deliberately not DRY — a change to
+   .ac-btn is a change everywhere it was copied. */
+
+.ac-btn {
+  --ac-btn-accent: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  --ac-btn-on-accent: var(--ac-on-pink, var(--on-pink, #22001a));
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  box-sizing: border-box;
+  min-height: var(--ac-target, 44px);
+  min-width: var(--ac-target, 44px);
+  padding: 0.5rem 1.1rem;
+  border: 2px solid transparent;
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: transparent;
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  appearance: none;
+  transition:
+    background-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease,
+    border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease,
+    color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-btn:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-btn:active {
+  translate: 0 calc(var(--ac-motion, var(--motion, 1)) * var(--ac-press-y, var(--press-y, 1px)));
+  scale: calc(1 - (1 - var(--ac-press-s, var(--press-s, 0.98))) * var(--ac-motion, var(--motion, 1)));
+}
+
+.ac-btn--outline {
+  border-color: var(--ac-btn-accent);
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  color: var(--ac-btn-accent);
+}
+
+.ac-btn--outline:hover {
+  background: color-mix(in srgb, var(--ac-btn-accent) 14%, var(--ac-surface, var(--bg-panel, #110620)));
+}
+
+.ac-btn--sm {
+  min-height: var(--ac-target-min, 24px);
+  min-width: var(--ac-target-min, 24px);
+  padding: 0.25rem 0.7rem;
+  font-size: 0.8rem;
+}
+
+/* --- [MONO] example 2 — delete this ---------------------------------------
+   Drains the color out of a stack of notices so what is left can be counted.
+   `filter` is the whole trick: no color is declared here, so nothing has to be
+   kept in step with [TONES]. */
+
+[data-ac-nc-mono-panel][data-ac-nc-mono-on="true"] .ac-nc-stack {
+  filter: grayscale(1);
+}
+
+/* --- [PANEL] the frame around each example --------------------------------
+   Page furniture: the panels, the captions, the readouts and the announcement
+   log. None of it is part of a notice. Delete the section. */
+
+.ac-nc-panel,
+.ac-nc__note {
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-nc-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.8rem;
+  width: 100%;
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+}
+
+.ac-nc-panel > * {
+  max-width: 100%;
+}
+
+.ac-nc-cases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: 1rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.ac-nc-case,
+.ac-nc-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.ac-nc-case__label,
+.ac-nc-log__label {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-nc__note {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-nc__verdict {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+  overflow-wrap: break-word;
+}
+
+/* Collapsed while empty so the layout reserves no gap for a message nobody has
+   caused yet. The element stays in the DOM and in the accessibility tree —
+   :empty is not display: none. */
+.ac-nc__verdict:empty {
+  display: none;
+}
+
+.ac-nc-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--ac-target-min, 24px);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.ac-nc-check input {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+}
+
+.ac-nc-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  font-size: 0.75rem;
+}
+
+/* Wraps rather than shrinking a value away: at 320px a label and a value do
+   not always fit on one line, and the value is the point. */
+.ac-nc-readout__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.5rem;
+  min-width: 0;
+}
+
+.ac-nc-readout dt,
+.ac-nc-readout dd {
+  margin: 0;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-nc-log {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0.5rem 0.6rem 0.5rem 1.7rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-nc-log:empty::after {
+  content: "nothing yet";
+}
+
+.ac-nc-log b {
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-nc-readout code,
+.ac-nc__note code,
+.ac-nc__verdict code,
+.ac-nc-case__label code,
+.ac-nc-log code {
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+/* The failing readouts are marked as well as colored — the color is gone under
+   forced colors, and it was never the thing carrying the meaning. */
+.ac-nc-readout code[data-ac-nc-bad="true"],
+.ac-nc__verdict[data-ac-nc-bad="true"],
+.ac-nc-log li[data-ac-nc-bad="true"] {
+  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------
+   Forced colors replaces every one of these accents with the same CanvasText,
+   so all four tones come out identical: same edge, same icon, same prefix, and
+   the color-mix tint dropped along with them.
+
+   Nothing here puts the difference back, because nothing can — the user asked
+   for two colors. That is the argument for the prefix word in one screenshot,
+   and it is why this block only has to keep the box readable. */
+
+@media (forced-colors: active) {
+  .ac-notice {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .ac-notice__icon,
+  .ac-notice__prefix {
+    color: CanvasText;
+  }
+
+  .ac-notice__dismiss {
+    border-color: ButtonBorder;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  .ac-notice__dismiss:hover {
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  .ac-btn {
+    border-color: ButtonBorder;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  .ac-btn:focus-visible,
+  .ac-notice__dismiss:focus-visible {
+    outline-color: CanvasText;
+  }
+
+  .ac-nc-panel,
+  .ac-nc-readout,
+  .ac-nc-log {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+
+  /* The failing lines lose their color here, which is why they were never only
+     a color — the sentence beside them says the same thing. */
+  .ac-nc-readout code[data-ac-nc-bad="true"],
+  .ac-nc__verdict[data-ac-nc-bad="true"],
+  .ac-nc-log li[data-ac-nc-bad="true"] {
+    color: CanvasText;
+  }
+}
