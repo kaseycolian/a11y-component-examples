@@ -52,8 +52,8 @@ Decided in advance, so do not re-derive:
 and `status-text`, so it goes last.
 
 **Then** batch D (`tabs` → `jump-nav`), E (`data-table` → `prose-surface`), F (`app-url-maker` →
-`app-page-to-markdown`), and the five non-component items under "Remaining non-component work" —
-items 1–4 are the ones that gate deploying.
+`app-page-to-markdown`), and the six non-component items under "Remaining non-component work" —
+items 1–4 are the ones that gate deploying; 0a and 0b are copy sweeps that can land any time.
 
 One standing caveat for every step above: the header is two rows tall now, so a demo that scrolls an
 anchor into view clears `--header-h`, not 4.5rem. Nothing in the suite needed changing for it, but a
@@ -102,7 +102,7 @@ Then the four items under **Remaining non-component work**, in this order:
 1. **`disclosure` retrofit + spec backfill** — any time, and best as a session warm-up rather than
    squeezed onto the end of one. It is the only component off-convention.
 2. **The shared a11y gate (item 2) — land it before batch F, not after all the components.** Its value
-   is catching a regression across the twenty already built, and every batch after it is checked for
+   is catching a regression across everything already built, and every batch after it is checked for
    free. Doing it last means it only ever runs once.
 3. **Docs (item 3)** — after the gate, because `wcag-mapping.md` should be generated against something
    that is actually being enforced.
@@ -134,7 +134,9 @@ npm run new:component -- <slug> --group <group-id> --name "Display Name"
    gotcha are already decided — implement, do not redesign.
 2. Fill in the scaffolded `component.html` / `.css` / `.js`. The templates already satisfy the token
    chain, the motion gate, the forced-colors block and the IIFE + `destroy()` shape.
-3. Fill in `meta.json` (summary, tags, apg, wcag) and set `status` to `stable`.
+3. Fill in `meta.json` (summary, tags, apg, wcag) and set `status` to `stable`. **The `summary` has
+   its own voice rule** in `CLAUDE.md` under Writing style — prose to a human, no enumerating the
+   examples. `status-text` is the reference; the scaffolded TODO string is not.
 4. Write `docs.md` and the spec. Assert the ARIA contract and keyboard map, not just that it renders.
 5. `npm run check:tokens && npm run build`
 6. `npx playwright test --project=chromium <slug>`

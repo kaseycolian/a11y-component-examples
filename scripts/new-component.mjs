@@ -247,7 +247,7 @@ const meta = `{
   "name": "${name}",
   "group": "${group}",
   "order": 100,
-  "summary": "TODO: one sentence, what it is and why it is here. Shown on the index card.",
+  "summary": "TODO: two or three sentences of prose, written to a person. Lead with the reader's problem, not the ARIA attribute. Never enumerate or count the examples. See CLAUDE.md > Writing style; status-text is the reference.",
   "tags": [],
   "apg": null,
   "wcag": [],
@@ -367,6 +367,7 @@ console.log(`
 Next:
   1. Read the "${slug}" entry in docs/component-specs.md and build to it.
   2. Fill in meta.json (summary, tags, apg, wcag) and flip status to "stable".
+     The summary has its own voice rule -- CLAUDE.md > Writing style.
   3. npm run check:tokens && npm run build
   4. npx playwright test --project=chromium ${slug}
   5. Tick the row in docs/BUILD-STATUS.md`);
