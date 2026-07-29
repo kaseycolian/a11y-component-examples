@@ -1,0 +1,409 @@
+/* ===========================================================================
+   JUMP NAV
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything outside [PANEL] is real component code; the demo frame
+   (ac-demo-*) lives in the site's own stylesheet, not this file.
+
+     [NAV]     every example. The list, the link, the current state.
+     [TARGET]  every example. Two rules on whatever the links point at, and
+               they are the two that decide whether the jump landed.
+     [BROKEN]  example 3. Delete it.
+     [PANEL]   the frame around each example on this page, including the
+               scrolling box that stands in for your page. Delete it.
+     [FORCED]  always ship this. Current is drawn with a tint and an edge, and
+               forced colors drops the tint.
+
+   Copy [NAV] + [TARGET] + [FORCED] for the component.
+
+   The current look is selected by [aria-current], which is the same attribute
+   a screen reader reads — so there is no way to mark a link without saying so.
+   Chip Toggle has the argument in full.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [NAV] every example ---------------------------------------------------
+   A real <ul>, so a screen reader can say how many sections the page has
+   before any of them is read. The bullets and the indent go; the list role
+   does not. */
+
+.ac-jump-nav {
+  min-width: 0;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-jump-nav__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ac-jump-nav__item {
+  min-width: 0;
+}
+
+.ac-jump-nav__link {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  /* SC 2.5.8 asks for 24px. 44px is the comfortable target, and a stack of
+     links on a phone is exactly where the difference is felt. */
+  min-height: 44px;
+  padding: 0.35rem 0.6rem;
+  /* The edge on the current link, declared at its full width in both states
+     so the list cannot reflow when the current section changes and shift the
+     next link out from under a pointer already heading for it. */
+  border-left: 3px solid transparent;
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  transition:
+    background-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease,
+    border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease,
+    color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-jump-nav__link:hover {
+  color: var(--ac-text, var(--text, #f3ecff));
+  background: color-mix(in srgb, var(--ac-accent, var(--accent, #3ceaff)) 10%, transparent);
+}
+
+/* Current differs by three things, because one of them is color and color is
+   never allowed to be the only one (SC 1.4.1): the edge, a tint, and full
+   text color against the muted rest of the list.
+
+   None of the three is generated content. `content: "▸"` would be folded into
+   the link's accessible name and rename it every time the reader scrolled
+   past a heading — Chip Toggle found that one. */
+.ac-jump-nav__link[aria-current] {
+  border-left-color: var(--ac-accent, var(--accent, #3ceaff));
+  background: color-mix(in srgb, var(--ac-accent, var(--accent, #3ceaff)) 16%, transparent);
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-jump-nav__link:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+/* --- [TARGET] every example ------------------------------------------------
+   Put this class on whatever the links point at. Both rules are about the
+   jump landing rather than about how the target looks.
+
+   The offset is one token so a host app sets it once: --ac-jump-offset is the
+   height of whatever is stuck to the top of the scrollport, measured rather
+   than guessed (SC 2.4.11). This site's own --header-h has three values and
+   two of them are line wraps.
+
+   `tabindex="-1"` belongs in the markup, not here — it is the half of the
+   contract CSS cannot express, and example 2 is what leaving it out costs. */
+
+.ac-jump-nav__target {
+  scroll-margin-top: var(--ac-jump-offset, 1rem);
+}
+
+/* :focus, not :focus-visible. The browser focuses the target as part of
+   following the link, and a pointer-initiated move does not match
+   :focus-visible — so the one confirmation a sighted keyboard user gets that
+   the jump landed would be missing exactly when they clicked. Skip Link makes
+   the same call for the same reason.
+
+   The doubled class is deliberate: a host stylesheet shipping
+   `:focus:not(:focus-visible) { outline: none }` — this site does — matches at
+   (0,2,0) and would otherwise cancel this. */
+.ac-jump-nav__target.ac-jump-nav__target:focus {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 3px;
+}
+
+/* --- [BROKEN] example 3 — delete this -------------------------------------
+   Example 2 needs no CSS at all: its three cases differ only by the tabindex
+   in the markup, which is the point. This is example 3's failure, and it is
+   one declaration.
+
+   Both classes, because the failing box carries --sticky as well and two
+   single-class rules are ordered by source rather than by intent — the same
+   trap Icon Button documents. */
+
+.ac-jn-doc--sticky.ac-jn-doc--under {
+  --ac-jump-offset: 0px;
+}
+
+/* --- [PANEL] the frame around each example --------------------------------
+   Page furniture: the scrolling box that stands in for your page, the case
+   columns, the readouts and the two plain buttons the demos press. None of it
+   is part of a jump nav. Button owns the real one. Delete the section. */
+
+.ac-jn-panel,
+.ac-jn__note {
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-jn-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.9rem;
+  width: 100%;
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+}
+
+.ac-jn-panel > * {
+  max-width: 100%;
+}
+
+/* The scrolling stand-in for your page. It is a scroll container, so Chromium
+   hands it a tab stop with no role, no name and a 1px near-black UA outline —
+   hence tabindex="0", role="region", a label, and a ring of its own. Effects
+   owns that finding; your page needs none of it. */
+.ac-jn-doc {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-height: 13rem;
+  overflow-y: auto;
+  padding: 0 0.75rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-bg, var(--bg, #070110));
+}
+
+.ac-jn-doc--short {
+  max-height: 8rem;
+}
+
+.ac-jn-doc:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+/* This page's scrollport is the box above, not the window, so the offset is
+   the box's own sticky bar rather than the site header. At (0,2,0) this also
+   beats the site's global `[id] { scroll-margin-top }` rule, which is aimed at
+   the page header and would otherwise push every heading most of the way out
+   of a 13rem box. */
+.ac-jn-doc .ac-jump-nav__target {
+  scroll-margin-top: var(--ac-jump-offset, 0.5rem);
+}
+
+.ac-jn-doc--sticky {
+  --ac-jump-offset: 2.4rem;
+  padding-top: 0;
+}
+
+.ac-jn-doc__bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 0 -0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--ac-border, var(--border, #34205a));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-jn-sec {
+  padding: 0.5rem 0 1.4rem;
+}
+
+/* Room under the last section so it can still scroll to the top of the box.
+   Without it the final link looks broken. */
+.ac-jn-sec:last-child {
+  padding-bottom: 9rem;
+}
+
+.ac-jn-sec p {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* A host page's own h1–h6 rules cascade into every property a class stays
+   quiet about — Typography's finding — so this declares the three the shell
+   sets as well as the ones it cares about. */
+.ac-jn-sec__title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: normal;
+  text-transform: none;
+  text-shadow: none;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-jn-cases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 1rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.ac-jn-case {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Two navs stacked in one case (example 5) read as a single list of four
+   without a line between them. The failure there is that a landmark menu
+   cannot tell them apart, not that you cannot. */
+.ac-jn-case .ac-jump-nav + .ac-jump-nav {
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--ac-border, var(--border, #34205a));
+}
+
+.ac-jn-case__label {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-jn__note {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-jn-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.ac-jn-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.ac-jn-btn:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-jn-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  font-size: 0.75rem;
+}
+
+.ac-jn-readout__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.5rem;
+  min-width: 0;
+}
+
+.ac-jn-readout dt,
+.ac-jn-readout dd {
+  margin: 0;
+  min-width: 0;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-jn-readout code,
+.ac-jn__note code,
+.ac-jn-case__label code {
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+  overflow-wrap: anywhere;
+}
+
+/* The failing readouts are marked as well as colored — the color is gone under
+   forced colors, and it was never the thing carrying the meaning. */
+.ac-jn-readout code[data-ac-jn-bad="true"] {
+  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------
+   The tint is a color-mix, which forced colors drops outright, so two of the
+   three cues for "current" would collapse into the edge alone. The current
+   link is repainted as a system-selected control instead, and the edge comes
+   back in HighlightText so it still reads against the new fill. */
+
+@media (forced-colors: active) {
+  .ac-jump-nav__link {
+    color: LinkText;
+  }
+
+  .ac-jump-nav__link[aria-current] {
+    border-left-color: HighlightText;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  .ac-jump-nav__link:focus-visible,
+  .ac-jump-nav__target.ac-jump-nav__target:focus,
+  .ac-jn-doc:focus-visible,
+  .ac-jn-btn:focus-visible {
+    outline-color: CanvasText;
+  }
+
+  .ac-jn-panel,
+  .ac-jn-doc,
+  .ac-jn-doc__bar,
+  .ac-jn-readout {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .ac-jn-btn {
+    border-color: ButtonBorder;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  .ac-jn-readout code[data-ac-jn-bad="true"] {
+    color: CanvasText;
+  }
+}

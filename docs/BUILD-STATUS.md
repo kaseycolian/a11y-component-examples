@@ -11,58 +11,57 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-29 (tabs — batch D is half done, `jump-nav` closes it; the `summary` voice
-changed on 2026-07-28, see item 0a)
+Last updated: 2026-07-29 (jump-nav — **batch D is closed**, `navigation` is complete; the `summary`
+voice changed on 2026-07-28, see item 0a)
 
 ---
 
-## START HERE — next component is `jump-nav`, closing batch D
+## START HERE — next component is `data-table`, opening batch E
 
-`tabs` landed: 29/29, suite is **644/644** in Chromium. Nothing was left open. Four findings from it
-are in the gotchas list and two are worth a skim before building anything that measures the keyboard:
-**`el.focus()` plus a read of `document.activeElement` is a focusability probe** and is what every
-readout on that page is built on, and **`toHaveAccessibleName` on a `[hidden]` element returns `""`**,
-which is correct and fails the assertion that proves the markup is right.
+`jump-nav` landed: 20/20, suite is **664/664** in Chromium. Nothing was left open. Two findings from
+it are in the gotchas list and the first is worth a skim before building anything that follows a
+fragment: **an unfocusable fragment target does not leave focus on the link — the browser focuses the
+document, so the next Tab starts at the top of the page.**
 
 **Read the `summary` rule in `CLAUDE.md` under Writing style before writing any `meta.json`.** It
 changed on 2026-07-28: the lede is prose written to a person, two or three sentences, leading with
 the reader's problem rather than the ARIA attribute, and **never enumerating or counting the
-examples**. `status-text`, `badge`, `result-panel` and `tabs` are written to it and are the
-references; everything earlier is the sweep in item 0a. The same session tightened the on-page copy
-rule (item 0b).
+examples**. `status-text`, `badge`, `result-panel`, `tabs` and `jump-nav` are written to it and are
+the references; everything earlier is the sweep in item 0a. The same session tightened the on-page
+copy rule (item 0b).
 
 ### The steps, in order
 
-**Step 1 — `jump-nav`.** Run the loop under "The loop for building one component" with:
+**Step 1 — `data-table`.** Run the loop under "The loop for building one component" with:
 
 ```sh
-node scripts/new-component.mjs jump-nav --group navigation --name "Jump Nav"
+node scripts/new-component.mjs data-table --group data-display --name "Data Table"
 ```
 
 Decided in advance, so do not re-derive:
 
-- Spec entry: `component-specs.md` → navigation → `jump-nav`. `<nav aria-label="On this page">` with
-  in-page anchors and `aria-current="location"` on the active one.
-- **`tabs` already owns the `aria-selected`-versus-`aria-current` argument** and the `page` versus
-  `location` distinction — its example 5 has a row of links wearing `role="tab"` beside the same
-  links in a `<nav>`, live. Point at it once; this page owns the *scroll* half, which `tabs` does
-  not touch: which section is current, and how that is worked out without a listener per scroll
-  event.
-- **Targets need `tabindex="-1"`** so focus actually lands when the anchor is followed, and
-  `scroll-margin-top` clearing the sticky header (SC 2.4.11) — which `site.css` already does
-  globally for every `[id]`, so read `--header-h` rather than a number.
-- **Throttle anything that watches scroll**, and put nothing live on it: a region firing per scroll
-  event is unusable. `IntersectionObserver` rather than a scroll handler.
-- `tabs`' `[FOCUS]` probe is the thing to lift if a demo has to prove a target really took focus.
+- Spec entry: `component-specs.md` → data-display → `data-table`. `<table>` with `<caption>`,
+  `<thead>`, `scope="col"` / `scope="row"`.
+- **Never `display: block` the table to make it responsive** — it drops the table role in Chrome and
+  Safari and takes the row/column relationships with it. Wrap and scroll instead. That gotcha is
+  already in the list below and `scripts/rehype-scrollable-tables.mjs` is the shell doing exactly
+  this to every `docs.md` table, so it is a working precedent to read.
+- **The scroll wrapper is `effects`' finding again**: `tabindex="0"` + `role="region"` + a name, plus
+  a focus ring, or Chromium hands it a silent tab stop. `jump-nav`'s `.ac-jn-doc` and `effects`'
+  `[PATCH]` are both lifts.
+- `<caption>` is the table's accessible name. Keep it even when it is clipped.
 - **Keep the on-page copy short** — item 0b.
 
-**Then** batch E (`data-table` → `prose-surface`), F (`app-url-maker` → `app-page-to-markdown`), and
-the six non-component items under "Remaining non-component work" — items 1–4 are the ones that gate
-deploying; 0a and 0b are copy sweeps that can land any time.
+**Step 2 — `prose-surface`**, which is the scroll-region pattern `data-table` establishes, applied to
+running text.
 
-One standing caveat for every step above: the header is two rows tall now, so a demo that scrolls an
-anchor into view clears `--header-h`, not 4.5rem. Nothing in the suite needed changing for it, but a
-new component that positions anything against the viewport top should read that token.
+**Then** batch F (`app-url-maker` → `app-page-to-markdown`) and the six non-component items under
+"Remaining non-component work" — items 1–4 are the ones that gate deploying; 0a and 0b are copy
+sweeps that can land any time.
+
+One standing caveat for every step above: the header is two rows tall, so a demo that scrolls an
+anchor into view clears `--header-h`, not 4.5rem. A new component that positions anything against
+the viewport top should read that token.
 
 ---
 
@@ -79,7 +78,7 @@ Build in this order. The order is the dependency graph, not a preference.
 | ~~**A**~~ | ~~`effects`~~ | **Done.** Closed `foundations` |
 | ~~**B**~~ | ~~`button` → `icon-button` → `loading-button` → `chip-toggle`~~ | **Done.** Closed `buttons-actions` |
 | ~~**C**~~ | ~~`notice` → `status-text` → `badge` → `result-panel`~~ | **Done.** Closed `feedback-status` |
-| **D** | ~~`tabs`~~ → `jump-nav` | `tabs` is **done**; `jump-nav` reuses its `aria-current` thinking and owns the scroll half |
+| ~~**D**~~ | ~~`tabs` → `jump-nav`~~ | **Done.** Closed `navigation` |
 | **E** | `data-table` → `prose-surface` | `prose-surface` is the scroll-region pattern `data-table` establishes |
 | **F** | `app-url-maker` → `app-page-to-markdown` | **last.** They compose the others and cannot be built before them |
 
@@ -103,6 +102,10 @@ Cross-batch notes that will otherwise be rediscovered:
   its example 5. `jump-nav` and anything later with a strip of controls points at it rather than
   re-deriving either. `src/site/components/CodePanel.astro` still has its own older copy of the
   pattern and is a candidate for the item 1 retrofit.
+- **`jump-nav` owns everything about following a fragment.** Where focus goes when the target cannot
+  take it, `scroll-margin-top` against a sticky header (SC 2.4.11), and `IntersectionObserver`
+  against a scroll handler. Anything later that moves someone within a page — `prose-surface`, both
+  batch F apps — points at it rather than re-deriving any of the three.
 - **Batch F composes with `effects`** — `app-page-to-markdown` is specified around `fx-bar-top`,
   `fx-scroll` and `fx-bar-bottom`, which are now documented and patched. Its scrollable preview is
   the `fx-scroll` case: `tabindex="0"` + `role="region"` + a name, and the focus ring from
@@ -216,7 +219,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 30 / 35
+## Component roster — 31 / 35
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -585,7 +588,30 @@ take their logic and not their layout. See item 1 under remaining work.
   element's accessible name is `""`** — correct, and it fails the assertion that proves the markup is
   right. And **`test.use({ forcedColors })` is still ignored**; `page.emulateMedia` in a `beforeEach`,
   as everywhere else.
-- [ ] `jump-nav`
+- [x] `jump-nav` — done. 20/20 tests in Chromium. **The subject is the other end of the link.** The
+  links are ordinary links and the component's own JS is one `IntersectionObserver`; everything that
+  can go wrong is on the target, which is why the contract is `tabindex="-1"` plus
+  `scroll-margin-top` and the factory sets **neither** — the tabindex is in the markup so the
+  keyboard behaves the same before the script loads and after, which is `tabs`' call about its panel
+  made a second time, and it is what makes example 2's failure possible. Defers to `tabs` for
+  `aria-selected`-versus-`aria-current` and `page`-versus-`location`. Example 2 is three documents
+  one attribute apart with the landing printed under each; example 3 measures the overlap between the
+  heading and a bar stuck above it (35px against a 3px clearance); example 4 counts scroll events
+  against section changes on one document; example 5 prints the landmark menu two navs produce named
+  and unnamed. Four findings. **An unfocusable fragment target does not leave focus on the link** —
+  the headline, see the gotchas list; it makes example 2 much stronger than the version it was
+  designed as. **A settle-poll that starts in the same frame as the scroll request reports the state
+  before the scroll** — also in the gotchas list, and it is what "the readout never updated" looked
+  like. **The demo's scrollport is a box, so the site's global `[id] { scroll-margin-top }` had to be
+  beaten at (0,2,0)** — the shell rule is aimed at the page header and would otherwise push every
+  heading most of the way out of a 13rem box; the spec asserts the resolved value is under 20px so
+  the collision cannot come back silently. And the failing box in example 3 carries **two** single-
+  class modifiers setting the same custom property, so `--under` lost to `--sticky` on source order
+  alone — `icon-button`'s ordering finding arriving through a custom property instead of `padding`.
+  The target's ring is `:focus`, not `:focus-visible`, for `skip-link`'s reason, and it carries a
+  doubled class for `focus-ring`'s.
+
+**`navigation` is complete.**
 
 ### feedback-status
 - [x] `notice` — done. 23/23 tests in Chromium. **Canonical home for the SC 1.4.1 glyph argument and
@@ -1082,6 +1108,22 @@ It must match `npm run preview` exactly, base path included.
   `border-bottom` declared at its full width in *both* states, transparent when unselected, so the
   row cannot reflow and shift the next tab out from under a pointer already heading for it. This is
   the layout half of the same rule `chip-toggle` found for its tick.
+- **An unfocusable fragment target does not leave focus on the link.** Following `<a href="#x">`
+  where `#x` cannot take focus does not fail quietly by leaving the keyboard where it was — the
+  browser runs the focusing steps for the document's viewport, so `document.activeElement` comes
+  back as `<body>` and the next Tab starts at the **top of the page**. A keyboard reader who asked
+  to be moved down the page is moved to the beginning of it. Browser-confirmed in Chromium, and it
+  is strictly worse than the failure `jump-nav` was designed around; the test asserts `body` is
+  focused, which reads oddly and is the correct assertion. `tabindex="-1"` on the target is the fix
+  and it is one attribute.
+- **A settle-poll that starts in the same frame as the scroll request reports the state before the
+  scroll.** "scrollTop has not changed for three frames" is true immediately after
+  `scrollTo({ behavior: 'smooth' })` and after a fragment jump, because both begin *after* the frame
+  they were requested in — so the callback fires against the old position and the readout looks like
+  it never ran. `jump-nav`'s `whenSettled` waits for a move to have been *seen*, or twenty frames
+  without one, before it will call anything settled. Same family as the geometry-polling gotchas
+  above, arriving from the other direction: the poll was not too early to be stable, it was stable
+  too early.
 - **Astro's bundled `site.css` loads *after* every `component.css`.** Head order is theme, effects,
   dropdown, the page's component, then the `_astro/*.css` bundle. So a shell rule at **equal**
   specificity wins over a component's. This bites exactly one rule shape: `site.css` ships a global
