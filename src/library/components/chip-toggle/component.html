@@ -1,0 +1,281 @@
+<!-- ===========================================================================
+     CHIP TOGGLE — a button that stays down
+
+     WHAT TO COPY
+       Example 1 is the component. Examples 2 to 5 are what the pressed state
+       costs when it is carried by the wrong thing. Each names the CSS and JS
+       sections it needs.
+
+     THE CONTRACT
+       .ac-btn .ac-chip          both classes. The base is button's, copied.
+       aria-pressed="false"      present from the start, never removed. It is
+                                 also the selector that draws the pressed look,
+                                 so there is no way to show one without it.
+       type="button"             the default is submit.
+       role="group" + a name     on the row, so the set is announced as a set.
+       The accessible name never changes.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     =========================================================================== -->
+
+<div class="ac-demo-grid" data-ac-chip-toggle>
+  <!-- ======================================================================
+       EXAMPLE 1 · The specimen
+       CSS [BTN] + [CHIP] + [ROW] + [ACCENTS] + [PANEL]. JS [CORE] + [FILTER].
+
+       Four filter chips in a named group, and a status line that reports what
+       pressing one did. The chips carry the state; the region carries the
+       result.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">1 &middot; The specimen</h3>
+
+    <div class="ac-ct-panel" data-ac-ct-filter>
+      <p class="ac-chip-row__label" id="ac-ct-crate">Filter the crate</p>
+      <div class="ac-chip-row" role="group" aria-labelledby="ac-ct-crate">
+        <button class="ac-btn ac-chip" type="button" aria-pressed="false"
+                data-ac-chip data-ac-ct-count="99">Live</button>
+        <button class="ac-btn ac-chip" type="button" aria-pressed="false"
+                data-ac-chip data-ac-ct-count="64">Split</button>
+        <button class="ac-btn ac-chip" type="button" aria-pressed="false"
+                data-ac-chip data-ac-ct-count="141">B-side</button>
+        <button class="ac-btn ac-chip" type="button" aria-pressed="false"
+                data-ac-chip data-ac-ct-count="31">Compilation</button>
+      </div>
+
+      <!-- Populated on the server. A live region announces changes, not the
+           text it was rendered with, so this first line is silent by design. -->
+      <p class="ac-chip-status" role="status" data-ac-ct-result>462 records &middot; no filters</p>
+
+      <p class="ac-ct__note">
+        Press one. The label never changes &mdash; the state is in
+        <code>aria-pressed</code>, and the result is in the line above.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 2 · Pressed is not a color
+       CSS [BTN] + [CHIP] + [ROW] + [PANEL] + [BROKEN]. JS [CORE] + [CUES].
+
+       Three chips that all look pressed. Press each one: the readout lists
+       what actually changed, and what the chip is called afterwards.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">2 &middot; Pressed is not a color</h3>
+
+    <div class="ac-ct-panel" data-ac-ct-cues>
+      <div class="ac-ct-cases">
+        <div class="ac-ct-case">
+          <!-- BROKEN ON PURPOSE — the fill is the only difference. -->
+          <button class="ac-btn ac-chip ac-ct-chip-flat" type="button" aria-pressed="false"
+                  data-ac-chip data-ac-ct-cue="flat">Sold out</button>
+          <p class="ac-ct-case__label">fill only</p>
+
+          <dl class="ac-ct-readout">
+            <div class="ac-ct-readout__row">
+              <dt>differs by</dt><dd><code data-ac-ct-out="flat-cues">&mdash;</code></dd>
+            </div>
+            <div class="ac-ct-readout__row">
+              <dt>name pressed</dt><dd><code data-ac-ct-out="flat-name">&mdash;</code></dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="ac-ct-case">
+          <button class="ac-btn ac-chip" type="button" aria-pressed="false"
+                  data-ac-chip data-ac-ct-cue="tick">All ages</button>
+          <p class="ac-ct-case__label">the specimen</p>
+
+          <dl class="ac-ct-readout">
+            <div class="ac-ct-readout__row">
+              <dt>differs by</dt><dd><code data-ac-ct-out="tick-cues">&mdash;</code></dd>
+            </div>
+            <div class="ac-ct-readout__row">
+              <dt>name pressed</dt><dd><code data-ac-ct-out="tick-name">&mdash;</code></dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="ac-ct-case">
+          <!-- BROKEN ON PURPOSE — the tick is a character in `content`, and
+               generated content lands in the accessible name. -->
+          <button class="ac-btn ac-chip ac-ct-chip-glyph" type="button" aria-pressed="false"
+                  data-ac-chip data-ac-ct-cue="glyph">Matinee</button>
+          <p class="ac-ct-case__label">a &check; in <code>content</code></p>
+
+          <dl class="ac-ct-readout">
+            <div class="ac-ct-readout__row">
+              <dt>differs by</dt><dd><code data-ac-ct-out="glyph-cues">&mdash;</code></dd>
+            </div>
+            <div class="ac-ct-readout__row">
+              <dt>name pressed</dt><dd><code data-ac-ct-out="glyph-name">&mdash;</code></dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <p class="ac-ct__note">
+        Press each one. The readout lists what actually changed, and what the
+        chip is called afterwards.
+      </p>
+
+      <p class="ac-ct__verdict" role="status" data-ac-ct-cues-verdict></p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 3 · The name has to stay still
+       CSS [BTN] + [CHIP] + [ROW] + [PANEL]. JS [CORE] + [NAMES].
+
+       One chip says its state twice, in two words that do not agree. The
+       readout records the name and aria-pressed together.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">3 &middot; The name has to stay still</h3>
+
+    <div class="ac-ct-panel" data-ac-ct-names>
+      <div class="ac-ct-cases">
+        <div class="ac-ct-case">
+          <!-- BROKEN ON PURPOSE — the label is being used as the state. -->
+          <button class="ac-btn ac-chip" type="button" aria-pressed="false"
+                  data-ac-chip data-ac-ct-name="swap" data-ac-ct-swap="Following">Follow</button>
+          <p class="ac-ct-case__label">renames itself</p>
+
+          <dl class="ac-ct-readout">
+            <div class="ac-ct-readout__row">
+              <dt>up</dt><dd><code data-ac-ct-out="swap-off">&mdash;</code></dd>
+            </div>
+            <div class="ac-ct-readout__row">
+              <dt>down</dt><dd><code data-ac-ct-out="swap-on">&mdash;</code></dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="ac-ct-case">
+          <button class="ac-btn ac-chip" type="button" aria-pressed="false"
+                  data-ac-chip data-ac-ct-name="keep">Follow</button>
+          <p class="ac-ct-case__label">keeps its name</p>
+
+          <dl class="ac-ct-readout">
+            <div class="ac-ct-readout__row">
+              <dt>up</dt><dd><code data-ac-ct-out="keep-off">&mdash;</code></dd>
+            </div>
+            <div class="ac-ct-readout__row">
+              <dt>down</dt><dd><code data-ac-ct-out="keep-on">&mdash;</code></dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <p class="ac-ct__note">
+        Press both. One of them is called something different on the way back up.
+      </p>
+
+      <p class="ac-ct__verdict" role="status" data-ac-ct-names-verdict></p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 4 · Toggle button, checkbox, or switch
+       CSS [BTN] + [CHIP] + [ROW] + [CHECK] + [PANEL]. JS [CORE] + [SUBMITS].
+
+       Three chips that look the same and are three different controls. Press
+       "What would submit?" for the one difference you cannot hear.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">4 &middot; Toggle button, checkbox, or switch</h3>
+
+    <div class="ac-ct-panel" data-ac-ct-submits>
+      <form class="ac-chip-row" data-ac-ct-form aria-label="Crate filters">
+        <button class="ac-btn ac-chip" type="button" aria-pressed="false"
+                data-ac-chip>Split</button>
+
+        <label class="ac-btn ac-chip ac-chip--check">
+          <input class="ac-chip__input" type="checkbox" name="format" value="7-inch" />
+          <span>7-inch</span>
+        </label>
+
+        <button class="ac-btn ac-chip" type="button" role="switch" aria-checked="false"
+                data-ac-chip-switch>In stock</button>
+      </form>
+
+      <dl class="ac-ct-readout">
+        <div class="ac-ct-readout__row">
+          <dt>Split</dt><dd><code data-ac-ct-out="what-split">&mdash;</code></dd>
+        </div>
+        <div class="ac-ct-readout__row">
+          <dt>7-inch</dt><dd><code data-ac-ct-out="what-check">&mdash;</code></dd>
+        </div>
+        <div class="ac-ct-readout__row">
+          <dt>In stock</dt><dd><code data-ac-ct-out="what-switch">&mdash;</code></dd>
+        </div>
+        <div class="ac-ct-readout__row">
+          <dt>would submit</dt><dd><code data-ac-ct-out="what-data">&mdash;</code></dd>
+        </div>
+      </dl>
+
+      <button class="ac-btn ac-btn--outline ac-btn--sm" type="button" data-ac-ct-ask>
+        What would submit?
+      </button>
+
+      <p class="ac-ct__note">
+        Press some chips, then ask. Only the checkbox has a value to send.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 5 · A row of chips is a row of tab stops
+       CSS [BTN] + [CHIP] + [ROW] + [PANEL]. JS [CORE] + [ROVING].
+
+       The same five chips as a plain group and as a toolbar. Tab into each and
+       count the stops; in the toolbar the arrow keys move instead.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">5 &middot; A row of chips is a row of tab stops</h3>
+
+    <div class="ac-ct-panel" data-ac-ct-roving>
+      <div class="ac-ct-cases">
+        <div class="ac-ct-case">
+          <p class="ac-chip-row__label" id="ac-ct-plain">Format &mdash; group</p>
+          <div class="ac-chip-row" role="group" aria-labelledby="ac-ct-plain" data-ac-ct-plain>
+            <button class="ac-btn ac-chip ac-chip--sm" type="button" aria-pressed="false"
+                    data-ac-chip>7-inch</button>
+            <button class="ac-btn ac-chip ac-chip--sm" type="button" aria-pressed="false"
+                    data-ac-chip>10-inch</button>
+            <button class="ac-btn ac-chip ac-chip--sm" type="button" aria-pressed="false"
+                    data-ac-chip>LP</button>
+            <button class="ac-btn ac-chip ac-chip--sm" type="button" aria-pressed="false"
+                    data-ac-chip>Cassette</button>
+            <button class="ac-btn ac-chip ac-chip--sm" type="button" aria-pressed="false"
+                    data-ac-chip>Zine</button>
+          </div>
+          <p class="ac-ct-case__out">tab stops: <code data-ac-ct-out="plain-stops">&mdash;</code></p>
+        </div>
+
+        <div class="ac-ct-case">
+          <p class="ac-chip-row__label" id="ac-ct-bar">Format &mdash; toolbar</p>
+          <div class="ac-chip-row" role="toolbar" aria-labelledby="ac-ct-bar" data-ac-chip-toolbar>
+            <button class="ac-btn ac-chip ac-chip--sm" type="button" aria-pressed="false"
+                    data-ac-chip>7-inch</button>
+            <button class="ac-btn ac-chip ac-chip--sm" type="button" aria-pressed="false"
+                    data-ac-chip>10-inch</button>
+            <button class="ac-btn ac-chip ac-chip--sm" type="button" aria-pressed="false"
+                    data-ac-chip>LP</button>
+            <button class="ac-btn ac-chip ac-chip--sm" type="button" aria-pressed="false"
+                    data-ac-chip>Cassette</button>
+            <button class="ac-btn ac-chip ac-chip--sm" type="button" aria-pressed="false"
+                    data-ac-chip>Zine</button>
+          </div>
+          <p class="ac-ct-case__out">tab stops: <code data-ac-ct-out="bar-stops">&mdash;</code></p>
+        </div>
+      </div>
+
+      <p class="ac-ct__note">
+        Neither is wrong. Past about six chips the toolbar stops the row swallowing
+        the tab order; below that it is a keyboard map nobody asked for.
+      </p>
+    </div>
+  </div>
+</div>

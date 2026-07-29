@@ -11,35 +11,58 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-28 (loading-button)
+Last updated: 2026-07-28 (chip-toggle, then the shell navigation tweak)
 
 ---
 
-## START HERE — next component is `chip-toggle`
+## START HERE — next component is `notice`, opening batch C
 
-`loading-button` landed (16/16 Chromium, 488/488 full suite). Run the loop below with:
+Two things landed since the last resume point, both verified, neither leaving anything open:
+
+1. `chip-toggle` — 21/21, and **`buttons-actions` is complete**.
+2. **Shell navigation tweak** (no component touched): the sidebar is gone below 901px, the header's
+   components picker moved beneath the theme/motion settings, `--header-h` is now measured per
+   breakpoint, and `tests/site-header.spec.mjs` gained three layout tests. Suite is **512/512** in
+   Chromium.
+
+### The steps, in order
+
+**Step 1 — `notice`.** Run the loop under "The loop for building one component" with:
 
 ```sh
-node scripts/new-component.mjs chip-toggle --group buttons-actions --name "Chip Toggle"
+node scripts/new-component.mjs notice --group feedback-status --name "Notice"
 ```
 
 Decided in advance, so do not re-derive:
 
-- Spec entry: `component-specs.md` → buttons-actions → `chip-toggle`. `<button class="ac-chip"
-  aria-pressed="false">` — a **toggle button**, not a checkbox and not a `role="switch"`.
-- **Extend `.ac-btn`, do not invent a parallel surface.** Copy `[BTN]` out of
-  `loading-button/component.css` — base + weights + accents + `--sm`, nothing else. That copy now
-  exists in seven places; a change to `.ac-btn` is a change in all seven.
-- **The pressed state needs a non-color cue** (fill *and* border, or a tick). Color alone is SC
-  1.4.1, and under forced colors the fill is replaced by a system color that says nothing.
-- **Do not swap the label on toggle.** `aria-pressed` already conveys it and doing both makes AT
-  announce a contradiction. This is the same rule `loading-button` example 4 and `switch` make —
-  point at one of them rather than re-arguing it.
-- `aria-pressed` versus `role="switch"` versus a checkbox is worth one short table, and `switch`
-  already owns the "older JAWS announces `role="switch"` inconsistently" note.
+- Spec entry: `component-specs.md` → feedback-status → `notice`. `.ac-notice` with `--info` /
+  `--success` / `--warn` / `--error`, each with an `aria-hidden` icon **and** a text prefix.
+- **This is the canonical home for the SC 1.4.1 glyph argument.** The icon is decoration; the
+  *word* ("Error:") carries the meaning. `status-text` restates it in a smaller shape and must
+  point here rather than re-arguing it — otherwise the two pages read as duplicates.
+- **Static versus announced is the component's real subject.** A notice rendered with the page gets
+  no live role at all; one that appears in response to an action gets `role="status"`, and
+  `role="alert"` is for errors only. A `role="alert"` present at page load fires on every render —
+  that is the live failure to ship.
+- `live-region` already owns the "the region must exist before the text" argument and the
+  clear-then-write recipe. Lift them, do not restate them.
+- **Read `chip-toggle` first, not `dropdown`.** It is the most recent worked example of the numbered
+  `EXAMPLE n ·` sections, the copy map, and shipping deliberate failures beside the correct version.
 - **Keep the on-page copy short** — see the writing note under "Remaining non-component work" item 0.
-- This closes `buttons-actions`. Batch C (`notice` → `status-text` → `badge` → `result-panel`) is
-  next.
+
+**Step 2 — `status-text`.** The same argument at label scale. Points at `notice` for the glyph
+reasoning rather than repeating it.
+
+**Step 3 — `badge`.** **Step 4 — `result-panel`.** Both close batch C and the `feedback-status`
+group; `result-panel` is the one that composes `notice` and `status-text`, so it goes last.
+
+**Then** batch D (`tabs` → `jump-nav`), E (`data-table` → `prose-surface`), F (`app-url-maker` →
+`app-page-to-markdown`), and the five non-component items under "Remaining non-component work" —
+items 1–4 are the ones that gate deploying.
+
+One standing caveat for every step above: the header is two rows tall now, so a demo that scrolls an
+anchor into view clears `--header-h`, not 4.5rem. Nothing in the suite needed changing for it, but a
+new component that positions anything against the viewport top should read that token.
 
 ---
 
@@ -54,7 +77,7 @@ Build in this order. The order is the dependency graph, not a preference.
 | Batch | Slugs | Why here |
 | --- | --- | --- |
 | ~~**A**~~ | ~~`effects`~~ | **Done.** Closed `foundations` |
-| **B** | ~~`button`~~ → ~~`icon-button`~~ → ~~`loading-button`~~ → `chip-toggle` | `button` is the canonical `.ac-btn`; the other three extend it |
+| ~~**B**~~ | ~~`button` → `icon-button` → `loading-button` → `chip-toggle`~~ | **Done.** Closed `buttons-actions` |
 | **C** | `notice` → `status-text` → `badge` → `result-panel` | all four are small, and three of them restate `live-region`'s argument in a new shape |
 | **D** | `tabs` → `jump-nav` | `tabs` is the largest behavior left; `jump-nav` reuses its `aria-current` thinking |
 | **E** | `data-table` → `prose-surface` | `prose-surface` is the scroll-region pattern `data-table` establishes |
@@ -64,9 +87,8 @@ Cross-batch notes that will otherwise be rediscovered:
 
 - **`.ac-btn` now lives in `button` and the local copies stay.** `.ac-motion__btn` in
   `motion-preferences`, the addon buttons in `input-group`, `modal`, `drawer` and `tooltip`, and the
-  `[BTN]` sections of `icon-button` and `loading-button` are deliberate duplicates — components are
-  not DRY here. A change to `.ac-btn` is a change in all seven. `loading-button`'s copy is the one to
-  lift for `chip-toggle`: base + weights + accents + `--sm` with nothing else.
+  `[BTN]` sections of `icon-button`, `loading-button` and `chip-toggle` are deliberate duplicates —
+  components are not DRY here. A change to `.ac-btn` is a change in all **eight**.
 - **`result-panel`'s copy button is `input-group`'s copy button.** Same clipboard write, same
   pre-existing empty `role="status"`, same rule against renaming the button. Lift it.
 - **`status-text` and `notice` are the same SC 1.4.1 point twice** — the glyph is `aria-hidden` and the
@@ -156,8 +178,9 @@ take their logic and not their layout. See item 1 under remaining work.
   described hint says so in advance (SC 3.2.2). A `Go` button, hidden by default, appears at `load` if
   the Dropdown never enhanced the select — a bare native select fires `change` on every arrow key.
   Prominence is set with `--ac-*` tokens on the wrapper (accent border, wider trigger) rather than by
-  reaching into the component's internals. Two rows on a phone: brand + settings, then the picker
-  full-width.
+  reaching into the component's internals. **Two rows at every width**: settings top-right, then the
+  picker beneath them — right-aligned above 760px, full-width below. The picker is *after* the
+  settings in the DOM as well as on screen, so Tab never runs back up the page (SC 2.4.3).
 - **Header theme picker** — is the library's own Dropdown, loaded site-wide from
   `public/library/components/dropdown/` by `BaseLayout`. The shell is a *consumer* of the library, so
   a regression in the dropdown breaks the site, not just a test. Covered by
@@ -166,16 +189,25 @@ take their logic and not their layout. See item 1 under remaining work.
   excerpt right (`tabindex="0"` + `role="group"`, because it scrolls sideways). No component counts
   anywhere: see the **Writing style** rules in `CLAUDE.md` — never count, and demo content is 90s punk
   song/album references with `462` and `99` as the arbitrary numbers.
+- **Sidebar (`ComponentNav`)** — the column from 901px up, `display: none` below it. Stacked, the
+  full roster sat between the header and the page the visitor asked for; the header picker is the
+  same list, grouped the same way, and it is already on screen. Nothing else navigates, so any change
+  that hides the picker on mobile has to bring the sidebar back.
+- **`--header-h` is measured, not guessed.** It drives `scroll-margin-top` on every `[id]`
+  (SC 2.4.11), so it must be ≥ the header's real height at *every* width, and a two-row header's
+  height depends on what wrapped. Three values — 9.75rem, 8.5rem below 760px, 9.25rem below 340px
+  where the brand wraps to two lines. `tests/site-header.spec.mjs` asserts the token covers the real
+  height at five widths; that test is the guard, not the comment.
 - **Markdown tables** — `scripts/rehype-scrollable-tables.mjs` wraps every `docs.md` table in a
   focusable `.table-scroll` region. Without it every component page overflowed sideways at 320px.
 - **Playwright** — `playwright.config.mjs`, three browser projects, `webServer` runs
   `npm run build && npm run preview`. **Only Chromium is installed**, so `npm run verify` currently
   *fails* at the test step: every Firefox and WebKit test errors with "Executable doesn't exist".
-  Chromium is **488/488**. Run `npx playwright install firefox webkit` to get a green `verify`.
+  Chromium is **512/512**. Run `npx playwright install firefox webkit` to get a green `verify`.
 
 ---
 
-## Component roster — 24 / 35
+## Component roster — 25 / 35
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -370,7 +402,33 @@ take their logic and not their layout. See item 1 under remaining work.
   against exactly that; the spinner is the visible cue and `aria-disabled` is about behavior. The
   demo grid stacks its two cases at every real width, so **"left"/"right" in demo copy is wrong** —
   name the cases instead.
-- [ ] `chip-toggle`
+- [x] `chip-toggle` — done. 21/21 tests in Chromium. **Canonical home for `.ac-chip`**, which is a
+  pill radius, a lighter weight and one state rule on top of a local copy of `button`'s base. The
+  pressed look is selected by `[aria-pressed="true"]` — the same attribute a screen reader reads, so
+  there is no way to draw a chip down without saying so, which is `loading-button`'s `aria-busy`
+  trick a second time. Pressed differs by **three** things: the fill, the border and a tick that
+  appears; `[aria-checked="true"]` rides along in the same selectors so a `role="switch"` chip is
+  one look with two spellings, never two looks. Example 4 is the three-way comparison made
+  operable — a toggle button, a real checkbox and a switch, identical on screen, with a
+  "What would submit?" button printing the `FormData`: only the checkbox is in it. Example 5 is the
+  tab-stop tradeoff, five stops beside APG's toolbar and its one, with the stops counted live and
+  arrows/Home/End wired; presented as a tradeoff rather than an upgrade, because a toolbar's
+  keyboard map has to be discovered. Four findings. **CSS generated content is folded into the
+  accessible name**, so the obvious non-color cue — `content: "✓"` — renames the control every time
+  it goes down ("Matinee" → "✓ Matinee", browser-confirmed); the tick is therefore `content: ""`
+  with a checkmark drawn from two borders, which contributes nothing to the name and, being
+  `currentColor`, survives forced colors on its own. That means the well-meaning fix for SC 1.4.1
+  walks straight into SC 2.5.3, and it is why examples 2 and 3 are next to each other. **A computed
+  color read straight after the state flips is the transition, not either state** — the fill and the
+  border are gated on `--ac-motion` at 150ms, so the demo's own readout reported "fill" where the
+  truth was "fill, border, tick"; `cuesOf()` sets `transition: none`, reads, and restores. **A
+  broken example inside a file that has a `[FORCED]` block has to opt out of it**, or the good rule
+  fixes the failure it was there to show — the fill-only chip needs its own `ButtonFace` line to
+  reproduce what a chip with no forced-colors block does for free. And the tick has to be rendered
+  in both states at `visibility: hidden`, or the row reflows on every press and moves the next chip
+  out from under the pointer heading for it.
+
+**`buttons-actions` is complete.**
 
 ### forms-inputs
 - [x] `field` — complete. 26/26 tests pass in Chromium. **Canonical home for `.ac-field*`**; the
@@ -527,6 +585,7 @@ This is stricter than `CLAUDE.md`'s general "say it once" rule and it applies on
 sees on screen. `loading-button` is written to it and is the reference. Everything before it is not:
 `effects`, `motion-preferences`, `typography`, `live-region`, `focus-ring`, `button` and
 `icon-button` are the worst, because their notes carry whole paragraphs of argument.
+`chip-toggle` is written to it as well.
 
 Do it as a sweep, one component at a time, and move anything cut into that component's `docs.md`
 rather than deleting the reasoning. **Do not touch the tests' assertions on verdict text without
@@ -647,6 +706,14 @@ It must match `npm run preview` exactly, base path included.
   the hidden native `<select>`'s `<option>` elements and trips strict mode.
 - **npm 11 gates install scripts.** `allowScripts` in `package.json` already approves esbuild and
   sharp; re-approve with `npm approve-scripts <pkg>` if a new one appears.
+- **Header height is not a number you can reason out — measure it in a browser at ~15 widths.** The
+  two-row header wraps in three different places (brand name, brand tagline, settings row) and each
+  wrap is worth 20–35px of sticky header. Every fix moved the problem to a different width until it
+  was measured rather than argued: shrinking the theme trigger fixed 320px and needlessly truncated
+  theme names at 375px, `white-space: nowrap` on the brand fixed 900–1024px and overflowed the page
+  at 320px. The measurement loop is a Playwright script over a list of widths printing header height,
+  each control's rect, and `scrollWidth > innerWidth` — cheap to rewrite, and it settles in one run
+  what CSS reasoning gets wrong repeatedly.
 - **Git is 2.24** — no `git init -b`, no interactive flags.
 - **Playwright does not walk up to find its config.** `npm` finds `package.json` from any
   subdirectory, so an earlier `cd` into a component folder leaves tests failing with
@@ -714,6 +781,30 @@ It must match `npm run preview` exactly, base path included.
   the gap in whatever system color the element's own background became (`ButtonFace` on a button,
   `Highlight` on hover) rather than assuming it survived. `loading-button`'s `[FORCED]` is the
   precedent, and its spec asserts the two border colors differ.
+- **A computed *color* read right after a state flip is the transition, not the state.** Every
+  component here gates its color transitions on `--ac-motion` at 150ms, and `getComputedStyle`
+  reports the animating value — so a readout or a test that flips `aria-pressed` and reads
+  `backgroundColor` in the same tick gets a color neither state ever has, and properties listed
+  later in the `transition` shorthand can look like they never changed at all. `chip-toggle`'s
+  readout claimed the border was unchanged for exactly this reason. Two fixes, both used there: in
+  page code, set `el.style.transition = 'none'`, read, restore (`getComputedStyle` flushes the style
+  it was just handed); in a test, `page.emulateMedia({ reducedMotion: 'reduce' })` before the run,
+  or an assertion that retries (`toHaveCSS`). This is the color sibling of the geometry-polling
+  gotcha above, and it cost the best part of an hour — it looks exactly like forced colors ignoring
+  the stylesheet.
+- **CSS generated content is part of the accessible name.** accname folds `::before` and `::after`
+  into the name of anything named from its contents, and Chromium implements it: a button reading
+  "Matinee" with `::before { content: "✓" }` announces **"✓ Matinee"** (joined with a space). So the
+  obvious non-color state cue renames the control every time the state changes — SC 1.4.1's fix
+  landing on SC 2.5.3. Draw the shape instead: `content: ""` plus borders contributes nothing to the
+  name and, on `currentColor`, survives forced colors with no rule of its own. `chip-toggle`'s
+  example 2 has both live. The same trap applies to any decorative pseudo-element on a button, an
+  `<a>` or a heading.
+- **A deliberately broken example has to opt out of the file's own `[FORCED]` block.** The good
+  forced-colors rule matches the failing element too — `.ac-chip[aria-pressed="true"]` covers
+  `.ac-ct-chip-flat` — so the block silently repairs the failure the example exists to show. The
+  broken variant needs its own line putting it back to what a component with no forced-colors block
+  gets for free. Screenshots do not catch this; only reading the computed style in both states does.
 - **Forced colors drops gradient `background-image`s and every `box-shadow`** in Chromium, which is
   why `fx-grid`, both `fx-bar-*` and the glow tokens vanish there without anyone writing a rule.
   `background-image` is not in the spec's forced list, so declare `none` yourself rather than relying

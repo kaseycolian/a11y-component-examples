@@ -1,0 +1,22 @@
+{
+  "slug": "chip-toggle",
+  "name": "Chip Toggle",
+  "group": "buttons-actions",
+  "order": 40,
+  "summary": "A filter chip that is a toggle button, not a checkbox — aria-pressed carries the state, and a tick carries it where color cannot. Four live failures: the color-only chip, the tick that renames its own control, the chip that renames itself on purpose, and a row that swallows the tab order.",
+  "tags": [
+    "button",
+    "aria-pressed",
+    "toggle",
+    "filter",
+    "toolbar",
+    "roving-tabindex",
+    "accessible-name",
+    "forced-colors"
+  ],
+  "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/button/",
+  "wcag": ["1.4.1", "1.4.11", "2.1.1", "2.4.3", "2.5.3", "2.5.8", "4.1.2"],
+  "status": "stable",
+  "files": ["html", "css", "js"],
+  "demoNote": "Examples 2 to 5 are live. Example 2's fill-only chip has no state left under Windows High Contrast, and the chip beside it puts a tick into its own accessible name; example 3's chip renames itself, so the word and the state disagree; example 5 puts five tab stops next to the toolbar's one."
+}

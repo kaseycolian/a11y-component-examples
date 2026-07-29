@@ -24,10 +24,29 @@
   --press-s: calc(1 - var(--motion, 1) * 0.02);
 
   /* Height of the sticky header, used for scroll-margin so that jumping to an
-     anchor never parks the target underneath it (WCAG 2.2 SC 2.4.11). */
-  --header-h: 4.5rem;
+     anchor never parks the target underneath it (WCAG 2.2 SC 2.4.11). Two rows
+     now -- settings, then the components picker -- so it is measured against the
+     real header at each width rather than guessed. Too high only wastes space
+     above an anchor; too low hides the anchor, so round up. */
+  --header-h: 9.75rem;
 
   --measure: 72ch;
+}
+
+/* From 760px down the brand's tagline is gone and the settings sit beside it,
+   so the top row is the height of one control instead of two lines. */
+@media (max-width: 760px) {
+  :root {
+    --header-h: 8.5rem;
+  }
+}
+
+/* Narrower than this the brand wraps to two lines whatever font it is given --
+   there is about 100px left for it once the settings have taken theirs. */
+@media (max-width: 340px) {
+  :root {
+    --header-h: 9.25rem;
+  }
 }
 
 * {
@@ -120,18 +139,31 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
+/* Two rows at every width: settings on the top row, the components picker on the
+   bottom one. The picker is the tallest, most-used target in the header, so it
+   sits closest to the page it navigates and furthest from the top edge -- and
+   below 900px it is the only navigation there is. */
 .site-header__inner {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 1rem 1.5rem;
-  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
   max-width: 90rem;
   margin: 0 auto;
   padding: 0.75rem 1.25rem;
   min-height: var(--header-h);
 }
 
+[data-jump-control] {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: end;
+}
+
 .site-brand {
+  /* Centered against both header rows rather than sitting up on the top one. */
+  grid-column: 1;
+  grid-row: 1 / span 2;
   display: inline-flex;
   align-items: baseline;
   gap: 0.6rem;
@@ -142,6 +174,11 @@ body {
 .site-brand__mark {
   /* The app name carries the header; the tagline beside it stays small. */
   font-size: clamp(1.35rem, 1.15rem + 0.9vw, 1.7rem);
+  /* The settings column is two rows tall, so the brand's column is narrower
+     than it looks and the name would break across lines long before it ran out
+     of header. The tagline beside it wraps instead -- it reads fine on two
+     lines and the name does not. */
+  white-space: nowrap;
   font-weight: 900;
   font-style: italic;
   letter-spacing: 0.08em;
@@ -156,9 +193,31 @@ body {
   letter-spacing: 0.04em;
 }
 
-@media (max-width: 560px) {
+/* Dropped at the width where the settings move up onto the brand's row: the
+   tagline is the one thing there that no one is reaching for, and keeping it
+   would push the settings onto a second line of their own. */
+@media (max-width: 760px) {
   .site-brand__sub {
     display: none;
+  }
+}
+
+/* Below 460px the settings have taken what they need and the brand gets what is
+   left -- about 100px, which at the clamp's floor is four wrapped lines of a
+   sticky header. Smaller here so it wraps to two. */
+@media (max-width: 460px) {
+  .site-brand__mark {
+    font-size: 1.05rem;
+    letter-spacing: 0.06em;
+  }
+}
+
+/* Past this point the name genuinely does not fit on one line, and nowrap would
+   push the page into a horizontal scroll -- which is the one thing a 320px
+   layout may not do (SC 1.4.10). */
+@media (max-width: 360px) {
+  .site-brand__mark {
+    white-space: normal;
   }
 }
 
@@ -169,16 +228,40 @@ body {
     gap: 0.5rem 0.75rem;
     padding: 0.6rem 1rem;
   }
+
+  /* Full width, still on the bottom row: with the sidebar gone this is the
+     navigation, and a wide target beats a right-aligned one on a thumb. */
+  [data-jump-control] {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+  }
+
+  /* The brand no longer spans down into that row -- it would squash against a
+     full-width picker. */
+  .site-brand {
+    grid-row: 1;
+  }
 }
 
-/* Settings sit at the far right, whether or not the components picker is there
-   to sit between them and the brand. */
+/* The theme picker and the motion switch share the brand's row from 760px down,
+   and there is not much of it. A tighter gap is what keeps them on one line at
+   320px, where wrapping would cost another 35px of sticky header. */
+@media (max-width: 560px) {
+  .site-header__controls {
+    gap: 0.6rem;
+  }
+}
+
+/* Settings stay at the far right on their own row, above the picker. */
 .site-header__controls {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
   display: flex;
   align-items: center;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-left: auto;
+  justify-content: flex-end;
 }
 
 /* --- Layout ------------------------------------------------------------------ */
@@ -214,15 +297,13 @@ body {
   padding-right: 0.5rem;
 }
 
+/* Below 900px there is no column to be a column in, and stacked it is a full
+   roster of links between the header and the page you asked for -- so it goes
+   rather than stacks. Not a loss of navigation: the header's Components picker
+   is the same list, grouped the same way, and it is right above this. */
 @media (max-width: 900px) {
   .sidebar {
-    position: static;
-    max-height: none;
-    overflow: visible;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1rem;
-    background: var(--bg-panel);
+    display: none;
   }
 }
 

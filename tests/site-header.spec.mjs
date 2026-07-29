@@ -119,6 +119,59 @@ test('the Go fallback stays hidden while the Dropdown is doing its job', async (
   await expect(page.locator('[data-component-jump-go]')).toBeHidden();
 });
 
+/* --- Header layout -------------------------------------------------------- */
+
+test('the picker sits below the settings, in that order in the DOM too', async ({ page }) => {
+  await page.goto('components/disclosure/');
+
+  const settings = await page.locator('.site-header__controls').boundingBox();
+  const picker = await page.locator('[data-jump-control]').boundingBox();
+
+  expect(picker.y).toBeGreaterThan(settings.y);
+  // Both right-aligned to the same edge, so the two rows read as one stack.
+  expect(Math.round(picker.x + picker.width)).toBe(Math.round(settings.x + settings.width));
+
+  // The point of the DOM order: Tab moves down the screen, never back up it
+  // (SC 2.4.3). Anything that moves the picker visually has to move it here.
+  const order = await page.evaluate(() => {
+    const inner = document.querySelector('.site-header__inner');
+    return [...inner.children].map((el) => el.className.split(' ')[0]);
+  });
+  expect(order.indexOf('site-header__controls')).toBeLessThan(order.indexOf('control'));
+});
+
+test('the sidebar gives way to the header picker below 900px', async ({ page }) => {
+  await page.goto('components/disclosure/');
+  await expect(page.locator('.sidebar')).toBeVisible();
+
+  // Stacked, the full roster sat between the header and the page you asked for.
+  await page.setViewportSize({ width: 760, height: 900 });
+  await expect(page.locator('.sidebar')).toBeHidden();
+  // Still navigable -- the picker is the same list, and now full width.
+  await expect(jump(page).locator('.ac-dropdown__toggle')).toBeVisible();
+
+  const picker = await page.locator('[data-jump-control]').boundingBox();
+  expect(picker.width).toBeGreaterThan(600);
+});
+
+test('--header-h covers the real header at every width, so anchors clear it', async ({ page }) => {
+  await page.goto('components/chip-toggle/');
+
+  // SC 2.4.11: scroll-margin-top is calc(--header-h + 1rem), so the token going
+  // stale is an anchor target parked underneath a sticky header. Two rows make
+  // that height depend on which things wrapped, hence a check per breakpoint.
+  for (const width of [1440, 900, 760, 375, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    const { real, token } = await page.evaluate(() => ({
+      real: document.querySelector('.site-header').getBoundingClientRect().height,
+      token: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) * 16,
+    }));
+    // The border-bottom is the 1px the token does not claim; the +1rem of
+    // scroll-margin absorbs it.
+    expect(real - token, `at ${width}px`).toBeLessThanOrEqual(2);
+  }
+});
+
 test('swatches carry each theme real accents from theme.css', async ({ page }) => {
   await page.goto('components/disclosure/');
   const swatch = page.locator('#theme-select option[value="rink-classic-dark"]');
