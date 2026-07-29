@@ -112,6 +112,22 @@ point at what the example is showing. Everything longer goes in `docs.md` or in 
 where a reader has opted in. `loading-button` is the reference. Never write "the left one" or "the
 right-hand readout": the demo grid stacks its cases at every real width, so name the case instead.
 
+**The `summary` in `meta.json` is written to a person, not to a search index.** It renders as the
+lede at the top of the component page, on the index card, and as the page description, so it is the
+first sentence anyone reads about the component. Say what the thing is for and what the hard part
+about it is, in the order a person would explain it out loud. Two or three sentences, ~50 words.
+
+Do **not** write it as a declarative string of clauses — `A filter chip that is a toggle button, not
+a checkbox — aria-pressed carries the state, and a tick carries it where color cannot. Four live
+failures: …` is the old style and reads as keywords bolted together. Write instead: *A chip is a
+filter you can switch on and off, and the temptation is to reach for a checkbox. It is a button that
+remembers, so `aria-pressed` is what tells a screen reader it is on — and something other than color
+has to say the same thing on screen.*
+
+Rules of thumb: lead with the reader's problem, not the ARIA attribute; name at most one attribute,
+and only when it *is* the point; never enumerate the examples or count the failures — the demo notes
+and the page already do that. Keep it a helpful guide, not an index entry.
+
 **Say it once, in as few words as carry the information.** Comments and docs here are load-bearing:
 they explain *why* a non-obvious accessibility decision was made, and that's the bar. Cut restated
 context, cut the same point made twice in prose and again in a table, cut adjectives. Never cut the

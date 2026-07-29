@@ -201,8 +201,14 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
 - **Gotcha** A count badge needs context in its name — "3" alone is useless. Use `aria-label="3 unread messages"` on the container, or visually-hidden text.
 
 ### status-text
-- **Markup** `.ac-status` with `--ok` / `--err` / `--muted`, tick/cross glyph plus a word.
-- **Gotcha** If it changes at runtime, wrap in a polite live region. The glyph must be `aria-hidden` with real text beside it.
+- **Markup** `.ac-status` with `--ok` / `--err` / `--muted`, tick/cross glyph plus a word. Also
+  `.ac-status__detail` (clipped, for the reason) and `--compact` (clips the word at narrow widths).
+- **Gotcha** If it changes at runtime, the live region goes on the **list**, never on the label —
+  twenty rows is twenty announcements. The glyph must be `aria-hidden` and **drawn**, not typed:
+  `content: "✓"` is folded into the accessible name.
+- **The subject is scale.** `notice` owns the SC 1.4.1 glyph argument and static-versus-announced;
+  this page is what those answers become when the whole component is one word wide — no room for a
+  prefix, no container for a region, no focus for a tooltip.
 
 ### result-panel
 - **Markup** `.ac-result` with a label and a monospace value, plus a copy button.

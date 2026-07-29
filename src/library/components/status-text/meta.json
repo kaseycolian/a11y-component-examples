@@ -1,0 +1,22 @@
+{
+  "slug": "status-text",
+  "name": "Status Text",
+  "group": "feedback-status",
+  "order": 20,
+  "summary": "A status label is one word sitting beside the thing it describes — Shipped, Failed, Waiting. It is too small for the usual fixes: no room for a sentence, no container to hang a live region on, nothing for a tooltip to attach to. So the word does the work, and the tick beside it only agrees.",
+  "tags": [
+    "status",
+    "label",
+    "live-region",
+    "visually-hidden",
+    "generated-content",
+    "accessible-name",
+    "non-text-contrast",
+    "forced-colors"
+  ],
+  "apg": "https://www.w3.org/WAI/ARIA/apg/practices/live-regions/",
+  "wcag": ["1.3.1", "1.4.1", "1.4.11", "1.4.13", "4.1.3"],
+  "status": "stable",
+  "files": ["html", "css", "js"],
+  "demoNote": "Examples 2 to 5 are live. Example 2 prints what four identical-looking labels are read out as; example 3 puts the reason for a failure in three places and only one survives; example 4 counts the announcements each list produces; example 5 squeezes the column until one of the two labels stops saying anything."
+}

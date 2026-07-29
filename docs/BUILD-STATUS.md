@@ -11,41 +11,45 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-28 (notice — batch C is open)
+Last updated: 2026-07-28 (status-text — batch C is open; the `summary` voice changed, see item 0a)
 
 ---
 
-## START HERE — next component is `status-text`, continuing batch C
+## START HERE — next component is `badge`, continuing batch C
 
-`notice` landed: 23/23, suite is **535/535** in Chromium. Nothing was left open.
+`status-text` landed: 22/22, suite is **557/557** in Chromium. Nothing was left open.
+
+**Read the `summary` rule in `CLAUDE.md` under Writing style before writing any `meta.json`.** It
+changed on 2026-07-28: the lede is prose written to a person, two or three sentences, leading with
+the reader's problem rather than the ARIA attribute, and **never enumerating or counting the
+examples**. `status-text` is the only component written to it so far and is the reference; every
+earlier one is the sweep in item 0a. The same session tightened the on-page copy rule (item 0b).
 
 ### The steps, in order
 
-**Step 1 — `status-text`.** Run the loop under "The loop for building one component" with:
+**Step 1 — `badge`.** Run the loop under "The loop for building one component" with:
 
 ```sh
-node scripts/new-component.mjs status-text --group feedback-status --name "Status Text"
+node scripts/new-component.mjs badge --group feedback-status --name "Badge"
 ```
 
 Decided in advance, so do not re-derive:
 
-- Spec entry: `component-specs.md` → feedback-status → `status-text`. `.ac-status` with `--ok` /
-  `--err` / `--muted`, a tick/cross glyph plus a word.
-- **`notice` now owns the SC 1.4.1 glyph argument and the static-versus-announced argument.** Point
-  at it from here — do not re-argue either, or the two pages read as duplicates. `notice`'s
-  `docs.md` already links forward to this page expecting that.
-- The thing this page owns that `notice` does not is **scale**: a status label sits inline beside
-  the thing it describes, so it has no room for a "Error:" prefix and no container of its own. That
-  tension is the component's subject.
-- The glyph is `aria-hidden` and drawn, not a character — `chip-toggle`'s finding is that CSS
-  generated content lands in the accessible name, and a `::before { content: "✓" }` on anything
-  named from its contents renames it.
-- **Read `notice` first.** It is the most recent worked example, and it is the page this one
-  defers to.
-- **Keep the on-page copy short** — see the writing note under "Remaining non-component work" item 0.
+- Spec entry: `component-specs.md` → feedback-status → `badge`. `<span class="ac-badge">` plus a
+  `--solid` variant.
+- **The subject is the number.** `3` alone is not a status — the name has to carry what is being
+  counted, via `aria-label` on the container or clipped text inside it. That is this page's one
+  argument and it is not `status-text`'s.
+- **`notice` owns the SC 1.4.1 glyph argument, `status-text` owns the scale argument.** Point at
+  both; re-arguing either makes three pages read as one.
+- **`status-text` already established the drawn-glyph finding at label scale** (generated content
+  lands in the accessible name) and the *clipped versus removed* distinction. A badge that hides its
+  word at a breakpoint is the same case — lift it, don't re-derive it.
+- **Read `status-text` first.** It is the most recent worked example and the nearest neighbor.
+- **Keep the on-page copy short** — item 0b.
 
-**Step 2 — `badge`.** **Step 3 — `result-panel`.** Both close batch C and the `feedback-status`
-group; `result-panel` is the one that composes `notice` and `status-text`, so it goes last.
+**Step 2 — `result-panel`.** Closes batch C and the `feedback-status` group; it composes `notice`
+and `status-text`, so it goes last.
 
 **Then** batch D (`tabs` → `jump-nav`), E (`data-table` → `prose-surface`), F (`app-url-maker` →
 `app-page-to-markdown`), and the five non-component items under "Remaining non-component work" —
@@ -69,7 +73,7 @@ Build in this order. The order is the dependency graph, not a preference.
 | --- | --- | --- |
 | ~~**A**~~ | ~~`effects`~~ | **Done.** Closed `foundations` |
 | ~~**B**~~ | ~~`button` → `icon-button` → `loading-button` → `chip-toggle`~~ | **Done.** Closed `buttons-actions` |
-| **C** | ~~`notice`~~ → `status-text` → `badge` → `result-panel` | all four are small, and three of them restate `live-region`'s argument in a new shape |
+| **C** | ~~`notice`~~ → ~~`status-text`~~ → `badge` → `result-panel` | all four are small, and three of them restate `live-region`'s argument in a new shape |
 | **D** | `tabs` → `jump-nav` | `tabs` is the largest behavior left; `jump-nav` reuses its `aria-current` thinking |
 | **E** | `data-table` → `prose-surface` | `prose-surface` is the scroll-region pattern `data-table` establishes |
 | **F** | `app-url-maker` → `app-page-to-markdown` | **last.** They compose the others and cannot be built before them |
@@ -82,9 +86,10 @@ Cross-batch notes that will otherwise be rediscovered:
   components are not DRY here. A change to `.ac-btn` is a change in all **eight**.
 - **`result-panel`'s copy button is `input-group`'s copy button.** Same clipboard write, same
   pre-existing empty `role="status"`, same rule against renaming the button. Lift it.
-- **`status-text` and `notice` are the same SC 1.4.1 point twice** — the glyph is `aria-hidden` and the
-  *word* carries the meaning. Make that argument on `notice` and point at it from `status-text`, or
-  the two pages read as duplicates.
+- **`notice` and `status-text` split the feedback argument, and `badge` / `result-panel` must not
+  re-open it.** `notice` owns SC 1.4.1's glyph-versus-word and static-versus-announced;
+  `status-text` owns what both become at one-word scale (no prefix, no container, no focus).
+  `badge` owns the *number* needing a name, `result-panel` owns composing the two.
 - **`tabs` has a working reference in `src/site/components/CodePanel.astro`.** Roving tabindex,
   automatic activation, panel at `tabindex="0"`.
 - **Batch F composes with `effects`** — `app-page-to-markdown` is specified around `fx-bar-top`,
@@ -198,7 +203,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 26 / 35
+## Component roster — 27 / 35
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -567,8 +572,27 @@ take their logic and not their layout. See item 1 under remaining work.
   load-time scan looks for alerts alone. And **the mock AT reports silence by watching the log, not
   by asserting it**: the button handler checks four frames later whether anything reached the list,
   so the "nothing was announced" line is derived from the same observer as the successful one.
+- [x] `status-text` — done. 22/22 tests in Chromium. **The subject is scale**, and it defers to
+  `notice` for the SC 1.4.1 glyph argument and static-versus-announced rather than re-arguing
+  either. What it owns is what those answers become when the component is one word wide: no room
+  for an `Error:` prefix, no container to hang a region on, and **no focus**, which is what rules
+  out every hover-based way of showing the reason. Example 3 is that point made three times over —
+  `title`, a CSS `:hover` bubble, and `.ac-status__detail` clipped inside the label — and the
+  readout prints what each one is read out as. The one API decision: `setStatus(el, tone, word)`
+  takes both together and there is **no way to set the tone alone**, so the color and the text
+  cannot drift. Four findings. **The `title` is not merely quiet, it is absent** — a `title` on an
+  element that already has text is not in the accessible name at all, so the "at least it's
+  somewhere" defense is wrong on its own terms. **A pseudo-element that is not rendered is not in
+  the accessibility tree**, which is what makes the hover bubble a genuine failure and is the check
+  the page's `generated()` had to add: `content` is declared and readable from
+  `getComputedStyle(el, '::after')` while `visibility: hidden` keeps it out of the name. **The name
+  walk has to distinguish *clipped* from *hidden***, and that one distinction is the whole of
+  example 5 — `display: none` on the word at a breakpoint drops it from the tree, `--compact` clips
+  it, and the two are **the same width on screen**, which is why the wrong one looks reasonable.
+  And **only rows that actually changed are rewritten** in example 4, or the "one region" list
+  still produces four mutations; the log counts 3 announcements against 1 and that count is the
+  demo.
 - [ ] `badge`
-- [ ] `status-text`
 - [ ] `result-panel`
 
 ### data-display
@@ -583,7 +607,23 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ## Remaining non-component work
 
-### 0. Cut the on-page copy back — every component built before 2026-07-28
+### 0a. Rewrite every `meta.json` `summary` in the new voice
+
+**New rule, from the user, 2026-07-28.** The `summary` renders as the lede at the top of the
+component page, on the index card, and as the page `<meta description>`. Every one written so far is
+declarative and clause-strung — *"A message with a tone — the icon decorates, the word carries it.
+… Four live failures: …"* — which reads as keywords bolted together rather than as someone
+explaining the component.
+
+The replacement voice is in `CLAUDE.md` under **Writing style**: two or three sentences, ~50 words,
+leading with the reader's problem rather than the ARIA attribute, naming at most one attribute, and
+**never enumerating or counting the examples** (`demoNote` already does that, and the page shows
+them). `status-text` onward is written this way from the start; everything before it is a sweep, and
+it pairs naturally with the on-page copy cut in 0b below since both are read at the same time.
+
+Cheap to do — one field per component, no tests touch it.
+
+### 0b. Cut the on-page copy back — every component built before 2026-07-28
 
 **New rule, from the user, 2026-07-28.** The text that *renders on a component page* — the
 `ac-demo__title`s, the `__note` paragraphs, captions, verdicts, readout labels — has to be short and
@@ -729,6 +769,16 @@ It must match `npm run preview` exactly, base path included.
   at 320px. The measurement loop is a Playwright script over a list of widths printing header height,
   each control's rect, and `scrollWidth > innerWidth` — cheap to rewrite, and it settles in one run
   what CSS reasoning gets wrong repeatedly.
+- **`[glob-loader] Duplicate id "<slug>" found in …/docs.md` is a stale `.astro` cache, not a
+  bug.** It appears on the *second* build after a `docs.md` is created or replaced wholesale — the
+  content layer has the old entry cached and re-syncs the new one under the same id. The page it
+  names still builds correctly. `Remove-Item -Recurse -Force .astro` and rebuild; the warning is
+  gone and nothing else changes. Do not go looking for a duplicate file — the glob's `base` is
+  `src/library/components` and `public/library/` is not in it.
+- **A readout key has to be unique across the whole page, not within its example.** `out()` is a
+  document-wide `querySelector`, so two examples both using `data-ac-…-out="good"` silently write
+  to the first one and the second readout never updates — caught in `status-text` before it shipped.
+  Prefix the key with its example when the obvious word is already taken (`detail-good`).
 - **Git is 2.24** — no `git init -b`, no interactive flags.
 - **Playwright does not walk up to find its config.** `npm` finds `package.json` from any
   subdirectory, so an earlier `cd` into a component folder leaves tests failing with

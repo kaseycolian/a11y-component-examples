@@ -1,0 +1,359 @@
+<!-- ===========================================================================
+     STATUS TEXT — a state in one word, inline beside the thing it describes
+
+     WHAT TO COPY
+       Example 1 is the component. Examples 2 to 5 are the four ways a label
+       this small goes wrong, live. Each names the CSS and JS sections it needs.
+
+     THE CONTRACT
+       .ac-status + one tone   --ok / --err / --muted.
+       the glyph               aria-hidden, and drawn from borders rather than
+                               typed as a character.
+       the word                "Shipped", "Failed". This is the status. A tick
+                               on its own is not one.
+       the detail              .ac-status__detail, clipped. This is where the
+                               sentence goes when there is no room for it.
+       changing at runtime     one live region for the list, never one per
+                               label. See Notice for the recipe.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     =========================================================================== -->
+
+<div class="ac-demo-grid" data-ac-status-text>
+  <!-- ======================================================================
+       EXAMPLE 1 · The specimen
+       CSS [STATUS] + [GLYPHS] + [TONES] + [PANEL]. No JS.
+
+       Three tones, inline in a list. Nothing changes, so nothing is live.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">1 &middot; The specimen</h3>
+
+    <div class="ac-st-panel">
+      <ul class="ac-st-list">
+        <li class="ac-st-row">
+          <span class="ac-st-row__name">Order 462 &middot; <i>Cold Water Flat</i> LP</span>
+          <span class="ac-status ac-status--ok">
+            <span class="ac-status__glyph" aria-hidden="true"></span>
+            <span class="ac-status__text">Shipped</span>
+          </span>
+        </li>
+
+        <li class="ac-st-row">
+          <span class="ac-st-row__name">Order 99 &middot; <i>Ten Second Anthem</i> 7&#8209;inch</span>
+          <span class="ac-status ac-status--err">
+            <span class="ac-status__glyph" aria-hidden="true"></span>
+            <span class="ac-status__text">Failed</span>
+          </span>
+        </li>
+
+        <li class="ac-st-row">
+          <span class="ac-st-row__name">Order 118 &middot; <i>Cassette Only</i> zine</span>
+          <span class="ac-status ac-status--muted">
+            <span class="ac-status__glyph" aria-hidden="true"></span>
+            <span class="ac-status__text">Waiting</span>
+          </span>
+        </li>
+      </ul>
+
+      <p class="ac-st__note">
+        The word is the status. The glyph and the color agree with it and never carry it alone.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 2 · A tick is not a status
+       CSS [STATUS] + [GLYPHS] + [TONES] + [PANEL] + [BROKEN]. JS [CORE] +
+       [NAME] + [GLYPH].
+
+       Four labels that all mean "this worked". The readout prints what each
+       one is actually read out as.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">2 &middot; A tick is not a status</h3>
+
+    <div class="ac-st-panel" data-ac-st-glyph>
+      <div class="ac-st-cases">
+        <div class="ac-st-case">
+          <p class="ac-st-case__label">glyph only &mdash; broken on purpose</p>
+          <!-- BROKEN ON PURPOSE — the glyph is aria-hidden, correctly, and
+               there is nothing else. This label announces an empty string. -->
+          <span class="ac-status ac-status--ok" data-ac-st-said="dot">
+            <span class="ac-status__glyph" aria-hidden="true"></span>
+          </span>
+        </div>
+
+        <div class="ac-st-case">
+          <p class="ac-st-case__label">a CSS tick &mdash; broken on purpose</p>
+          <!-- BROKEN ON PURPOSE — content: "✓" from a stylesheet. Generated
+               content is folded into the accessible name, so this is not
+               silent; it is a punctuation mark standing in for a word. -->
+          <span class="ac-status ac-status--ok ac-st-bad-tick" data-ac-st-said="css"></span>
+        </div>
+
+        <div class="ac-st-case">
+          <p class="ac-st-case__label">an emoji &mdash; broken on purpose</p>
+          <!-- BROKEN ON PURPOSE — a character with a Unicode name nobody on
+               this team chose and no translator will ever see. -->
+          <span class="ac-status ac-status--ok" data-ac-st-said="emoji">
+            <span class="ac-status__text">&#9989;</span>
+          </span>
+        </div>
+
+        <div class="ac-st-case">
+          <p class="ac-st-case__label">the specimen</p>
+          <span class="ac-status ac-status--ok" data-ac-st-said="good">
+            <span class="ac-status__glyph" aria-hidden="true"></span>
+            <span class="ac-status__text">Shipped</span>
+          </span>
+        </div>
+      </div>
+
+      <dl class="ac-st-readout">
+        <div class="ac-st-readout__row">
+          <dt>glyph only</dt><dd><code data-ac-st-out="dot">&mdash;</code></dd>
+        </div>
+        <div class="ac-st-readout__row">
+          <dt>a CSS tick</dt><dd><code data-ac-st-out="css">&mdash;</code></dd>
+        </div>
+        <div class="ac-st-readout__row">
+          <dt>an emoji</dt><dd><code data-ac-st-out="emoji">&mdash;</code></dd>
+        </div>
+        <div class="ac-st-readout__row">
+          <dt>the specimen</dt><dd><code data-ac-st-out="good">&mdash;</code></dd>
+        </div>
+      </dl>
+
+      <p class="ac-st__note">
+        The specimen's glyph is drawn from two borders, so it adds nothing to the text.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 3 · The detail that does not fit
+       CSS [STATUS] + [GLYPHS] + [TONES] + [DETAIL] + [PANEL] + [BROKEN].
+       JS [CORE] + [NAME] + [DETAIL].
+
+       "Failed" is rarely enough on its own. Three places to put the reason,
+       and only one of them can be reached without a mouse.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">3 &middot; The detail that does not fit</h3>
+
+    <div class="ac-st-panel" data-ac-st-detail>
+      <div class="ac-st-cases">
+        <div class="ac-st-case">
+          <p class="ac-st-case__label">in a <code>title</code> &mdash; broken on purpose</p>
+          <!-- BROKEN ON PURPOSE — title shows on hover, on a span nobody can
+               focus. No keyboard, no touch, and announced inconsistently. -->
+          <span class="ac-status ac-status--err" data-ac-st-detail-case="title"
+                title="Card ending 4620 was declined">
+            <span class="ac-status__glyph" aria-hidden="true"></span>
+            <span class="ac-status__text">Failed</span>
+          </span>
+        </div>
+
+        <div class="ac-st-case">
+          <p class="ac-st-case__label">a hover bubble &mdash; broken on purpose</p>
+          <!-- BROKEN ON PURPOSE — a CSS-only tooltip on :hover. It is not in
+               the accessible name and it has no keyboard route at all. -->
+          <span class="ac-status ac-status--err ac-st-bad-tip" data-ac-st-detail-case="tip"
+                data-ac-st-tip="Card ending 4620 was declined">
+            <span class="ac-status__glyph" aria-hidden="true"></span>
+            <span class="ac-status__text">Failed</span>
+          </span>
+        </div>
+
+        <div class="ac-st-case">
+          <p class="ac-st-case__label">the specimen</p>
+          <span class="ac-status ac-status--err" data-ac-st-detail-case="good">
+            <span class="ac-status__glyph" aria-hidden="true"></span>
+            <span class="ac-status__text">Failed<span class="ac-status__detail"> &mdash; card ending 4620 was declined</span></span>
+          </span>
+        </div>
+      </div>
+
+      <dl class="ac-st-readout">
+        <div class="ac-st-readout__row">
+          <dt>title</dt><dd><code data-ac-st-out="title">&mdash;</code></dd>
+        </div>
+        <div class="ac-st-readout__row">
+          <dt>hover bubble</dt><dd><code data-ac-st-out="tip">&mdash;</code></dd>
+        </div>
+        <div class="ac-st-readout__row">
+          <dt>specimen</dt><dd><code data-ac-st-out="detail-good">&mdash;</code></dd>
+        </div>
+      </dl>
+
+      <p class="ac-st__note">
+        A status is not a control, so it has no focus and no hover a keyboard reaches. Clipped text
+        inside the label is the one route that is always open.
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 4 · One region, not one per row
+       CSS [STATUS] + [GLYPHS] + [TONES] + [SLOT] + [BTN] + [PANEL].
+       JS [CORE] + [SET] + [LOG] + [CHANGE].
+
+       Press refresh on each list. The log counts what a screen reader was
+       handed.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">4 &middot; One region, not one per row</h3>
+
+    <div class="ac-st-panel" data-ac-st-change>
+      <div class="ac-st-cases">
+        <div class="ac-st-case">
+          <p class="ac-st-case__label">a region per row &mdash; broken on purpose</p>
+          <!-- BROKEN ON PURPOSE — every label is its own live region. Four
+               rows changing is four announcements, queued behind each other,
+               with no way to skip them. -->
+          <ul class="ac-st-list" data-ac-st-list="many">
+            <li class="ac-st-row">
+              <span class="ac-st-row__name">Order 462</span>
+              <span class="ac-status ac-status--muted" role="status" data-ac-st-cell="many-1">
+                <span class="ac-status__glyph" aria-hidden="true"></span>
+                <span class="ac-status__text">Waiting</span>
+              </span>
+            </li>
+            <li class="ac-st-row">
+              <span class="ac-st-row__name">Order 99</span>
+              <span class="ac-status ac-status--muted" role="status" data-ac-st-cell="many-2">
+                <span class="ac-status__glyph" aria-hidden="true"></span>
+                <span class="ac-status__text">Waiting</span>
+              </span>
+            </li>
+            <li class="ac-st-row">
+              <span class="ac-st-row__name">Order 118</span>
+              <span class="ac-status ac-status--muted" role="status" data-ac-st-cell="many-3">
+                <span class="ac-status__glyph" aria-hidden="true"></span>
+                <span class="ac-status__text">Waiting</span>
+              </span>
+            </li>
+            <li class="ac-st-row">
+              <span class="ac-st-row__name">Order 205</span>
+              <span class="ac-status ac-status--muted" role="status" data-ac-st-cell="many-4">
+                <span class="ac-status__glyph" aria-hidden="true"></span>
+                <span class="ac-status__text">Waiting</span>
+              </span>
+            </li>
+          </ul>
+          <button class="ac-btn ac-btn--outline ac-btn--sm" type="button" data-ac-st-refresh="many"
+                  aria-label="Refresh &mdash; a region per row">
+            Refresh
+          </button>
+        </div>
+
+        <div class="ac-st-case">
+          <p class="ac-st-case__label">the specimen</p>
+          <ul class="ac-st-list" data-ac-st-list="one">
+            <li class="ac-st-row">
+              <span class="ac-st-row__name">Order 462</span>
+              <span class="ac-status ac-status--muted" data-ac-st-cell="one-1">
+                <span class="ac-status__glyph" aria-hidden="true"></span>
+                <span class="ac-status__text">Waiting</span>
+              </span>
+            </li>
+            <li class="ac-st-row">
+              <span class="ac-st-row__name">Order 99</span>
+              <span class="ac-status ac-status--muted" data-ac-st-cell="one-2">
+                <span class="ac-status__glyph" aria-hidden="true"></span>
+                <span class="ac-status__text">Waiting</span>
+              </span>
+            </li>
+            <li class="ac-st-row">
+              <span class="ac-st-row__name">Order 118</span>
+              <span class="ac-status ac-status--muted" data-ac-st-cell="one-3">
+                <span class="ac-status__glyph" aria-hidden="true"></span>
+                <span class="ac-status__text">Waiting</span>
+              </span>
+            </li>
+            <li class="ac-st-row">
+              <span class="ac-st-row__name">Order 205</span>
+              <span class="ac-status ac-status--muted" data-ac-st-cell="one-4">
+                <span class="ac-status__glyph" aria-hidden="true"></span>
+                <span class="ac-status__text">Waiting</span>
+              </span>
+            </li>
+          </ul>
+          <!-- One region for the whole list, in the markup from the start and
+               empty until there is a summary to put in it. -->
+          <p class="ac-st-slot" role="status" data-ac-st-slot="one"></p>
+          <button class="ac-btn ac-btn--outline ac-btn--sm" type="button" data-ac-st-refresh="one"
+                  aria-label="Refresh &mdash; the specimen">
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <p class="ac-st__note">
+        Both lists end up showing the same four statuses.
+      </p>
+
+      <p class="ac-st-log__label" id="ac-st-log-4">What a screen reader was given</p>
+      <ol class="ac-st-log" aria-labelledby="ac-st-log-4" data-ac-st-log="change"></ol>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 5 · When the column gets narrow
+       CSS [STATUS] + [GLYPHS] + [TONES] + [COMPACT] + [PANEL] + [BROKEN].
+       JS [CORE] + [NAME] + [NARROW].
+
+       The word is dropped at narrow widths to save room. Where it goes decides
+       whether the phone version still has a status in it.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">5 &middot; When the column gets narrow</h3>
+
+    <div class="ac-st-panel" data-ac-st-narrow-panel>
+      <label class="ac-st-check">
+        <input type="checkbox" data-ac-st-narrow />
+        <span>Squeeze the column</span>
+      </label>
+
+      <div class="ac-st-cases">
+        <div class="ac-st-case">
+          <p class="ac-st-case__label"><code>display: none</code> &mdash; broken on purpose</p>
+          <!-- BROKEN ON PURPOSE — display: none removes the word from the
+               accessibility tree along with the layout box. The narrow layout
+               has no status left in it. -->
+          <span class="ac-status ac-status--ok ac-st-bad-narrow" data-ac-st-narrow-case="gone">
+            <span class="ac-status__glyph" aria-hidden="true"></span>
+            <span class="ac-status__text">Shipped</span>
+          </span>
+
+          <dl class="ac-st-readout">
+            <div class="ac-st-readout__row">
+              <dt>announced</dt><dd><code data-ac-st-out="gone">&mdash;</code></dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="ac-st-case">
+          <p class="ac-st-case__label">the specimen &mdash; <code>--compact</code></p>
+          <span class="ac-status ac-status--ok" data-ac-st-narrow-case="keep">
+            <span class="ac-status__glyph" aria-hidden="true"></span>
+            <span class="ac-status__text">Shipped</span>
+          </span>
+
+          <dl class="ac-st-readout">
+            <div class="ac-st-readout__row">
+              <dt>announced</dt><dd><code data-ac-st-out="keep">&mdash;</code></dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <p class="ac-st__note">
+        Squeezed, the two look identical: a tick and no word. Only one of them still says Shipped.
+      </p>
+
+      <p class="ac-st__verdict" role="status" data-ac-st-narrow-verdict></p>
+    </div>
+  </div>
+</div>

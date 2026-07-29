@@ -1,0 +1,541 @@
+/* ===========================================================================
+   STATUS TEXT
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) lives in
+   the site's own stylesheet, not this file.
+
+     [STATUS]    every example. The label: glyph, word, one accent.
+     [GLYPHS]    every example. The tick, the cross and the dot, drawn from
+                 borders. Nothing here is a character.
+     [TONES]     every example. Three one-line rules. Each sets one custom
+                 property and nothing else.
+     [DETAIL]    example 3. The clipped sentence inside the label.
+     [COMPACT]   example 5. The narrow-column modifier that keeps the word.
+     [SLOT]      example 4. The one region the list announces from.
+     [BTN]       the refresh buttons on this page. A status has no buttons —
+                 delete this section unless you want a copy of .ac-btn.
+     [BROKEN]    examples 2, 3 and 5. Delete it. It exists to reproduce four
+                 failures that otherwise have to be described rather than seen.
+     [PANEL]     the frame around each example on this page. Delete it.
+     [FORCED]    always ship this. The tone is an accent color, and accent
+                 colors are what forced colors replaces.
+
+   Copy the file whole for the library version.
+
+   A status label is small, and every problem on this page comes from that.
+   There is no container to hang a live region on, no room for "Error:" in
+   front of the word, and no focus for a tooltip to attach to. So the label
+   carries its own meaning: .ac-status reads --ac-status-accent for the glyph
+   and the word together, and the word is never optional.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [STATUS] every example -----------------------------------------------
+   inline-flex rather than a grid: this sits inside a sentence, a table cell or
+   a list row, and it has to line up on the text baseline of whatever it landed
+   next to.
+
+   `min-width: 0` because the word can be long in a language that is not
+   English — "Fehlgeschlagen" is fourteen characters where "Failed" is six. */
+
+.ac-status {
+  --ac-status-accent: var(--ac-text-muted, var(--text-muted, #bcadde));
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+  max-width: 100%;
+  color: var(--ac-status-accent);
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ac-status__text {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+/* --- [GLYPHS] every example -----------------------------------------------
+   Drawn from borders, on currentColor. Two reasons, and the first is the one
+   that gets missed: CSS generated content is folded into the accessible name,
+   so `content: "✓"` renames whatever it is on — the tick becomes part of the
+   status. `content: ""` plus a border contributes nothing. Chip Toggle found
+   this on a control; example 2 is the same finding on a label.
+
+   The second is forced colors, where currentColor is recolored along with the
+   text and an image or an emoji is not. */
+
+.ac-status__glyph {
+  position: relative;
+  flex: none;
+  width: 0.85em;
+  height: 0.85em;
+}
+
+.ac-status__glyph::before,
+.ac-status__glyph::after {
+  content: "";
+  position: absolute;
+}
+
+/* A tick is a rectangle with two of its four borders, turned 45 degrees. */
+.ac-status--ok .ac-status__glyph::before {
+  top: 0;
+  left: 30%;
+  width: 34%;
+  height: 74%;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(42deg);
+}
+
+/* A cross is two bars through the middle. */
+.ac-status--err .ac-status__glyph::before,
+.ac-status--err .ac-status__glyph::after {
+  top: calc(50% - 1px);
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+}
+
+.ac-status--err .ac-status__glyph::before {
+  transform: rotate(45deg);
+}
+
+.ac-status--err .ac-status__glyph::after {
+  transform: rotate(-45deg);
+}
+
+/* An open ring, not a filled dot: a filled circle at this size reads as a
+   bullet point rather than as a state. */
+.ac-status--muted .ac-status__glyph::before {
+  top: 10%;
+  left: 10%;
+  width: 80%;
+  height: 80%;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+/* --- [TONES] every example ------------------------------------------------
+   One property each, so the glyph and the word can never disagree about which
+   color they are. The accents are the theme's own.
+
+   Three tones and not five: at label scale the reader is telling them apart
+   from the word, and a fourth shade of green does not help with that. */
+
+.ac-status--ok {
+  --ac-status-accent: var(--ac-accent-green, var(--accent-green, #5bff3a));
+}
+
+.ac-status--err {
+  --ac-status-accent: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+}
+
+.ac-status--muted {
+  --ac-status-accent: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+/* --- [DETAIL] example 3 ---------------------------------------------------
+   The sentence that does not fit. A local copy of Visually Hidden's clipping
+   recipe — a change there is a change here, deliberately, because a component
+   has to work pasted on its own.
+
+   `clip-path: inset(50%)` rather than `display: none`: the text has to stay in
+   the accessibility tree, which is the entire point of putting it here instead
+   of in a title attribute. */
+
+.ac-status__detail {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- [COMPACT] example 5 --------------------------------------------------
+   The narrow-column modifier. It clips the word rather than removing it, so
+   the phone layout shows a glyph and still announces "Shipped".
+
+   Apply it from a media query or a container query in your own app; the
+   checkbox in example 5 is standing in for one so the difference can be
+   watched without resizing the window. */
+
+.ac-status--compact .ac-status__text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- [SLOT] example 4 -----------------------------------------------------
+   One region per list, not one per row. It is in the markup from the start and
+   stays empty until there is a summary to put in it — a region a screen reader
+   is not already watching cannot change. Notice has the recipe. */
+
+.ac-st-slot {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+/* --- [BTN] example 4 ------------------------------------------------------
+   The refresh buttons, copied from Button. A status has no buttons of its own,
+   so delete this section unless you want the copy. This library is
+   deliberately not DRY — a change to .ac-btn is a change everywhere it landed. */
+
+.ac-btn {
+  --ac-btn-accent: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  box-sizing: border-box;
+  min-height: var(--ac-target, 44px);
+  min-width: var(--ac-target, 44px);
+  padding: 0.5rem 1.1rem;
+  border: 2px solid transparent;
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: transparent;
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+  appearance: none;
+  transition:
+    background-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease,
+    border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease,
+    color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-btn:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-btn:active {
+  translate: 0 calc(var(--ac-motion, var(--motion, 1)) * var(--ac-press-y, var(--press-y, 1px)));
+  scale: calc(1 - (1 - var(--ac-press-s, var(--press-s, 0.98))) * var(--ac-motion, var(--motion, 1)));
+}
+
+.ac-btn--outline {
+  border-color: var(--ac-btn-accent);
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  color: var(--ac-btn-accent);
+}
+
+.ac-btn--outline:hover {
+  background: color-mix(in srgb, var(--ac-btn-accent) 14%, var(--ac-surface, var(--bg-panel, #110620)));
+}
+
+.ac-btn--sm {
+  min-height: var(--ac-target-min, 24px);
+  min-width: var(--ac-target-min, 24px);
+  padding: 0.25rem 0.7rem;
+  font-size: 0.8rem;
+}
+
+/* --- [BROKEN] examples 2, 3 and 5 — delete this --------------------------- */
+
+/* Example 2. The tick that renames its own label. */
+.ac-st-bad-tick::before {
+  content: "\2713";
+}
+
+/* Example 3. A hover-only bubble: no focus, no touch, and nothing in the
+   accessibility tree. */
+.ac-st-bad-tip {
+  position: relative;
+}
+
+.ac-st-bad-tip::after {
+  content: attr(data-ac-st-tip);
+  position: absolute;
+  bottom: calc(100% + 0.4rem);
+  left: 0;
+  z-index: 1;
+  width: max-content;
+  max-width: 14rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-weight: 400;
+  visibility: hidden;
+}
+
+.ac-st-bad-tip:hover::after {
+  visibility: visible;
+}
+
+/* Example 5. The word removed rather than clipped. */
+[data-ac-st-narrow-panel][data-ac-st-narrow-on="true"] .ac-st-bad-narrow .ac-status__text {
+  display: none;
+}
+
+/* --- [PANEL] the frame around each example --------------------------------
+   Page furniture: the panels, the captions, the readouts and the announcement
+   log. None of it is part of a status. Delete the section. */
+
+.ac-st-panel,
+.ac-st__note {
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-st-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.8rem;
+  width: 100%;
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+}
+
+.ac-st-panel > * {
+  max-width: 100%;
+}
+
+.ac-st-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Wraps rather than shrinking the status away: at 320px the name and the
+   status do not fit on one line, and the status is the point. */
+.ac-st-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.2rem 0.8rem;
+  min-width: 0;
+  padding-block-end: 0.5rem;
+  border-block-end: 1px solid var(--ac-border, var(--border, #34205a));
+}
+
+.ac-st-row:last-child {
+  padding-block-end: 0;
+  border-block-end: 0;
+}
+
+.ac-st-row__name {
+  min-width: 0;
+  font-size: 0.85rem;
+  overflow-wrap: break-word;
+}
+
+.ac-st-cases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 1rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.ac-st-case {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.ac-st-case__label,
+.ac-st-log__label {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-st__note {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-st__verdict {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+  overflow-wrap: break-word;
+}
+
+/* Collapsed while empty so nothing reserves a gap for a message nobody has
+   caused yet. The element stays in the DOM and in the accessibility tree —
+   :empty is not display: none. */
+.ac-st__verdict:empty {
+  display: none;
+}
+
+.ac-st-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--ac-target-min, 24px);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.ac-st-check input {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+}
+
+.ac-st-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  font-size: 0.75rem;
+}
+
+.ac-st-readout__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.5rem;
+  min-width: 0;
+}
+
+.ac-st-readout dt,
+.ac-st-readout dd {
+  margin: 0;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-st-log {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0.5rem 0.6rem 0.5rem 1.7rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-st-log:empty::after {
+  content: "nothing yet";
+}
+
+.ac-st-log b {
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-st-readout code,
+.ac-st__note code,
+.ac-st__verdict code,
+.ac-st-case__label code,
+.ac-st-log code {
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+/* The failing readouts are marked as well as colored — the color is gone under
+   forced colors, and it was never the thing carrying the meaning. */
+.ac-st-readout code[data-ac-st-bad="true"],
+.ac-st__verdict[data-ac-st-bad="true"],
+.ac-st-log li[data-ac-st-bad="true"] {
+  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------
+   The two accents become the same CanvasText, so the tick and the cross are
+   the same color and only their shape is left. That is enough on screen and it
+   was never what a screen reader had — the word is. */
+
+@media (forced-colors: active) {
+  .ac-status {
+    color: CanvasText;
+  }
+
+  .ac-btn {
+    border-color: ButtonBorder;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  .ac-btn:hover {
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  .ac-btn:focus-visible {
+    outline-color: CanvasText;
+  }
+
+  .ac-st-panel,
+  .ac-st-readout,
+  .ac-st-log,
+  .ac-st-bad-tip::after {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+
+  .ac-st-row {
+    border-block-end-color: CanvasText;
+  }
+
+  .ac-st-readout code[data-ac-st-bad="true"],
+  .ac-st__verdict[data-ac-st-bad="true"],
+  .ac-st-log li[data-ac-st-bad="true"] {
+    color: CanvasText;
+  }
+}
