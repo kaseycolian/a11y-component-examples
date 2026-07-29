@@ -1,0 +1,387 @@
+<!-- ===========================================================================
+     PROSE SURFACE — a box of long-form content you did not write, and the
+     things that go missing on the way in
+
+     WHAT TO COPY
+       Example 1 is the component. Examples 2 to 5 are the four ways a surface
+       full of prose loses something, live. Each names the CSS it needs; there
+       is no JavaScript in this component at all.
+
+     THE CONTRACT
+       .ac-prose            the scroll container: tabindex="0", role="region"
+                            and a name, or it is a tab stop with neither
+                            (SC 2.1.1). Data Table owns that argument.
+       aria-labelledby      points at the surface's own first heading, so the
+                            name is written once.
+       .ac-prose h1..h6     styled by element, because the markup arrives from
+                            a CMS and carries no classes.
+       .ac-prose__code      a <pre> scrolls inside the surface, and that inner
+                            scroller needs the same three attributes.
+
+     The headings inside every surface here start at <h4>, because the page
+     already spent h1, h2 and h3 above them. That is the surface's whole
+     situation: it styles by element and takes whatever level the host page has
+     left. Typography owns the argument for when a class is the answer instead.
+
+     Every readout on this page is written by hand and asserted against the real
+     accessibility tree by tests/prose-surface.spec.mjs, so it cannot drift.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     Neither is anything named ac-ps-*.
+     =========================================================================== -->
+
+<div class="ac-demo-grid">
+  <!-- ======================================================================
+       EXAMPLE 1 · The specimen
+       CSS [PROSE] + [FLOW] + [CODE] + [QUOTE].
+
+       One container, and element selectors for everything inside it.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">1 &middot; The specimen</h3>
+
+    <!-- Named from its own first heading, so the name is written once. A region
+         with a name is a landmark: give a page one surface, not one per
+         paragraph. -->
+    <div class="ac-prose" tabindex="0" role="region" aria-labelledby="ps1-h" id="ps1">
+      <h4 id="ps1-h">Notes from the basement</h4>
+
+      <p>
+        The room on Marcy Street held ninety-nine people and the door list said
+        <strong>462</strong>. Nobody was counting by the second set. There is a
+        <a href="#ps1-h">write-up of the same night</a> in issue four, and it
+        disagrees with this one about almost everything.
+      </p>
+
+      <h5>Doors at nine</h5>
+
+      <p>
+        Two bands, one PA, and a generator out the back. The set list came off a
+        napkin and half of it was crossed out before anyone played.
+      </p>
+
+      <ul>
+        <li>Roots &amp; radicals, twice</li>
+        <li>Timebomb, cut short</li>
+        <li>Ruby Soho, into the fence</li>
+      </ul>
+
+      <figure class="ac-prose__quote">
+        <blockquote>
+          <p>They told us the room only held ninety-nine. We counted 462, and the
+            floor was still there in the morning.</p>
+        </blockquote>
+        <figcaption>Ruby, on the door &mdash; <cite>Olympia WA</cite>, issue four</figcaption>
+      </figure>
+
+      <hr>
+
+      <p>The archive is a flat file and the query is one line:</p>
+
+      <pre class="ac-prose__code" tabindex="0" role="region" aria-label="Setlist query, sample"><code>curl -s https://zine.example/setlists?night=462&amp;venue=basement-marcy | jq '.songs[] | .title'</code></pre>
+
+      <p>
+        Everything past the fold is real text, in the accessibility tree, and
+        reachable by keyboard. That is the whole component.
+      </p>
+    </div>
+
+    <p class="ac-ps__note">
+      The surface scrolls, so it takes a tab stop, a role and a name. Data Table
+      owns those three attributes; this page is about what goes inside.
+    </p>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 2 · A code block inside prose
+       CSS [PROSE] + [FLOW] + [CODE] + [BROKEN].
+
+       The same long line three ways. A <pre> does not wrap, so it either widens
+       the surface or scrolls on its own — and scrolling on its own puts a
+       second stop inside the first one.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">2 &middot; A code block inside prose</h3>
+
+    <div class="ac-ps-cases">
+      <!-- BROKEN ON PURPOSE — no overflow of its own, so the surface takes it. -->
+      <div class="ac-ps-case">
+        <p class="ac-ps-case__label"><code>&lt;pre&gt;</code> as it comes &mdash; broken on purpose</p>
+        <div class="ac-prose ac-ps-short" tabindex="0" role="region" aria-labelledby="ps2a-h" id="ps2a">
+          <h4 id="ps2a-h">Bare</h4>
+          <pre class="ac-ps-plain-code" id="ps2a-pre"><code>curl -s https://zine.example/setlists?night=462 | jq '.songs[]'</code></pre>
+        </div>
+        <dl class="ac-ps-readout">
+          <div class="ac-ps-readout__row">
+            <dt>the surface scrolls sideways</dt>
+            <dd><code data-ac-ps-out="code-side-bare" data-ac-ps-bad="true">yes</code></dd>
+          </div>
+          <div class="ac-ps-readout__row">
+            <dt>tab stops inside it</dt>
+            <dd><code data-ac-ps-out="code-stop-bare">0</code></dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- BROKEN ON PURPOSE — overflow-x and nothing else, so Chromium hands it
+           a stop with no role and no name. -->
+      <div class="ac-ps-case">
+        <p class="ac-ps-case__label"><code>overflow-x</code> alone &mdash; broken on purpose</p>
+        <div class="ac-prose ac-ps-short" tabindex="0" role="region" aria-labelledby="ps2b-h" id="ps2b">
+          <h4 id="ps2b-h">Scrolling</h4>
+          <pre class="ac-ps-bare-code" id="ps2b-pre"><code>curl -s https://zine.example/setlists?night=462 | jq '.songs[]'</code></pre>
+        </div>
+        <dl class="ac-ps-readout">
+          <div class="ac-ps-readout__row">
+            <dt>the surface scrolls sideways</dt>
+            <dd><code data-ac-ps-out="code-side-scroll">no</code></dd>
+          </div>
+          <div class="ac-ps-readout__row">
+            <dt>tab stops inside it</dt>
+            <dd><code data-ac-ps-out="code-stop-scroll" data-ac-ps-bad="true">1 &mdash; no role, no name</code></dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="ac-ps-case">
+        <p class="ac-ps-case__label"><code>.ac-prose__code</code></p>
+        <div class="ac-prose ac-ps-short" tabindex="0" role="region" aria-labelledby="ps2c-h" id="ps2c">
+          <h4 id="ps2c-h">Named</h4>
+          <pre class="ac-prose__code" id="ps2c-pre" tabindex="0" role="region" aria-label="Setlist query"><code>curl -s https://zine.example/setlists?night=462 | jq '.songs[]'</code></pre>
+        </div>
+        <dl class="ac-ps-readout">
+          <div class="ac-ps-readout__row">
+            <dt>the surface scrolls sideways</dt>
+            <dd><code data-ac-ps-out="code-side-named">no</code></dd>
+          </div>
+          <div class="ac-ps-readout__row">
+            <dt>tab stops inside it</dt>
+            <dd><code data-ac-ps-out="code-stop-named">1 &mdash; Setlist query, region</code></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <p class="ac-ps__note">
+      A scroller inside a scroller is still a scroller, and needs the same three
+      attributes the surface has. Not <code>white-space: pre-wrap</code>: code
+      that wraps wherever it likes reads as different code.
+    </p>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 3 · A quote and who said it
+       CSS [PROSE] + [FLOW] + [QUOTE] + [BROKEN].
+
+       Three quotes that look identical. The difference is whether the
+       attribution is part of what was said.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">3 &middot; A quote and who said it</h3>
+
+    <div class="ac-ps-cases">
+      <!-- BROKEN ON PURPOSE — the attribution is inside the quotation. -->
+      <div class="ac-ps-case">
+        <p class="ac-ps-case__label">attribution inside &mdash; broken on purpose</p>
+        <div class="ac-prose ac-ps-static">
+          <blockquote class="ac-ps-inside-quote" id="ps3a">
+            <p>We counted 462, and the floor was still there in the morning.</p>
+            <p class="ac-ps-attr">&mdash; Ruby, on the door</p>
+          </blockquote>
+        </div>
+        <dl class="ac-ps-readout">
+          <div class="ac-ps-readout__row">
+            <dt>the quoted element is a</dt>
+            <dd><code data-ac-ps-out="quote-role-inside">blockquote</code></dd>
+          </div>
+          <div class="ac-ps-readout__row">
+            <dt>the quotation ends</dt>
+            <dd><code data-ac-ps-out="quote-end-inside" data-ac-ps-bad="true">&mdash; Ruby, on the door</code></dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- BROKEN ON PURPOSE — a div with a left bar. Nothing is quoted. -->
+      <div class="ac-ps-case">
+        <p class="ac-ps-case__label">a <code>&lt;div&gt;</code> with a bar &mdash; broken on purpose</p>
+        <div class="ac-prose ac-ps-static">
+          <div class="ac-ps-fake-quote" id="ps3b">
+            <p>We counted 462, and the floor was still there in the morning.</p>
+            <p class="ac-ps-attr">&mdash; Ruby, on the door</p>
+          </div>
+        </div>
+        <dl class="ac-ps-readout">
+          <div class="ac-ps-readout__row">
+            <dt>the quoted element is a</dt>
+            <dd><code data-ac-ps-out="quote-role-div" data-ac-ps-bad="true">&mdash; nothing is quoted</code></dd>
+          </div>
+          <div class="ac-ps-readout__row">
+            <dt>the quotation ends</dt>
+            <dd><code data-ac-ps-out="quote-end-div" data-ac-ps-bad="true">&mdash;</code></dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="ac-ps-case">
+        <p class="ac-ps-case__label"><code>&lt;figure&gt;</code> + <code>&lt;figcaption&gt;</code></p>
+        <div class="ac-prose ac-ps-static">
+          <figure class="ac-prose__quote" id="ps3c-fig">
+            <blockquote id="ps3c">
+              <p>We counted 462, and the floor was still there in the morning.</p>
+            </blockquote>
+            <figcaption>Ruby, on the door</figcaption>
+          </figure>
+        </div>
+        <dl class="ac-ps-readout">
+          <div class="ac-ps-readout__row">
+            <dt>the quoted element is a</dt>
+            <dd><code data-ac-ps-out="quote-role-figure">blockquote</code></dd>
+          </div>
+          <div class="ac-ps-readout__row">
+            <dt>the quotation ends</dt>
+            <dd><code data-ac-ps-out="quote-end-figure">&hellip; in the morning.</code></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <p class="ac-ps__note">
+      All three read the same words in the same order. Only the third draws a
+      line between what was said and who said it.
+    </p>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 4 · Bullets and rules that are only drawn
+       CSS [PROSE] + [FLOW] + [BROKEN].
+
+       Pasted prose arrives as paragraphs. A bullet character is not a list and
+       a bordered div is not a separator.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">4 &middot; Bullets and rules that are only drawn</h3>
+
+    <div class="ac-ps-cases">
+      <!-- BROKEN ON PURPOSE — bullets typed into paragraphs, and a div rule. -->
+      <div class="ac-ps-case">
+        <p class="ac-ps-case__label">typed in &mdash; broken on purpose</p>
+        <div class="ac-prose ac-ps-static" id="ps4a">
+          <p class="ac-ps-fake-item">&bull; Roots &amp; radicals, twice</p>
+          <p class="ac-ps-fake-item">&bull; Timebomb, cut short</p>
+          <p class="ac-ps-fake-item">&bull; Ruby Soho, into the fence</p>
+          <div class="ac-ps-fake-rule"></div>
+          <p>Second set, after the fuse.</p>
+        </div>
+        <dl class="ac-ps-readout">
+          <div class="ac-ps-readout__row">
+            <dt>lists here</dt>
+            <dd><code data-ac-ps-out="flow-list-typed" data-ac-ps-bad="true">0</code></dd>
+          </div>
+          <div class="ac-ps-readout__row">
+            <dt>the divider is a</dt>
+            <dd><code data-ac-ps-out="flow-rule-typed" data-ac-ps-bad="true">&mdash;</code></dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="ac-ps-case">
+        <p class="ac-ps-case__label"><code>&lt;ul&gt;</code> and <code>&lt;hr&gt;</code></p>
+        <div class="ac-prose ac-ps-static" id="ps4b">
+          <ul>
+            <li>Roots &amp; radicals, twice</li>
+            <li>Timebomb, cut short</li>
+            <li>Ruby Soho, into the fence</li>
+          </ul>
+          <hr>
+          <p>Second set, after the fuse.</p>
+        </div>
+        <dl class="ac-ps-readout">
+          <div class="ac-ps-readout__row">
+            <dt>lists here</dt>
+            <dd><code data-ac-ps-out="flow-list-real">1, of 3 items</code></dd>
+          </div>
+          <div class="ac-ps-readout__row">
+            <dt>the divider is a</dt>
+            <dd><code data-ac-ps-out="flow-rule-real">separator</code></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <p class="ac-ps__note">
+      The typed version announces &ldquo;bullet&rdquo; three times and never says how
+      many there are, which is the one thing a list is for.
+    </p>
+  </div>
+
+  <!-- ======================================================================
+       EXAMPLE 5 · A surface that clips instead of scrolling
+       CSS [PROSE] + [FLOW] + [BROKEN].
+
+       The same overlong text in a box of the same height. One of them can be
+       read to the end.
+       ====================================================================== -->
+  <div class="ac-demo">
+    <h3 class="ac-demo__title">5 &middot; A surface that clips instead of scrolling</h3>
+
+    <div class="ac-ps-cases">
+      <!-- BROKEN ON PURPOSE — overflow: hidden and a fade, which is the "read
+           more" look with no more to read. -->
+      <div class="ac-ps-case">
+        <p class="ac-ps-case__label"><code>overflow: hidden</code> and a fade &mdash; broken on purpose</p>
+        <div class="ac-prose ac-ps-clip" id="ps5a">
+          <h4 id="ps5a-h">Second set</h4>
+          <p>The generator went at the third song and the room sang the rest of it
+            in the dark, which is either the best thing that ever happened on
+            Marcy Street or a fire code violation, depending on who you ask.</p>
+          <p id="ps5a-last">The fuse was 99 cents from the hardware shop on the corner.</p>
+        </div>
+        <dl class="ac-ps-readout">
+          <div class="ac-ps-readout__row">
+            <dt>text past the fold is announced</dt>
+            <dd><code data-ac-ps-out="box-tree-clip">yes</code></dd>
+          </div>
+          <div class="ac-ps-readout__row">
+            <dt>&hellip; and can be brought on screen</dt>
+            <dd><code data-ac-ps-out="box-reach-clip" data-ac-ps-bad="true">no</code></dd>
+          </div>
+          <div class="ac-ps-readout__row">
+            <dt>the box takes a tab stop</dt>
+            <dd><code data-ac-ps-out="box-stop-clip" data-ac-ps-bad="true">no</code></dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="ac-ps-case">
+        <p class="ac-ps-case__label"><code>.ac-prose</code></p>
+        <div class="ac-prose ac-ps-short" tabindex="0" role="region" aria-labelledby="ps5b-h" id="ps5b">
+          <h4 id="ps5b-h">Second set</h4>
+          <p>The generator went at the third song and the room sang the rest of it
+            in the dark, which is either the best thing that ever happened on
+            Marcy Street or a fire code violation, depending on who you ask.</p>
+          <p id="ps5b-last">The fuse was 99 cents from the hardware shop on the corner.</p>
+        </div>
+        <dl class="ac-ps-readout">
+          <div class="ac-ps-readout__row">
+            <dt>text past the fold is announced</dt>
+            <dd><code data-ac-ps-out="box-tree-scroll">yes</code></dd>
+          </div>
+          <div class="ac-ps-readout__row">
+            <dt>&hellip; and can be brought on screen</dt>
+            <dd><code data-ac-ps-out="box-reach-scroll">yes</code></dd>
+          </div>
+          <div class="ac-ps-readout__row">
+            <dt>the box takes a tab stop</dt>
+            <dd><code data-ac-ps-out="box-stop-scroll">yes, from tabindex="0"</code></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <p class="ac-ps__note">
+      Both boxes hold the same text and both announce all of it. The clipped one
+      has no scrollbar, no wheel and no tab stop: Chromium only hands a stop to a
+      box a person could already scroll.
+    </p>
+  </div>
+</div>

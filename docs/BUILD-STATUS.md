@@ -11,53 +11,52 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-29 (data-table — batch E is half done; Playwright **firefox is now installed**,
-webkit still is not; the `summary` voice changed on 2026-07-28, see item 0a)
+Last updated: 2026-07-29 (prose-surface — **batch E is closed and every component group except
+`compositions` is complete**; Playwright **firefox is installed but has never been run**, webkit is
+not installed; the `summary` voice changed on 2026-07-28, see item 0a)
 
 ---
 
-## START HERE — next component is `prose-surface`, closing batch E
+## START HERE — the components are done except batch F. Do item 2 next.
 
-`data-table` landed: 21/21, suite is **685/685** in Chromium. Nothing was left open. Two of its
-findings are in the gotchas list and both are worth a skim before building anything with a table or a
-cell-level modifier in it: **`display: block` no longer drops the table role in Chromium 151** — the
-advice outlived its reason, and the gotcha that said otherwise has been corrected — and **a base rule
-written `.ac-thing th, .ac-thing td` outranks every single-class modifier on a cell**, silently.
+`prose-surface` landed: 31/31, suite is **716/716** in Chromium, and `data-display` is closed.
+Nothing was left open. Two things from it are worth a skim before touching anything that scrolls or
+that styles bare elements:
+
+- **`overflow: hidden` gets no Chromium tab stop.** The gotchas list entry has been corrected — the
+  free stop goes to `auto`/`scroll` only, so a `hidden` box of text is announced in full and
+  unreachable by every input device. `result-panel`'s two comments were fixed at the same time.
+- **A broken example has to be laid out as carefully as the good one.** Example 3's failing
+  blockquote kept the UA's `margin-inline: 40px` and had no bar, so three cases whose entire claim is
+  that nothing tells them apart were visibly different. Every test was green; the screenshot pass is
+  what found it, for the fourth time.
 
 **Read the `summary` rule in `CLAUDE.md` under Writing style before writing any `meta.json`.** It
 changed on 2026-07-28: the lede is prose written to a person, two or three sentences, leading with
 the reader's problem rather than the ARIA attribute, and **never enumerating or counting the
-examples**. `status-text`, `badge`, `result-panel`, `tabs`, `jump-nav` and `data-table` are written to
-it and are the references; everything earlier is the sweep in item 0a. The same session tightened the
-on-page copy rule (item 0b).
+examples**. `status-text` onward is written to it; everything earlier is the sweep in item 0a. The
+same session tightened the on-page copy rule (item 0b).
 
 ### The steps, in order
 
-**Step 1 — `prose-surface`.** Run the loop under "The loop for building one component" with:
+**Step 1 — the shared a11y gate (item 2).** It moved ahead of batch F deliberately and the reason is
+in "The road to done": its value is catching a regression across everything already built, and every
+batch after it is checked for free. Thirty-two components is the whole point; doing it after batch F
+means it only ever runs once. `field`'s spec already has one-component precedents for reduced
+motion, the 320px reflow and the ≥24×24 sweep — lift them rather than reinventing.
 
-```sh
-node scripts/new-component.mjs prose-surface --group data-display --name "Prose Surface" --no-js
-```
+Two traps are already known and both will fire on the first run: **an empty live region is 0px tall,
+so any sweep asserting "everything I found is visible" fails on every correctly built
+`role="status"` in the library**, and **`test.use({ forcedColors })` / `test.use({ reducedMotion })`
+are accepted and ignored** — `page.emulateMedia` in a `beforeEach`, always. Both are in the gotchas
+list with the precedents.
 
-Decided in advance, so do not re-derive:
+**Step 2 — batch F**, `app-url-maker` then `app-page-to-markdown`. They compose the others and every
+piece they need now exists. `app-page-to-markdown`'s scrollable preview is `prose-surface` plus
+`effects`' `fx-scroll` and its `[PATCH]` ring — build it out of those rather than from scratch.
 
-- Spec entry: `component-specs.md` → data-display → `prose-surface`. `.ac-prose` scroll container,
-  `tabindex="0"`, `role="region"`, a name. Styles for nested `h1`–`h3`, `p`, `a`, `pre`,
-  `blockquote`, `hr`.
-- **The scroll region is settled** — `data-table`'s `.ac-table-scroll` is the same three attributes
-  and the same reasoning, and `effects`' `[PATCH]` is the ring. Lift it rather than re-arguing it,
-  and point at `data-table` from `docs.md` the way it points at `effects`.
-- **`pre` needs its own `overflow-x`**, or a long code line widens the surface instead of scrolling
-  inside it — and that inner scroller is a second silent tab stop unless it is named too.
-- **`typography` owns the type scale and the SC 1.4.12 argument.** This component is the *container*;
-  do not re-derive muted-text contrast or the heading-versus-class point.
-- **CSS-only, like `data-table`** — no `component.js`. Hand-write the readouts and have the spec
-  assert them against the browser; `data-table`'s spec is the pattern.
-- **Keep the on-page copy short** — item 0b.
-
-**Then** batch F (`app-url-maker` → `app-page-to-markdown`) and the six non-component items under
-"Remaining non-component work" — items 1–4 are the ones that gate deploying; 0a and 0b are copy
-sweeps that can land any time.
+**Then** item 3 (docs) and item 4 (deploy), plus the two copy sweeps 0a and 0b, which can land any
+time and pair naturally with each other.
 
 One standing caveat for every step above: the header is two rows tall, so a demo that scrolls an
 anchor into view clears `--header-h`, not 4.5rem. A new component that positions anything against
@@ -79,7 +78,7 @@ Build in this order. The order is the dependency graph, not a preference.
 | ~~**B**~~ | ~~`button` → `icon-button` → `loading-button` → `chip-toggle`~~ | **Done.** Closed `buttons-actions` |
 | ~~**C**~~ | ~~`notice` → `status-text` → `badge` → `result-panel`~~ | **Done.** Closed `feedback-status` |
 | ~~**D**~~ | ~~`tabs` → `jump-nav`~~ | **Done.** Closed `navigation` |
-| **E** | ~~`data-table`~~ → `prose-surface` | `prose-surface` is the scroll-region pattern `data-table` establishes |
+| ~~**E**~~ | ~~`data-table` → `prose-surface`~~ | **Done.** Closed `data-display` |
 | **F** | `app-url-maker` → `app-page-to-markdown` | **last.** They compose the others and cannot be built before them |
 
 Cross-batch notes that will otherwise be rediscovered:
@@ -111,6 +110,11 @@ Cross-batch notes that will otherwise be rediscovered:
   the region and the table agree. `prose-surface` and `app-page-to-markdown`'s preview are the same
   three attributes; point at it rather than re-deriving them. It also owns the argument against the
   responsive card restyle, and the fact that a `<caption>` is not only the name.
+- **`prose-surface` owns styling markup you did not write.** Element selectors inside a container,
+  the heading-cascade guard that makes them survive a host page, `<pre>` as a scroller inside a
+  scroller, the `<figure>`/`<blockquote>`/`<figcaption>` split, and the argument that a region with
+  nothing to scroll is a stop and a landmark that do nothing. `app-page-to-markdown`'s preview is
+  this component plus `fx-scroll`; point at it rather than rebuilding it.
 - **Batch F composes with `effects`** — `app-page-to-markdown` is specified around `fx-bar-top`,
   `fx-scroll` and `fx-bar-bottom`, which are now documented and patched. Its scrollable preview is
   the `fx-scroll` case: `tabindex="0"` + `role="region"` + a name, and the focus ring from
@@ -221,13 +225,13 @@ take their logic and not their layout. See item 1 under remaining work.
 - **Playwright** — `playwright.config.mjs`, three browser projects, `webServer` runs
   `npm run build && npm run preview`. **Chromium and Firefox are installed; WebKit is not**, so
   `npm run verify` still *fails* at the test step with "Executable doesn't exist" for every WebKit
-  test. Chromium is **685/685**. Firefox was installed on 2026-07-29 and **has not been run yet** —
+  test. Chromium is **716/716**. Firefox was installed on 2026-07-29 and **has not been run yet** —
   expect real failures rather than none, since every spec was written against Chromium. Run
   `npx playwright install webkit` to finish the set.
 
 ---
 
-## Component roster — 32 / 35
+## Component roster — 33 / 35
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -726,7 +730,29 @@ take their logic and not their layout. See item 1 under remaining work.
   `LayoutTable`** by Chromium and is not exposed as a table at all — a `<caption>` alone promotes it
   and `aria-label` does not — and **a `<caption>` inside a `display: block` table keeps
   `display: table-caption`** and shrink-wraps to one word per line.
-- [ ] `prose-surface`
+- [x] `prose-surface` — done, **CSS-only** (`--no-js`), 31/31 tests in Chromium. **The container for
+  markup you did not write**, so everything inside it is selected by element and the readouts are
+  hand-written and asserted against the tree, `data-table`'s arrangement. Lifts the scroll-region
+  contract from `data-table` rather than re-arguing it, and names the surface from **its own first
+  heading** — the caption trick with the label inside the region instead of at the top of it.
+  Example 2 is one long code line in three surfaces; example 3 attributes the same quote three ways;
+  example 4 is a typed-in list beside a real one; example 5 clips a box and scrolls the same box.
+  Four findings. **`overflow: hidden` gets no Chromium tab stop** — the headline, and it is a
+  correction to what `result-panel` recorded; see the gotchas list, and both of that component's
+  comments now say the right thing. **A host page's `h1`–`h6` rules are not an edge case here, they
+  are the normal condition** — this is the one component whose whole job is styling bare elements
+  inside somebody else's page, so `typography`'s cascade finding is load-bearing rather than
+  interesting, and every heading rule declares `text-transform`, `letter-spacing` and `text-shadow`
+  it does not appear to need. **A `<pre>` is a scroller inside a scroller** and needs the same three
+  attributes as the surface, with its ring **inset** (`outline-offset: -3px`) because the surface
+  clips a positive one on the edge that matters. And **a broken example has to be laid out as
+  carefully as the good one**: the failing blockquote in example 3 kept the UA's
+  `margin-inline: 40px` and no bar, so the three cases whose whole claim is that nothing tells them
+  apart were visibly different — caught by the screenshot pass with every test green, and the spec
+  now asserts all three compute the same border, padding and margin. Same for the typed bullets in
+  example 4, which needed a hanging indent to line up with the real `<ul>`.
+
+**`data-display` is complete.**
 
 ### compositions
 - [ ] `app-url-maker`
@@ -1030,11 +1056,16 @@ It must match `npm run preview` exactly, base path included.
   `break-word` and **32px** under `anywhere`, and the two are pixel-identical on screen.
   `result-panel`'s example 2 has all three side by side and the number is what tells them apart.
   Measure it on a clone with `width: min-content`; the real layout cannot have that width.
-- **`overflow: hidden` makes a scroll container and therefore a Chromium tab stop; `overflow: clip`
-  does not.** Clipping a demo so a broken example does not take the page sideways is otherwise a
-  silent way to add an unnamed, roleless focus stop to the page — the same Chromium 151 behavior
-  `effects` documents, arriving from a direction where nothing looks scrollable. `clip` exists for
-  precisely this and is the one to reach for whenever the intent is "cut this off", not "scroll it".
+- **Chromium's free tab stop is given to `overflow: auto`/`scroll` only — not to `hidden`, not to
+  `clip`.** Corrected while building `prose-surface`, which measures all three side by side; the
+  earlier note from `result-panel` had `hidden` buying a stop and it does not. The rule is
+  *user*-scrollable, so a box that only script can scroll gets nothing. Two things follow. A
+  `overflow: hidden` box of text is worse than the silent-stop version everyone worries about: the
+  content is in the DOM and fully announced, and there is **no route to it at all** — no scrollbar,
+  no wheel, no keyboard. And `clip` is still the right choice for "cut this off", just for a
+  different reason than the one recorded: it makes no scroll container, so a focused descendant
+  cannot be scrolled into view under the clamp. `result-panel`'s CSS comment and spec comment were
+  both fixed at the same time.
 - **The UA's `[hidden] { display: none }` loses to any author `display`.** A component that declares
   `display: inline-flex` on its root has silently disabled the `hidden` attribute, so
   `el.hidden = true` leaves the thing on screen and in the accessibility tree. Declare

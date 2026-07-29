@@ -1,0 +1,444 @@
+/* ===========================================================================
+   PROSE SURFACE
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything outside [PANEL] is real component code; the demo frame
+   (ac-demo-*) lives in the site's own stylesheet, not this file.
+
+     [PROSE]   every example. The container, its scroll behavior, its ring.
+     [FLOW]    every example. Element selectors for the markup inside it.
+     [CODE]    examples 1, 2. A <pre> that scrolls on its own.
+     [QUOTE]   examples 1, 3. The figure + blockquote + figcaption shape.
+     [BROKEN]  examples 2 to 5. Delete it.
+     [PANEL]   the frame around each example on this page. Delete it.
+     [FORCED]  always ship this. The rules, the tints and the code fill are all
+               color-mix, and forced colors drops every one.
+
+   Copy [PROSE] + [FLOW] + [CODE] + [QUOTE] + [FORCED] for the component.
+
+   Everything inside the surface is selected by element, because the markup
+   arrives from a CMS, an editor or a Markdown renderer and carries no classes.
+   That is also why every heading rule below declares text-transform,
+   letter-spacing and text-shadow it does not appear to need: a host page's own
+   h1-h6 rules cascade into every property a rule stays quiet about, and this
+   library's own shell sets all three. Typography owns that finding.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [PROSE] every example -------------------------------------------------
+   Three attributes go with this in the markup and none is optional:
+
+     tabindex="0"      Chromium gives a scroll container a tab stop with no
+                       role, no name and a 1px near-black UA ring; Safari gives
+                       it no stop at all, so the surface cannot be scrolled by
+                       keyboard (SC 2.1.1). Effects owns that finding and Data
+                       Table owns this wrapper's shape.
+     role="region"     so the stop announces as something.
+     aria-labelledby   pointing at the surface's own first heading, so the name
+                       is written once.
+
+   A named region is a landmark. One surface per page, not one per pull quote.
+   And if it never overflows, it needs none of the three -- a stop with nothing
+   to scroll is a stop that does nothing. */
+
+.ac-prose {
+  box-sizing: border-box;
+  width: 100%;
+  /* A scroll container's automatic minimum size is its content's, so without
+     this the surface grows to fit its widest line and takes the page sideways
+     at 320px instead of scrolling (SC 1.4.10). */
+  min-width: 0;
+  max-height: 22rem;
+  overflow-y: auto;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-prose:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+/* --- [FLOW] every example --------------------------------------------------
+   The type scale here is the surface's own and stops at the container. It is
+   not a set of utility classes -- Typography owns those, and owns the argument
+   for when a class rather than a level is the right answer. */
+
+.ac-prose > :first-child {
+  margin-top: 0;
+}
+
+.ac-prose > :last-child {
+  margin-bottom: 0;
+}
+
+.ac-prose h1,
+.ac-prose h2,
+.ac-prose h3,
+.ac-prose h4,
+.ac-prose h5,
+.ac-prose h6 {
+  margin: 1.4em 0 0.4em;
+  font-weight: 700;
+  line-height: 1.25;
+  /* Declared because a host page sets them, not because the design wants them.
+     See the file header. */
+  letter-spacing: normal;
+  text-transform: none;
+  text-shadow: none;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-prose h1 { font-size: 1.5rem; font-weight: 800; }
+.ac-prose h2 { font-size: 1.25rem; font-weight: 800; }
+.ac-prose h3 { font-size: 1.12rem; }
+.ac-prose h4 { font-size: 1.02rem; }
+.ac-prose h5 { font-size: 0.92rem; }
+.ac-prose h6 { font-size: 0.85rem; }
+
+.ac-prose p {
+  margin: 0 0 0.9em;
+  /* `anywhere`, not `break-word`: break-word wraps a long token and leaves the
+     box's min-content width alone, so the surface still cannot reflow to 320px
+     (SC 1.4.10). Result Panel measured the difference. */
+  overflow-wrap: anywhere;
+}
+
+/* Underlined, not colored. A link inside a paragraph is one word away from the
+   text it has to be told apart from, and that is the contrast ratio SC 1.4.1
+   asks about -- Typography measures it. */
+.ac-prose a {
+  color: var(--ac-link, var(--accent-blue, #3ceaff));
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.ac-prose a:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.ac-prose ul,
+.ac-prose ol {
+  margin: 0 0 0.9em;
+  padding-inline-start: 1.4em;
+}
+
+.ac-prose li {
+  margin-bottom: 0.25em;
+}
+
+.ac-prose strong {
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+/* An <hr> is a separator in the accessibility tree. A bordered div is a box
+   with a line on it, which is example 4. */
+.ac-prose hr {
+  height: 0;
+  margin: 1.3em 0;
+  border: 0;
+  border-top: 1px solid var(--ac-border, var(--border, #34205a));
+}
+
+/* --- [CODE] examples 1, 2 --------------------------------------------------
+   A <pre> does not wrap, so a long line either widens the surface or scrolls
+   inside it. Scrolling inside it is right, and it makes a second scroll
+   container -- which takes the same three attributes the surface does. */
+
+.ac-prose__code {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  margin: 0 0 0.9em;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.ac-prose__code:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  /* Inset, because the surface clips it: an outline at a positive offset on a
+     child of an overflow container is cut off on the edge it matters most on.
+     Focus Ring owns the --inset variant. */
+  outline-offset: -3px;
+}
+
+.ac-prose code {
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
+  font-size: 0.95em;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+/* --- [QUOTE] examples 1, 3 -------------------------------------------------
+   The attribution is not part of the quotation, so it goes outside the
+   <blockquote> and inside the <figure> with it. Put it in the blockquote and a
+   screen reader reads it as something the person said about themselves. */
+
+.ac-prose__quote {
+  margin: 1.2em 0;
+  padding-inline-start: 0.9rem;
+  border-inline-start: 3px solid var(--ac-accent, var(--accent, #3ceaff));
+}
+
+.ac-prose__quote blockquote {
+  margin: 0;
+}
+
+.ac-prose__quote figcaption {
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  font-size: 0.82rem;
+}
+
+/* A <cite> is the name of the work, and it is italic by UA default in every
+   browser. It names nothing in the accessibility tree, which is fine -- it is
+   the figcaption that carries the attribution. */
+.ac-prose__quote cite {
+  font-style: italic;
+}
+
+/* --- [BROKEN] examples 2 to 5 — delete this -------------------------------
+   Four failures, each one declaration or two. Every one of them looks right on
+   screen, which is why they are here rather than described. */
+
+/* Example 2. overflow-x on the <pre> and nothing else, so Chromium hands it a
+   tab stop with no role, no name and a hairline ring. */
+.ac-ps-bare-code {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  margin: 0 0 0.9em;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+/* Example 2's first case is a <pre> with no overflow of its own, so it keeps the
+   UA's white-space: pre and pushes the surface sideways. Only the frame is drawn
+   here; the overflow-x is deliberately absent. */
+.ac-ps-plain-code {
+  margin: 0 0 0.9em;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+/* Example 3. The bar drawn on the <blockquote> itself, because there is no
+   <figure> to hang it on once the attribution has moved inside. The UA's own
+   `margin-inline: 40px` has to go with it, or the three cases are not the same
+   shape and the comparison the example is making stops being one. */
+.ac-ps-inside-quote {
+  margin: 1.2em 0;
+  padding-inline-start: 0.9rem;
+  border-inline-start: 3px solid var(--ac-accent, var(--accent, #3ceaff));
+}
+
+/* A div with a left bar. Pixel-identical to .ac-prose__quote and nothing in it
+   is quoted. */
+.ac-ps-fake-quote {
+  margin: 1.2em 0;
+  padding-inline-start: 0.9rem;
+  border-inline-start: 3px solid var(--ac-accent, var(--accent, #3ceaff));
+}
+
+.ac-ps-attr {
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  font-size: 0.82rem;
+}
+
+/* Example 4. A list drawn out of paragraphs, and a separator drawn out of a
+   border. Both are typed by hand into a CMS every day. */
+/* The indent matches .ac-prose ul exactly, hanging bullet and all, so nothing
+   on screen tells the two lists apart -- which is the example. */
+.ac-ps-fake-item {
+  margin: 0 0 0.25em;
+  padding-inline-start: 1.4em;
+  text-indent: -0.85em;
+}
+
+.ac-ps-fake-rule {
+  height: 0;
+  margin: 1.3em 0;
+  border-top: 1px solid var(--ac-border, var(--border, #34205a));
+}
+
+/* Example 5. The "read more" look with no more to read: the text is in the DOM
+   and in the accessibility tree, and there is no route to it at all. Chromium's
+   free tab stop for scroll containers does not apply here -- it is given only to
+   a box a person could already scroll, and overflow: hidden is scrollable by
+   script and by nothing else.
+
+   Written at (0,2,0) so it beats .ac-prose's own overflow rather than depending
+   on which of two single-class rules was declared last -- Icon Button found that
+   one and Jump Nav found it again. */
+.ac-prose.ac-ps-clip {
+  max-height: 9rem;
+  overflow: hidden;
+  /* currentColor, not a literal: the mask reads alpha, so an opaque color is
+     "keep" and transparent is "fade". */
+  mask-image: linear-gradient(to bottom, currentColor 60%, transparent);
+}
+
+/* --- [PANEL] the frame around each example --------------------------------
+   Page furniture: the case columns, the labels, the readouts, and the two
+   surface sizes the comparisons need. None of it is part of a prose surface.
+   Delete the section. */
+
+/* Short enough that the text in example 5 has somewhere to scroll. */
+.ac-prose.ac-ps-short {
+  max-height: 9rem;
+}
+
+/* Examples 3 and 4 are about the markup, not about scrolling -- so those
+   surfaces fit their content and carry no tabindex, no role and no name. */
+.ac-prose.ac-ps-static {
+  max-height: none;
+  overflow: visible;
+}
+
+.ac-ps-cases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 1rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.ac-ps-case {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.ac-ps-case__label,
+.ac-ps__note {
+  margin: 0;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-ps-case__label {
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.ac-ps__note {
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.ac-ps-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.75rem;
+}
+
+.ac-ps-readout__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.5rem;
+  min-width: 0;
+}
+
+.ac-ps-readout dt,
+.ac-ps-readout dd {
+  margin: 0;
+  min-width: 0;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-ps-readout code,
+.ac-ps__note code,
+.ac-ps-case__label code {
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+  overflow-wrap: anywhere;
+}
+
+/* The failing readouts are marked in the markup as well as colored -- the color
+   is gone under forced colors, and it was never the thing carrying it. */
+.ac-ps-readout code[data-ac-ps-bad="true"] {
+  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------
+   Every line in this component is a border or a rule, so most of it survives.
+   What does not is the mask in [BROKEN] -- forced colors leaves it alone, which
+   is worth knowing: a fade that hides text is not something the platform can
+   put back. */
+
+@media (forced-colors: active) {
+  .ac-prose,
+  .ac-prose__code,
+  .ac-ps-bare-code,
+  .ac-ps-plain-code,
+  .ac-ps-readout {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .ac-prose:focus-visible,
+  .ac-prose__code:focus-visible,
+  .ac-prose a:focus-visible {
+    outline-color: CanvasText;
+  }
+
+  .ac-prose hr,
+  .ac-ps-fake-rule {
+    border-top-color: CanvasText;
+  }
+
+  .ac-prose__quote,
+  .ac-ps-fake-quote,
+  .ac-ps-inside-quote {
+    border-inline-start-color: CanvasText;
+  }
+
+  .ac-prose a {
+    color: LinkText;
+  }
+
+  .ac-ps-readout code[data-ac-ps-bad="true"] {
+    color: CanvasText;
+  }
+}

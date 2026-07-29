@@ -1,0 +1,23 @@
+{
+  "slug": "prose-surface",
+  "name": "Prose Surface",
+  "group": "data-display",
+  "order": 20,
+  "summary": "Sooner or later you render writing somebody else wrote — from a CMS, an editor, a Markdown file — inside a box of your own, and you cannot add classes to it. The styling has to hang off the elements, and whatever structure did not survive the trip is simply gone: a quote that swallowed its attribution, a list that is paragraphs with a bullet typed in front. A box that scrolls is also a control.",
+  "tags": [
+    "prose",
+    "long-form",
+    "scroll-region",
+    "blockquote",
+    "figcaption",
+    "pre",
+    "separator",
+    "cms",
+    "forced-colors"
+  ],
+  "apg": "https://www.w3.org/WAI/WCAG22/Understanding/info-and-relationships.html",
+  "wcag": ["1.3.1", "1.4.1", "1.4.10", "2.1.1", "2.4.7", "4.1.2"],
+  "status": "stable",
+  "files": ["html", "css"],
+  "demoNote": "Every readout here is written by hand and checked against the real accessibility tree by the spec, so it cannot drift. Example 2 puts one long line of code in a surface three ways; example 3 attributes the same quote three ways; example 4 has a typed-in list beside a real one; example 5 clips a box of text and scrolls the same box."
+}

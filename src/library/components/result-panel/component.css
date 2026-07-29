@@ -502,8 +502,12 @@
    viewport, and clips them so this page itself does not scroll sideways — the
    readout reports how far past the edge each one went.
 
-   `overflow: clip` and not `hidden`: hidden makes a scroll container, and
-   Chromium gives any scroll container a tab stop with no role and no name. */
+   `overflow: clip` and not `hidden`: hidden makes a scroll container that only
+   script can scroll, so anything focused inside it is silently scrolled into
+   view and the clamp shifts under the reader. clip makes no scroll container at
+   all, which is what "cut this off" means. (Corrected while building Prose
+   Surface: `hidden` does *not* also buy a Chromium tab stop — the free stop for
+   scroll containers is given only to a box a person could already scroll.) */
 .ac-rp-clamp {
   box-sizing: border-box;
   width: 100%;

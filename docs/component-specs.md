@@ -256,8 +256,12 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
 - **Finding** A base rule written `.ac-table th, .ac-table td` is (0,1,1) and silently outranks every single-class modifier on a cell. Write modifiers as `.ac-table .ac-table__num`.
 
 ### prose-surface
-- **Markup** `.ac-prose` scroll container, `tabindex="0"`, `role="region"`, `aria-label`.
-- **Gotcha** Any scrollable region must be keyboard-scrollable. Styles for nested `h1`–`h3`, `p`, `a`, `pre`, `blockquote`, `hr` — and `pre` needs its own `overflow-x` so code does not widen the page.
+- **Markup** `.ac-prose` scroll container, `tabindex="0"`, `role="region"`, and `aria-labelledby` pointing at the surface's **own first heading** — the label lives inside the region, not above it.
+- **Gotcha** Any scrollable region must be keyboard-scrollable. Styles for nested `h1`–`h6`, `p`, `a`, `ul`/`ol`, `pre`, `blockquote`, `hr` — and `pre` needs its own `overflow-x` so code does not widen the surface. **Built:** that inner scroller is a second stop and takes the same three attributes, with an **inset** ring, because the surface clips a positive offset.
+- **Gotcha** Element selectors, because the markup arrives without classes. Every heading rule must declare `text-transform`, `letter-spacing` and `text-shadow`, or the host page's own `h1`–`h6` rules cascade into them. Typography owns the finding; here it is the normal condition.
+- **Finding** `overflow: hidden` gets **no** Chromium tab stop — the free stop is for `auto`/`scroll` only. So a clipped box of prose is fully announced and reachable by nothing at all. Corrects what `result-panel` recorded.
+- **Finding** The attribution goes in a `<figcaption>` beside the `<blockquote>`, not inside it. `cite` the attribute is exposed to nobody; `<cite>` the element names a work, not a person.
+- **Finding** A region with nothing to scroll is a tab stop and a landmark that do nothing. Drop all three attributes when the surface fits its content.
 
 ---
 
