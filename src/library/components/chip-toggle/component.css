@@ -364,7 +364,13 @@
 }
 
 .ac-ct__verdict[data-ac-ct-bad="true"] {
-  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-pink, var(--accent-pink, #ff2ec4)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
 }
 
 .ac-ct-readout {
@@ -410,7 +416,13 @@
 
 .ac-ct-readout code[data-ac-ct-bad="true"],
 .ac-ct-case__out code[data-ac-ct-bad="true"] {
-  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-pink, var(--accent-pink, #ff2ec4)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
 }
 
 /* --- [BROKEN] example 2 — delete this -------------------------------------

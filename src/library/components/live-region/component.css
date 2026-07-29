@@ -66,7 +66,13 @@
 
 /* An alert interrupts, so it is drawn as something that interrupts. */
 .ac-lr-region--loud {
-  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-pink, var(--accent-pink, #ff2ec4)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
   border-style: solid;
   border-color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
 }
@@ -165,7 +171,13 @@
 }
 
 .ac-lr-mirror__label {
-  color: var(--ac-accent-purple, var(--accent-purple, #b57fff));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-purple, var(--accent-purple, #b57fff)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
 }
 
 .ac-lr-fails {
@@ -183,18 +195,31 @@
   margin-block-start: 0.4rem;
 }
 
+/* The scroller and the list are two elements because the live-region role has
+   to sit on something that is allowed to carry it -- see the markup. */
 .ac-lr-log {
   max-height: 9rem;
   margin-block-start: 0.6rem;
-  padding-inline-start: 2rem;
   overflow-y: auto;
   font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
   font-size: 0.9rem;
+}
+
+/* Inset, so the ring is not clipped by the scroller it is drawn on --
+   focus-ring's --inset case. */
+.ac-lr-log:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: -3px;
+}
+
+.ac-lr-log__list {
+  margin: 0;
+  padding-inline-start: 1.4rem;
   list-style: decimal;
 }
 
-.ac-lr-log:empty {
-  padding-inline-start: 0.6rem;
+.ac-lr-log__list:empty {
+  padding-inline-start: 0;
 }
 
 /* --- [FORCED] Windows High Contrast — always ship this --------------------- */

@@ -185,7 +185,13 @@
   display: flex;
   align-items: center;
   min-height: var(--ac-target, 44px);
-  color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
 }
 
 /* --- [EDGES] which side it comes from -------------------------------------

@@ -65,6 +65,23 @@ background: var(--ac-surface, var(--bg-panel, #110620));
 Allowed bare: `transparent`, `currentColor`, and CSS system colors (`Canvas`, `Highlight`,
 `ButtonBorder`, …) — the last are required inside `@media (forced-colors: active)`.
 
+The linter also checks that the **middle** token is one theme-service actually defines. A misspelled
+one does not fail — it silently resolves to the literal and stops following the theme picker, which
+is invisible in a dark theme because the literal *is* a dark-theme color. `--bg-elev` (it is
+`--bg-elevated`) put tooltip at 1.01:1 in every light theme.
+
+**An accent used as *text* is mixed toward `--text`.** The accents are drawn to be vivid on a dark
+page, so on a light theme surface they land at 2.7–4.2:1. The shell has `--accent-{green,blue,
+purple}-text` for this; a component writes it inline, because it has to stand alone:
+
+```css
+color: color-mix(in srgb, var(--ac-accent-pink, var(--accent-pink, #ff2ec4)) 80%, var(--ac-text, var(--text, #f3ecff)));
+```
+
+Mixing toward `--text` always raises contrast against the surface, in either mode, because `--text`
+is the one color a theme guarantees contrasts with its own background. Borders and tints keep the
+raw accent — they are decoration and have no ratio to clear.
+
 **Motion is gated, never hardcoded.**
 
 ```css
@@ -154,6 +171,19 @@ EXAMPLE 3 · Server-rendered error
 per-example headings, the legend. They live in `src/site/styles/site.css`, **not** in any
 `component.css`, so that everything in a component's own files is real component code. Use the
 classes in `component.html` and say in the file header that they are not to be copied.
+
+**An example that is broken on purpose says so in the markup.** The shared a11y gate
+(`tests/shared/a11y.spec.mjs`) drives every component, and most pages ship a live failure, so the
+failing element carries `data-ac-demo-broken="<check> <check>"` naming the checks it is expected to
+fail — any axe rule id, plus `focus-visible` (SC 2.4.7) and `target-size` (SC 2.5.8). The gate does
+not skip them, it **asserts they still fail**: an example that quietly stops being broken fails the
+build too. Another demo-scaffolding attribute, never copied.
+
+Two traps come with it. A violation *inside* a marked element that is not in its list is still a
+failure, so the list stays specific. And a good rule written for the whole file will reach the
+broken variant and repair it — `.ac-t-broken-link` has to keep the raw accent while every other
+accent in the library is mixed toward `--text`, or typography's example 4 stops being a failure.
+The same shape as a `[FORCED]` block reaching a broken variant.
 
 **Every `docs.md` states the framework caveat once**, near the top: your framework probably has a
 better idiom for this, but the ARIA attributes and their wiring are the same either way, and this is

@@ -14,7 +14,7 @@ say which examples need them.
 
 ## Why this beats a custom dropdown
 
-| | Native select | Custom listbox |
+| Behavior | Native select | Custom listbox |
 | --- | --- | --- |
 | On a phone | the OS picker: full height, scrollable, platform gestures | a `div` you have to size, scroll and trap focus in |
 | Keyboard | arrows, Home, End, type-ahead, page keys — free | reimplemented, and usually incompletely |

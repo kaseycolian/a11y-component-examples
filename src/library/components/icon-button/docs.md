@@ -59,7 +59,7 @@ visible affordance exists for mouse users only. See [Tooltip](../tooltip/) for w
 Both announce the same. They are not the same thing, and the clipped-text version is the better
 default whenever the label *can* be a phrase.
 
-| | `aria-label` | clipped text inside the button |
+| Property | `aria-label` | clipped text inside the button |
 | --- | --- | --- |
 | Announced | yes | yes |
 | Found by Ctrl+F | no | **yes** |

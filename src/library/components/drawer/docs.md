@@ -44,7 +44,7 @@ aimed at something else.
 
 ## Modal or not — behavior, not a style flag
 
-| | Modal (default) | `data-ac-modal="false"` |
+| What changes | Modal (default) | `data-ac-modal="false"` |
 | --- | --- | --- |
 | Role | `role="dialog"` | `role="region"` |
 | `aria-modal` | `"true"` | **absent** |

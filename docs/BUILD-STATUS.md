@@ -11,25 +11,24 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-29 (prose-surface — **batch E is closed and every component group except
-`compositions` is complete**; Playwright **firefox is installed but has never been run**, webkit is
-not installed; the `summary` voice changed on 2026-07-28, see item 0a)
+Last updated: 2026-07-29 (**the shared a11y gate landed — item 2 is done** and it found a great deal;
+suite is **1046/1046** in Chromium. Playwright **firefox is installed but has never been run**,
+webkit is not installed; the `summary` voice changed on 2026-07-28, see item 0a)
 
 ---
 
-## START HERE — the components are done except batch F. Do item 2 next.
+## START HERE — every component group except `compositions` is complete, and the gate is in. Do batch F next.
 
-`prose-surface` landed: 31/31, suite is **716/716** in Chromium, and `data-display` is closed.
-Nothing was left open. Two things from it are worth a skim before touching anything that scrolls or
-that styles bare elements:
+The shared a11y gate is `tests/shared/a11y.spec.mjs`: ten checks against all 33 components, 330
+tests, and `.github/workflows/ci.yml` runs it. It went in before batch F for the reason recorded
+below — its value is catching a regression across everything already built — and that paid off
+immediately. **It found nine real defects, including two that made whole pages unreadable in half
+the shipped themes.** The list is in "What the gate found" below and every one is fixed.
 
-- **`overflow: hidden` gets no Chromium tab stop.** The gotchas list entry has been corrected — the
-  free stop goes to `auto`/`scroll` only, so a `hidden` box of text is announced in full and
-  unreachable by every input device. `result-panel`'s two comments were fixed at the same time.
-- **A broken example has to be laid out as carefully as the good one.** Example 3's failing
-  blockquote kept the UA's `margin-inline: 40px` and had no bar, so three cases whose entire claim is
-  that nothing tells them apart were visibly different. Every test was green; the screenshot pass is
-  what found it, for the fourth time.
+Read that list before touching CSS. Three of its findings are now conventions in `CLAUDE.md`:
+the middle link of a token chain has to be a token that exists, an accent used as *text* is mixed
+80% toward `--text`, and an example that is broken on purpose says so in the markup with
+`data-ac-demo-broken`.
 
 **Read the `summary` rule in `CLAUDE.md` under Writing style before writing any `meta.json`.** It
 changed on 2026-07-28: the lede is prose written to a person, two or three sentences, leading with
@@ -39,28 +38,64 @@ same session tightened the on-page copy rule (item 0b).
 
 ### The steps, in order
 
-**Step 1 — the shared a11y gate (item 2).** It moved ahead of batch F deliberately and the reason is
-in "The road to done": its value is catching a regression across everything already built, and every
-batch after it is checked for free. Thirty-two components is the whole point; doing it after batch F
-means it only ever runs once. `field`'s spec already has one-component precedents for reduced
-motion, the 320px reflow and the ≥24×24 sweep — lift them rather than reinventing.
-
-Two traps are already known and both will fire on the first run: **an empty live region is 0px tall,
-so any sweep asserting "everything I found is visible" fails on every correctly built
-`role="status"` in the library**, and **`test.use({ forcedColors })` / `test.use({ reducedMotion })`
-are accepted and ignored** — `page.emulateMedia` in a `beforeEach`, always. Both are in the gotchas
-list with the precedents.
-
-**Step 2 — batch F**, `app-url-maker` then `app-page-to-markdown`. They compose the others and every
+**Step 1 — batch F**, `app-url-maker` then `app-page-to-markdown`. They compose the others and every
 piece they need now exists. `app-page-to-markdown`'s scrollable preview is `prose-surface` plus
-`effects`' `fx-scroll` and its `[PATCH]` ring — build it out of those rather than from scratch.
+`effects`' `fx-scroll` and its `[PATCH]` ring — build it out of those rather than from scratch. The
+gate now covers each new component the moment its folder exists, so a batch F page that ships an
+accent as text, or a target under 24px, is red before it is reviewed.
 
 **Then** item 3 (docs) and item 4 (deploy), plus the two copy sweeps 0a and 0b, which can land any
 time and pair naturally with each other.
 
-One standing caveat for every step above: the header is two rows tall, so a demo that scrolls an
-anchor into view clears `--header-h`, not 4.5rem. A new component that positions anything against
-the viewport top should read that token.
+Two standing caveats for every step above. The header is two rows tall, so a demo that scrolls an
+anchor into view clears `--header-h`, not 4.5rem. And a component page that ships a live failure
+has to mark it — an unmarked one fails the gate, and a marked one that stops failing does too.
+
+### What the gate found
+
+Nine defects, all fixed in the same session. The first two are the reason to run a sweep at all:
+every test in the library was green and both had been there since the shell was written.
+
+1. **The copy panel shipped a hardcoded dark syntax theme** — `<Code>` from `astro:components` does
+   **not** inherit `markdown.shikiConfig`, so while `docs.md` fences got the dual-theme custom
+   properties `site.css` was written for, the panel emitted `github-dark` as inline
+   `style="color:#…"` on every token. Inline styles beat the stylesheet, so the rules selecting
+   `--shiki-light` had never once applied. In the five light themes the code sat at **1.2:1** — the
+   thing the whole library exists to show, unreadable. Both consumers now share
+   `src/site/lib/code-theme.mjs`, and the pair is `github-*-high-contrast` because plain
+   `github-dark`'s comment color is 3.84:1 on the darkest code surface.
+2. **`--bg-elev` is not a token** — it is `--bg-elevated`. `tooltip` had been resolving to its
+   standalone literal `#1b0c30` in every theme, which is invisible in a dark one and is dark text on
+   a dark fill in a light one: **1.01:1**. `--accent` (it is `--accent-blue`) did the same in
+   `data-table`, `jump-nav`, `prose-surface` and `tabs`, which quietly ignored the theme picker
+   entirely. `scripts/check-tokens.mjs` now fails on a middle token nothing defines, with
+   `--dur-slow` and `--backdrop` allow-listed because theme-service genuinely ships neither.
+3. **An accent used as text fails SC 1.4.3 in the light themes** — 40 distinct selectors across the
+   shell and 20 components. The accents are drawn to be vivid on a dark page; on a light surface
+   they land at 2.7–4.2:1, and on a tint *of themselves* (a badge, a selected tab, the current
+   sidebar link) worse. Measured across all ten themes and four accents: raw fails 7 of 40
+   combinations, 80% toward `--text` fails none at a 12% tint, and the sidebar's 14–16% tint needs
+   65%. The shell's `--accent-*-text` are 60%; components write the mix inline.
+4. **`code { background: color-mix(--text 10%) }` with no color of its own** — the tint pulls the
+   surface toward the text color, so muted text inside a `<code>` came out at **2.28:1 in every
+   theme**. Inline code is content and now takes the full `--text`.
+5. **`<ol role="log">` is not allowed** — ARIA in HTML permits no live-region role on a list
+   element. `live-region`'s example 5 now puts `role="log"` on a wrapping `<div>`, which also gave
+   the scroller the `tabindex="0"` it needed once it had lines in it.
+6. **Two navigation landmarks named "On this page"** — `jump-nav`'s example 1 and example 5's
+   *named* case collided, on the page whose fifth example is about exactly that. Example 5 is
+   "Album sections" now.
+7. **Twelve `docs.md` comparison tables had an empty corner `<th>`.** Each got a word.
+8. **A bare 16px link alone in a paragraph gets no inline exception** to SC 2.5.8 — there is no
+   surrounding sentence constraining it. `tabs`' panel links are padded to the floor.
+9. **`h3` is 17.6px bold, which is not large text** — 18.66px is the threshold, so it needs the full
+   4.5:1 where `h1` and `h2` clear 3:1 and keep the raw accent.
+
+And one the gate caused rather than found, which is worth more than any of them: **the codemod that
+fixed finding 3 repaired `typography`'s deliberately broken link**, whose entire example is a link
+told apart from its sentence by color alone at 1.27:1. `typography`'s own spec caught it. That is
+the argument for `data-ac-demo-broken` asserting rather than skipping, and it is the same shape as a
+`[FORCED]` block reaching a broken variant.
 
 ---
 
@@ -123,12 +158,13 @@ Cross-batch notes that will otherwise be rediscovered:
 Then the four items under **Remaining non-component work**, in this order:
 
 1. **`disclosure` retrofit + spec backfill** — any time, and best as a session warm-up rather than
-   squeezed onto the end of one. It is the only component off-convention.
-2. **The shared a11y gate (item 2) — land it before batch F, not after all the components.** Its value
-   is catching a regression across everything already built, and every batch after it is checked for
-   free. Doing it last means it only ever runs once.
-3. **Docs (item 3)** — after the gate, because `wcag-mapping.md` should be generated against something
-   that is actually being enforced.
+   squeezed onto the end of one. It is the only component off-convention. The gate already covers it
+   (it selects `.demo`, the shell's wrapper, not `.ac-demo-grid`), so the retrofit is about the
+   copyability conventions only.
+2. ~~**The shared a11y gate (item 2).**~~ **Done, 2026-07-29.** Landed before batch F, and the bet
+   paid — see "What the gate found".
+3. **Docs (item 3)** — now unblocked, and `wcag-mapping.md` has something real to be generated
+   against: the gate names an SC in almost every check.
 4. **Final verification and deploy (item 4)** — last. Two known blockers are already written up below:
    WebKit is not installed, so `npm run verify` fails at the test step until
    `npx playwright install webkit` (Firefox was installed on 2026-07-29 but has never been run, so
@@ -225,9 +261,13 @@ take their logic and not their layout. See item 1 under remaining work.
 - **Playwright** — `playwright.config.mjs`, three browser projects, `webServer` runs
   `npm run build && npm run preview`. **Chromium and Firefox are installed; WebKit is not**, so
   `npm run verify` still *fails* at the test step with "Executable doesn't exist" for every WebKit
-  test. Chromium is **716/716**. Firefox was installed on 2026-07-29 and **has not been run yet** —
-  expect real failures rather than none, since every spec was written against Chromium. Run
+  test. Chromium is **1046/1046** in about 5 minutes — 716 component specs plus the 330 of the
+  shared gate. Firefox was installed on 2026-07-29 and **has not been run yet** — expect real
+  failures rather than none, since every spec was written against Chromium. Run
   `npx playwright install webkit` to finish the set.
+- **CI** — `.github/workflows/ci.yml` on push to `main`, on every pull request, and by hand.
+  `check:tokens` first because it is cheap and needs no browser, then the Chromium suite, then the
+  HTML report as an artifact for 14 days. Separate from `deploy.yml`, which is unchanged.
 
 ---
 
@@ -837,28 +877,53 @@ Keeping it in the shell means everything inside a `component.css` is real compon
 3" would be genuinely useful and the global `scroll-margin-top` already clears the sticky header. Left
 out for now rather than adding six ids with no consumer.
 
-### 2. Shared a11y gate — `tests/shared/a11y.spec.mjs`
+### 2. ~~Shared a11y gate~~ — **done, `tests/shared/a11y.spec.mjs`**
 
-Drives every component in the registry:
+Ten checks × 33 components = 330 tests, plus `.github/workflows/ci.yml` (`npm ci`, `check:tokens`,
+`playwright install chromium`, `playwright test` — the Playwright config builds and serves the site
+itself, so the build is covered). The slug list is read from `meta.json` with `node:fs`, **not**
+imported from `registry.mjs`, which is built on Vite's `import.meta.glob`.
 
-- `@axe-core/playwright`, tags `wcag2a wcag2aa wcag21a wcag21aa wcag22aa best-practice`, repeated
-  per `data-theme` value
-- Tab reachability in DOM order + a visibly changed focus indicator
-- focus never obscured by the sticky header (SC 2.4.11)
-- accessibility-tree snapshot as a committed fixture
-- reduced motion via **both** routes (media emulation and `data-motion="off"`) → durations 0
-- `forcedColors: 'active'` → states still distinguishable
-- 320×640 → no horizontal overflow (SC 1.4.10)
-- interactive boxes ≥24×24 (SC 2.5.8)
+| Check | What it asserts |
+| --- | --- |
+| axe | Full tag set, partitioned against `data-ac-demo-broken` in both directions |
+| contrast | `color-contrast` repeated across all ten themes |
+| tab order | No positive `tabindex` — the one thing that detaches focus order from DOM order |
+| focusability | `el.focus()` then read `activeElement` back, the ground-truth probe |
+| focus visible | An outline with width, or a box-shadow (SC 2.4.7) |
+| SC 2.4.11 | A focused control is never left under the sticky header |
+| SC 2.5.8 | Targets ≥24×24, with the inline and user-agent exceptions honored |
+| reduced motion | Both routes — `emulateMedia` **and** `[data-motion="off"]` — give 0 durations |
+| forced colors | The component ships a `@media (forced-colors: active)` block *and* it takes effect |
+| SC 1.4.10 | No horizontal overflow at 320×640 |
 
-Then `.github/workflows/ci.yml`: `npm ci`, `check:tokens`, `build`, `playwright test`.
+Four things worth knowing before editing it:
 
-`tests/site-header.spec.mjs` already covers the shell's own controls (theme picker, motion toggle) —
-that is not the gate, and the gate should not duplicate it.
+- **The deliberate failures are asserted, not skipped.** Every claim in a `data-ac-demo-broken` list
+  has to still fire, and a violation inside a marked element that is *not* in its list still fails.
+  That check is what makes the file worth more than a lint run — see the typography incident above.
+- **`:disabled`, never `el.disabled`.** The IDL property reflects only the control's own attribute,
+  so it is `false` for every input inside a `<fieldset disabled>` — the gate hit the library's own
+  documented gotcha on its first run and reported eight healthy controls as broken.
+- **SC 2.5.8 is about *pointer* targets and has exceptions.** A focusable heading or scroll region
+  is not a target; a link inside a sentence is exempt; a native checkbox is user-agent sized. A
+  sweep written without those reports the spec rather than the page — it flagged 60 elements, all
+  fine. And "the target" is the control *or any label bound to it*, whichever clears both
+  dimensions: comparing areas instead picks a full-width block label that is 282×18 and clears
+  nothing.
+- **The contrast test needs `test.setTimeout(180_000)`.** Ten axe passes over a demo page does not
+  fit in the default 30s, and the failure looks like a hang rather than a slow test.
 
-Several of these bullets now have a one-component precedent in `field`'s spec (reduced motion,
-320px reflow, the ≥24×24 sweep). Lift them from there rather than reinventing, then delete the
-per-component copies once the shared gate covers every slug.
+**Not built, deliberately: the accessibility-tree snapshot fixture.** A committed `ariaSnapshot` of
+a whole demo page is enormous, and these pages update their own readouts on interaction and on load,
+so the fixture would churn on every run and be re-recorded rather than read. The per-component specs
+already assert the tree where it carries the argument — `typography` and `data-table` both check
+hand-written readouts against the real accessibility tree, which is the same guarantee scoped to
+where it means something.
+
+`tests/site-header.spec.mjs` still covers the shell's own controls and the gate does not duplicate
+it. `field`'s per-component copies of the reduced-motion, 320px and ≥24×24 checks are now redundant
+with the gate but are left in place — they are cheap and they name the component in the failure.
 
 ### 3. Docs
 
@@ -901,6 +966,53 @@ It must match `npm run preview` exactly, base path included.
 
 - **Node is not on the inherited PATH.** Prefix PowerShell calls with
   `$env:Path = "C:\nvm4w\nodejs;$env:Path"`.
+- **Astro's `<Code>` component does not inherit `markdown.shikiConfig`.** They are configured
+  separately, and a `<Code>` given no `themes` falls back to a single hardcoded `github-dark`
+  written as inline `style="color:#…"` on every token — which beats any stylesheet. So a page can
+  have two code blocks side by side, one following the theme and one not, with nothing in either
+  file to suggest it. `src/site/lib/code-theme.mjs` exists to keep the two consumers in step.
+  Check by grepping the built HTML: `astro-code-themes` in the class list means the dual-theme
+  custom properties were emitted, and `style="color:#` anywhere means they were not.
+- **A misspelled theme token does not fail, it goes quiet.** `var(--ac-x, var(--typo, #literal))`
+  resolves to the literal in every theme, forever. In a dark theme that is invisible, because the
+  standalone literals *are* dark-theme colors — `--bg-elev` (the token is `--bg-elevated`) sat in
+  `tooltip` unnoticed until an axe run in a light theme reported **1.01:1**. `check-tokens.mjs` now
+  fails on any middle token no stylesheet defines.
+- **A theme accent used as text fails SC 1.4.3 in the light themes.** The palette is drawn to be
+  vivid against a dark page, so on a light surface an accent lands at 2.7–4.2:1, and worse on a tint
+  of itself. Mix it toward `--text` — that raises contrast in *both* modes, because `--text` is the
+  one color a theme guarantees contrasts with its own background (`focus-ring`'s two-tone ring rests
+  on the same fact). Measured: raw fails 7 of 40 theme×accent combinations, 80% clears a 12% tint,
+  65% clears a 16% one. Borders and tints keep the raw accent.
+- **A `<code>` with a tinted background and no color of its own loses contrast.**
+  `background: color-mix(in srgb, var(--text) 10%, transparent)` pulls the surface *toward* the text
+  color, so inherited muted text inside it measured 2.28:1 in every theme. Whatever sets a tint from
+  the text color has to set a color too.
+- **ARIA in HTML allows no live-region role on a list element.** `<ol role="log">` is invalid;
+  `role="log"` goes on a wrapping `<div>` and the `<ol>` stays a list inside it. axe reports it as
+  `aria-allowed-role`, which is easy to read as a false positive and is not.
+- **A blanket fix will reach the example that exists to be broken.** The codemod that mixed every
+  accent-as-text toward `--text` repaired `typography`'s color-only link, whose whole argument is
+  1.27:1 against the sentence around it. Caught by that component's own spec. The general rule: a
+  broken variant needs a comment saying it must stay broken, and the gate has to *assert* the
+  failure rather than skip it — same shape as a `[FORCED]` block reaching a broken variant.
+- **`el.disabled` is false for an input inside `<fieldset disabled>`** — already recorded for
+  `radio-group`, and it caught the shared gate on its first run too: eight healthy controls reported
+  as unfocusable and ringless. Any sweep over "the things a keyboard reaches" has to filter on
+  `el.matches(':disabled')`.
+- **SC 2.5.8 has exceptions, and a sweep written without them reports the spec rather than the
+  page.** It applies to *pointer* targets, so a focusable heading or scroll region is not one; a
+  link inside a sentence is exempt (its size is constrained by the line-height around it); and a
+  native checkbox or radio is user-agent sized. Without those three the gate flagged 60 perfectly
+  fine elements. A link *alone* in a paragraph gets no inline exception, though — there is no
+  surrounding sentence, so it is just a 16px target.
+- **`getComputedStyle` returns a `color-mix()` result as `color(srgb r g b)` with 0–1 components**,
+  and everything else as `rgb()` with 0–255 ones. A hand-rolled contrast helper that assumes one
+  format silently reports 1.0 for every pair. Do not hand-roll it: run `color-contrast` through axe,
+  which also composites translucent backgrounds and walks for the real backdrop.
+- **`new AxeBuilder({ page })` needs a page from `browser.newContext()`**, not `browser.newPage()`.
+  The error says "Please use browser.newContext()" and only bites throwaway scripts, since the
+  Playwright `page` fixture is already contexted.
 - **`npm run x -- --flag "two words"` loses the quotes.** `new-component.mjs` joins words up to the
   next `--` to compensate. Running `node scripts/new-component.mjs …` directly is more predictable.
 - **Astro `srcDir` is `./src/site`**, so pages live at `src/site/pages/`. `src/library/` is

@@ -69,7 +69,7 @@ Two details that are easy to get wrong:
 
 ## Read-only is not disabled
 
-| | `readonly` | `disabled` |
+| Behavior | `readonly` | `disabled` |
 | --- | --- | --- |
 | Tab reaches it | yes | no |
 | Keyboard can scroll it | yes | **no** |

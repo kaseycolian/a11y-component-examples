@@ -109,6 +109,42 @@ function lineOf(css, index) {
   return css.slice(0, index).split('\n').length;
 }
 
+/**
+ * The middle link has to be a token that something actually defines.
+ *
+ * A chain whose theme token is misspelled does not fail -- it quietly resolves
+ * to the standalone literal and stops following the theme picker forever. In a
+ * dark theme that is invisible, because the literal *is* a dark-theme color;
+ * in a light theme it is dark text on a dark fill. `--bg-elev` (the token is
+ * `--bg-elevated`) sat in tooltip at 1.01:1 in every light theme, and
+ * `--accent` (it is `--accent-blue`) had four components ignoring the theme
+ * entirely. Both were found by an axe sweep, not by reading the CSS.
+ */
+const TOKEN_SOURCES = [
+  'src/site/theme/theme.css',
+  'src/site/theme/effects.css',
+  'src/site/styles/site.css',
+  'src/library/tokens/tokens.css',
+];
+
+/** Middle tokens theme-service genuinely does not ship. The chain is dead at
+ *  the middle link on purpose and the literal is the value in every theme. */
+const NO_THEME_TOKEN = new Set([
+  '--dur-slow', // theme-service ships --dur only; a slow variant is ours.
+  '--backdrop', // no backdrop token exists; a dark dim is right in every theme.
+]);
+
+const definedTokens = new Set();
+for (const source of TOKEN_SOURCES) {
+  let css;
+  try {
+    css = await readFile(resolve(root, source), 'utf8');
+  } catch {
+    continue; // tokens.css is optional and the theme dir may not be synced yet.
+  }
+  for (const match of css.matchAll(/^\s*(--[\w-]+)\s*:/gm)) definedTokens.add(match[1]);
+}
+
 const files = [];
 for await (const entry of glob('src/library/**/*.css', { cwd: root })) {
   files.push(entry);
@@ -135,6 +171,21 @@ for (const file of files) {
           `${name} "${text.trim()}" is not in a var() fallback position`,
       );
     }
+  }
+
+  // Second pass, on the commented-out source so documentation examples like
+  // var(--ac-token, var(--theme-token, #fallback)) are not linted.
+  const decommented = stripComments(original);
+  for (const match of decommented.matchAll(/var\(\s*--[\w-]+\s*,\s*var\(\s*(--[\w-]+)/g)) {
+    const token = match[1];
+    if (definedTokens.has(token) || NO_THEME_TOKEN.has(token)) continue;
+
+    violations++;
+    console.error(
+      `${relative(root, abs).replace(/\\/g, '/')}:${lineOf(decommented, match.index)}  ` +
+        `theme token "${token}" is not defined by theme-service, so this chain ` +
+        `silently resolves to its literal in every theme`,
+    );
   }
 }
 

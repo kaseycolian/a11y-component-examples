@@ -69,7 +69,7 @@ ZIPs, PINs and phone numbers are digit *strings*. Quantities and prices are numb
 
 The distinction people get wrong most often after `autocomplete`:
 
-| | `readonly` | `disabled` |
+| Behavior | `readonly` | `disabled` |
 | --- | --- | --- |
 | In the tab order | yes | no |
 | Announced | yes | no |

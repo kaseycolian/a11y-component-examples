@@ -294,13 +294,27 @@
       <button class="ac-lr-btn" type="button" data-ac-log>Add a line to the log</button>
     </div>
 
-    <ol class="ac-lr-region ac-lr-log" id="lr-log" role="log" aria-label="Sound check"></ol>
+    <!-- role="log" goes on a <div>, not on the <ol>. ARIA in HTML does not
+         allow a live-region role on a list element, so `<ol role="log">` is
+         invalid and the list role is what a browser may keep. The wrapper
+         carries the role, the name and the tab stop; the <ol> stays a list.
+         tabindex="0" because it scrolls once it has lines in it, and a box
+         only a mouse can scroll is unreachable content (SC 2.1.1). -->
+    <div
+      class="ac-lr-region ac-lr-log"
+      id="lr-log"
+      role="log"
+      aria-label="Sound check"
+      tabindex="0"
+    >
+      <ol class="ac-lr-log__list"></ol>
+    </div>
 
     <p class="ac-demo__legend">
       Press either Copy button twice. Both leave the same text on screen; only
-      the left one is announced the second time. Then add several lines to the
-      log &mdash; each is read as it arrives, and the earlier ones stay where
-      they can be read back.
+      <em>re-announces</em> is read out the second time. Then add several lines
+      to the log &mdash; each is read as it arrives, and the earlier ones stay
+      where they can be read back.
     </p>
   </div>
 </div>

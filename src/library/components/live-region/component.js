@@ -318,7 +318,7 @@
       var line = document.createElement('li');
       line.textContent = LOG_LINES[logIndex % LOG_LINES.length];
       logIndex += 1;
-      root.querySelector('#lr-log').appendChild(line);
+      root.querySelector('#lr-log .ac-lr-log__list').appendChild(line);
     }
 
     root.addEventListener('click', onClick);

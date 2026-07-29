@@ -130,7 +130,13 @@
   font-size: 0.8rem;
   line-height: 1.45;
   font-weight: 700;
-  color: var(--ac-danger, var(--accent-pink, #ff2ec4));
+  /* 80% toward --text: raw, the danger accent fails SC 1.4.3 as text on a
+     light theme surface -- and again on its own tint inside a <code>. */
+  color: color-mix(
+    in srgb,
+    var(--ac-danger, var(--accent-pink, #ff2ec4)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
 }
 
 .ac-field__error::before {

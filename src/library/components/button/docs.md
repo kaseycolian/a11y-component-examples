@@ -62,7 +62,7 @@ Two related things worth knowing about the same form:
 
 They look the same and behave completely differently.
 
-| | `disabled` | `aria-disabled="true"` |
+| Behavior | `disabled` | `aria-disabled="true"` |
 | --- | --- | --- |
 | In the tab order | no | **yes** |
 | Announced | not reached at all | "unavailable" / "dimmed" |

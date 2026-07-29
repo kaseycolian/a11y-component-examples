@@ -195,7 +195,8 @@
       <div class="ac-ib-cases">
         <div class="ac-ib-case">
           <!-- BROKEN ON PURPOSE — no name at all. -->
-          <button class="ac-btn ac-btn-icon ac-btn--outline" type="button" data-ac-ib-name="bare">
+          <button class="ac-btn ac-btn-icon ac-btn--outline" type="button" data-ac-ib-name="bare"
+                  data-ac-demo-broken="button-name">
             <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" />
             </svg>
@@ -206,7 +207,7 @@
 
         <div class="ac-ib-case">
           <!-- BROKEN ON PURPOSE — the label is on the wrapper, not the button. -->
-          <span aria-label="Delete the take">
+          <span aria-label="Delete the take" data-ac-demo-broken="aria-prohibited-attr button-name">
             <button class="ac-btn ac-btn-icon ac-btn--outline" type="button" data-ac-ib-name="wrapped">
               <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" />
@@ -352,6 +353,7 @@
         </button>
         <!-- BROKEN ON PURPOSE — shrink-wrapped to its glyph, under the floor. -->
         <button class="ac-btn ac-btn-icon ac-btn-icon--tiny ac-btn--solid" type="button"
+                data-ac-demo-broken="target-size"
                 aria-label="Stop the take">
           <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M6 6h12v12H6Z" />

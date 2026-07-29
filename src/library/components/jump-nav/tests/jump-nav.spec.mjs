@@ -16,7 +16,10 @@ const cssNumber = (value) => parseFloat(String(value));
 
 test('the nav is named, and it is a list of links', async ({ page }) => {
   const nav = page.getByRole('navigation', { name: 'On this page', exact: true });
-  await expect(nav).toHaveCount(2); // example 1 and example 5's named case
+  // Exactly one. Example 5's named case used to reuse this name, which made
+  // two navigation landmarks called the same thing on a page whose fifth
+  // example is about that -- it is "Album sections" now.
+  await expect(nav).toHaveCount(1);
 
   const list = nav.first().getByRole('list');
   await expect(list).toHaveCount(1);
@@ -157,7 +160,7 @@ test('two unnamed navs are one entry repeated', async ({ page }) => {
   await expect(unnamed).toHaveAttribute('data-ac-jn-bad', 'true');
 
   const named = page.locator('[data-ac-jn-out="mark-named"]');
-  await expect(named).toHaveText('On this page · Site sections');
+  await expect(named).toHaveText('Album sections · Site sections');
   await expect(named).not.toHaveAttribute('data-ac-jn-bad', 'true');
 });
 

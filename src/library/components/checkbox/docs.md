@@ -10,7 +10,7 @@ which examples need them.
 
 ## How this differs from a radio group
 
-| | Checkbox | Radio |
+| Keyboard and grouping | Checkbox | Radio |
 | --- | --- | --- |
 | Tab | one stop **per box** | one stop for the whole group |
 | Arrow keys | nothing | move *and* select |

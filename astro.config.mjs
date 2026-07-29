@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import { rehypeScrollableTables } from './scripts/rehype-scrollable-tables.mjs';
+import { CODE_THEMES, CODE_DEFAULT_COLOR } from './src/site/lib/code-theme.mjs';
 
 /**
  * The site is published to GitHub Pages at
@@ -33,15 +34,11 @@ export default defineConfig({
     // the scrollable, focusable region around each one.
     rehypePlugins: [rehypeScrollableTables],
     shikiConfig: {
-      // Two themes, emitted as --shiki-light / --shiki-dark custom properties.
-      // `defaultColor: false` stops Shiki picking one, so site.css decides
-      // based on the active theme -- see the `.code-block` rules there. That
-      // keeps code readable in all 16 themes plus the light/dark auto default.
-      themes: {
-        light: 'github-light',
-        dark: 'github-dark',
-      },
-      defaultColor: false,
+      // Shared with CodePanel.astro so a snippet in docs.md and the same
+      // snippet in the copy panel are colored identically. See code-theme.mjs
+      // for why the pair is what it is.
+      themes: CODE_THEMES,
+      defaultColor: CODE_DEFAULT_COLOR,
       wrap: false,
     },
   },

@@ -134,7 +134,13 @@
    No focus rule here: the ring is the Focus Ring component's job and the
    library ships it globally. */
 .ac-t-link {
-  color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
   text-decoration: underline;
   text-decoration-thickness: 0.08em;
   text-underline-offset: 0.18em;
@@ -170,6 +176,12 @@
 }
 
 .ac-t-broken-link {
+  /* The raw accent, deliberately, and it must stay raw. Everywhere else in the
+     library this chain is mixed 80% toward --text so accent-colored text
+     clears SC 1.4.3 -- here the whole example is that the link is told apart
+     from the sentence around it by color alone at 1.27:1, so the good rule
+     would repair the failure the demo exists to show. Same trap as a [FORCED]
+     block reaching a broken variant. */
   color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
   text-decoration: none;
 }
@@ -280,7 +292,13 @@
   min-width: 2.2em;
   font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
   font-size: 0.9em;
-  color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
 }
 
 .ac-t-key {

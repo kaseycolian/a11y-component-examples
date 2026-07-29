@@ -98,7 +98,7 @@ Example 4 has all three cases, with the next stop after the selected tab printed
 
 They look identical on screen and they say opposite things.
 
-| | Tabs | Navigation |
+| Aspect | Tabs | Navigation |
 | --- | --- | --- |
 | markup | `<button role="tab">` in a `role="tablist"` | `<a href>` in a `<nav>` |
 | state | `aria-selected="true"` | `aria-current="page"` or `"location"` |

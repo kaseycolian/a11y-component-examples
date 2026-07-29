@@ -20,7 +20,7 @@ might want to read *alongside* what they were doing — that is a [disclosure](.
 
 `<dialog>` plus `showModal()` is not a convenience. It is most of the pattern:
 
-| | Handled by the browser |
+| What you get | Handled by the browser |
 | --- | --- |
 | The top layer | no ancestor can clip it, no `z-index` can beat it — including your sticky header |
 | `::backdrop` | a real pseudo-element to dim the page with |

@@ -206,7 +206,13 @@
 }
 
 .ac-dropdown__option[aria-selected="true"] {
-  color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
   font-weight: 700;
 }
 
@@ -216,7 +222,13 @@
   flex: none;
   margin-left: auto;
   opacity: 0;
-  color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
 }
 
 .ac-dropdown__option[aria-selected="true"] .ac-dropdown__check {
@@ -251,7 +263,13 @@
   flex: none;
   width: 1.15rem;
   height: 1.15rem;
-  color: var(--ac-accent-purple, var(--accent-purple, #b57fff));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-purple, var(--accent-purple, #b57fff)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
 }
 
 .ac-dropdown__swatch {

@@ -360,7 +360,7 @@
       <div class="ac-jn-cases">
         <!-- BROKEN ON PURPOSE — two navigation landmarks, no way to tell them
              apart in a landmark menu. -->
-        <div class="ac-jn-case" data-ac-jn-mark-case="unnamed">
+        <div class="ac-jn-case" data-ac-jn-mark-case="unnamed" data-ac-demo-broken="landmark-unique">
           <p class="ac-jn-case__label">no <code>aria-label</code> &mdash; broken on purpose</p>
           <nav class="ac-jump-nav">
             <ul class="ac-jump-nav__list">
@@ -378,7 +378,10 @@
 
         <div class="ac-jn-case" data-ac-jn-mark-case="named">
           <p class="ac-jn-case__label">named</p>
-          <nav class="ac-jump-nav" aria-label="On this page">
+          <!-- Not "On this page": example 1 already uses that name, and two
+               navigation landmarks with the same name on one page are the very
+               thing the unnamed pair beside this one is about. -->
+          <nav class="ac-jump-nav" aria-label="Album sections">
             <ul class="ac-jump-nav__list">
               <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn5-salad">Salad Days</a></li>
               <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn5-nausea">Nausea</a></li>

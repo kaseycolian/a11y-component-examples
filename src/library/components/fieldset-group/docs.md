@@ -86,7 +86,7 @@ than the rule:
 
 ## Locked, two ways
 
-| | `disabled` on the fieldset | `aria-disabled="true"` on the fieldset |
+| Behavior | `disabled` on the fieldset | `aria-disabled="true"` on the fieldset |
 | --- | --- | --- |
 | Cascades to the controls | **yes** — the one attribute that does | **no** — announces the group, changes nothing inside |
 | Tab | every control skipped | everything still reachable |

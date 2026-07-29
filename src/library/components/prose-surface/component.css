@@ -194,7 +194,7 @@
 .ac-prose__quote {
   margin: 1.2em 0;
   padding-inline-start: 0.9rem;
-  border-inline-start: 3px solid var(--ac-accent, var(--accent, #3ceaff));
+  border-inline-start: 3px solid var(--ac-accent, var(--accent-blue, #3ceaff));
 }
 
 .ac-prose__quote blockquote {
@@ -255,7 +255,7 @@
 .ac-ps-inside-quote {
   margin: 1.2em 0;
   padding-inline-start: 0.9rem;
-  border-inline-start: 3px solid var(--ac-accent, var(--accent, #3ceaff));
+  border-inline-start: 3px solid var(--ac-accent, var(--accent-blue, #3ceaff));
 }
 
 /* A div with a left bar. Pixel-identical to .ac-prose__quote and nothing in it
@@ -263,7 +263,7 @@
 .ac-ps-fake-quote {
   margin: 1.2em 0;
   padding-inline-start: 0.9rem;
-  border-inline-start: 3px solid var(--ac-accent, var(--accent, #3ceaff));
+  border-inline-start: 3px solid var(--ac-accent, var(--accent-blue, #3ceaff));
 }
 
 .ac-ps-attr {
@@ -397,7 +397,13 @@
 /* The failing readouts are marked in the markup as well as colored -- the color
    is gone under forced colors, and it was never the thing carrying it. */
 .ac-ps-readout code[data-ac-ps-bad="true"] {
-  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-pink, var(--accent-pink, #ff2ec4)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
 }
 
 /* --- [FORCED] Windows High Contrast — always ship this --------------------

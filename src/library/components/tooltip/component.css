@@ -116,7 +116,7 @@
   padding: 0.5rem 1rem;
   border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
   border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
-  background: var(--ac-surface-2, var(--bg-elev, #1b0c30));
+  background: var(--ac-surface-2, var(--bg-elevated, #1b0c30));
   color: var(--ac-text, var(--text, #f3ecff));
   font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
   font-size: 0.9rem;
@@ -133,7 +133,7 @@
   background: color-mix(
     in srgb,
     var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 14%,
-    var(--ac-surface-2, var(--bg-elev, #1b0c30))
+    var(--ac-surface-2, var(--bg-elevated, #1b0c30))
   );
 }
 
@@ -159,7 +159,7 @@
   padding: 0;
   border: 1px solid var(--ac-border-strong, var(--border-strong, #8064c0));
   border-radius: 50%;
-  background: var(--ac-surface-2, var(--bg-elev, #1b0c30));
+  background: var(--ac-surface-2, var(--bg-elevated, #1b0c30));
   color: var(--ac-text, var(--text, #f3ecff));
   font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
   font-size: 1rem;
@@ -177,7 +177,7 @@
   background: color-mix(
     in srgb,
     var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 14%,
-    var(--ac-surface-2, var(--bg-elev, #1b0c30))
+    var(--ac-surface-2, var(--bg-elevated, #1b0c30))
   );
 }
 

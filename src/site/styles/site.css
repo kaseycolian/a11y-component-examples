@@ -31,6 +31,23 @@
   --header-h: 9.75rem;
 
   --measure: 72ch;
+
+  /* Accent-colored *text* on a tint of the same accent -- the badge, the
+     selected tab, the current sidebar link. The raw accent is drawn to be
+     vivid against a dark page, so in the light themes it lands at 2.7-4.2:1
+     on its own 12-16% tint and fails SC 1.4.3 while looking perfectly
+     deliberate. Mixing toward --text always *raises* contrast against the
+     surface, in either mode, because --text is the one color a theme
+     guarantees contrasts with its own background -- the same fact focus-ring's
+     two-tone ring is built on. Measured across all ten themes and four
+     accents: 100% accent fails 7 of 40 combinations and 80% still leaves the
+     sidebar's current link at 3.51:1, because its fill is a 14-16% tint rather
+     than the badge's 12%. 65% is the first that clears everything; 60% is that
+     with headroom. Use these for text; keep the raw accent for borders and
+     tints, which are decoration and have no ratio to clear. */
+  --accent-green-text: color-mix(in srgb, var(--accent-green) 60%, var(--text));
+  --accent-blue-text: color-mix(in srgb, var(--accent-blue) 60%, var(--text));
+  --accent-purple-text: color-mix(in srgb, var(--accent-purple) 60%, var(--text));
 }
 
 /* From 760px down the brand's tagline is gone and the settings sit beside it,
@@ -335,7 +352,11 @@ body {
   min-height: 2rem;
   border-radius: var(--radius-sm);
   border-left: 2px solid transparent;
-  color: var(--text-muted);
+  /* --text-muted clears 4.5:1 on --bg but only 4.3:1 on --bg-panel, which is
+     what the sidebar sits on. A nav link is content, not chrome, so it takes
+     the full text color; the current page is still told apart four other ways
+     (accent, left border, fill, weight). */
+  color: var(--text);
   text-decoration: none;
   font-size: 0.9rem;
   transition:
@@ -350,7 +371,7 @@ body {
 }
 
 .sidebar__link[aria-current="page"] {
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
   border-left-color: var(--accent-blue);
   background: color-mix(in srgb, var(--accent-blue) 14%, transparent);
   font-weight: 700;
@@ -391,7 +412,10 @@ h2 {
 h3 {
   font-size: 1.1rem;
   font-weight: 800;
-  color: var(--accent-green);
+  /* 17.6px bold is just under the 18.66px that would make this large text, so
+     it needs the full 4.5:1 -- unlike h1 and h2, which clear the large-text
+     3:1 and keep the raw accent. */
+  color: var(--accent-green-text);
   text-shadow: var(--tglow-green-sm);
   margin-top: 2rem;
 }
@@ -427,6 +451,11 @@ code {
   padding: 0.1em 0.35em;
   border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--text) 10%, transparent);
+  /* The tint pulls the surface toward the text color, which costs whatever
+     contrast the inherited color had -- muted text inside a <code> came out at
+     2.28:1 in every theme. Inline code is content, so it takes the full text
+     color; anything that wants it colored says so at higher specificity. */
+  color: var(--text);
 }
 
 .lede {
@@ -480,13 +509,13 @@ code {
 
 .badge--wcag {
   border-color: var(--accent-green);
-  color: var(--accent-green);
+  color: var(--accent-green-text);
   background: color-mix(in srgb, var(--accent-green) 12%, transparent);
 }
 
 .badge--draft {
   border-color: var(--accent-purple);
-  color: var(--accent-purple);
+  color: var(--accent-purple-text);
   background: color-mix(in srgb, var(--accent-purple) 12%, transparent);
 }
 
@@ -677,7 +706,7 @@ code {
 }
 
 .code-tab[aria-selected="true"] {
-  color: var(--accent-blue);
+  color: var(--accent-blue-text);
   border-color: var(--accent-blue);
   background: color-mix(in srgb, var(--accent-blue) 16%, transparent);
   text-shadow: var(--tglow-blue-sm);
@@ -692,7 +721,7 @@ code {
   border: 1px solid var(--accent-green);
   border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--accent-green) 12%, transparent);
-  color: var(--accent-green);
+  color: var(--accent-green-text);
   font: inherit;
   font-size: 0.82rem;
   font-weight: 700;

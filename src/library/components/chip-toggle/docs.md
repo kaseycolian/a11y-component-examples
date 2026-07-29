@@ -29,7 +29,7 @@ color.
 All three are legal and they are not interchangeable. Example 4 has them side by side, looking
 identical.
 
-| | `aria-pressed` button | checkbox | `role="switch"` |
+| Behavior | `aria-pressed` button | checkbox | `role="switch"` |
 | --- | --- | --- | --- |
 | Announces | "toggle button, pressed" | "checkbox, checked" | "switch, on" |
 | Takes effect | immediately | when the form is submitted | immediately |

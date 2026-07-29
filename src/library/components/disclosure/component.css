@@ -53,7 +53,13 @@
 
 .ac-disclosure__trigger:hover {
   background: color-mix(in srgb, var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 12%, transparent);
-  color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
 }
 
 .ac-disclosure__trigger:focus-visible {
@@ -64,7 +70,13 @@
 /* Expanded state is signaled three ways -- rotated chevron, tinted background,
    and aria-expanded -- so it never depends on color alone. */
 .ac-disclosure__trigger[aria-expanded="true"] {
-  color: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
   background: color-mix(in srgb, var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 10%, transparent);
 }
 

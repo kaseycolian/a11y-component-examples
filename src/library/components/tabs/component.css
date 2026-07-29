@@ -86,7 +86,7 @@
 
 .ac-tabs__tab:hover {
   color: var(--ac-text, var(--text, #f3ecff));
-  background: color-mix(in srgb, var(--ac-accent, var(--accent, #3ceaff)) 10%, transparent);
+  background: color-mix(in srgb, var(--ac-accent, var(--accent-blue, #3ceaff)) 10%, transparent);
 }
 
 /* Selected differs by three things, because one of them is color and color is
@@ -98,8 +98,8 @@
    found that one. */
 .ac-tabs__tab[aria-selected="true"] {
   border-color: var(--ac-border, var(--border, #34205a));
-  border-bottom-color: var(--ac-accent, var(--accent, #3ceaff));
-  background: color-mix(in srgb, var(--ac-accent, var(--accent, #3ceaff)) 16%, transparent);
+  border-bottom-color: var(--ac-accent, var(--accent-blue, #3ceaff));
+  background: color-mix(in srgb, var(--ac-accent, var(--accent-blue, #3ceaff)) 16%, transparent);
   color: var(--ac-text, var(--text, #f3ecff));
 }
 
@@ -118,6 +118,16 @@
   font-size: 0.85rem;
   line-height: 1.55;
   overflow-wrap: break-word;
+}
+
+/* A link that is the only thing in its paragraph gets no help from the inline
+   exception to SC 2.5.8 -- there is no surrounding sentence constraining it,
+   so it is just a 16px target. Padding it to the floor costs nothing and does
+   not move the text, because the line box was already taller than the glyphs. */
+.ac-tabs__panel a {
+  display: inline-block;
+  min-height: 24px;
+  padding-block: 0.15rem;
 }
 
 .ac-tabs__panel > :first-child {
@@ -200,8 +210,8 @@
 
 .ac-tb-nav__link[aria-current] {
   border-color: var(--ac-border, var(--border, #34205a));
-  border-bottom-color: var(--ac-accent, var(--accent, #3ceaff));
-  background: color-mix(in srgb, var(--ac-accent, var(--accent, #3ceaff)) 16%, transparent);
+  border-bottom-color: var(--ac-accent, var(--accent-blue, #3ceaff));
+  background: color-mix(in srgb, var(--ac-accent, var(--accent-blue, #3ceaff)) 16%, transparent);
   color: var(--ac-text, var(--text, #f3ecff));
 }
 
@@ -366,7 +376,13 @@
 /* The failing readouts are marked as well as colored — the color is gone under
    forced colors, and it was never the thing carrying the meaning. */
 .ac-tb-readout code[data-ac-tb-bad="true"] {
-  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-pink, var(--accent-pink, #ff2ec4)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
 }
 
 /* --- [FORCED] Windows High Contrast — always ship this --------------------

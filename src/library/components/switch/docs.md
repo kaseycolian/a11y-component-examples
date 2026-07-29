@@ -92,7 +92,7 @@ expected; rearranging the page around the control is not.
 
 ## Unavailable, two ways
 
-| | `disabled` | `aria-disabled="true"` |
+| Behavior | `disabled` | `aria-disabled="true"` |
 | --- | --- | --- |
 | Tab | skipped | still reachable |
 | Announced | nothing | "dimmed" / "unavailable" |

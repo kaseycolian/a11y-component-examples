@@ -56,7 +56,7 @@
    the fill depends on the theme. */
 .ac-table .ac-table__head {
   border-bottom-width: 2px;
-  background: color-mix(in srgb, var(--ac-accent, var(--accent, #3ceaff)) 12%, transparent);
+  background: color-mix(in srgb, var(--ac-accent, var(--accent-blue, #3ceaff)) 12%, transparent);
   font-weight: 700;
   white-space: nowrap;
 }
@@ -196,7 +196,7 @@
    the first row is bold because a rule says so. */
 .ac-dt-fake-head tr:first-child td {
   border-bottom-width: 2px;
-  background: color-mix(in srgb, var(--ac-accent, var(--accent, #3ceaff)) 12%, transparent);
+  background: color-mix(in srgb, var(--ac-accent, var(--accent-blue, #3ceaff)) 12%, transparent);
   font-weight: 700;
 }
 
@@ -310,7 +310,13 @@
 /* The failing readouts are marked in the markup as well as colored — the color
    is gone under forced colors, and it was never the thing carrying it. */
 .ac-dt-readout code[data-ac-dt-bad="true"] {
-  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-pink, var(--accent-pink, #ff2ec4)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
 }
 
 /* --- [FORCED] Windows High Contrast — always ship this --------------------

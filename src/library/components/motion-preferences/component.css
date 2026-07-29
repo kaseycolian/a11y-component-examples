@@ -122,7 +122,13 @@
 
 .ac-motion__btn--warn {
   border-color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
-  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-pink, var(--accent-pink, #ff2ec4)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
 }
 
 /* --- [SWITCH] example 2 ---------------------------------------------------
@@ -275,7 +281,13 @@
 /* The one state the page can reach that is genuinely wrong, so it is colored
    and also worded — see the verdict text in component.js. */
 .ac-motion__verdict[data-ac-motion-wrong="true"] {
-  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-pink, var(--accent-pink, #ff2ec4)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
 }
 
 /* --- [SPIN] example 1 ----------------------------------------------------- */

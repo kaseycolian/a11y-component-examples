@@ -1,5 +1,6 @@
 ---
 import { Code } from 'astro:components';
+import { CODE_THEMES, CODE_DEFAULT_COLOR } from '../lib/code-theme.mjs';
 
 /**
  * The copy panel.
@@ -82,7 +83,11 @@ const titleId = `${id}-title`;
         data-href={file.href}
         hidden={i !== 0}
       >
-        <Code code={file.code} lang={file.lang} />
+        {/* `<Code>` does not inherit markdown.shikiConfig -- it has to be told
+            the same theme pair, or it falls back to a single hardcoded
+            github-dark and writes inline colors that beat every rule in
+            site.css. See lib/code-theme.mjs. */}
+        <Code code={file.code} lang={file.lang} themes={CODE_THEMES} defaultColor={CODE_DEFAULT_COLOR} />
       </div>
     ))
   }

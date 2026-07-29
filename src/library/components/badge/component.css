@@ -62,7 +62,10 @@
   border: 1px solid var(--ac-badge-accent);
   border-radius: calc(var(--ac-badge-size) / 2);
   background: color-mix(in srgb, var(--ac-badge-accent) 18%, var(--ac-surface, var(--bg-panel, #110620)));
-  color: var(--ac-badge-accent);
+  /* The border and the fill take the accent raw; the digits are text, and raw
+     on their own 18% tint they land at 3.92:1 in the light themes. --solid
+     sets its own pair below and is unaffected. */
+  color: color-mix(in srgb, var(--ac-badge-accent) 80%, var(--ac-text, var(--text, #f3ecff)));
   font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
   font-size: 0.72rem;
   font-weight: 700;
@@ -488,7 +491,13 @@
 .ac-bdg-readout code[data-ac-bdg-bad="true"],
 .ac-bdg__verdict[data-ac-bdg-bad="true"],
 .ac-bdg-log li[data-ac-bdg-bad="true"] {
-  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-pink, var(--accent-pink, #ff2ec4)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
 }
 
 /* --- [FORCED] Windows High Contrast — always ship this --------------------

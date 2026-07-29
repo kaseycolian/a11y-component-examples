@@ -85,7 +85,9 @@
    carries it — the word does, which is why this rule could be deleted and the
    notice would still pass SC 1.4.1. */
 .ac-notice__prefix {
-  color: var(--ac-notice-accent);
+  /* The edge, the icon and the tint take the accent raw; the prefix is the one
+     place it is *text*, and raw it fails SC 1.4.3 on a light theme surface. */
+  color: color-mix(in srgb, var(--ac-notice-accent) 80%, var(--ac-text, var(--text, #f3ecff)));
   font-weight: 700;
 }
 
@@ -416,7 +418,13 @@
 .ac-nc-readout code[data-ac-nc-bad="true"],
 .ac-nc__verdict[data-ac-nc-bad="true"],
 .ac-nc-log li[data-ac-nc-bad="true"] {
-  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  /* 80% toward --text: the raw accent is drawn for a dark page and fails
+     SC 1.4.3 as text on a light theme surface. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-pink, var(--accent-pink, #ff2ec4)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
 }
 
 /* --- [FORCED] Windows High Contrast — always ship this --------------------
