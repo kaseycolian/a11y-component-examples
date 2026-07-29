@@ -1,0 +1,425 @@
+/* ===========================================================================
+   TABS
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) lives in
+   the site's own stylesheet, not this file.
+
+     [TABS]    every example. The strip, the selected state, the panel.
+     [BROKEN]  example 2. Delete it. It fades panels out with opacity so the
+               readout has something to catch.
+     [NAV]     example 5. A row of links, which is the thing tabs are not.
+               Delete it; Jump Nav owns that pattern.
+     [PANEL]   the frame around each example on this page. Delete it.
+     [FORCED]  always ship this. Selected is drawn with a tint and a bar, and
+               forced colors drops both.
+
+   Copy the file whole for the library version.
+
+   The selected look is selected by [aria-selected="true"], which is the same
+   attribute a screen reader reads — so there is no way to draw a tab down
+   without saying so. Chip Toggle has the argument.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [TABS] every example -------------------------------------------------
+   A column: the strip, then the panel directly under it. The two share an
+   edge, which is the whole visual claim that the panel belongs to the tab. */
+
+.ac-tabs {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+/* Wraps rather than scrolls. A strip that scrolls sideways needs tabindex="0",
+   role="region" and a name of its own, or it is a silent tab stop — Effects
+   has that finding. Wrapping needs none of it and survives 320px.
+
+   Nothing here draws a rail across the whole strip, and that is why it can
+   wrap: a rail belongs to one row, so a six-tab strip on a phone would leave
+   the first row hanging over nothing. */
+.ac-tabs__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  min-width: 0;
+  margin-bottom: 0.45rem;
+}
+
+.ac-tabs__tab {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* SC 2.5.8 asks for 24px. 44px is the comfortable target and it is what a
+     row of tabs on a phone actually needs. */
+  min-height: 44px;
+  min-width: 44px;
+  margin: 0;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid transparent;
+  /* The edge under the selected tab. Declared at its full width in both
+     states — transparent when it is not the one — so the row cannot reflow
+     when the selection moves and shift the next tab out from under a pointer
+     already heading for it. */
+  border-bottom: 3px solid transparent;
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: transparent;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease,
+    border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease,
+    color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-tabs__tab:hover {
+  color: var(--ac-text, var(--text, #f3ecff));
+  background: color-mix(in srgb, var(--ac-accent, var(--accent, #3ceaff)) 10%, transparent);
+}
+
+/* Selected differs by three things, because one of them is color and color is
+   never allowed to be the only one (SC 1.4.1): a tint, a border, and the
+   thicker accent edge along the bottom.
+
+   None of the three is generated content. `content: "▾"` would be folded into
+   the tab's accessible name and rename it on every selection — Chip Toggle
+   found that one. */
+.ac-tabs__tab[aria-selected="true"] {
+  border-color: var(--ac-border, var(--border, #34205a));
+  border-bottom-color: var(--ac-accent, var(--accent, #3ceaff));
+  background: color-mix(in srgb, var(--ac-accent, var(--accent, #3ceaff)) 16%, transparent);
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-tabs__tab:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-tabs__panel {
+  box-sizing: border-box;
+  min-width: 0;
+  padding: 0.85rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  font-size: 0.85rem;
+  line-height: 1.55;
+  overflow-wrap: break-word;
+}
+
+.ac-tabs__panel > :first-child {
+  margin-top: 0;
+}
+
+.ac-tabs__panel > :last-child {
+  margin-bottom: 0;
+}
+
+/* The UA's [hidden] { display: none } loses to any author `display`, so a
+   component that ever sets one has quietly disabled the attribute. Declared
+   here whether or not this file sets one, because the next edit might. */
+.ac-tabs__panel[hidden] {
+  display: none;
+}
+
+.ac-tabs__panel:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+/* --- [BROKEN] example 2 — delete this -------------------------------------
+   Panels hidden with opacity so they can cross-fade. This is the shape a
+   fade is usually built in, and opacity hides nothing: the faded panels keep
+   their layout box, their place in the accessibility tree and every tab stop
+   inside them. They are overlaid rather than stacked only so the failure fits
+   on the page. */
+
+.ac-tb-bad-fade {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.ac-tb-bad-fade > .ac-tabs__list {
+  grid-row: 1;
+}
+
+.ac-tb-bad-fade__panel {
+  grid-row: 2;
+  grid-column: 1;
+  opacity: 0;
+  transition: opacity calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-tb-bad-fade__panel[data-ac-tb-shown="true"] {
+  opacity: 1;
+}
+
+/* --- [NAV] example 5 — delete this ----------------------------------------
+   A row of links that moves you around the page. It is here to sit beside a
+   tablist and look identical, which is the point: the difference is what the
+   row does, not what it looks like. */
+
+.ac-tb-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  min-width: 0;
+  margin-bottom: 0.45rem;
+}
+
+.ac-tb-nav__link {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.ac-tb-nav__link[aria-current] {
+  border-color: var(--ac-border, var(--border, #34205a));
+  border-bottom-color: var(--ac-accent, var(--accent, #3ceaff));
+  background: color-mix(in srgb, var(--ac-accent, var(--accent, #3ceaff)) 16%, transparent);
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-tb-nav__link:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+/* The links wearing role="tab" borrow .ac-tabs__tab, so they only need the
+   two things an <a> does not get from a <button>. */
+.ac-tb-bad-nav .ac-tabs__tab {
+  text-decoration: none;
+}
+
+/* --- [PANEL] the frame around each example --------------------------------
+   Page furniture: the case columns, the readouts and the two plain buttons
+   the demos press. None of it is part of a tab strip. Button owns the real
+   one. Delete the section. */
+
+.ac-tb-panel,
+.ac-tb__note {
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-tb-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.9rem;
+  width: 100%;
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+}
+
+.ac-tb-panel > * {
+  max-width: 100%;
+}
+
+.ac-tb-cases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 1rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.ac-tb-case {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.ac-tb-case__label {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-tb__note {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-tb-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.ac-tb-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  color: var(--ac-text, var(--text, #f3ecff));
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.ac-tb-btn:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-tb-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+  min-width: 0;
+  font-size: 0.78rem;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-tb-sections p {
+  margin: 0;
+}
+
+.ac-tb-sections p:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-tb-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  font-size: 0.75rem;
+}
+
+.ac-tb-readout__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.5rem;
+  min-width: 0;
+}
+
+.ac-tb-readout dt,
+.ac-tb-readout dd {
+  margin: 0;
+  min-width: 0;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-tb-readout code,
+.ac-tb__note code,
+.ac-tb-case__label code {
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+  overflow-wrap: anywhere;
+}
+
+/* The failing readouts are marked as well as colored — the color is gone under
+   forced colors, and it was never the thing carrying the meaning. */
+.ac-tb-readout code[data-ac-tb-bad="true"] {
+  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------
+   The tint is a color-mix, which forced colors drops outright, so two of the
+   three cues for "selected" would collapse into one. The selected tab is
+   repainted as a system-selected control instead — which is what it is — and
+   the accent edge comes back in HighlightText so it still reads against the
+   new fill.
+
+   The unselected tabs are given ButtonFace and a border here rather than left
+   transparent: with the tint gone there is otherwise nothing to say the row
+   is made of controls at all. */
+
+@media (forced-colors: active) {
+  .ac-tabs__tab,
+  .ac-tb-nav__link {
+    border-color: ButtonBorder;
+    border-bottom-color: ButtonFace;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  .ac-tabs__tab[aria-selected="true"],
+  .ac-tb-nav__link[aria-current] {
+    border-color: Highlight;
+    border-bottom-color: HighlightText;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  .ac-tabs__tab:focus-visible,
+  .ac-tabs__panel:focus-visible,
+  .ac-tb-nav__link:focus-visible,
+  .ac-tb-btn:focus-visible,
+  .ac-tb-sections p:focus-visible {
+    outline-color: CanvasText;
+  }
+
+  .ac-tabs__panel,
+  .ac-tb-panel,
+  .ac-tb-readout {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .ac-tb-btn {
+    border-color: ButtonBorder;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  .ac-tb-readout code[data-ac-tb-bad="true"] {
+    color: CanvasText;
+  }
+}

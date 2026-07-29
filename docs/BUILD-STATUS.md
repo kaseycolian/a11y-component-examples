@@ -11,53 +11,54 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-29 (result-panel — batch C is closed, `tabs` opens batch D next; the
-`summary` voice changed on 2026-07-28, see item 0a)
+Last updated: 2026-07-29 (tabs — batch D is half done, `jump-nav` closes it; the `summary` voice
+changed on 2026-07-28, see item 0a)
 
 ---
 
-## START HERE — next component is `tabs`, opening batch D
+## START HERE — next component is `jump-nav`, closing batch D
 
-`result-panel` landed: 29/29, suite is **615/615** in Chromium. Nothing was left open, and
-**`feedback-status` is complete**. Three findings from it are in the gotchas list and worth a skim
-before building anything with a computed value or a long string in it: `<output>` is a live region
-nobody declared, `overflow-wrap: break-word` does not do what it looks like it does, and
-`overflow: hidden` buys a tab stop where `overflow: clip` does not.
+`tabs` landed: 29/29, suite is **644/644** in Chromium. Nothing was left open. Four findings from it
+are in the gotchas list and two are worth a skim before building anything that measures the keyboard:
+**`el.focus()` plus a read of `document.activeElement` is a focusability probe** and is what every
+readout on that page is built on, and **`toHaveAccessibleName` on a `[hidden]` element returns `""`**,
+which is correct and fails the assertion that proves the markup is right.
 
 **Read the `summary` rule in `CLAUDE.md` under Writing style before writing any `meta.json`.** It
 changed on 2026-07-28: the lede is prose written to a person, two or three sentences, leading with
 the reader's problem rather than the ARIA attribute, and **never enumerating or counting the
-examples**. `status-text`, `badge` and `result-panel` are written to it and are the references;
-everything earlier is the sweep in item 0a. The same session tightened the on-page copy rule
-(item 0b).
+examples**. `status-text`, `badge`, `result-panel` and `tabs` are written to it and are the
+references; everything earlier is the sweep in item 0a. The same session tightened the on-page copy
+rule (item 0b).
 
 ### The steps, in order
 
-**Step 1 — `tabs`.** Run the loop under "The loop for building one component" with:
+**Step 1 — `jump-nav`.** Run the loop under "The loop for building one component" with:
 
 ```sh
-node scripts/new-component.mjs tabs --group navigation --name "Tabs"
+node scripts/new-component.mjs jump-nav --group navigation --name "Jump Nav"
 ```
 
 Decided in advance, so do not re-derive:
 
-- Spec entry: `component-specs.md` → navigation → `tabs`. `role="tablist"` → `role="tab"`
-  (`aria-selected`, `aria-controls`) → `role="tabpanel"` (`aria-labelledby`, `tabindex="0"`).
-- **Roving tabindex with automatic activation.** Only the selected tab is `tabindex="0"`; the rest
-  are `-1`. Arrows move *and* select, since the panels are already in the DOM. Home/End jump. Tab
-  leaves the list for the panel.
-- **A working reference already exists in `src/site/components/CodePanel.astro`** — take its logic,
-  not its layout; it predates the copyability conventions.
-- `chip-toggle`'s example 5 already argues the tab-stop tradeoff (five stops against a toolbar's
-  one) and `tabs` is the other side of it. Point at it once rather than re-deriving it.
-- **This is the largest behavior left.** `dropdown` is the reference for hard behavior;
-  `result-panel` and `badge` are the two most recent worked examples for file shape.
+- Spec entry: `component-specs.md` → navigation → `jump-nav`. `<nav aria-label="On this page">` with
+  in-page anchors and `aria-current="location"` on the active one.
+- **`tabs` already owns the `aria-selected`-versus-`aria-current` argument** and the `page` versus
+  `location` distinction — its example 5 has a row of links wearing `role="tab"` beside the same
+  links in a `<nav>`, live. Point at it once; this page owns the *scroll* half, which `tabs` does
+  not touch: which section is current, and how that is worked out without a listener per scroll
+  event.
+- **Targets need `tabindex="-1"`** so focus actually lands when the anchor is followed, and
+  `scroll-margin-top` clearing the sticky header (SC 2.4.11) — which `site.css` already does
+  globally for every `[id]`, so read `--header-h` rather than a number.
+- **Throttle anything that watches scroll**, and put nothing live on it: a region firing per scroll
+  event is unusable. `IntersectionObserver` rather than a scroll handler.
+- `tabs`' `[FOCUS]` probe is the thing to lift if a demo has to prove a target really took focus.
 - **Keep the on-page copy short** — item 0b.
 
-**Then** `jump-nav` (reuses `tabs`' `aria-current` thinking), batch E (`data-table` →
-`prose-surface`), F (`app-url-maker` → `app-page-to-markdown`), and the six non-component items
-under "Remaining non-component work" — items 1–4 are the ones that gate deploying; 0a and 0b are
-copy sweeps that can land any time.
+**Then** batch E (`data-table` → `prose-surface`), F (`app-url-maker` → `app-page-to-markdown`), and
+the six non-component items under "Remaining non-component work" — items 1–4 are the ones that gate
+deploying; 0a and 0b are copy sweeps that can land any time.
 
 One standing caveat for every step above: the header is two rows tall now, so a demo that scrolls an
 anchor into view clears `--header-h`, not 4.5rem. Nothing in the suite needed changing for it, but a
@@ -78,7 +79,7 @@ Build in this order. The order is the dependency graph, not a preference.
 | ~~**A**~~ | ~~`effects`~~ | **Done.** Closed `foundations` |
 | ~~**B**~~ | ~~`button` → `icon-button` → `loading-button` → `chip-toggle`~~ | **Done.** Closed `buttons-actions` |
 | ~~**C**~~ | ~~`notice` → `status-text` → `badge` → `result-panel`~~ | **Done.** Closed `feedback-status` |
-| **D** | `tabs` → `jump-nav` | `tabs` is the largest behavior left; `jump-nav` reuses its `aria-current` thinking |
+| **D** | ~~`tabs`~~ → `jump-nav` | `tabs` is **done**; `jump-nav` reuses its `aria-current` thinking and owns the scroll half |
 | **E** | `data-table` → `prose-surface` | `prose-surface` is the scroll-region pattern `data-table` establishes |
 | **F** | `app-url-maker` → `app-page-to-markdown` | **last.** They compose the others and cannot be built before them |
 
@@ -96,8 +97,12 @@ Cross-batch notes that will otherwise be rediscovered:
   computed value points at `result-panel` rather than re-deriving it.
 - **`.ac-result__btn` is a fifth copy of `input-group`'s addon button**, alongside the copies in
   `modal`, `drawer` and `tooltip`. Deliberate; a change to that button is a change in all five.
-- **`tabs` has a working reference in `src/site/components/CodePanel.astro`.** Roving tabindex,
-  automatic activation, panel at `tabindex="0"`.
+- **`tabs` owns the keyboard-map trade and the `aria-current` handoff.** Roving tabindex versus one
+  stop per control is argued from both sides — `chip-toggle`'s example 5 keeps its stops,
+  `tabs` gives them up — and `aria-selected` versus `aria-current` (and `page` versus `location`) is
+  its example 5. `jump-nav` and anything later with a strip of controls points at it rather than
+  re-deriving either. `src/site/components/CodePanel.astro` still has its own older copy of the
+  pattern and is a candidate for the item 1 retrofit.
 - **Batch F composes with `effects`** — `app-page-to-markdown` is specified around `fx-bar-top`,
   `fx-scroll` and `fx-bar-bottom`, which are now documented and patched. Its scrollable preview is
   the `fx-scroll` case: `tabindex="0"` + `role="region"` + a name, and the focus ring from
@@ -211,7 +216,7 @@ take their logic and not their layout. See item 1 under remaining work.
 
 ---
 
-## Component roster — 29 / 35
+## Component roster — 30 / 35
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -556,7 +561,30 @@ take their logic and not their layout. See item 1 under remaining work.
 **`overlays-disclosure` is complete** apart from the `disclosure` retrofit in item 1.
 
 ### navigation
-- [ ] `tabs` — a working reference already exists in `src/site/components/CodePanel.astro`
+- [x] `tabs` — done. 29/29 tests in Chromium. **The subject is the tab order**, and every readout on
+  the page is measured by asking the browser rather than by matching a selector: `[FOCUS]` focuses an
+  element and reads `document.activeElement` back, so a stop the page reports is a stop the Tab key
+  really gives. The spec then proves the same walks with real Tab presses, so the page's own method
+  is checked against the browser rather than against itself. Example 2 is three strips printing every
+  stop in order — 5 with no roving tabindex, 4 with panels faded out (two of them invisible), 3 for
+  the specimen; example 3 arrows across an automatic and a manual strip and counts panels opened,
+  2 against 1, with the focused-versus-selected pair that only manual can make disagree; example 4 is
+  three panels one attribute apart with the next stop after the selected tab named; example 5 is a row
+  of links wearing `role="tab"` beside a `<nav>`, where the failure is an `aria-controls` naming a
+  panel nobody built. Two decisions worth keeping: **the factory never sets the panel's `tabindex`**
+  — it is in the markup, so the keyboard map is the same before the script loads and after, which is
+  also what makes example 4's failures possible — and the library adds it **unconditionally** rather
+  than following the APG's "only if the panel has no focusable content", because that condition is
+  about the content and the content is the part that changes. Four findings. **A rename that misses
+  one line can leave a silent always-false**: `panels[i].hidden = !on` survived a rename of `on` to
+  `isOn` and resolved to the file's own `on()` listener helper, so `!on` was `false` forever, every
+  panel stayed visible, and nothing threw — see the gotchas list for how it was caught. **A wrapped
+  tab strip must not have a full-width rail**: the `border-bottom` on the tablist belongs to the last
+  row, so at 320px the first row hangs over nothing; the selected cue moved onto each tab as a 3px
+  `border-bottom`, declared at full width in both states so the row cannot reflow. **A `[hidden]`
+  element's accessible name is `""`** — correct, and it fails the assertion that proves the markup is
+  right. And **`test.use({ forcedColors })` is still ignored**; `page.emulateMedia` in a `beforeEach`,
+  as everywhere else.
 - [ ] `jump-nav`
 
 ### feedback-status
@@ -1023,6 +1051,37 @@ It must match `npm run preview` exactly, base path included.
   is correct behavior and the same reason a screen reader says "unavailable", so do not weaken the
   markup: pass `{ force: true }` and say in a comment that the `preventDefault` in the component is
   what the assertion is actually about. `motion-preferences` and `switch` both need this.
+- **`el.focus()` plus a read of `document.activeElement` is a focusability probe, and it is ground
+  truth.** A selector can only list the elements that are *usually* focusable, and every interesting
+  case is one that is unusually focusable or unusually not — a link inside an `opacity: 0` panel, a
+  scroll container Chromium hands a stop to, a `[hidden]` box that still has `tabindex="0"`. Asking
+  the browser answers all of them: `el.focus({ preventScroll: true })` and then
+  `document.activeElement === el`. Two rules come with it. **Focus on something that cannot take it
+  is a no-op, not a move**, so the probe has to `blur()` and restore focus itself or it parks a
+  keyboard reader wherever the last probe landed — the same trap as `document.body.focus()` above.
+  And **focusable is not tabbable**: filter on `el.tabIndex >= 0` first, which is exactly the
+  distinction roving tabindex trades on. `tabs`' `[FOCUS]` is the block to lift, and its spec proves
+  every walk again with real `page.keyboard.press('Tab')` rather than trusting the probe.
+- **A rename that misses one line can leave a silent always-false.** `panels[i].hidden = !on` was
+  left behind by a rename of `on` to `isOn`, and `on` resolved to the file's own `on(el, type, fn)`
+  listener helper — so `!on` was `false` on every iteration, every panel stayed visible, and there
+  was no error, no warning and nothing wrong-looking in the source. Every test written at that point
+  passed; the readout was the only thing that disagreed. What found it in one run: patch the
+  property on the prototype from a Playwright `addInitScript` and log `new Error().stack` on every
+  set. Worth reaching for whenever the DOM is in a state nothing in the code appears to produce.
+  The general shape — a leftover identifier that resolves to a *function* in scope — is invisible to
+  `undefined` checks, because functions are truthy and negating one is always `false`.
+- **A `[hidden]` element has no accessible name.** `toHaveAccessibleName` returns `""` for it, which
+  is correct — it is out of the accessibility tree, which is the whole reason to hide it that way —
+  and it means the assertion that proves the markup is right *fails* on the panel that is not
+  showing. Select it first, then assert. Same shape as the empty-live-region trap above: the correct
+  state is the one the obvious assertion cannot express.
+- **A tab strip that wraps must not have a rail across the whole strip.** A `border-bottom` on the
+  tablist belongs to the last row, so at 320px the first row of a wrapped strip hangs over nothing
+  and the leftover tabs read as stray text. Put the selected cue on each tab instead — a
+  `border-bottom` declared at its full width in *both* states, transparent when unselected, so the
+  row cannot reflow and shift the next tab out from under a pointer already heading for it. This is
+  the layout half of the same rule `chip-toggle` found for its tick.
 - **Astro's bundled `site.css` loads *after* every `component.css`.** Head order is theme, effects,
   dropdown, the page's component, then the `_astro/*.css` bundle. So a shell rule at **equal**
   specificity wins over a component's. This bites exactly one rule shape: `site.css` ships a global

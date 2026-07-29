@@ -1,0 +1,22 @@
+{
+  "slug": "tabs",
+  "name": "Tabs",
+  "group": "navigation",
+  "order": 10,
+  "summary": "A row of buttons over a box of content is the easiest thing on a page to draw and one of the easiest to get wrong. The pattern hands the arrow keys a job the Tab key used to do, so the whole strip becomes one stop — and the panel underneath still has to be somewhere the keyboard can land.",
+  "tags": [
+    "tabs",
+    "tablist",
+    "tabpanel",
+    "roving-tabindex",
+    "keyboard",
+    "aria-selected",
+    "aria-current",
+    "forced-colors"
+  ],
+  "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/tabs/",
+  "wcag": ["1.3.1", "1.4.1", "2.1.1", "2.4.3", "2.4.7", "2.5.8", "4.1.2"],
+  "status": "stable",
+  "files": ["html", "css", "js"],
+  "demoNote": "Examples 2 to 5 are live. Example 2 asks the browser which elements it will really give focus to and prints every stop three strips have; example 3 counts the panels opened while arrowing across; example 4 names the next thing Tab reaches after the selected tab; example 5 puts a row of links wearing role=tab beside the same links in a nav."
+}
