@@ -1,0 +1,22 @@
+{
+  "slug": "loading-button",
+  "name": "Loading Button",
+  "group": "buttons-actions",
+  "order": 30,
+  "summary": "A button that reports its own pending state — aria-busy plus a live region, never disabled, and never a new name. Four live failures: the silent spinner, the lost focus, the label used as a status, and the cue that disappears when motion is off.",
+  "tags": [
+    "button",
+    "aria-busy",
+    "live-region",
+    "aria-disabled",
+    "accessible-name",
+    "spinner",
+    "reduced-motion",
+    "forced-colors"
+  ],
+  "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/button/",
+  "wcag": ["1.4.1", "2.1.1", "2.2.2", "2.4.3", "2.5.3", "4.1.2"],
+  "status": "stable",
+  "files": ["html", "css", "js"],
+  "demoNote": "Examples 2 to 5 are live and half wrong on purpose. Example 2's spinner-only button announces nothing; example 3's disabled button drops focus to the document body the moment it is pressed; example 4's renaming button ends up with three different names; example 5's dot is indistinguishable from its resting state once motion is off."
+}

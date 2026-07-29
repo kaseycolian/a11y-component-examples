@@ -1,0 +1,456 @@
+/* ===========================================================================
+   LOADING BUTTON
+
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code; the demo frame (ac-demo-*) lives in
+   the site's own stylesheet, not this file.
+
+     [BTN]       every example. A copy of button's base, weights and --sm.
+                 Already have .ac-btn in your app? Delete this section.
+     [LOADING]   every example. The spinner and the busy state. Five rules.
+     [STATUS]    every example. The status line beside the button.
+     [ACCENTS]   example 1. Four one-line rules. Delete the ones you don't use.
+     [PANEL]     the frame around each example on this page. Delete it.
+     [BROKEN]    examples 2 and 5. Delete them — they are the failures.
+     [FORCED]    always ship this. The ring is a border, so it survives.
+
+   Copy the file whole for the library version.
+
+   [BTN] is button's file, unchanged. This library is deliberately not DRY —
+   .ac-motion__btn, icon-button's copy and the addon buttons in input-group,
+   modal, drawer and tooltip are the same copy, so a change to .ac-btn is a
+   change in seven places.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
+   =========================================================================== */
+
+/* --- [BTN] every example --------------------------------------------------
+   Copied from button. Weight and accent are independent axes, so the accent is
+   a local custom property the weights read rather than twelve combination
+   rules — which is why [ACCENTS] below adds no weight rules of its own.
+
+   Three declarations here are not styling and are easy to lose:
+
+     font-family: inherit   form controls do not inherit type from the page.
+     appearance: none       iOS Safari draws its own button chrome otherwise.
+     text-decoration: none  because .ac-btn also has to work on an <a href>. */
+
+.ac-btn {
+  --ac-btn-accent: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  --ac-btn-on-accent: var(--ac-on-pink, var(--on-pink, #22001a));
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  box-sizing: border-box;
+  min-height: var(--ac-target, 44px);
+  min-width: var(--ac-target, 44px);
+  padding: 0.5rem 1.1rem;
+  border: 2px solid transparent;
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: transparent;
+  color: var(--ac-text, var(--text, #f3ecff));
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  appearance: none;
+  transition:
+    background-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease,
+    border-color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease,
+    color calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
+}
+
+.ac-btn:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-btn:active {
+  translate: 0 calc(var(--ac-motion, var(--motion, 1)) * var(--ac-press-y, var(--press-y, 1px)));
+  scale: calc(1 - (1 - var(--ac-press-s, var(--press-s, 0.98))) * var(--ac-motion, var(--motion, 1)));
+}
+
+.ac-btn--solid {
+  border-color: var(--ac-btn-accent);
+  background: var(--ac-btn-accent);
+  color: var(--ac-btn-on-accent);
+}
+
+.ac-btn--solid:hover {
+  border-color: color-mix(in srgb, var(--ac-btn-accent) 88%, var(--ac-text, var(--text, #f3ecff)));
+  background: color-mix(in srgb, var(--ac-btn-accent) 88%, var(--ac-text, var(--text, #f3ecff)));
+}
+
+.ac-btn--outline {
+  border-color: var(--ac-btn-accent);
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  color: var(--ac-btn-accent);
+}
+
+.ac-btn--outline:hover {
+  background: color-mix(in srgb, var(--ac-btn-accent) 14%, var(--ac-surface, var(--bg-panel, #110620)));
+}
+
+.ac-btn--ghost {
+  border-color: transparent;
+  background: transparent;
+  color: var(--ac-btn-accent);
+}
+
+.ac-btn--ghost:hover {
+  background: color-mix(in srgb, var(--ac-btn-accent) 14%, transparent);
+}
+
+.ac-btn--sm {
+  min-height: var(--ac-target-min, 24px);
+  min-width: var(--ac-target-min, 24px);
+  padding: 0.25rem 0.7rem;
+  font-size: 0.8rem;
+}
+
+/* --- [LOADING] every example ----------------------------------------------
+   The whole component, and the one decision in it: the spinner is selected by
+   [aria-busy="true"]. There is no --loading class, so there is no way to draw
+   a spinner without setting the attribute a screen reader reads. Example 2 is
+   what the other way round looks like.
+
+   visibility: hidden, not display: none. It keeps the layout box, so the
+   button is the same width busy and idle and does not move out from under the
+   pointer that just pressed it. (That kept box is usually the bug — see
+   visually-hidden — and here it is the reason.)
+
+   currentColor, so the ring follows the button's text color into every weight,
+   every state, and Windows High Contrast, with no rule of its own. */
+
+.ac-btn-loading__spinner {
+  flex: none;
+  visibility: hidden;
+  box-sizing: border-box;
+  width: var(--ac-btn-loading-spinner, 1em);
+  height: var(--ac-btn-loading-spinner, 1em);
+  border: 2px solid currentColor;
+  /* The gap is what makes the rotation readable. It is also the reason the
+     static ring still reads as "working" when motion is off: a broken circle
+     is a shape the resting button does not have. */
+  border-top-color: transparent;
+  border-radius: var(--ac-radius-pill, var(--radius-pill, 999px));
+  animation: ac-btn-loading-spin calc(var(--ac-motion, var(--motion, 1)) * 700ms) linear infinite;
+}
+
+.ac-btn-loading[aria-busy="true"] .ac-btn-loading__spinner {
+  visibility: visible;
+}
+
+/* The busy button also carries aria-disabled, and gets no dimming for it. A
+   faded control is the usual look, and it is opacity over a color nobody
+   chose — the spinner is already the visible cue, and aria-disabled is about
+   what the button announces and whether the second click runs. */
+.ac-btn-loading[aria-busy="true"] {
+  cursor: progress;
+}
+
+@keyframes ac-btn-loading-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+/* --- [STATUS] every example -----------------------------------------------
+   The line that does the actual announcing. Ship it rendered and empty, next
+   to the button, and write into it with the clear-then-write in component.js.
+
+   It is visible here on purpose. Clip it instead (visually-hidden's recipe) if
+   the pending state is already obvious on screen — but the announcement itself
+   is never optional, because aria-busy alone is read inconsistently. */
+
+.ac-btn-loading-status {
+  margin: 0;
+  min-height: 1.4em;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--ac-text, var(--text, #f3ecff));
+  overflow-wrap: break-word;
+}
+
+/* --- [ACCENTS] example 1 --------------------------------------------------
+   Copied from button, and identical there. Decoration, never the thing
+   carrying the meaning (SC 1.4.1). */
+
+.ac-btn--pink {
+  --ac-btn-accent: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  --ac-btn-on-accent: var(--ac-on-pink, var(--on-pink, #22001a));
+}
+
+.ac-btn--green {
+  --ac-btn-accent: var(--ac-accent-green, var(--accent-green, #5bff3a));
+  --ac-btn-on-accent: var(--ac-on-green, var(--on-green, #062600));
+}
+
+.ac-btn--blue {
+  --ac-btn-accent: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  --ac-btn-on-accent: var(--ac-on-blue, var(--on-blue, #00212b));
+}
+
+.ac-btn--purple {
+  --ac-btn-accent: var(--ac-accent-purple, var(--accent-purple, #b57fff));
+  --ac-btn-on-accent: var(--ac-on-purple, var(--on-purple, #1a0838));
+}
+
+/* --- [PANEL] the frame around each example --------------------------------
+   Page furniture: the rows, the captions, the readouts and the motion
+   checkbox. None of it is part of a loading button. Delete the section. */
+
+.ac-lb-panel,
+.ac-lb-caption,
+.ac-lb__note {
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-lb-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius, var(--radius, 10px));
+  background: var(--ac-surface, var(--bg-panel, #110620));
+}
+
+.ac-lb-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.ac-lb-hint {
+  font-size: 0.78rem;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-lb-cases {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: 1rem;
+  min-width: 0;
+}
+
+.ac-lb-case {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.ac-lb-case__label,
+.ac-lb-case__out {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-lb__note {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-lb__verdict {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+  overflow-wrap: break-word;
+}
+
+/* Collapsed while empty so the layout does not reserve a gap for a message
+   nobody has caused yet. The element stays in the DOM and in the accessibility
+   tree — :empty is not display: none. */
+.ac-lb__verdict:empty {
+  display: none;
+}
+
+.ac-lb__verdict[data-ac-lb-bad="true"] {
+  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+}
+
+.ac-lb-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  font-size: 0.75rem;
+}
+
+/* Wraps rather than shrinking a value away: at 320px a label and a value do
+   not always fit on one line, and the value is the point. */
+.ac-lb-readout__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.5rem;
+  min-width: 0;
+}
+
+.ac-lb-readout dt {
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-lb-readout dd {
+  margin: 0;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-lb-readout code,
+.ac-lb-case__out code,
+.ac-lb__note code,
+.ac-lb__verdict code {
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", "Consolas", ui-monospace, monospace));
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-lb-readout code[data-ac-lb-bad="true"],
+.ac-lb-case__out code[data-ac-lb-bad="true"] {
+  color: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+}
+
+.ac-lb-check {
+  width: var(--ac-target-min, 24px);
+  height: var(--ac-target-min, 24px);
+  margin: 0;
+  accent-color: var(--ac-accent-purple, var(--accent-purple, #b57fff));
+}
+
+.ac-lb-check:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+.ac-lb-check__label {
+  font-size: 0.82rem;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+/* Example 5's checkbox writes data-motion onto its own panel. motion-preferences
+   is the canonical explanation; this is the one rule of the gate that matters
+   here. Deliberately no [data-motion="on"] and no scope re-declaration — either
+   would stop the site header's toggle and the reader's OS preference reaching
+   this panel, so the control could only ever add the restriction. */
+[data-motion="off"] {
+  --ac-motion: 0;
+}
+
+/* --- [BROKEN] examples 2 and 5 — delete this ------------------------------
+   Example 2's spinner-only button. The same spinner, shown by a data attribute
+   instead of aria-busy. Nothing about it is invalid, nothing reports it, and
+   it announces nothing.
+
+   Example 5's dot. Always visible, and pending is signaled only by the
+   animation — so at --ac-motion: 0 the busy state is pixel-identical to the
+   resting one. */
+
+.ac-btn-loading[data-ac-lb-spinning="true"] .ac-btn-loading__spinner {
+  visibility: visible;
+}
+
+.ac-lb-dot {
+  flex: none;
+  box-sizing: border-box;
+  width: var(--ac-btn-loading-spinner, 1em);
+  height: var(--ac-btn-loading-spinner, 1em);
+  border-radius: var(--ac-radius-pill, var(--radius-pill, 999px));
+  background: currentColor;
+}
+
+.ac-btn-loading[data-ac-lb-spinning="true"] .ac-lb-dot {
+  animation: ac-lb-pulse calc(var(--ac-motion, var(--motion, 1)) * 900ms) ease-in-out infinite alternate;
+}
+
+@keyframes ac-lb-pulse {
+  to {
+    opacity: 0.2;
+  }
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------
+   The three weights collapse into ButtonFace inside a ButtonBorder, and
+   ghost — no fill, no border of its own — stops reading as a control.
+
+   The ring survives because it is a border on currentColor: it becomes
+   ButtonText with the label. Its gap does not. Forced colors replaces
+   border-color wholesale — including transparent, which comes back opaque —
+   so the ring closes into a full circle and stops reading as turning at all.
+   Painting the gap in the button's own forced-colors background is what puts
+   it back, which means it has to follow the button into hover.
+
+   A box-shadow or gradient spinner would have been dropped outright, with no
+   declaration that brings it back. */
+
+@media (forced-colors: active) {
+  .ac-btn {
+    border-color: ButtonBorder;
+    background: ButtonFace;
+    color: ButtonText;
+  }
+
+  .ac-btn--ghost {
+    border-color: ButtonBorder;
+  }
+
+  .ac-btn:hover {
+    border-color: Highlight;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  .ac-btn:focus-visible {
+    outline-color: CanvasText;
+  }
+
+  .ac-btn-loading__spinner {
+    border-color: ButtonText;
+    border-top-color: ButtonFace;
+  }
+
+  .ac-btn-loading:hover .ac-btn-loading__spinner {
+    border-color: HighlightText;
+    border-top-color: Highlight;
+  }
+
+  .ac-lb-panel,
+  .ac-lb-readout {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+
+  /* The failing lines lose their color here, which is why they were never only
+     a color — the sentence says the same thing. */
+  .ac-lb__verdict[data-ac-lb-bad="true"],
+  .ac-lb-readout code[data-ac-lb-bad="true"],
+  .ac-lb-case__out code[data-ac-lb-bad="true"] {
+    color: CanvasText;
+  }
+}

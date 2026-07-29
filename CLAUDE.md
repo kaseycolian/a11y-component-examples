@@ -106,6 +106,12 @@ never the band names themselves. Nothing vulgar. Prefer `462` and `99` when a nu
 Fake credentials look obviously fake but keep a valid shape (`sk_test_` prefix, right length, right
 character set) so the example still teaches the format.
 
+**Text that renders on a component page is short and scannable.** The demo titles, the `__note`
+paragraphs, captions, verdicts and readout labels get one or two plain sentences each — enough to
+point at what the example is showing. Everything longer goes in `docs.md` or in a source comment,
+where a reader has opted in. `loading-button` is the reference. Never write "the left one" or "the
+right-hand readout": the demo grid stacks its cases at every real width, so name the case instead.
+
 **Say it once, in as few words as carry the information.** Comments and docs here are load-bearing:
 they explain *why* a non-obvious accessibility decision was made, and that's the bar. Cut restated
 context, cut the same point made twice in prose and again in a table, cut adjectives. Never cut the

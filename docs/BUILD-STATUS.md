@@ -11,41 +11,35 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-28 (icon-button)
+Last updated: 2026-07-28 (loading-button)
 
 ---
 
-## START HERE — next component is `loading-button`
+## START HERE — next component is `chip-toggle`
 
-`icon-button` landed (16/16 Chromium). Run the loop below with:
+`loading-button` landed (16/16 Chromium, 488/488 full suite). Run the loop below with:
 
 ```sh
-node scripts/new-component.mjs loading-button --group buttons-actions --name "Loading Button"
+node scripts/new-component.mjs chip-toggle --group buttons-actions --name "Chip Toggle"
 ```
 
 Decided in advance, so do not re-derive:
 
-- Spec entry: `component-specs.md` → buttons-actions → `loading-button`. `aria-busy="true"` while
-  pending, the spinner `aria-hidden`, and a polite live region that announces "Saving…" then "Saved".
+- Spec entry: `component-specs.md` → buttons-actions → `chip-toggle`. `<button class="ac-chip"
+  aria-pressed="false">` — a **toggle button**, not a checkbox and not a `role="switch"`.
 - **Extend `.ac-btn`, do not invent a parallel surface.** Copy `[BTN]` out of
-  `icon-button/component.css` — it is already the trimmed copy (base + weights + `--sm`, no `[SIZE]`
-  section of its own) and the accent stays the `--ac-btn-accent` custom property. That copy now
-  exists in six places; a change to `.ac-btn` is a change in all six.
-- The one thing this page exists to say: **a spinner is silent.** Its state lives in `aria-busy` and
-  in a live region, never in the animation. `live-region` owns the announcer argument (two rAFs, the
-  region pre-existing and empty, the repeat problem) — lift `AC.speak`'s shape and link rather than
-  re-deriving it.
-- **Never `disabled` while loading.** Focus is lost the moment it is set, the reader is dropped back
-  to the body with no explanation, and they cannot hear the state they caused. `aria-disabled` plus
-  `button`'s capture-phase guard is the answer, and that guard is already written — lift `[CORE]`
-  from `button/component.js`.
-- **The accessible name must not change.** Swapping "Save" for "Saving…" re-announces the control as
-  a new one and loses the reader's place; the status goes in the live region. This is the same rule
-  `switch` and `input-group` already follow for their confirmations.
-- The spinner is a motion-gated animation and SC 2.2.2 is independent of the preference — see
-  `motion-preferences`. At `--ac-motion: 0` the spinner must still show that something is pending
-  without rotating.
-- `chip-toggle` follows, and also extends `.ac-btn`.
+  `loading-button/component.css` — base + weights + accents + `--sm`, nothing else. That copy now
+  exists in seven places; a change to `.ac-btn` is a change in all seven.
+- **The pressed state needs a non-color cue** (fill *and* border, or a tick). Color alone is SC
+  1.4.1, and under forced colors the fill is replaced by a system color that says nothing.
+- **Do not swap the label on toggle.** `aria-pressed` already conveys it and doing both makes AT
+  announce a contradiction. This is the same rule `loading-button` example 4 and `switch` make —
+  point at one of them rather than re-arguing it.
+- `aria-pressed` versus `role="switch"` versus a checkbox is worth one short table, and `switch`
+  already owns the "older JAWS announces `role="switch"` inconsistently" note.
+- **Keep the on-page copy short** — see the writing note under "Remaining non-component work" item 0.
+- This closes `buttons-actions`. Batch C (`notice` → `status-text` → `badge` → `result-panel`) is
+  next.
 
 ---
 
@@ -60,7 +54,7 @@ Build in this order. The order is the dependency graph, not a preference.
 | Batch | Slugs | Why here |
 | --- | --- | --- |
 | ~~**A**~~ | ~~`effects`~~ | **Done.** Closed `foundations` |
-| **B** | ~~`button`~~ → ~~`icon-button`~~ → `loading-button` → `chip-toggle` | `button` is the canonical `.ac-btn`; the other three extend it |
+| **B** | ~~`button`~~ → ~~`icon-button`~~ → ~~`loading-button`~~ → `chip-toggle` | `button` is the canonical `.ac-btn`; the other three extend it |
 | **C** | `notice` → `status-text` → `badge` → `result-panel` | all four are small, and three of them restate `live-region`'s argument in a new shape |
 | **D** | `tabs` → `jump-nav` | `tabs` is the largest behavior left; `jump-nav` reuses its `aria-current` thinking |
 | **E** | `data-table` → `prose-surface` | `prose-surface` is the scroll-region pattern `data-table` establishes |
@@ -69,10 +63,10 @@ Build in this order. The order is the dependency graph, not a preference.
 Cross-batch notes that will otherwise be rediscovered:
 
 - **`.ac-btn` now lives in `button` and the local copies stay.** `.ac-motion__btn` in
-  `motion-preferences`, the addon buttons in `input-group`, `modal`, `drawer` and `tooltip`, and
-  `icon-button`'s `[BTN]` are deliberate duplicates — components are not DRY here. A change to
-  `.ac-btn` is a change in all six. `icon-button`'s copy is the one to lift for the rest of batch B:
-  it is base + weights + accents + `--sm` with nothing else.
+  `motion-preferences`, the addon buttons in `input-group`, `modal`, `drawer` and `tooltip`, and the
+  `[BTN]` sections of `icon-button` and `loading-button` are deliberate duplicates — components are
+  not DRY here. A change to `.ac-btn` is a change in all seven. `loading-button`'s copy is the one to
+  lift for `chip-toggle`: base + weights + accents + `--sm` with nothing else.
 - **`result-panel`'s copy button is `input-group`'s copy button.** Same clipboard write, same
   pre-existing empty `role="status"`, same rule against renaming the button. Lift it.
 - **`status-text` and `notice` are the same SC 1.4.1 point twice** — the glyph is `aria-hidden` and the
@@ -177,11 +171,11 @@ take their logic and not their layout. See item 1 under remaining work.
 - **Playwright** — `playwright.config.mjs`, three browser projects, `webServer` runs
   `npm run build && npm run preview`. **Only Chromium is installed**, so `npm run verify` currently
   *fails* at the test step: every Firefox and WebKit test errors with "Executable doesn't exist".
-  Chromium is **472/472**. Run `npx playwright install firefox webkit` to get a green `verify`.
+  Chromium is **488/488**. Run `npx playwright install firefox webkit` to get a green `verify`.
 
 ---
 
-## Component roster — 23 / 35
+## Component roster — 24 / 35
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -354,7 +348,28 @@ take their logic and not their layout. See item 1 under remaining work.
   colors**: it becomes `ButtonText` with the label and `HighlightText` on hover with no rule of its
   own, while an `<img>` keeps the color it was drawn in on a background the system just replaced and
   a `background-image` is dropped outright.
-- [ ] `loading-button`
+- [x] `loading-button` — done. 16/16 tests in Chromium. **The first component whose subject is a
+  state rather than a control.** The one decision: the spinner is selected by `[aria-busy="true"]`,
+  so the attribute a screen reader reads is the same one that draws it and there is no way to show a
+  spinner without setting it. `setBusy()` is twenty lines — `aria-busy`, `aria-disabled`, and a
+  clear-then-write into a pre-existing empty `role="status"` (lifted from `live-region`) — and it has
+  no branch that touches the name. Examples 2 to 5 are each half wrong and live: a spinner driven by
+  a private `data-` attribute whose three readouts never move; `disabled` while pending, printing
+  `document.activeElement` right after the press; a button that renames itself and ends with three
+  names; and a pulsing dot whose only pending cue is the animation. Four findings. **Forced colors
+  hands `transparent` back *opaque*** — the ring's gap is a `border-top-color: transparent`, and
+  under `forced-colors: active` Chromium returns `rgb(0, 0, 0)` for it, so the ring closes into a
+  full circle and stops reading as turning; the gap has to be repainted in the button's own system
+  background (`ButtonFace`, `Highlight` on hover), and that is the whole `[FORCED]` block's reason
+  for existing. **`visibility: hidden` is the right way to hide the spinner**, because it keeps the
+  layout box — the button is the same width busy and idle and does not move out from under the
+  pointer that pressed it; the kept box is `visually-hidden`'s bug and this component's fix.
+  **`aria-busy` is announced inconsistently**, which is the argument for the region being
+  non-optional rather than an argument against the attribute. **No dimming for the busy state** —
+  the usual faded look is `opacity` over a color nobody chose, and `typography` already argues
+  against exactly that; the spinner is the visible cue and `aria-disabled` is about behavior. The
+  demo grid stacks its two cases at every real width, so **"left"/"right" in demo copy is wrong** —
+  name the cases instead.
 - [ ] `chip-toggle`
 
 ### forms-inputs
@@ -499,6 +514,27 @@ take their logic and not their layout. See item 1 under remaining work.
 ---
 
 ## Remaining non-component work
+
+### 0. Cut the on-page copy back — every component built before 2026-07-28
+
+**New rule, from the user, 2026-07-28.** The text that *renders on a component page* — the
+`ac-demo__title`s, the `__note` paragraphs, captions, verdicts, readout labels — has to be short and
+scannable. One or two plain sentences. No restated context, no second explanation of a point already
+made. The long-form reasoning belongs in `docs.md` and in the source comments, where someone has
+opted into reading it.
+
+This is stricter than `CLAUDE.md`'s general "say it once" rule and it applies only to what a visitor
+sees on screen. `loading-button` is written to it and is the reference. Everything before it is not:
+`effects`, `motion-preferences`, `typography`, `live-region`, `focus-ring`, `button` and
+`icon-button` are the worst, because their notes carry whole paragraphs of argument.
+
+Do it as a sweep, one component at a time, and move anything cut into that component's `docs.md`
+rather than deleting the reasoning. **Do not touch the tests' assertions on verdict text without
+re-running them** — several specs match on a phrase.
+
+Also settled while writing `loading-button`: the demo grid stacks its cases at every width the site
+actually produces, so **never write "the left one" / "the right-hand readout"** in demo copy. Name
+the case (`spinner only`, `keeps its name`) instead.
 
 ### 1. Retrofit everything built before the copyability conventions
 
@@ -671,6 +707,13 @@ It must match `npm run preview` exactly, base path included.
   hairline that is invisible on a dark theme. So a scroll region is reachable and silent by default;
   `tabindex="0"` + `role="region"` + a name is still required (Safari does not do this at all), and
   the ring has to be supplied. `effects`' `[PATCH]` is the one to lift.
+- **Forced colors hands `transparent` back opaque.** `border-top-color: transparent` — the standard
+  way to cut the gap into a CSS ring spinner — computes to `rgb(0, 0, 0)` under
+  `forced-colors: active` in Chromium, so the ring closes into a full circle and the rotation stops
+  being visible at all. `border-color` is forced wholesale and `transparent` is not exempt. Repaint
+  the gap in whatever system color the element's own background became (`ButtonFace` on a button,
+  `Highlight` on hover) rather than assuming it survived. `loading-button`'s `[FORCED]` is the
+  precedent, and its spec asserts the two border colors differ.
 - **Forced colors drops gradient `background-image`s and every `box-shadow`** in Chromium, which is
   why `fx-grid`, both `fx-bar-*` and the glow tokens vanish there without anyone writing a rule.
   `background-image` is not in the spec's forced list, so declare `none` yourself rather than relying
