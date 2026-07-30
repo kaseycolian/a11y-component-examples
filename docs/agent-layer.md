@@ -2,11 +2,12 @@
 
 Why the agent-facing side of this library is shaped the way it is, and what it is made of.
 
-**Status: being built.** Phases 0 through 3 are done — the generator runs, all four tiers ship, every
-component has a contract, the cross-cutting surfaces are written, and `npm run check:agents` plus
-`tests/shared/agent-surfaces.spec.mjs` gate them in CI. Phases 4–7 are ahead. The checklist below is
-the source of truth for how far it got; update it as each phase lands, and record what surprised you
-in the **What phase N cost** sections.
+**Status: being built.** Phases 0 through 5 are done — the generator runs, all four tiers ship, every
+component has a contract, the cross-cutting surfaces are written, all three Tier 0 doors are rendered
+from one preamble, the entry docs say which audience they serve, and `npm run check:agents` plus
+`tests/shared/agent-surfaces.spec.mjs` gate them in CI. Phases 6 and 7 are ahead. The checklist below is
+the source of truth for how far it got; update it as each phase lands, and record what surprised you in
+the **What phase N cost** sections.
 
 This is a contributor document. An agent *consuming* the library should read `AGENTS.md` and
 `agents/`, never this file — the same way it should never read `BUILD-STATUS.md`.
@@ -52,7 +53,7 @@ Four tiers with hard budgets. An agent stops as soon as it has enough, and each 
 
 | Tier | Surface | Budget | For |
 | --- | --- | --- | --- |
-| 0 | `AGENTS.md` / `llms.txt` | ~2.5 KB | What this is, the read path, and the one rule: never read `BUILD-STATUS.md` or `CLAUDE.md` |
+| 0 | `AGENTS.md` / `llms.txt` / the skill | ~2.5 KB, skill 3 KB | What this is, the read path, and the one rule: never read `BUILD-STATUS.md` or `CLAUDE.md` |
 | 1 | `agents/index.md` | ~3.5 KB | Route to one component — slug, group, `useWhen`, tags, WCAG, files |
 | 2 | `agents/components/<slug>.md` | 1.8 KB | The answer: ARIA, keyboard, states, failure modes, API |
 | 3 | `library/components/<slug>/component.*` | as needed | The code to copy. Already served, unchanged |
@@ -93,7 +94,8 @@ are renderings of one in-memory manifest, and **no file is ever half hand-writte
 ```
 HAND-WRITTEN — the only places to edit
   src/library/components/<slug>/meta.json    + a new `contract` block
-  docs/agents/preamble.md                    Tier 0 prose
+  docs/agents/preamble.md                    Tier 0 prose, in slots -- the two
+                                             skill-* ones render only into SKILL.md
   docs/agents/pitfalls.src.md                one block per transferable finding
   docs/agents/testing.src.md                 harness findings
   docs/agents/conventions.src.md             the copy-paste contract
@@ -228,28 +230,17 @@ one names the part and the selector it could not find.
       `conventions.src.md` and `verify.src.md`. See **What phase 3 cost**; "Phase 3, prepared" below is
       the classification it was built from and is kept as the record of what was decided before any of
       it moved.
-- [ ] **4 · The Claude Code skill.** `.claude/skills/a11y-library/SKILL.md`, generated, a router only.
-      Its `description` triggers on accessibility work; its body is the read path and the budgets, and
-      it holds no duplicated content, so it cannot go stale. (`.gitignore` excludes only
-      `.claude/settings.local.json` — verified — so this commits cleanly.)
-      Four things to know before starting, all confirmed against the generator as it stands after
-      phase 3:
-      **(a) Write mode must not rebuild `.claude/` from scratch.** `main()` does
-      `rm(resolve(root, 'agents'), { recursive: true })` so a deleted component cannot leave an
-      authoritative-looking file behind. Extending that pattern to `.claude/` would delete
-      `settings.local.json`, which is machine-specific and gitignored and therefore unrecoverable.
-      Write the one file; never clear the tree.
-      **(b) `ownedOnDisk()` walks `agents/` and `AGENTS.md` only,** so orphan detection will not cover
-      the skill until its path is added. Without that, a renamed skill directory leaves a stale
-      `SKILL.md` that `--check` calls clean.
-      **(c) It needs YAML frontmatter** — `name` and `description` — which no other surface has. The
-      `description` is the whole routing mechanism, so it is the one string in this project where
-      keyword coverage beats brevity, and it is the opposite of every other rule here.
-      **(d) It does not touch Tier 0.** The skill is Tier 0 *for Claude Code* and adds no read-path
-      row, which matters because `llms.txt` has 65 bytes of headroom left and `AGENTS.md` 124. Give
-      `SKILL.md` its own budget in `PROSE_SURFACES`-style config rather than borrowing one.
-- [ ] **5 · Split the entry docs by audience.** `CLAUDE.md` states the two contracts up front —
-      contributing to the library versus consuming it — and `README.md` points agents at `AGENTS.md`.
+- [x] **4 · The Claude Code skill.** `.claude/skills/a11y-library/SKILL.md`, generated, a router only —
+      the third Tier 0 rendering rather than a fourth document, so it cannot disagree with `AGENTS.md`
+      or `llms.txt` about the read path or the rules. Two new preamble slots, `skill-description` and
+      `skill-audience`, render into it alone. All four warnings written into this item before the phase
+      started were real and all four are addressed; see **What phase 4 cost**.
+- [x] **5 · Split the entry docs by audience.** `CLAUDE.md` states the two contracts up front —
+      contributing to the library versus consuming it, plus the one thing they share — and `README.md`
+      gained an "if an agent is doing the copying" section. The conventions duplication between
+      `CLAUDE.md` and `agents/conventions.md` was resolved by keeping both and checking the overlap
+      rather than by deleting one; a routing row that sent contributors to the wrong file for a
+      component's contract was fixed. See **What phase 5 cost**.
 - [ ] **6 · Close the record.** Update this file from plan to built state: what shipped, the measured
       token cost per tier against the budgets above, and anything that cost more than ten minutes.
       Tick the item in `BUILD-STATUS.md` with what was *found*, not just that it passed.
@@ -536,6 +527,140 @@ machinery can go red: a removed lede, a duplicate lede, an item before any group
 marker, an item with no body, an unknown marker kind, a malformed success criterion, a source edited
 without regenerating, a source pushed over its byte budget, a pitfall naming a component that does not
 exist, and a pitfall pointing at a renamed source marker.
+
+---
+
+## What phase 4 cost
+
+| Surface | Budget | Landed at |
+| --- | --- | --- |
+| `.claude/skills/a11y-library/SKILL.md` | 3 KB | 2.7 KB |
+
+Nothing else moved. The skill adds no read-path row, so `AGENTS.md` and `llms.txt` are byte-identical to
+what phase 3 left — the one phase so far that cost Tier 0 nothing.
+
+Seven things worth keeping:
+
+1. **The budget was mis-sized by analogy, and about 600 of its bytes cannot be cut.** 2.5 KB came from
+   `AGENTS.md`, which has no frontmatter. The skill's *body* is the leanest of the three renderings — it
+   drops `copying`, whose Tier 4 row reaches the same reasoning at greater length, and one intro
+   paragraph — but the `description` is ~600 bytes whose entire job is keyword coverage, so cutting it
+   is cutting the routing. Phase 1's rule, cut prose rather than raise a budget, does not reach a string
+   that is read by a matcher instead of a person. The raise is 3 KB, the measured size rounded up,
+   leaving room for about two more read-path rows. One real cut happened anyway: the audience note
+   opened *"Two audiences, and this is the consuming one:"*, which was throat-clearing, and the budget
+   failure is what made anyone look at it.
+2. **Ownership inside `.claude/` has to be by signature, not by location** — this is warning (b), and
+   the obvious fix for it was wrong. `agents/` is owned wholesale because everything in it is output.
+   `.claude/skills/` cannot be: `settings.local.json` sits beside it and someone may add a skill of
+   their own, which walking the folder would report as an orphan. So `ownedOnDisk()` claims a file
+   there only if it carries the do-not-edit marker. Proven in both directions — a leftover generated
+   `SKILL.md` at a renamed path is reported, and a hand-written sibling skill is left alone.
+3. **Frontmatter inverts the file's opening, and the YAML needs quoting.** Every other surface starts
+   with the do-not-edit comment; here it comes second, because a file that does not open with `---` has
+   no frontmatter as far as the loader is concerned and a skill with no `description` never triggers —
+   silently, looking exactly like a description that failed to match. The description itself is written
+   as a YAML single-quoted scalar, the one form that needs no thought about content: everything inside
+   is literal and only `'` escapes, by doubling. Unquoted, its first colon would be read as a key. It
+   also carries a 1,024-character ceiling enforced by the generator, because the description is always
+   in context while the body is read only once the skill fires.
+4. **The skill is where the two audiences collide, and the first attempt got the boundary wrong.**
+   `CLAUDE.md` says to read `docs/BUILD-STATUS.md` first; Tier 0's rules say never to. Both are right
+   for their reader, and this is the one surface where the same agent sees both, because Claude Code has
+   `CLAUDE.md` loaded already. The note first said the rule was *inverted* for a contributor — "those
+   two are your files" — which reads as an invitation to look up a component in a build log. It is not
+   an inversion. Working on the library changes where the *conventions* come from, `CLAUDE.md`, and
+   nothing else; a component's behavior comes from `agents/` and the component's own files for everyone,
+   contributor included. `docs/BUILD-STATUS.md` is a progress log and answers nothing about a component,
+   so it now appears in exactly one place across every agent surface: the rule forbidding it. Phase 5
+   generalizes the split, and this is the sentence it has to keep.
+5. **Two Tier 0 claims had never been checked, and one was load-bearing since phase 1.** The `rules`
+   slot names `docs/BUILD-STATUS.md` and `CLAUDE.md`; nothing asserted either exists. Rename one and
+   Tier 0 forbids a file that is not there while the skill sends a contributor nowhere. A new test
+   scans all three renderings for backticked verbatim `.md` paths and asserts each resolves —
+   retroactive cover for phase 1. Templates are skipped (`<slug>`, `{docs.md,meta.json}` name no single
+   file), and the check is `.md`-only because `llms.txt` is written bare in prose while living at
+   `agents/llms.txt`. The report is deduplicated: the skill names `CLAUDE.md` twice, in the audience note
+   and again in the rules, and one fix covers both.
+6. **The one failure that would have been total and silent is a gitignored skill.** Every other check
+   here would still pass, `--check` included, and the skill would simply never reach a clone. The design
+   record has claimed since phase 0 that `.gitignore` excludes only `.claude/settings.local.json`;
+   `git check-ignore -q` in the spec is what now holds it to that.
+7. **Third first-look-green probe in this project, and this time the probe had not run at all.**
+   `execFileSync('npx.cmd', …)` is `EINVAL` on modern Node — spawning a `.cmd` without a shell — so
+   `err.status` came back `undefined`, the probe's `code !== 0` read that as a failing test, and both
+   spec probes reported RED against an empty report. Fixed by running
+   `node_modules/@playwright/test/cli.js` through `process.execPath` and by throwing when `status` is
+   undefined. The lesson is the same one phases 2 and 3 each learned by a different mechanism, and it
+   now has a sharper form: **a probe that reports RED without printing the failure has not run.**
+
+**Not done, deliberately:** the skill is not published to `public/`, so `sync-library.mjs` is untouched.
+Claude Code loads a skill from `.claude/` in a checkout and never over HTTP, and an agent that fetched
+the site reads `llms.txt` — the same slots through a different frame. Publishing it would be a fourth
+copy of Tier 0 that nothing would ever fetch.
+
+**Verified:** `check:tokens` 34 files clean · `check:agents` **42 surfaces match** · `npm run build` 35
+pages · **chromium 1125/1125** (1123 before; the two new tests are the difference). Eight probes: a
+`skill-description` over the character ceiling, a hand-edited `SKILL.md`, a leftover generated skill at
+a renamed path, a hand-written sibling skill that must *not* be flagged, `settings.local.json` surviving
+write mode, an apostrophe escaped into the YAML scalar, Tier 0 naming a file that does not exist, and
+the skill excluded by `.gitignore`.
+
+---
+
+## What phase 5 cost
+
+No surface moved — this phase edited two hand-written files, `CLAUDE.md` and `README.md`, and added one
+test. Six things worth keeping:
+
+1. **The duplication was measured before it was resolved, and the measurement reversed the decision.**
+   The first read of it — from memory, across two files not open side by side — was that all eleven
+   entries in `agents/conventions.md` were restated in `CLAUDE.md`, which pointed at stripping
+   `CLAUDE.md` down to a pointer. Read properly, the two diverge exactly where they should:
+   `CLAUDE.md` carries the linter contract, the `--bg-elev` incident and the shapes a contributor types;
+   `conventions.md` carries the consequences for someone else's page ("one of the few things a paste does
+   **not** bring with it"). The genuine overlap is three CSS snippets and about seven one-line rule
+   statements. Deleting the section would have cost the linter's context to remove eight sentences.
+2. **So the resolution is a check, not a deletion**, and that is the right shape for this specific case:
+   two documents for two readers whose *rules* must agree while their *framing* must not. Two of the
+   three shared snippets were already byte-identical and the third differed only by a trailing
+   semicolon — evidence they had not yet drifted, and that the risk is a token name, a percentage or a
+   duration changing in one file only.
+3. **`CLAUDE.md` is canonical, and the extraction is anchored on a heading.** The test reads the fenced
+   `css` blocks under `## Non-negotiable conventions` and asserts each declaration appears in
+   `docs/agents/conventions.src.md`. Canonical because a contributor changing a convention is editing
+   `CLAUDE.md`; heading-anchored because parsing the prose is the mistake this project already refused
+   once. It carries its own vacuity guard — a renamed heading leaves nothing to compare, so the test
+   fails on an empty extraction rather than passing over it. That guard was probed, and it is the third
+   surface in this layer to need one.
+4. **The routing bug was the phase's most concrete defect and predates the whole layer.**
+   `CLAUDE.md`'s table sent anyone wanting "the ARIA contract + keyboard map for a specific component" to
+   `docs/component-specs.md` — a *pre-build* planning document, written before the components existed,
+   with no entry at all for `disclosure`, `dropdown` or `field`, and rejected as a machine source in the
+   problem statement at the top of this file. `agents/components/<slug>.md` has been the generated,
+   test-asserted answer since phase 2 and nothing pointed at it. Both files now have a row saying what
+   they are actually for: the contract, versus the up-front design decisions and CSS gotchas that the
+   contract does not carry.
+5. **The "three homes" rule had a hole exactly where this phase landed.** It routed platform facts,
+   harness facts and repo trivia, and said nothing about a fact concerning what a copied component
+   assumes — which is `conventions.src.md`. It is four homes now, and it no longer claims nothing checks
+   for the overlap, because one overlap is checked and being precise about which is the difference
+   between a rule and a slogan.
+6. **`CLAUDE.md` names a machine-local path and always has.** The last row of its table points at
+   `C:\Users\kasey\.claude\plans\this-will-be-a-curious-pnueli.md`, which no other clone has. Left
+   alone deliberately: it is a personal archive, `docs/agent-layer.md` is the in-repo record that
+   replaced it, and it is also why the Tier 0 path-existence check from phase 4 was **not** extended to
+   `CLAUDE.md` — the check would pass on this machine and fail in CI, which is worse than not checking.
+
+**Verified:** `check:tokens` 34 files clean · `check:agents` 42 surfaces match · `npm run build` 35
+pages · **chromium 1126/1126** (1125 before; the new test is the difference). Three probes: the accent
+mix percentage changed in `CLAUDE.md` only, the motion token renamed in `conventions.src.md` only, and
+the anchoring heading renamed so the extraction finds nothing.
+
+**Still open, and a candidate for phase 6:** `README.md`'s markdown links are unchecked, so a moved
+`docs/at-support.md` or `docs/authoring-a-component.md` breaks silently on a public page. Different shape
+from the backticked-path check phase 4 added — links, not inline code — so it is a small separate test
+rather than a widening.
 
 ---
 

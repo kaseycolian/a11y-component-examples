@@ -29,7 +29,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
-import { TIER_2_BUDGET } from '../../scripts/build-agent-surfaces.mjs';
+import { TIER_2_BUDGET, SKILL_OUT } from '../../scripts/build-agent-surfaces.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const componentsDir = resolve(root, 'src/library/components');
@@ -266,6 +266,123 @@ test.describe('cross-cutting surfaces', () => {
 
     expect(slugs.length, 'no component references found in agents/*.md at all').toBeGreaterThan(5);
     expect(markers.length, 'no source-comment markers found in agents/*.md at all').toBeGreaterThan(0);
+  });
+});
+
+/* --- 9 · Tier 0 points at files that are really there --------------------- */
+
+/**
+ * The three Tier 0 renderings -- a checkout reads AGENTS.md, a fetcher reads
+ * llms.txt, Claude Code loads the skill.
+ *
+ * `--check` proves all three match the preamble. It cannot prove the preamble is
+ * true about the repo, and two of its claims are: the rule naming
+ * `docs/BUILD-STATUS.md` and `CLAUDE.md` as the files never to read, and the
+ * skill's audience note naming the same two as a contributor's files. Rename
+ * either and Tier 0 forbids a file that is not there, while the skill sends a
+ * contributor nowhere.
+ */
+const TIER_0 = ['AGENTS.md', 'agents/llms.txt', SKILL_OUT].map((path) => ({
+  path,
+  text: read(resolve(root, path)),
+}));
+
+/**
+ * Only `.md`, and only without a metacharacter. The read path is mostly
+ * templates -- `<slug>`, `{docs.md,meta.json}` -- which name no single file, and
+ * `llms.txt` is written bare in prose while living at `agents/llms.txt`. What is
+ * left is every path a reader could open verbatim.
+ */
+const MD_PATH = /`([^`\n]+\.md)`/g;
+const TEMPLATED = /[<>{}|*]/;
+
+test.describe('Tier 0 references', () => {
+  test('every repo file a Tier 0 surface names verbatim exists', () => {
+    // Deduplicated: the skill names `CLAUDE.md` twice, in its audience note and
+    // again in the rules, and one fix covers both.
+    const missing = new Set();
+    let checked = 0;
+
+    for (const { path, text } of TIER_0) {
+      for (const [, named] of text.matchAll(MD_PATH)) {
+        if (TEMPLATED.test(named)) continue;
+        checked++;
+        if (!existsSync(resolve(root, named))) missing.add(`${path} names \`${named}\``);
+      }
+    }
+
+    // Same guard as the pitfall references: a regex over prose that stops
+    // matching passes forever. Six is the floor the current surfaces clear.
+    expect(checked, 'no verbatim .md paths found in Tier 0 at all').toBeGreaterThan(5);
+    expect(
+      [...missing],
+      `Tier 0 points at files that do not exist:\n  ${[...missing].join('\n  ')}`,
+    ).toEqual([]);
+  });
+
+  test('the skill is not gitignored, so it will actually commit', () => {
+    // The one claim in this phase that would fail silently and completely: a
+    // skill that does not commit is a skill nobody but its author ever loads,
+    // and every other check here would still pass. .gitignore excludes
+    // `.claude/settings.local.json` only, and this is what holds that to it.
+    let ignored = false;
+    try {
+      execFileSync('git', ['check-ignore', '-q', '--', SKILL_OUT], { cwd: root, stdio: 'pipe' });
+      ignored = true; // exit 0 means git would ignore the path
+    } catch (err) {
+      // 1 is "not ignored", which is the answer we want. Anything else -- no
+      // git, not a work tree -- is a real failure and should say so.
+      if (err.status !== 1) throw err;
+    }
+    expect(ignored, `${SKILL_OUT} is gitignored, so the skill would never reach a clone`).toBe(false);
+  });
+});
+
+/* --- 10 · the one duplication between the two audiences ------------------- */
+
+/**
+ * `CLAUDE.md` and `agents/conventions.md` deliberately state the same conventions
+ * to different readers -- one is a checklist for someone adding a component, the
+ * other is an explanation for someone pasting one out -- and most of what each
+ * says is its own. What they genuinely share is the canonical CSS shapes: the
+ * three-level token chain, the accent mixed toward `--text`, and the motion
+ * `calc()`. Those carry token names, a percentage and a duration, which is
+ * exactly the kind of detail that gets updated in one file only.
+ *
+ * `CLAUDE.md` is canonical, because a contributor changing a convention is
+ * editing that file. Extracted from its "Non-negotiable conventions" section by
+ * heading, never by parsing the prose.
+ */
+const CANONICAL_CSS = (() => {
+  const section = read(resolve(root, 'CLAUDE.md'))
+    .split('## Non-negotiable conventions')[1]
+    ?.split('\n## ')[0];
+  if (!section) return [];
+  return [...section.matchAll(/```css\n([\s\S]*?)```/g)]
+    .flatMap(([, block]) => block.split('\n'))
+    // A declaration, not the annotation comment under the first one. The
+    // trailing semicolon goes because conventions.src.md writes one of the three
+    // inline in a sentence rather than in a fenced block.
+    .map((line) => line.trim().replace(/;$/, ''))
+    .filter((line) => line && !line.startsWith('/*'));
+})();
+
+test.describe('the contributor and agent conventions agree', () => {
+  test('every CSS shape CLAUDE.md mandates is the shape the agent surface teaches', () => {
+    const source = read(resolve(root, 'docs/agents/conventions.src.md'));
+
+    // Guards the extraction, not the docs: a renamed heading or a fence that
+    // stopped being ```css would silently leave nothing to compare and pass.
+    expect(
+      CANONICAL_CSS.length,
+      'no CSS declarations found under CLAUDE.md "## Non-negotiable conventions"',
+    ).toBeGreaterThan(2);
+
+    const drifted = CANONICAL_CSS.filter((declaration) => !source.includes(declaration));
+    expect(
+      drifted,
+      `in CLAUDE.md but not in docs/agents/conventions.src.md:\n  ${drifted.join('\n  ')}`,
+    ).toEqual([]);
   });
 });
 

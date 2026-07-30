@@ -40,12 +40,19 @@ same session tightened the on-page copy rule (item 0b).
 record and item 5 below tracks it. It is the current work, ahead of batch F. Read that file before
 touching `AGENTS.md`, `agents/`, `.claude/`, or `scripts/build-agent-surfaces.mjs`; the short version
 is that agents get a four-tier read path with hard token budgets, every surface is rendered from one
-manifest so they cannot drift, and the human pages are not touched. **Phases 0 through 3 are done** —
+manifest so they cannot drift, and the human pages are not touched. **Phases 0 through 5 are done** —
 all four tiers ship, every component has a `contract` block, the cross-cutting surfaces
-(`agents/{pitfalls,conventions,verify,testing}.md`) are written, `npm run check:agents` fails if any
-surface drifts from its source, and `tests/shared/agent-surfaces.spec.mjs` fails if a contract lies
-about the markup. **Phase 4 is next: the Claude Code skill.** Nothing under `agents/` or `AGENTS.md`
-is hand-editable; edit a file in `docs/agents/` or a `meta.json`, then run `npm run agents`.
+(`agents/{pitfalls,conventions,verify,testing}.md`) are written, a generated Claude Code skill at
+`.claude/skills/a11y-library/SKILL.md` is the third Tier 0 door, `CLAUDE.md` and `README.md` say which
+audience they serve, `npm run check:agents` fails if any surface drifts from its source, and
+`tests/shared/agent-surfaces.spec.mjs` fails if a contract lies about the markup. **Phase 6 is next:
+close the record.** Nothing under `agents/`, `AGENTS.md` or `.claude/skills/` is hand-editable; edit a
+file in `docs/agents/` or a `meta.json`, then run `npm run agents`.
+
+**This file is a build log and only that.** It is where progress, the roster checklist, the ordered next
+steps and the repo-local gotchas live. It is never where a component's behavior is looked up — that is
+`agents/components/<slug>.md` and the component's own files, for contributors as much as for agents.
+Every agent-facing surface names this file exactly once, in the rule forbidding it.
 
 ### The steps, in order
 
@@ -945,7 +952,7 @@ dated; mark untested combinations untested rather than assuming they pass), `doc
 ticked. What is genuinely left is filling `at-support.md`'s matrix, which needs a real screen reader
 rather than a keyboard.
 
-### 5. The agent-facing layer — **in progress, phase 4 next, see `docs/agent-layer.md`**
+### 5. The agent-facing layer — **in progress, phase 6 next, see `docs/agent-layer.md`**
 
 The library has two audiences and only the human one was built for. An agent arriving before this work
 found no `AGENTS.md`, no index, no `llms.txt`, a 1.42 MB corpus, and a `CLAUDE.md` telling it to read
@@ -953,14 +960,42 @@ this 113 KB file first. The design record has the measurements, the four-tier re
 budgets, the one-manifest generator that keeps every surface in sync, and the accuracy tests that
 assert the hand-written contracts against the real markup.
 
-**Phases 0 through 3 are done.** All four tiers ship — `AGENTS.md` at 2.4 KB, `agents/index.md` at
+**Phases 0 through 5 are done.** All four tiers ship — `AGENTS.md` at 2.4 KB, `agents/index.md` at
 3.2 KB, `agents/index.json`, `agents/llms.txt`, and a per-component contract in
 `agents/components/<slug>.md` at 0.8–1.5 KB — plus the four cross-cutting Tier 4 surfaces,
-`agents/{pitfalls,conventions,verify,testing}.md`. All of it is rendered by
+`agents/{pitfalls,conventions,verify,testing}.md`, and a generated Claude Code skill at
+`.claude/skills/a11y-library/SKILL.md` (2.7 KB) that is Tier 0's third door. All of it is rendered by
 `scripts/build-agent-surfaces.mjs` and gated by `npm run check:agents` in `verify` and in CI, plus
 `tests/shared/agent-surfaces.spec.mjs` in the suite. **A component now costs an agent about 1.1 KB to
-answer.** Phases 4–7 are the checklist at the bottom of that file; keep it current there rather than
+answer.** Phases 6 and 7 are the checklist at the bottom of that file; keep it current there rather than
 duplicating it here.
+
+Two things from phase 5 that outlive it:
+
+- **`CLAUDE.md` and `agents/conventions.md` state the same conventions on purpose**, one as a checklist
+  for whoever adds a component and one as an explanation for whoever pastes one out. The three canonical
+  CSS shapes — the token chain, the accent mixed toward `--text`, the motion `calc()` — are duplicated
+  verbatim, `CLAUDE.md` is canonical, and `tests/shared/agent-surfaces.spec.mjs` asserts they still
+  match. Change a token name, a percentage or a duration in one and change the other in the same commit.
+- **`docs/component-specs.md` is a pre-build planning record, not a component reference.** It decided
+  the patterns before they were built and has no entry for `disclosure`, `dropdown` or `field`. For a
+  built component's ARIA contract and keyboard map, `agents/components/<slug>.md` is the generated,
+  asserted answer; go to `component-specs.md` for the design reasoning and the CSS gotchas it carries
+  that a contract does not.
+
+Two things from phase 4 that outlive it:
+
+- **Never let a generator clear `.claude/`.** `npm run agents` rebuilds `agents/` from scratch so a
+  deleted component cannot leave an authoritative-looking file behind. `.claude/` must never get the
+  same treatment: `settings.local.json` lives there, and it is machine-specific and gitignored and so
+  unrecoverable. The skill is written in place, and a leftover from a renamed skill folder is caught
+  instead by ownership-by-signature — a file under `.claude/skills/` is the generator's only if it
+  carries the do-not-edit marker, which also leaves a hand-written skill of your own alone.
+- **`.claude/skills/a11y-library/SKILL.md` is generated**, from `docs/agents/preamble.md`'s two
+  `skill-*` slots. Hand-edit it and `npm run check:agents` reverts your work. Its `description` is the
+  routing mechanism Claude Code matches against a request, which makes it the one string in this repo
+  where keyword coverage beats brevity — and its pattern nouns are a trigger net, not a roster, so do
+  not sync them to `agents/index.md`.
 
 One thing from phase 3 that outlives it:
 
@@ -1009,8 +1044,11 @@ Worth a check:
 1. **Encoding, repo-wide.** `build-agent-surfaces.mjs` throws on `â€` in the six files it reads, so
    every `component.*`, every `docs.md` and this file are unguarded — and a 92 KB prose file is
    exactly what gets round-tripped. The only trap on the list that silently corrupts the product.
-   Needs an allowlist: two files legitimately contain the signature, the guard's own doc comment and
-   `docs/agent-layer.md`'s record of the incident. Same shape as `data-ac-demo-broken`.
+   Needs an allowlist, and measured in July 2026 it is **three files, eight lines**: the guard's own doc
+   comment, condition and message in `scripts/build-agent-surfaces.mjs`; `docs/agent-layer.md`'s record
+   of the incident; and this file — the gotcha entry above and this line. Same shape as
+   `data-ac-demo-broken`. Re-measure before writing the check rather than trusting the number: an
+   earlier version of this entry said two files, having forgotten the one it was written in.
 2. **"What you see is what you copy", asserted.** Rule 1 of `CLAUDE.md` and nothing enforces it.
    `src/` → `public/` is byte-identical — measured, 89 of 89 files — but that is the sync, not the
    page. The open edge is the inlined `<style>` / `<script>`: drop `is:inline` and Astro bundles it,
