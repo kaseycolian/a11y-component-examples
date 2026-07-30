@@ -11,8 +11,8 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-29 (**the shared a11y gate landed — item 2 is done** and it found a great deal;
-suite is **1046/1046** in Chromium. Playwright **firefox is installed but has never been run**,
+Last updated: 2026-07-30 (**the agent layer is through phase 6 — only phase 7 is left**, see item 5;
+suite is **1127/1127** in Chromium. Playwright **firefox is installed but has never been run**,
 webkit is not installed; the `summary` voice changed on 2026-07-28, see item 0a)
 
 ---
@@ -40,14 +40,15 @@ same session tightened the on-page copy rule (item 0b).
 record and item 5 below tracks it. It is the current work, ahead of batch F. Read that file before
 touching `AGENTS.md`, `agents/`, `.claude/`, or `scripts/build-agent-surfaces.mjs`; the short version
 is that agents get a four-tier read path with hard token budgets, every surface is rendered from one
-manifest so they cannot drift, and the human pages are not touched. **Phases 0 through 5 are done** —
+manifest so they cannot drift, and the human pages are not touched. **Phases 0 through 6 are done** —
 all four tiers ship, every component has a `contract` block, the cross-cutting surfaces
 (`agents/{pitfalls,conventions,verify,testing}.md`) are written, a generated Claude Code skill at
 `.claude/skills/a11y-library/SKILL.md` is the third Tier 0 door, `CLAUDE.md` and `README.md` say which
 audience they serve, `npm run check:agents` fails if any surface drifts from its source, and
-`tests/shared/agent-surfaces.spec.mjs` fails if a contract lies about the markup. **Phase 6 is next:
-close the record.** Nothing under `agents/`, `AGENTS.md` or `.claude/skills/` is hand-editable; edit a
-file in `docs/agents/` or a `meta.json`, then run `npm run agents`.
+`tests/shared/agent-surfaces.spec.mjs` fails if a contract lies about the markup. **Phase 7 is the only
+one left: couple a component edit to its agent-side knowledge** — the design record specifies it and it is
+not yet designed. Nothing under `agents/`, `AGENTS.md` or `.claude/skills/` is hand-editable; edit a file
+in `docs/agents/` or a `meta.json`, then run `npm run agents`.
 
 **This file is a build log and only that.** It is where progress, the roster checklist, the ordered next
 steps and the repo-local gotchas live. It is never where a component's behavior is looked up — that is
@@ -952,7 +953,7 @@ dated; mark untested combinations untested rather than assuming they pass), `doc
 ticked. What is genuinely left is filling `at-support.md`'s matrix, which needs a real screen reader
 rather than a keyboard.
 
-### 5. The agent-facing layer — **in progress, phase 6 next, see `docs/agent-layer.md`**
+### 5. The agent-facing layer — **built through phase 6, only phase 7 left, see `docs/agent-layer.md`**
 
 The library has two audiences and only the human one was built for. An agent arriving before this work
 found no `AGENTS.md`, no index, no `llms.txt`, a 1.42 MB corpus, and a `CLAUDE.md` telling it to read
@@ -960,15 +961,27 @@ this 113 KB file first. The design record has the measurements, the four-tier re
 budgets, the one-manifest generator that keeps every surface in sync, and the accuracy tests that
 assert the hand-written contracts against the real markup.
 
-**Phases 0 through 5 are done.** All four tiers ship — `AGENTS.md` at 2.4 KB, `agents/index.md` at
+**Phases 0 through 6 are done.** All four tiers ship — `AGENTS.md` at 2.4 KB, `agents/index.md` at
 3.2 KB, `agents/index.json`, `agents/llms.txt`, and a per-component contract in
 `agents/components/<slug>.md` at 0.8–1.5 KB — plus the four cross-cutting Tier 4 surfaces,
 `agents/{pitfalls,conventions,verify,testing}.md`, and a generated Claude Code skill at
-`.claude/skills/a11y-library/SKILL.md` (2.7 KB) that is Tier 0's third door. All of it is rendered by
+`.claude/skills/a11y-library/SKILL.md` (2.8 KB) that is Tier 0's third door. All of it is rendered by
 `scripts/build-agent-surfaces.mjs` and gated by `npm run check:agents` in `verify` and in CI, plus
-`tests/shared/agent-surfaces.spec.mjs` in the suite. **A component now costs an agent about 1.1 KB to
-answer.** Phases 6 and 7 are the checklist at the bottom of that file; keep it current there rather than
+`tests/shared/agent-surfaces.spec.mjs` in the suite. **Answering "how do I build an accessible X" costs
+an agent 6.4–7.1 KB** — Tier 0, the index, and one contract — against a `src/library/` of 1,829 KB.
+Phase 7 is the last item on the checklist at the bottom of that file; keep it current there rather than
 duplicating it here.
+
+One thing from phase 6 that outlives it:
+
+- **A fact stated in three places gets corrected in two.** Phase 5 made the accessibility findings a
+  four-homes rule and added a check for the one overlap that is mechanizable; it updated `CLAUDE.md` and
+  the design record and left the copy in this file saying "three homes" and "nothing checks for it". Phase
+  6 found it by reading, not by any check. Same session found `scripts/new-component.mjs` still sending a
+  new component's author to `docs/component-specs.md` for the contract — the misrouting phase 5 fixed in
+  `CLAUDE.md` — in its own header and inside the spec template it writes. **When you correct a
+  convention, grep for it.** The layer mechanizes the overlaps it knows about; the rest is on the person
+  making the change.
 
 Two things from phase 5 that outlive it:
 
@@ -999,11 +1012,12 @@ Two things from phase 4 that outlive it:
 
 One thing from phase 3 that outlives it:
 
-- **The accessibility findings have three homes now, and a new one belongs in exactly one.** A fact
+- **The accessibility findings have four homes now, and a new one belongs in exactly one.** A fact
   about the platform that makes correct-looking markup wrong goes in `docs/agents/pitfalls.src.md`. A
-  fact about Playwright or axe that makes a correct assertion wrong goes in `testing.src.md`. Anything
+  fact about Playwright or axe that makes a correct assertion wrong goes in `testing.src.md`. Something a
+  copied component assumes about the page it lands in goes in `conventions.src.md`. Anything
   about working *on* this repo stays in the gotchas list here. Writing it in two places is the drift
-  the layer exists to prevent, and nothing checks for it.
+  the layer exists to prevent, and only one overlap is checked — the CSS shapes shared with `CLAUDE.md`.
 
 Two things from phase 2 that outlive it:
 
@@ -1041,14 +1055,15 @@ environment facts. What is left is below, ranked, with the measurements so they 
 
 Worth a check:
 
-1. **Encoding, repo-wide.** `build-agent-surfaces.mjs` throws on `â€` in the six files it reads, so
-   every `component.*`, every `docs.md` and this file are unguarded — and a 92 KB prose file is
-   exactly what gets round-tripped. The only trap on the list that silently corrupts the product.
-   Needs an allowlist, and measured in July 2026 it is **three files, eight lines**: the guard's own doc
-   comment, condition and message in `scripts/build-agent-surfaces.mjs`; `docs/agent-layer.md`'s record
-   of the incident; and this file — the gotcha entry above and this line. Same shape as
-   `data-ac-demo-broken`. Re-measure before writing the check rather than trusting the number: an
-   earlier version of this entry said two files, having forgotten the one it was written in.
+1. **Encoding, repo-wide.** `build-agent-surfaces.mjs` throws on `â€` only in what it reads — the five
+   files in `docs/agents/` and every `meta.json` — so every `component.*`, every `docs.md` and this file
+   are unguarded, and a 98 KB prose file is exactly what gets round-tripped. The only trap on the list
+   that silently corrupts the product. Needs an allowlist, and re-measured on 2026-07-30 it is **three
+   files, ten lines**: four in `scripts/build-agent-surfaces.mjs` (the guard's own doc comment, condition
+   and message), two in `docs/agent-layer.md`'s record of the incident, and four in this file. Same shape
+   as `data-ac-demo-broken`. **Re-measure again before writing the check rather than trusting the number**
+   — it has now been wrong twice: an earlier version said two files, having forgotten the one it was
+   written in, and the eight-line count went stale within the month.
 2. **"What you see is what you copy", asserted.** Rule 1 of `CLAUDE.md` and nothing enforces it.
    `src/` → `public/` is byte-identical — measured, 89 of 89 files — but that is the sync, not the
    page. The open edge is the inlined `<style>` / `<script>`: drop `is:inline` and Astro bundles it,
@@ -1107,12 +1122,19 @@ It must match `npm run preview` exactly, base path included.
 ## Gotchas already solved — do not rediscover these
 
 Working *on* this repo. The transferable accessibility findings moved to
-`docs/agents/pitfalls.src.md` and the harness findings to `docs/agents/testing.src.md`, which render
-to the `agents/` surfaces an agent reads — see `docs/agent-layer.md`. A new finding goes in whichever
-of the three it belongs to, not in all of them.
+`docs/agents/pitfalls.src.md`, the harness findings to `docs/agents/testing.src.md`, and what a copied
+component assumes about its page to `docs/agents/conventions.src.md` — all of which render to the
+`agents/` surfaces an agent reads, see `docs/agent-layer.md`. A new finding goes in whichever of the four
+homes it belongs to, not in all of them.
 
 - **Node is not on the inherited PATH.** Prefix PowerShell calls with
   `$env:Path = "C:\nvm4w\nodejs;$env:Path"`.
+- **Never write a size or a count into a doc by hand.** Three of them were wrong here, each by a
+  different mechanism: four rows divided bytes by 1000 while the budget beside them used 1024; one row
+  quoted the number out of the generator's budget-failure message, describing a file two edits stale; and
+  a gotcha total was counted by eye at 62 against an actual 69. All three were plausible and internally
+  consistent, which is why none was caught by reading. Measure with `stat` in a loop, after the last edit,
+  and paste the output.
 - **Never round-trip a repo file through PowerShell.** `Get-Content -Raw` then
   `Set-Content -Encoding utf8` re-encodes UTF-8 as Latin-1 on 5.1 and adds a BOM: every `—` becomes
   `â€"`, every `…` becomes `â€¦`. It survives `git diff --stat`, renders as garbage, and in a

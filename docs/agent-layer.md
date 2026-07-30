@@ -2,12 +2,14 @@
 
 Why the agent-facing side of this library is shaped the way it is, and what it is made of.
 
-**Status: being built.** Phases 0 through 5 are done — the generator runs, all four tiers ship, every
-component has a contract, the cross-cutting surfaces are written, all three Tier 0 doors are rendered
-from one preamble, the entry docs say which audience they serve, and `npm run check:agents` plus
-`tests/shared/agent-surfaces.spec.mjs` gate them in CI. Phases 6 and 7 are ahead. The checklist below is
-the source of truth for how far it got; update it as each phase lands, and record what surprised you in
-the **What phase N cost** sections.
+**Status: built, and this record matches it.** Phases 0 through 6 are done — the generator runs, all four
+tiers ship, every component has a contract, the cross-cutting surfaces are written, all three Tier 0
+doors are rendered from one preamble, the entry docs say which audience they serve, and
+`npm run check:agents` plus `tests/shared/agent-surfaces.spec.mjs` gate them in CI. What each surface
+measured against its budget is in **What the layer costs, measured**. One phase is left: **7**, coupling a
+component edit to its agent-side knowledge, specified at the bottom of this file and not yet designed.
+The checklist below is the source of truth for how far it got; update it as each phase lands, and record
+what surprised you in the **What phase N cost** sections.
 
 This is a contributor document. An agent *consuming* the library should read `AGENTS.md` and
 `agents/`, never this file — the same way it should never read `BUILD-STATUS.md`.
@@ -241,9 +243,13 @@ one names the part and the selector it could not find.
       `CLAUDE.md` and `agents/conventions.md` was resolved by keeping both and checking the overlap
       rather than by deleting one; a routing row that sent contributors to the wrong file for a
       component's contract was fixed. See **What phase 5 cost**.
-- [ ] **6 · Close the record.** Update this file from plan to built state: what shipped, the measured
-      token cost per tier against the budgets above, and anything that cost more than ten minutes.
-      Tick the item in `BUILD-STATUS.md` with what was *found*, not just that it passed.
+- [x] **6 · Close the record.** This file went from plan to built state: the status line above, and a
+      current **What the layer costs, measured** section that re-measures rather than merging the five
+      per-phase tables, which stay as the snapshots they are. `README.md` now reaches this record, so both
+      entry points land on something true — humans → `README.md` → here, agents → `AGENTS.md` →
+      `agents/`. One of the two items that was to be recorded as open got closed instead, because this
+      phase's one required edit made it worse; the other is recorded as open. Phase 6 also found real
+      drift, in `BUILD-STATUS.md` and in `scripts/new-component.mjs`. See **What phase 6 cost**.
 - [ ] **7 · Couple a component edit to its agent-side knowledge.** Requested after phase 1 landed, to
       be designed once phases 2–6 are done. See "Phase 7 — the requirement" below; it is not designed
       yet, and the gap it closes is real rather than hypothetical.
@@ -251,6 +257,67 @@ one names the part and the selector it could not find.
 **Deferred: an MCP server.** Files work for every agent with no runtime, and a server would be a
 second thing to keep accurate. The manifest the generator already builds is the natural backing for
 one when it is wanted.
+
+---
+
+## What the layer costs, measured
+
+Measured 2026-07-30 against the budgets in **The read path** above, KB = 1024 throughout. These are
+current values. The five **What phase N cost** tables below are snapshots of the day each phase landed
+and are deliberately *not* merged into this one — three surfaces moved after their table was written, so
+a merge would present history as the present.
+
+| Tier | Surface | Budget | Measured | Spare |
+| --- | --- | --- | --- | --- |
+| 0 | `AGENTS.md` | 2,560 B | 2,436 B | 124 B |
+| 0 | `agents/llms.txt` | 2,560 B | 2,495 B | 65 B |
+| 0 | `.claude/skills/a11y-library/SKILL.md` | 3,072 B | 2,831 B | 241 B |
+| 1 | `agents/index.md` | 3,584 B | 3,253 B | 331 B |
+| 2 | `agents/components/<slug>.md` | 1,800 B each | 853–1,538 B, median 1,121 | 262 B on `dropdown`, the largest |
+| 4 | `agents/pitfalls.md` | 16 KB | 14.7 KB | 1.3 KB |
+| 4 | `agents/testing.md` | 12 KB | 9.9 KB | 2.1 KB |
+| 4 | `agents/verify.md` | 8 KB | 5.8 KB | 2.2 KB |
+| 4 | `agents/conventions.md` | 7 KB | 5.0 KB | 2.0 KB |
+
+Bytes rather than KB in the top half, because bytes are what the generator compares and those margins
+are thin enough that rounding hides them. **Every budget held, and only one was ever raised** — the
+skill's, mis-sized by analogy with `AGENTS.md`, which has no frontmatter; see finding 1 under phase 4.
+
+**The claim at the top of this file, measured for the first time.** Tier 0 → Tier 1 → one Tier 2 file is
+**6.4 to 7.1 KB**, 6.8 KB for `tabs`: about 1.7k tokens at four bytes per token, so *"under ~2k tokens"*
+holds. Read it as bytes rather than tokens — markdown tables tokenize worse than prose, and the
+conversion is the soft part of that sentence, not the measurement.
+
+**The map against the territory.** `AGENTS.md` + `agents/` + the skill is **100.6 KB across 42 files**,
+against a `src/library/` of **1,829.4 KB** — 5.5%. Those 42 files are exactly what `check:agents` reports
+matching, which is the cheapest available proof that nothing generated is unaccounted for.
+
+**`agents/index.json` is 18.4 KB and is not on the read path.** It is the machine copy, for filtering the
+roster; no agent reads it to answer a question. Phase 1 recorded it rendering to more than five times
+`index.md`, and the contract blocks have widened that gap — still not a problem, for the same reason.
+
+**What the layer cost to build.** The hand-written side is `docs/agents/` at 43.6 KB across five files;
+the machinery is `scripts/build-agent-surfaces.mjs` at 39.1 KB and
+`tests/shared/agent-surfaces.spec.mjs` at 21.5 KB, so rendering and checking the sources costs about 1.4×
+the sources themselves. The rendering is close to 1:1 by design rather than by accident: the four
+`.src.md` files total 39.3 KB and render to 35.4 KB, losing only the markers and the editorial headers,
+because the split is on markers and the prose passes through byte for byte. `preamble.md` is the exception
+in the other direction — 4.3 KB rendering to 7.6 KB, because it is rendered three times. Everything else,
+the index and every Tier 2 file, comes from `meta.json`.
+
+**`meta.json` grew more than the plan predicted** — 30 KB to an estimated ~50 KB, landing at **64.6 KB**
+across the roster, of which the `contract` blocks are 26.9 KB minified. The estimate was low because
+`failureModes` and `aria` run richer per component than the sketched example did. It still costs nothing,
+for the reason the plan gave: an agent reads `index.md` and then one Tier 2 file, and neither is a
+`meta.json`.
+
+**Where the two records sit.** The contributor docs are **about 210 KB across six files** at the top of
+`docs/`, against `agents/` at 95.4 KB across 40 — and **about 162 KB of that is `BUILD-STATUS.md` plus
+this file**, the two an agent must never open. The audience split is not a matter of taste; it is 162 KB of
+context that would otherwise be spent saying nothing about how a component behaves. `docs/agents/` is
+excluded here and counted with the machinery above, being sources rather than record. Rounded, not
+because the measurement is soft but because writing this paragraph changes the number it reports — the
+one figure in this section that cannot be exact.
 
 ---
 
@@ -466,10 +533,15 @@ verification**.
 | --- | --- | --- |
 | `AGENTS.md` | 2.5 KB | 2.4 KB (124 bytes spare) |
 | `agents/llms.txt` | 2.5 KB | 2.4 KB (65 bytes spare) |
-| `agents/pitfalls.md` | 16 KB | 15.0 KB, 26 entries in 8 groups |
-| `agents/testing.md` | 12 KB | 10.2 KB, 22 entries in 5 groups |
-| `agents/verify.md` | 8 KB | 6.0 KB, 17 entries in 3 groups |
-| `agents/conventions.md` | 7 KB | 5.1 KB, 11 entries in 6 groups |
+| `agents/pitfalls.md` | 16 KB | 14.7 KB, 26 entries in 8 groups |
+| `agents/testing.md` | 12 KB | 9.9 KB, 22 entries in 5 groups |
+| `agents/verify.md` | 8 KB | 5.8 KB, 17 entries in 3 groups |
+| `agents/conventions.md` | 7 KB | 5.0 KB, 11 entries in 6 groups |
+
+The four Tier 4 rows above were first written as 15.0, 10.2, 6.0 and 5.1 KB — the recorded byte counts
+(15,018 · 10,183 · 5,989 · 5,107) divided by 1000, while the Budget column and the generator both use
+1024. Corrected against the files on disk. Worth knowing because the mistake is invisible: every value
+was plausible, internally consistent, and wrong in the same direction.
 
 `docs/BUILD-STATUS.md` went from **118.1 KB to 91.9 KB**, and its gotchas list from 69 entries to 19.
 
@@ -534,10 +606,14 @@ exist, and a pitfall pointing at a renamed source marker.
 
 | Surface | Budget | Landed at |
 | --- | --- | --- |
-| `.claude/skills/a11y-library/SKILL.md` | 3 KB | 2.7 KB |
+| `.claude/skills/a11y-library/SKILL.md` | 3 KB | 2.8 KB |
 
 Nothing else moved. The skill adds no read-path row, so `AGENTS.md` and `llms.txt` are byte-identical to
 what phase 3 left — the one phase so far that cost Tier 0 nothing.
+
+That row first read 2.7 KB, which was 2,767 bytes — the size in the generator's own budget-failure
+message, quoted before the audience note was rewritten later in the same phase. The shipped file is 2,831
+bytes. Corrected in phase 6; see finding 1 there.
 
 Seven things worth keeping:
 
@@ -660,7 +736,76 @@ the anchoring heading renamed so the extraction finds nothing.
 **Still open, and a candidate for phase 6:** `README.md`'s markdown links are unchecked, so a moved
 `docs/at-support.md` or `docs/authoring-a-component.md` breaks silently on a public page. Different shape
 from the backticked-path check phase 4 added — links, not inline code — so it is a small separate test
-rather than a widening.
+rather than a widening. *Closed in phase 6, which had to add a link to that file and would otherwise have
+been documenting a gap while widening it.*
+
+---
+
+## What phase 6 cost
+
+Two hand-written files edited (`README.md`, `docs/BUILD-STATUS.md`), five misroutings and one omission
+fixed in `scripts/new-component.mjs`, one test added. No generated surface moved, so `check:agents` was 42
+both before and after. Seven things worth keeping:
+
+1. **A per-phase cost table went stale inside its own phase, and the stale number came from an error
+   message.** Phase 4 recorded `SKILL.md` at 2.7 KB — 2,767 bytes, which is the figure the generator
+   printed when the file blew its budget, *before* the audience note was rewritten later in that same
+   phase. The shipped file is 2,831 bytes. This is warning (a) in miniature and it is worse than a table
+   drifting over time: **a number lifted from a failure message describes a file that no longer exists.**
+   Measure the artifact, and measure it after the last edit.
+2. **Every arithmetic error in this record came from doing it by hand, and every one was caught by a
+   script.** Phase 3's four rows used KB = 1000 while the budgets used 1024; phase 4's row was stale;
+   "Phase 3, prepared" counted 62 gotchas where there were 69. Three mistakes, three phases, one
+   mechanism. Phase 6's numbers come from `stat` in a loop, which is why the tightest Tier 2 margin
+   (`dropdown`, 262 bytes) is in the table at all — nobody would have looked for it by hand.
+3. **The design's headline claim had never been tested against a file.** *"Under ~2k tokens"* has been at
+   the top of this document since phase 0. Tier 0 → 1 → 2 measures 6.4–7.1 KB, so it holds at roughly
+   1.7k tokens — with less room than the sentence implies, and only because Tier 2 came in at a median of
+   1.1 KB against a 1.8 KB budget. A claim that survives six phases without being measured is a claim
+   nobody has checked.
+4. **Phase 6 was told to record a gap and instead had to close it, because its one required edit widened
+   it.** Point (e) said to leave `README.md`'s unchecked links open. But the phase's single mandated change
+   *is* a new link in `README.md` — a fourth unchecked in-repo target on the repository's most-read page. Writing
+   "these are unchecked" while adding to them is not recording a gap, it is signing off on one. The test is
+   40 lines. The generated surfaces need no equivalent: every markdown link under `agents/` points outward
+   at a spec, so this is a hand-written-file problem only, which is what phase 5 had already said.
+5. **That test needs the same exclusion phase 5 argued for, and the interesting probe is the inverted
+   one.** `README.md` links `../theme-service`, outside the repo. Checking it would pass on a machine with
+   the sibling checkout and fail in CI — the reason phase 4's path check was never extended to `CLAUDE.md`.
+   So targets that escape the root are skipped, and the probe that matters points the sibling link at
+   something that does not exist and asserts the check *stays quiet*. Two ordinary probes went red (a moved
+   target; every in-repo link stripped, which must fail on the vacuity guard rather than pass over an empty
+   list) and the inverted one stayed green.
+6. **Two files still carried what phase 5 corrected elsewhere, and both were found by reading rather than
+   by any check.** `BUILD-STATUS.md`'s item 5 still said the accessibility findings have *three* homes and
+   that *nothing checks for the overlap*; phase 5 made it four and added the check, in `CLAUDE.md` and in
+   this file, and left the third copy alone. And `scripts/new-component.mjs` still sent a new component's
+   author to `docs/component-specs.md` for "the contract to build to" — the misrouting phase 5 fixed in
+   `CLAUDE.md`'s table — in **five** places: its own header, the `component.html` copy map, the
+   `component.js` core comment, the spec template's assertion comment, and the numbered next steps it
+   prints, whose step 1 was *"read the `<slug>` entry in `docs/component-specs.md` and build to it"* for a
+   slug that by definition has no entry. So **every component scaffolded since phase 2 was seeded with a
+   pointer to a pre-build planning
+   document that has no entry for three of the components already shipped.** The lesson is not the fix, it
+   is the sequence: the first grep found two, they were fixed, and only a second and wider grep found the
+   other three. **Grep for the pattern, not for the instance you noticed** — and a fact stated in five
+   places gets corrected in two.
+7. **The scaffolder never told anyone to regenerate, and had not since phase 1.** Its printed steps went
+   `check:tokens` → `build` → `playwright` → tick the roster, with no `npm run agents` anywhere. Follow
+   them exactly and the new component has no Tier 2 file, so `check:agents` fails at the end of a session
+   that thought it was finished — and the read path would have sent an agent to a file that is not there,
+   which is the coverage test's own reason for existing. Phase 1 added the generator, phase
+   2 added the obligation, and neither went back to the one script whose whole job is telling a new author
+   what to do. This is the phase 7 gap in its cheapest form — a component change with no agent-side
+   follow-through — and the fix was one line of output.
+
+**Verified:** `check:tokens` 34 files clean · `check:agents` 42 surfaces match · `npm run build` 35 pages ·
+**chromium 1127/1127** (1126 before; the new test is the difference).
+
+**Deliberately not done:** `scripts/new-component.mjs` does not yet scaffold an empty `contract` block.
+That is a phase 7 bullet already and phase 7's design decides the shape. What phase 6 did to that file is
+routing and instructions only — five wrong pointers, and the missing `npm run agents` step — which cost
+nothing to fix now and pre-empt nothing.
 
 ---
 
@@ -733,15 +878,21 @@ updated to match."*
 
 **Design it after phases 2–6, not before** — phase 2 defines the contract block, and the contract block
 is what a component edit has to keep in step, so designing the coupling first would be guessing at its
-own input.
+own input. Phases 2–6 are now done and this section was written before any of them; what follows is
+re-checked against what shipped, as of phase 6.
 
-**The gap is real and phase 1 does not close it.** `check:agents` only couples `meta.json` and
-`docs/agents/preamble.md` to the generated surfaces, because those are the only files the generator
-reads. It never opens `component.html`, `component.css` or `component.js`. So renaming an ARIA
-attribute, deleting a keyboard handler, or renaming a factory changes nothing the generator can see,
-and `check:agents` passes with the agent surfaces now lying about the component. Phase 2's tests 2–4
-close part of this — they assert the contract against the real markup — but only for what a contract
-claims, never for a component whose contract was never written or whose new behavior nobody documented.
+**The gap is real and the generator cannot close it.** `check:agents` couples `meta.json`,
+`docs/agents/preamble.md` and the four `docs/agents/*.src.md` files to the generated surfaces — those are
+every file the generator reads. It never opens `component.html`, `component.css` or `component.js`. So
+renaming an ARIA attribute, deleting a keyboard handler, or renaming a factory changes nothing the
+generator can see, and `check:agents` passes with the agent surfaces now lying about the component.
+
+**What already closes part of it, so a design does not re-buy it.** Phase 2's tests 2–4 assert a contract
+against the real markup, the real spec and the real `global.AC` registrations. Phase 3 added two checks
+that reach into component files from the other direction: every component a pitfall names by possessive
+must exist, and every `[MARKER]` a pitfall points at must still be in that component's CSS or JS. **What
+none of them cover is a component whose contract was never written, or whose new behavior nobody
+documented** — the checks verify claims, and silence makes no claim.
 
 Directions worth weighing when it is designed, recorded here so the thinking is not redone:
 
@@ -764,15 +915,24 @@ Directions worth weighing when it is designed, recorded here so the thinking is 
   component's one-line `useWhen` is now stale. That needs a stated convention — an edit-to-obligation
   table in `CLAUDE.md` and `docs/authoring-a-component.md`: change the roles in `component.html` →
   revisit `contract.aria`; change a key handler → `contract.keyboard` and the spec; rename the factory
-  → `contract.api`; rewrite the `summary` → `contract.useWhen`.
+  → `contract.api`; rewrite the `summary` → `contract.useWhen`. Phase 2 landed the first three as one
+  sentence in `CLAUDE.md`'s "Component folder shape"; the `summary` → `useWhen` row is the one still
+  missing, and it is the row no check can ever cover.
 - **`scripts/new-component.mjs` should scaffold an empty `contract` block**, so a new component starts
-  with the obligation visible rather than discovering it at review.
+  with the obligation visible rather than discovering it at review. Still true as of phase 6 — the
+  scaffolder writes no `contract` at all, so test 1 fails on a new component until someone adds one by
+  hand, which is a discoverable-at-review obligation exactly where the plan said it should not be. Phase 6
+  made the obligation visible in that file's own output — step 1 of what it prints is now writing the
+  block, and step 3 is `npm run agents` — and left the block itself to this phase.
 
 ---
 
-## Found during phase 1, and still open
+## Still open
 
-**A scaffold from `npm run new:component` publishes itself.** Neither
+Two things this work found and did not close. Everything else it found is either fixed or is phase 7's
+subject, listed in **Phase 7 — the requirement** above and not repeated here.
+
+**A scaffold from `npm run new:component` publishes itself.** Found during phase 1. Neither
 `src/site/pages/components/index.astro` nor `src/site/components/ComponentNav.astro` filters on
 `status`, and `[slug].astro` builds a page per slug, so an untouched scaffold reaches the site as a
 card and a sidebar row reading its own `TODO:` placeholder summary, plus an empty page — and the

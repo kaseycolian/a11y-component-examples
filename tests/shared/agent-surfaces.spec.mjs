@@ -386,6 +386,50 @@ test.describe('the contributor and agent conventions agree', () => {
   });
 });
 
+/* --- 11 · the human entry point's links resolve --------------------------- */
+
+/**
+ * `README.md` is the human door and the only hand-written file here with
+ * markdown links -- every link under `agents/` points outward at a spec, and
+ * `CLAUDE.md` writes its paths in backticks, which section 9 already covers.
+ * So a moved `docs/at-support.md` or `docs/agent-layer.md` breaks on the
+ * repository's most-read page and nothing says so.
+ *
+ * Different shape from section 9: a link target, not inline code, and the
+ * failure is a reader's dead end rather than a false claim.
+ */
+const MD_LINK = /\[[^\]]+\]\(([^)\s]+)\)/g;
+const EXTERNAL = /^(https?:|mailto:|#)/;
+
+test.describe('README links', () => {
+  test('every repo file README.md links to exists', () => {
+    const text = read(resolve(root, 'README.md'));
+    const missing = [];
+    let checked = 0;
+
+    for (const [, target] of text.matchAll(MD_LINK)) {
+      if (EXTERNAL.test(target)) continue;
+      const path = target.split('#')[0];
+      // A target that escapes the repo -- `../theme-service` -- is deliberately
+      // not checked. It would pass on a machine that has the sibling checkout
+      // and fail in CI, which is worse than not checking. Same reason phase 4's
+      // path check was not extended to CLAUDE.md.
+      const absolute = resolve(root, path);
+      if (!absolute.startsWith(resolve(root))) continue;
+      checked++;
+      if (!existsSync(absolute)) missing.push(target);
+    }
+
+    // A regex over prose that stops matching passes forever. Three is the floor
+    // the current README clears.
+    expect(checked, 'no in-repo markdown links found in README.md at all').toBeGreaterThan(2);
+    expect(
+      missing,
+      `README.md links to files that do not exist:\n  ${missing.join('\n  ')}`,
+    ).toEqual([]);
+  });
+});
+
 /* --- 7 · the generated surfaces match their sources ---------------------- */
 
 test.describe('generated surfaces', () => {

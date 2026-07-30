@@ -60,7 +60,9 @@ The same files are served under the site's base path, so a fetcher needs no chec
 entry point there. Claude Code picks up `.claude/skills/a11y-library/` on clone.
 
 Do not point an agent at `CLAUDE.md` or `docs/`. Those are for working *on* the library and cost tens of
-thousands of tokens to say nothing about how a component behaves.
+thousands of tokens to say nothing about how a component behaves. Why that side is built the way it is —
+the tiers, the budgets, the single manifest, and what each surface measured against its budget — is
+recorded for people in [docs/agent-layer.md](docs/agent-layer.md).
 
 ## Repository layout
 

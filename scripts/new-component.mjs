@@ -9,7 +9,9 @@
  * The templates already satisfy every convention the linter and the a11y gate
  * check for -- the token fallback chain, the motion gate, a forced-colors
  * block, the IIFE + destroy() shape. Fill in the behavior, do not re-derive
- * the boilerplate. See docs/component-specs.md for the contract to build to.
+ * the boilerplate. The contract to build to is meta.json's `contract` block --
+ * CLAUDE.md says what it owes -- and docs/component-specs.md has the up-front
+ * design decisions, for the components it has an entry for.
  */
 import { mkdir, writeFile, access } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -88,8 +90,9 @@ const html = `<!-- =============================================================
        Copy all three files whole for the library-grade version.
 
      THE CONTRACT (the same in every example)
-       TODO: the two or three attributes that make this work, from
-       docs/component-specs.md. This block is the reason the file exists.
+       TODO: the two or three attributes that make this work. The full contract
+       is the "contract" block in meta.json. This block is the reason the file
+       exists.
 
      ac-demo-* / ac-demo__* is scaffolding for this page only — the grid and the
      per-example headings. Never copy it into your app.
@@ -207,8 +210,8 @@ const js = `/* =================================================================
     /* === [CORE] ========================================================== */
 
     // TODO: query the parts, mint any ids that are missing, set the ARIA
-    // attributes, bind the listeners. See docs/component-specs.md for the
-    // contract this component has to meet.
+    // attributes, bind the listeners. The contract this component has to meet is
+    // the "contract" block in meta.json.
 
     var api = {
       destroy: function () {
@@ -333,9 +336,10 @@ test.beforeEach(async ({ page }) => {
   await page.goto(PAGE);
 });
 
-// Assert the ARIA contract and the keyboard map from docs/component-specs.md --
-// not merely that the thing rendered. A test that only checks for presence
-// would still pass if every attribute were wrong.
+// Assert the ARIA contract and the keyboard map from this component's meta.json
+// contract block -- not merely that the thing rendered. A test that only checks
+// for presence would still pass if every attribute were wrong. Every key that
+// block names has to be pressed here; agent-surfaces.spec.mjs checks that it is.
 
 test('TODO: exposes the right roles and names', async ({ page }) => {
   await expect(page.locator('.ac-${slug}')).toBeVisible();
@@ -365,9 +369,12 @@ console.log(`new-component: created src/library/components/${slug}/`);
 for (const [file] of files) console.log(`  ${file}`);
 console.log(`
 Next:
-  1. Read the "${slug}" entry in docs/component-specs.md and build to it.
-  2. Fill in meta.json (summary, tags, apg, wcag) and flip status to "stable".
-     The summary has its own voice rule -- CLAUDE.md > Writing style.
-  3. npm run check:tokens && npm run build
-  4. npx playwright test --project=chromium ${slug}
-  5. Tick the row in docs/BUILD-STATUS.md`);
+  1. Write the "contract" block in meta.json -- the aria, keyboard, states,
+     failureModes and api this component owes. CLAUDE.md > Component folder shape
+     says what it must carry; the suite asserts it against your own markup.
+  2. Fill in the rest of meta.json (summary, tags, apg, wcag) and flip status to
+     "stable". The summary has its own voice rule -- CLAUDE.md > Writing style.
+  3. npm run agents      (renders agents/components/${slug}.md from that contract)
+  4. npm run check:tokens && npm run build
+  5. npx playwright test --project=chromium ${slug}
+  6. Tick the row in docs/BUILD-STATUS.md`);
