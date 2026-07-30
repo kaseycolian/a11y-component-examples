@@ -2,10 +2,11 @@
 
 Why the agent-facing side of this library is shaped the way it is, and what it is made of.
 
-**Status: being built.** Phases 0, 1 and 2 are done — the generator runs, all four tiers ship, every
-component has a contract, and `npm run check:agents` plus `tests/shared/agent-surfaces.spec.mjs` gate
-them in CI. Phases 3–7 are ahead. The checklist below is the source of truth for how far it got;
-update it as each phase lands, and record what surprised you in the **What phase N cost** sections.
+**Status: being built.** Phases 0 through 3 are done — the generator runs, all four tiers ship, every
+component has a contract, the cross-cutting surfaces are written, and `npm run check:agents` plus
+`tests/shared/agent-surfaces.spec.mjs` gate them in CI. Phases 4–7 are ahead. The checklist below is
+the source of truth for how far it got; update it as each phase lands, and record what surprised you
+in the **What phase N cost** sections.
 
 This is a contributor document. An agent *consuming* the library should read `AGENTS.md` and
 `agents/`, never this file — the same way it should never read `BUILD-STATUS.md`.
@@ -55,23 +56,31 @@ Four tiers with hard budgets. An agent stops as soon as it has enough, and each 
 | 1 | `agents/index.md` | ~3.5 KB | Route to one component — slug, group, `useWhen`, tags, WCAG, files |
 | 2 | `agents/components/<slug>.md` | 1.8 KB | The answer: ARIA, keyboard, states, failure modes, API |
 | 3 | `library/components/<slug>/component.*` | as needed | The code to copy. Already served, unchanged |
-| 4 | `docs.md`, `agents/pitfalls.md` | as needed | The *why*, and the cross-cutting traps |
+| 4 | `library/components/<slug>/{docs.md,meta.json}` | as needed | The *why*, per component |
+| 4 | `agents/{pitfalls,conventions,verify,testing}.md` | ≤ 15 KB each | The cross-cutting traps |
 
 Tier 1 uses a new one-line `useWhen`, deliberately **not** `meta.json`'s `summary`: the summaries run
 ~50 words and are written as ledes for a human page.
 
-Cross-cutting, reachable from Tier 0:
+The cross-cutting set is one read-path row, not four, because Tier 0 has no room for four and the file
+names already say which is which:
 
-- **`agents/pitfalls.md`** (+ `.json`) — the transferable accessibility findings, grouped by topic
-  (names and labels · live regions · focus · forced colors · targets · CSS cascade · tables) and tagged
-  with the SC. This is the highest-value unique artifact in the repo: every item was paid for once by
-  a real failure.
-- **`agents/conventions.md`** — the copy-paste contract. The token chain, the motion gate, the
-  forced-colors block, the `ac-` prefix, IIFE + `destroy()`. Currently tangled together with
-  contributor instructions in `CLAUDE.md`.
+- **`agents/pitfalls.md`** — the transferable accessibility findings, grouped by topic (names and
+  labels · live regions · focus · forced colors · targets and pointers · color and contrast · CSS and
+  the cascade · tables and reflow) and tagged with the SC where there is an honest one. This is the
+  highest-value unique artifact in the repo: every item was paid for once by a real failure.
+- **`agents/conventions.md`** — the copy-paste contract with its reasoning. The token chain, the motion
+  gate, the forced-colors block, the `ac-` prefix, IIFE + `destroy()`. It is where Tier 0's compressed
+  claims get their *why*, which is what let Tier 0 shrink enough to afford this row.
 - **`agents/verify.md`** — how to check the result, distilled from `tests/shared/a11y.spec.mjs`: the
   ten checks, and the exceptions that make a naive sweep wrong.
 - **`agents/testing.md`** — the Playwright and axe harness findings, for an agent writing a11y tests.
+
+**No `pitfalls.json`.** The plan paired one with the markdown. There is no consumer: `index.json`
+exists because routing over the roster is a filtering job, while a reader of a 15 KB pitfalls file
+reads all of it, and the SC tags are in the markdown already. It would have been a second rendering of
+the same bytes with nothing pointing at it — phase 1's finding about `index.json`'s size, applied
+before paying for it rather than after.
 
 ---
 
@@ -88,6 +97,7 @@ HAND-WRITTEN — the only places to edit
   docs/agents/pitfalls.src.md                one block per transferable finding
   docs/agents/testing.src.md                 harness findings
   docs/agents/conventions.src.md             the copy-paste contract
+  docs/agents/verify.src.md                  how to check the result
         |
         v
   scripts/build-agent-surfaces.mjs   ->  one manifest  ->  every surface below
@@ -95,10 +105,15 @@ HAND-WRITTEN — the only places to edit
         +--> AGENTS.md                                                    committed
         +--> agents/index.md, agents/index.json                           committed
         +--> agents/components/<slug>.md                                  committed
-        +--> agents/{pitfalls,testing,conventions,verify}.md, pitfalls.json  committed
+        +--> agents/{pitfalls,conventions,verify,testing}.md              committed
         +--> .claude/skills/a11y-library/SKILL.md                         committed
         +--> public/llms.txt, public/agents/**       generated at build, gitignored
 ```
+
+The four `.src.md` files share one parser and one renderer. They carry three markers —
+`<!-- lede -->`, `<!-- group: Title -->`, `<!-- item: Title · 4.1.2 -->` — and the split is on the
+markers only, never on the prose, so a body passes through byte for byte. Same rule as the preamble's
+slots, and for the same reason: parsing prose is what got `component-specs.md` rejected as a source.
 
 Every generated file opens with
 `<!-- generated by scripts/build-agent-surfaces.mjs from meta.json + docs/agents/ — do not edit -->`.
@@ -207,14 +222,32 @@ one names the part and the selector it could not find.
       `BROKEN ON PURPOSE` comment bodies; `disclosure`, `dropdown` and `field` were backfilled from
       their `docs.md` and markup, having no spec entry at all. The shape shipped is the one in
       **Phase 2, as revised** below, not the one sketched further up — see **What phase 2 cost**.
-- [ ] **3 · Split the gotchas.** The transferable accessibility findings move to
-      `docs/agents/pitfalls.src.md`, the harness findings to `testing.src.md`, the build trivia stays
-      in `BUILD-STATUS.md`, and the duplicated stale-cache entry collapses to one. Then
-      `conventions.src.md` and `verify.md`.
+- [x] **3 · Split the gotchas.** The transferable accessibility findings moved to
+      `docs/agents/pitfalls.src.md`, the harness findings to `testing.src.md`, the build trivia stayed
+      in `BUILD-STATUS.md`, and the duplicated stale-cache entry collapsed to one. Then
+      `conventions.src.md` and `verify.src.md`. See **What phase 3 cost**; "Phase 3, prepared" below is
+      the classification it was built from and is kept as the record of what was decided before any of
+      it moved.
 - [ ] **4 · The Claude Code skill.** `.claude/skills/a11y-library/SKILL.md`, generated, a router only.
       Its `description` triggers on accessibility work; its body is the read path and the budgets, and
       it holds no duplicated content, so it cannot go stale. (`.gitignore` excludes only
-      `.claude/settings.local.json`, so this commits cleanly.)
+      `.claude/settings.local.json` — verified — so this commits cleanly.)
+      Four things to know before starting, all confirmed against the generator as it stands after
+      phase 3:
+      **(a) Write mode must not rebuild `.claude/` from scratch.** `main()` does
+      `rm(resolve(root, 'agents'), { recursive: true })` so a deleted component cannot leave an
+      authoritative-looking file behind. Extending that pattern to `.claude/` would delete
+      `settings.local.json`, which is machine-specific and gitignored and therefore unrecoverable.
+      Write the one file; never clear the tree.
+      **(b) `ownedOnDisk()` walks `agents/` and `AGENTS.md` only,** so orphan detection will not cover
+      the skill until its path is added. Without that, a renamed skill directory leaves a stale
+      `SKILL.md` that `--check` calls clean.
+      **(c) It needs YAML frontmatter** — `name` and `description` — which no other surface has. The
+      `description` is the whole routing mechanism, so it is the one string in this project where
+      keyword coverage beats brevity, and it is the opposite of every other rule here.
+      **(d) It does not touch Tier 0.** The skill is Tier 0 *for Claude Code* and adds no read-path
+      row, which matters because `llms.txt` has 65 bytes of headroom left and `AGENTS.md` 124. Give
+      `SKILL.md` its own budget in `PROSE_SURFACES`-style config rather than borrowing one.
 - [ ] **5 · Split the entry docs by audience.** `CLAUDE.md` states the two contracts up front —
       contributing to the library versus consuming it — and `README.md` points agents at `AGENTS.md`.
 - [ ] **6 · Close the record.** Update this file from plan to built state: what shipped, the measured
@@ -436,12 +469,85 @@ verification**.
 
 ---
 
+## What phase 3 cost
+
+| Surface | Budget | Landed at |
+| --- | --- | --- |
+| `AGENTS.md` | 2.5 KB | 2.4 KB (124 bytes spare) |
+| `agents/llms.txt` | 2.5 KB | 2.4 KB (65 bytes spare) |
+| `agents/pitfalls.md` | 16 KB | 15.0 KB, 26 entries in 8 groups |
+| `agents/testing.md` | 12 KB | 10.2 KB, 22 entries in 5 groups |
+| `agents/verify.md` | 8 KB | 6.0 KB, 17 entries in 3 groups |
+| `agents/conventions.md` | 7 KB | 5.1 KB, 11 entries in 6 groups |
+
+`docs/BUILD-STATUS.md` went from **118.1 KB to 91.9 KB**, and its gotchas list from 69 entries to 19.
+
+Eight things worth keeping:
+
+1. **The count in "Phase 3, prepared" was wrong.** It says 62 entries; a mechanical count says **69**,
+   splitting 28 → pitfalls, 21 → testing, 20 → local. The classification itself held up entry for
+   entry — only the total was off, because it was counted by hand while reading. Recorded rather than
+   quietly corrected, because the lesson is that a hand count in a design record is worth re-running
+   before anything depends on it, and this one was about to size a budget.
+2. **69 entries became 65 rendered ones.** The duplicate collapsed, the two tab-stop entries merged
+   into one, and the three "a modifier that never applies" entries — which `BUILD-STATUS.md` itself
+   calls members of one family — became a single pitfall with three mechanisms. The two observation
+   *tails* the prepared section said to cross-reference rather than repeat (`<output>` cannot be found
+   with `el.role`, `ariaSnapshot()` does not report a table demotion) merged into one testing entry.
+   Consolidation was the largest single quality gain in the phase: a build log accretes near-duplicates
+   because each one was true on the day it was written.
+3. **Tier 0 went over on the first render, by exactly the amount forecast** — 73 bytes in `AGENTS.md`,
+   132 in `llms.txt`, one new read-path row each. The prediction that there was no prose headroom left
+   was right, and the way out was not more cutting but the consolidation phase 1 had already planned
+   for: `copying`'s three "which…" clauses were the compressed reasoning, `conventions.md` now holds
+   the real reasoning, so the clauses became a pointer. Tier 0 keeps every claim and lost only the
+   explanations that now have a better home. **A budget that has to be paid for twice is a sign the
+   content wants to move, not that the budget is wrong.**
+4. **One grouped read-path row was the right call and would have been even if Tier 0 were roomy.** Four
+   rows would have spent ~600 bytes routing between four files whose names already route. The row cost
+   156 bytes and quotes the largest single file, because one fetch is what a reader actually pays.
+5. **The four surfaces needed a format, and it had to be markers.** `<!-- lede -->`,
+   `<!-- group: … -->`, `<!-- item: Title · 4.1.2 -->`, split on the markers only. Success criteria are
+   optional, and that is load-bearing: about a third of the pitfalls are *mechanisms* — how a failure
+   gets introduced, like a modifier that never applies — and inventing a criterion for those would make
+   every real tag less trustworthy. The generator checks the shape of the ones that are there
+   (`4.12` for `4.1.2` renders as a plausible tag and is wrong forever).
+6. **A self-describing format makes its own markers non-unique, and that broke a probe.** Each
+   `.src.md` explains its markers in the editorial header, so `String.replace('<!-- lede -->', …)` hit
+   the *documentation* and left the real marker intact — the probe came back green against a check that
+   works. Second time in this project a first-match-only replace produced a false negative; the fix is
+   a line-anchored `^…$` regex. **A green mutation probe is a claim about the probe until you read what
+   it changed.**
+7. **A `[MARKER]` reference in prose is machine-checkable, and prose in general is not.** The surfaces
+   earn their keep by naming the component that has each fix live — `badge`'s `[NAME]`, `effects`'
+   `[PATCH]`, `loading-button`'s `[FORCED]` — and a rename would break those silently. Two new tests
+   check the possessive form (`` `slug`'s ``) against the roster and each `[MARKER]` against that
+   component's CSS and JS. A third asserts the regexes still match something, because a pattern over
+   prose that stops matching passes forever. Widening past the possessive was tried and rejected: it
+   catches every backticked CSS property in the file.
+8. **The dangling references were in the entries that stayed.** Deleting 50 entries left three
+   survivors pointing at "the gotcha below" and "the focus probe above". Nothing checks cross-references
+   inside a markdown file, and they were only found by grepping for `above|below` afterwards — worth
+   doing as a step rather than hoping.
+
+**Verified:** `check:tokens` 34 files clean · `check:agents` 41 surfaces match · `agent-surfaces`
+**77/77 on chromium** (74 before; the three new tests are the difference). Ten mutations proved the new
+machinery can go red: a removed lede, a duplicate lede, an item before any group, prose under a group
+marker, an item with no body, an unknown marker kind, a malformed success criterion, a source edited
+without regenerating, a source pushed over its byte budget, a pitfall naming a component that does not
+exist, and a pitfall pointing at a renamed source marker.
+
+---
+
 ## Phase 3, prepared
 
-The gotchas list was read and classified but not moved. Recorded so the reading is not repeated —
-**do the additive half first** (write the `.src.md` files, render, confirm), and only then delete from
-`BUILD-STATUS.md`. Half-moved gotchas live in two places at once, which is the exact drift this design
-exists to prevent, and it is the one interruption that would leave the repo worse than untouched.
+Written before any of it moved, and kept as the record of what was decided. The count is wrong — see
+finding 1 in **What phase 3 cost** — but every classification below held.
+
+The sequencing constraint it names was the right one: **do the additive half first** (write the
+`.src.md` files, render, confirm), and only then delete from `BUILD-STATUS.md`. Half-moved gotchas live
+in two places at once, which is the exact drift this design exists to prevent, and it is the one
+interruption that would leave the repo worse than untouched.
 
 Measured: **62 entries**, splitting about **30 transferable · 22 harness · 17 repo-local** — close to
 the estimate in the phase list, and the file has grown since that estimate was made.

@@ -36,15 +36,22 @@ scripts/         sync-library (src -> public), check-tokens (linter), new-compon
                  build-agent-surfaces (renders AGENTS.md + agents/), rehype-scrollable-tables
                  (wraps docs.md tables so pages don't overflow at 320px)
 tests/           Site-shell specs (site-header) + the shared a11y gate every component must pass.
-AGENTS.md        GENERATED. The agent read path. Edit docs/agents/preamble.md, run npm run agents.
-agents/          GENERATED, committed. The index and the per-component contracts agents read.
-docs/agents/     Hand-written sources for the above.
+AGENTS.md        GENERATED. The agent read path. Edit docs/agents/, run npm run agents.
+agents/          GENERATED, committed. The index, the per-component contracts, and the four
+                 cross-cutting surfaces (pitfalls, conventions, verify, testing) agents read.
+docs/agents/     Hand-written sources for the above: preamble.md + four *.src.md.
 ```
 
 **`AGENTS.md` and everything under `agents/` are output, never input.** `npm run check:agents`
-re-renders them and fails CI on any difference, so a hand-edit is reverted work. Edit
-`docs/agents/preamble.md` or a `meta.json`, then `npm run agents`. The layer has hard byte budgets and
-the generator fails when prose pushes a surface over one — `docs/agent-layer.md` says why.
+re-renders them and fails CI on any difference, so a hand-edit is reverted work. Edit a file in
+`docs/agents/` or a `meta.json`, then `npm run agents`. The layer has hard byte budgets and the
+generator fails when prose pushes a surface over one — `docs/agent-layer.md` says why.
+
+**An accessibility finding has three homes and belongs in exactly one.** A fact about the platform that
+makes correct-looking markup wrong → `docs/agents/pitfalls.src.md`. A fact about Playwright or axe that
+makes a correct assertion wrong → `testing.src.md`. Anything about working *on* this repo → the gotchas
+list in `docs/BUILD-STATUS.md`. Writing it twice is the drift this layer exists to prevent, and nothing
+checks for it.
 
 `public/library/`, `public/theme/`, `public/agents/` and `public/llms.txt` are **generated** by
 `scripts/sync-library.mjs` and gitignored. Edit the source, never the copy.

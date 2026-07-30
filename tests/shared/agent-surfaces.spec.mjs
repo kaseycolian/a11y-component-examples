@@ -50,6 +50,7 @@ const COMPONENTS = readdirSync(componentsDir, { withFileTypes: true })
       files: meta.files ?? ['html', 'css', 'js'],
       contract: meta.contract ?? null,
       js: existsSync(resolve(dir, 'component.js')) ? read(resolve(dir, 'component.js')) : '',
+      css: existsSync(resolve(dir, 'component.css')) ? read(resolve(dir, 'component.css')) : '',
       spec: existsSync(specFile) ? read(specFile) : '',
     };
   })
@@ -196,6 +197,75 @@ test.describe('API signatures', () => {
       (c) => c.slug,
     );
     expect(wrong, `CSS-only components claiming an API:\n  ${wrong.join('\n  ')}`).toEqual([]);
+  });
+});
+
+/* --- 8 · the cross-cutting prose points at things that exist -------------- */
+
+/**
+ * The four Tier 4 surfaces are prose, and prose cannot be asserted. What *can*
+ * be asserted is the part of them that is a reference: they earn their keep by
+ * naming the component in this library that has each fix live, and a name is
+ * exactly the thing a rename breaks silently.
+ *
+ * Two forms are checked, both distinctive enough to match without parsing the
+ * sentence around them:
+ *
+ *   `badge`'s ...        a possessive, which prose here only uses for a slug
+ *   `jump-nav` is the precedent
+ *
+ * A mention in any other shape is not checked. That is a deliberate floor, not
+ * an oversight -- widening the pattern to catch `field` keeps ... would also
+ * catch every backticked CSS property in the file.
+ */
+const PROSE_SURFACES_OUT = ['pitfalls', 'conventions', 'verify', 'testing'].map((name) => ({
+  name,
+  text: read(resolve(root, `agents/${name}.md`)),
+}));
+
+const SLUG_REFERENCE = /`([a-z][a-z0-9-]*)`(?:'s?|\s+is the precedent\b)/g;
+const MARKER_REFERENCE = /`([a-z][a-z0-9-]*)`'?s? `(\[[A-Z]+\])`/g;
+
+test.describe('cross-cutting surfaces', () => {
+  test('every component a pitfall names still exists', () => {
+    const missing = [];
+
+    for (const { name, text } of PROSE_SURFACES_OUT) {
+      for (const [, slug] of text.matchAll(SLUG_REFERENCE)) {
+        if (!SLUGS.has(slug)) missing.push(`agents/${name}.md names \`${slug}\`, which is not a component`);
+      }
+    }
+
+    expect(missing, `dead references:\n  ${missing.join('\n  ')}`).toEqual([]);
+  });
+
+  test('every source-comment marker a pitfall points at is still in that component', () => {
+    // `effects`' `[PATCH]` is the only way a reader finds the block worth
+    // lifting. A section renamed in the CSS leaves the pitfall pointing at
+    // nothing, and nothing else in the repo would notice.
+    const dead = [];
+
+    for (const { name, text } of PROSE_SURFACES_OUT) {
+      for (const [, slug, marker] of text.matchAll(MARKER_REFERENCE)) {
+        const component = COMPONENTS.find((c) => c.slug === slug);
+        if (!component) continue; // the reference test above owns this case
+        if (!component.css.includes(marker) && !component.js.includes(marker)) {
+          dead.push(`agents/${name}.md points at ${slug}'s ${marker}, which is in neither its CSS nor its JS`);
+        }
+      }
+    }
+
+    expect(dead, `dead section markers:\n  ${dead.join('\n  ')}`).toEqual([]);
+  });
+
+  test('a reference is actually being found, so the checks above cannot pass vacuously', () => {
+    // Both patterns are regexes over prose. A rewrite that stopped using the
+    // possessive would make them match nothing and pass forever.
+    const slugs = PROSE_SURFACES_OUT.flatMap(({ text }) => [...text.matchAll(SLUG_REFERENCE)]);
+    const markers = PROSE_SURFACES_OUT.flatMap(({ text }) => [...text.matchAll(MARKER_REFERENCE)]);
+
+    expect(slugs.length, 'no component references found in agents/*.md at all').toBeGreaterThan(5);
+    expect(markers.length, 'no source-comment markers found in agents/*.md at all').toBeGreaterThan(0);
   });
 });
 

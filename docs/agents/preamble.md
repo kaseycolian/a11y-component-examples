@@ -9,9 +9,10 @@ generated. Then run `npm run agents` and commit this file together with what it 
 
 Tier 0 has a hard byte budget and the generator fails when prose pushes it over, so this is the one
 place in the repo where cutting a good sentence is the right call. `copying` is the block under the
-most pressure: it is deliberately compressed to claims without their reasoning, because a reader who
-wants the reasoning is one hop from a component's `docs.md`. An unknown slot is an error and so is a
-missing one; everything above the first marker is ignored, which is what lets this note sit here.
+most pressure: it is compressed to the claims alone, and `agents/conventions.md` now holds every
+reason, so a clause here that explains rather than states is the first thing to go. An unknown slot is
+an error and so is a missing one; everything above the first marker is ignored, which is what lets
+this note sit here.
 
 `title` is the `<h1>` of both files, and `intro`'s first paragraph is also the `llms.txt` blockquote —
 so keep that paragraph able to stand on its own.
@@ -25,9 +26,8 @@ Accessible component library
 Accessible UI components as folders of plain files — no build step, no dependencies. Read, copy,
 adapt.
 
-Plausible ARIA markup is the easy part. Which attribute the browser ignores, which state cue vanishes
-in Windows High Contrast, which focus move a screen reader never announces — that is what this
-library hands over.
+Plausible ARIA markup is the easy part. What the browser ignores, and what vanishes in High Contrast,
+is what this library hands over.
 
 <!-- slot: rules -->
 
@@ -47,11 +47,10 @@ anything written about them.
 Each component stands alone: CSS scoped to `.ac-<slug>`, an IIFE registering `window.AC.create<Name>`
 returning `destroy()`, no imports. A paste into a bare page works.
 
-Three conventions fail silently if stripped. Colors are `var(--ac-token, var(--theme-token, #literal))`,
-or the component stops following its host theme. Every component ends with
-`@media (forced-colors: active)`, which restores the state cues High Contrast deletes. Transitions
-gate through `calc(var(--ac-motion, var(--motion, 1)) * …)`, which is how `prefers-reduced-motion`
-reaches them.
+Three conventions fail silently if stripped: the `var(--ac-token, var(--theme-token, #literal))` color
+chain, the closing `@media (forced-colors: active)` block, and
+`calc(var(--ac-motion, var(--motion, 1)) * …)` on every duration. `agents/conventions.md` says what
+each one is protecting.
 
 <!-- slot: outro -->
 
