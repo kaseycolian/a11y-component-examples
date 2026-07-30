@@ -56,12 +56,24 @@ src/library/components/<slug>/
   component.html   canonical accessible markup (a fragment, not a document)
   component.css    scoped to .ac-<slug>
   component.js     IIFE -> window.AC.create<Name> + auto-init block
-  meta.json        slug, name, group, order, summary, tags, apg, wcag, status, files
+  meta.json        slug, name, group, order, summary, tags, apg, wcag, status, files, contract
   docs.md          rendered on the page below the code panel
   tests/<slug>.spec.mjs
 ```
 
-`meta.json` `group` must be one of the ids in `src/site/lib/registry.mjs` `GROUPS`.
+`meta.json` `group` must be one of the ids in `src/site/lib/groups.mjs` `GROUPS`.
+
+`meta.json` `contract` is the agent-facing ARIA contract — `useWhen`, `aria`, `keyboard`, `states`,
+`failureModes`, `api`, `seeAlso` — and it renders to `agents/components/<slug>.md`. It is **asserted
+against the component**, so three of its fields carry an obligation:
+
+- `aria` is what must be in the markup you copy. An attribute that exists only in a transient state
+  (`aria-busy` while pending, `aria-invalid` after a failed validation) goes in `states`.
+- a key in `keyboard` must be pressed by `tests/<slug>.spec.mjs`, unless its effect starts `native:`.
+- `api` names factories really registered as `global.AC.<name>`; the demo-page wiring is left out.
+
+Change the roles in `component.html`, a key handler, or a factory name, and revisit the contract in the
+same commit — `tests/shared/agent-surfaces.spec.mjs` is what tells you if you didn't.
 
 ## Non-negotiable conventions
 

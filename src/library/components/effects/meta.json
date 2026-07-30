@@ -21,5 +21,32 @@
   "wcag": ["1.4.3", "1.4.11", "2.1.1", "2.2.2", "2.4.7", "4.1.2"],
   "status": "stable",
   "files": ["html", "css"],
-  "demoNote": "The one page here whose subject is not a component this library owns: these five classes ship in theme-service's effects.css. No JavaScript. Examples 2 and 3 are broken on purpose and live, and example 5 is about the header's Reduce motion toggle."
+  "demoNote": "The one page here whose subject is not a component this library owns: these five classes ship in theme-service's effects.css. No JavaScript. Examples 2 and 3 are broken on purpose and live, and example 5 is about the header's Reduce motion toggle.",
+  "contract": {
+    "useWhen": "Background decoration, and the two accessibility rules its own file lacks.",
+    "aria": {
+      "a scroll container": [
+        "tabindex=0",
+        "role=region",
+        "aria-label"
+      ]
+    },
+    "keyboard": [
+      [
+        "Tab",
+        "a scrolling box is a stop, so it needs a role, a name and a ring"
+      ]
+    ],
+    "failureModes": [
+      "fx-grid on a host with no isolation:isolate, so the z-index:-1 backdrop paints behind it",
+      "a gradient sampled at its endpoints, which are two corners nobody puts text in",
+      "decoration carrying meaning on its own, which forced colors deletes outright",
+      "two motion gates with different reach — gate through the token, not the selector"
+    ],
+    "seeAlso": [
+      "motion-preferences",
+      "focus-ring",
+      "data-table"
+    ]
+  }
 }

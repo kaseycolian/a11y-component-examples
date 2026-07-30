@@ -2,61 +2,58 @@
 
 # Component index
 
-Pick one, then read `library/components/<slug>/component.html` and its siblings.
-
-Keywords are what tell one component from another, so the ones true of most of the library are
-left off every row: `forced-colors`, `live-region`, `no-js`. Assume them.
+Pick one, then read `agents/components/<slug>.md` — not this file twice.
 
 ## Foundations
 
-- **skip-link** · bypass-blocks, 2.4.1, tabindex, focus, visually-hidden
-- **visually-hidden** · sr-only, clip-path, accessible-name, aria-label, focus
-- **focus-ring** · focus-visible, outline, outline-offset, scroll-margin-top
-- **live-region** · role-status, role-alert, role-log, aria-live, aria-atomic, announcer, 4.1.3
-- **typography** · type-scale, headings, rem, line-height, text-spacing, contrast, links
-- **motion-preferences** · prefers-reduced-motion, animation, vestibular, tokens, cascade, matchmedia, pause-stop-hide
-- **effects** · theme-service, decoration, gradient, contrast, stacking-context, isolation, scrollbar, motion
+- **skip-link** — The first focusable thing on the page, and a target that accepts focus.
+- **visually-hidden** — Text for screen readers only, in nine declarations that all matter.
+- **focus-ring** — The visible focus indicator, and what clips or hides one by accident.
+- **live-region** — Announcing a change, to a region that was already being listened to.
+- **typography** — Visual text classes that carry no semantics at all.
+- **motion-preferences** — One motion token: a page can add the restriction, never override the OS.
+- **effects** — Background decoration, and the two accessibility rules its own file lacks.
 
 ## Buttons & Actions
 
-- **button** · type, disabled, aria-disabled, target-size, focus-visible, semantics
-- **icon-button** · aria-label, accessible-name, svg, label-in-name, target-size
-- **loading-button** · aria-busy, aria-disabled, accessible-name, spinner, reduced-motion
-- **chip-toggle** · button, aria-pressed, filter, toolbar, roving-tabindex, accessible-name
+- **button** — A real button, plus why a div with a click handler is not one.
+- **icon-button** — A button whose only label is an attribute, at a size a finger can hit.
+- **loading-button** — A button that is working, saying so to someone who cannot see the spinner.
+- **chip-toggle** — A filter you switch on and off: a button that remembers, not a checkbox.
 
 ## Forms & Inputs
 
-- **field** · label, hint, error, aria-describedby, aria-invalid, validation, alert
-- **text-input** · autocomplete, inputmode, type, readonly, placeholder
-- **input-group** · button, addon, affix, password, clipboard
-- **textarea** · counter, autogrow, resize, readonly
-- **native-select** · optgroup, appearance-none, os-picker, multiple
-- **radio-group** · fieldset, legend, keyboard, required
-- **checkbox** · indeterminate, mixed, select-all, fieldset
-- **switch** · toggle, checkbox, role-switch, aria-disabled
-- **fieldset-group** · legend, role-group, validation, aria-describedby, disabled
+- **field** — A label, a hint and an error on one control, wired so both stay announced.
+- **text-input** — A text field, with the type and autocomplete that make it fillable.
+- **input-group** — A text input with a button joined to it, both reachable at 200% zoom.
+- **textarea** — A multi-line field you can still resize, and a counter that is not chatty.
+- **native-select** — The native select, which is the better default on a phone.
+- **radio-group** — One answer out of a few, where the arrows both move and choose.
+- **checkbox** — A native checkbox, kept focusable under whatever you draw over it.
+- **switch** — An on/off that applies immediately, with the thumb as the second cue.
+- **fieldset-group** — Related controls under one question, named by a legend.
 
 ## Overlays & Disclosure
 
-- **disclosure** · accordion, expand, collapse, aria-expanded, progressive-enhancement
-- **dropdown** · listbox, select, combobox, popover, progressive-enhancement, top-layer
-- **modal** · dialog, alertdialog, focus-trap, top-layer, scroll-lock
-- **drawer** · dialog, sheet, modal, focus-trap, popover, top-layer, scroll-lock
-- **tooltip** · toggletip, aria-describedby, hover, focus, 1.4.13, title
+- **disclosure** — A button that shows and hides the region right after it.
+- **dropdown** — A custom select, for when the native one cannot be styled the way you need.
+- **modal** — A native dialog over the page, and the ARIA you must not add to it.
+- **drawer** — A panel from a screen edge. The whole component is the focus management.
+- **tooltip** — A description on hover and focus, plus the toggletip for touch.
 
 ## Navigation
 
-- **tabs** · tablist, tabpanel, roving-tabindex, keyboard, aria-selected, aria-current
-- **jump-nav** · in-page, anchor, aria-current, scroll-margin, intersection-observer, landmark, focus
+- **tabs** — Swap panels in place. Not for moving between pages; that is jump-nav.
+- **jump-nav** — In-page links to sections, where focus has to actually land on the target.
 
 ## Feedback & Status
 
-- **notice** · alert, role-status, error-message, non-text-contrast, focus-management
-- **status-text** · label, visually-hidden, generated-content, accessible-name, non-text-contrast
-- **badge** · count, accessible-name, visually-hidden, icon-button, non-text-contrast
-- **result-panel** · copy, clipboard, composition, output, reflow
+- **notice** — An inline message: the word carries the tone, the icon carries nothing.
+- **status-text** — A one-word status, at the scale where there is room for nothing else.
+- **badge** — A count on a control, where the digits are not the thing being announced.
+- **result-panel** — A computed value, with exactly one thing inside it that talks.
 
 ## Data Display
 
-- **data-table** · caption, scope, columnheader, rowheader, scroll-region, responsive, generated-content
-- **prose-surface** · long-form, scroll-region, blockquote, figcaption, pre, separator, cms
+- **data-table** — A real table: the caption names it, and it scrolls instead of becoming cards.
+- **prose-surface** — A scrolling box of prose, named from the heading inside it.

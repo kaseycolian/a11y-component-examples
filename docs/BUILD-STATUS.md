@@ -40,18 +40,20 @@ same session tightened the on-page copy rule (item 0b).
 record and item 5 below tracks it. It is the current work, ahead of batch F. Read that file before
 touching `AGENTS.md`, `agents/`, `.claude/`, or `scripts/build-agent-surfaces.mjs`; the short version
 is that agents get a four-tier read path with hard token budgets, every surface is rendered from one
-manifest so they cannot drift, and the human pages are not touched. **Phases 0 and 1 are done** —
-`npm run agents` writes the surfaces, `npm run check:agents` fails if any of them drifts from its
-source, and **phase 2 is next: a `contract` block per `meta.json`, plus the accuracy tests.** Nothing
-under `agents/` or `AGENTS.md` is hand-editable; edit `docs/agents/preamble.md` or a `meta.json`.
+manifest so they cannot drift, and the human pages are not touched. **Phases 0, 1 and 2 are done** —
+all four tiers ship, every component has a `contract` block, `npm run check:agents` fails if any
+surface drifts from its source, and `tests/shared/agent-surfaces.spec.mjs` fails if a contract lies
+about the markup. **Phase 3 is next: splitting the gotchas below into `docs/agents/pitfalls.src.md`
+and `testing.src.md`.** Nothing under `agents/` or `AGENTS.md` is hand-editable; edit
+`docs/agents/preamble.md` or a `meta.json`.
 
 ### The steps, in order
 
-**Step 1 — batch F**, `app-url-maker` then `app-page-to-markdown`. They compose the others and every
-piece they need now exists. `app-page-to-markdown`'s scrollable preview is `prose-surface` plus
-`effects`' `fx-scroll` and its `[PATCH]` ring — build it out of those rather than from scratch. The
-gate now covers each new component the moment its folder exists, so a batch F page that ships an
-accent as text, or a target under 24px, is red before it is reviewed.
+**Step 1 — batch F**, `app-page-to-markdown`. It composes the others and every piece it needs now
+exists. Its scrollable preview is `prose-surface` plus `effects`' `fx-scroll` and its `[PATCH]` ring —
+build it out of those rather than from scratch. The gate now covers each new component the moment its
+folder exists, so a batch F page that ships an accent as text, or a target under 24px, is red before
+it is reviewed.
 
 **Then** item 3 (docs) and item 4 (deploy), plus the two copy sweeps 0a and 0b, which can land any
 time and pair naturally with each other.
@@ -123,7 +125,7 @@ Build in this order. The order is the dependency graph, not a preference.
 | ~~**C**~~ | ~~`notice` → `status-text` → `badge` → `result-panel`~~ | **Done.** Closed `feedback-status` |
 | ~~**D**~~ | ~~`tabs` → `jump-nav`~~ | **Done.** Closed `navigation` |
 | ~~**E**~~ | ~~`data-table` → `prose-surface`~~ | **Done.** Closed `data-display` |
-| **F** | `app-url-maker` → `app-page-to-markdown` | **last.** They compose the others and cannot be built before them |
+| **F** | `app-page-to-markdown` | **last.** It composes the others and cannot be built before them |
 
 Cross-batch notes that will otherwise be rediscovered:
 
@@ -804,7 +806,6 @@ take their logic and not their layout. See item 1 under remaining work.
 **`data-display` is complete.**
 
 ### compositions
-- [ ] `app-url-maker`
 - [ ] `app-page-to-markdown`
 
 ---
@@ -952,10 +953,23 @@ this 113 KB file first. The design record has the measurements, the four-tier re
 budgets, the one-manifest generator that keeps every surface in sync, and the accuracy tests that
 assert the hand-written contracts against the real markup.
 
-**Phases 0 and 1 are done.** Tier 0 and Tier 1 ship — `AGENTS.md` at 2.4 KB, `agents/index.md` at
-3.2 KB, `agents/index.json`, `agents/llms.txt` — all rendered by `scripts/build-agent-surfaces.mjs`
-and gated by `npm run check:agents` in `verify` and in CI. Phases 2–6 are the checklist at the bottom
-of that file; keep it current there rather than duplicating it here.
+**Phases 0, 1 and 2 are done.** All four tiers ship — `AGENTS.md` at 2.4 KB, `agents/index.md` at
+3.2 KB, `agents/index.json`, `agents/llms.txt`, and a per-component contract in
+`agents/components/<slug>.md` at 0.8–1.5 KB — all rendered by `scripts/build-agent-surfaces.mjs` and
+gated by `npm run check:agents` in `verify` and in CI, plus
+`tests/shared/agent-surfaces.spec.mjs` in the suite. **A component now costs an agent about 1.1 KB to
+answer.** Phases 3–7 are the checklist at the bottom of that file; keep it current there rather than
+duplicating it here.
+
+Two things from phase 2 that outlive it:
+
+- **A contract's `aria` block is what must be in the markup you copy** — so an attribute that exists
+  only in a transient state (`aria-busy` while pending, `aria-invalid` after a failed validation)
+  belongs in `states`, not `aria`. The browser check asserts against the initialized demo at rest and
+  will fail otherwise. It caught `loading-button` in the same session the rule was written down.
+- **A key documented in a contract must be pressed by that component's own spec**, unless its effect
+  starts `native:` — the browser owns those, and testing them would be testing Chromium. Adding a key
+  to a `contract.keyboard` therefore means adding a press to `tests/<slug>.spec.mjs`.
 
 Three things from phase 1 that outlive it:
 
@@ -967,11 +981,13 @@ Three things from phase 1 that outlive it:
   `preamble.md` and `tabs/meta.json` during the phase and reached a generated surface unnoticed. Never
   round-trip a repo file through `Get-Content -Raw` / `Set-Content`; use the editor, or
   `git checkout --` to undo it.
-- **`app-url-maker` was deleted** rather than filtered. It was a `new:component` scaffold from the
-  halted batch F, never committed, and the next build would have published its `TODO:` summary. The
-  gap it exposed is still open: nothing filters `status !== 'draft'` out of the human index, nav or
-  `getStaticPaths`, so scaffolding a component can still publish placeholder prose. Worth closing next
-  time those pages are open.
+- **A `new:component` scaffold can publish itself.** Nothing filters `status !== 'draft'` out of the
+  human index, the nav or `getStaticPaths`, so an untouched scaffold reaches the site as a card and a
+  sidebar row reading its own `TODO:` placeholder summary, plus an empty page — and the a11y gate
+  starts driving it. Found during phase 1, with a scaffold that was sitting in the tree; deleting it
+  was the fix that session, but the gap is still open. Worth closing next time those pages are open.
+  The agent surfaces are covered either way: the generator carries `status` through to
+  `agents/index.{md,json}` and marks any non-stable component on its index row.
 
 ### 4. Final verification
 

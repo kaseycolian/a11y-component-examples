@@ -9,5 +9,39 @@
   "wcag": ["1.3.1", "1.3.5", "1.4.3", "2.4.6", "2.5.8", "3.3.2"],
   "status": "stable",
   "files": ["html", "css"],
-  "demoNote": "No JavaScript on this page. A text input that needs a script to be accessible is a broken one."
+  "demoNote": "No JavaScript on this page. A text input that needs a script to be accessible is a broken one.",
+  "contract": {
+    "useWhen": "A text field, with the type and autocomplete that make it fillable.",
+    "aria": {
+      "the label": [
+        "for"
+      ],
+      "the control": [
+        "autocomplete",
+        "aria-describedby"
+      ]
+    },
+    "keyboard": [
+      [
+        "Tab",
+        "native: nothing here needs a key handler"
+      ]
+    ],
+    "states": [
+      "invalid",
+      "disabled",
+      "readonly"
+    ],
+    "failureModes": [
+      "no autocomplete — SC 1.3.5, and the most-skipped criterion in this group",
+      "a placeholder standing in for the label, gone the moment anyone types",
+      "type=text for an email or a phone number, so the phone keyboard is the wrong one",
+      "aria-label instead of a visible label, which find-in-page and translation never see"
+    ],
+    "seeAlso": [
+      "field",
+      "textarea",
+      "input-group"
+    ]
+  }
 }

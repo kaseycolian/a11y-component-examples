@@ -9,5 +9,45 @@
   "wcag": ["1.3.1", "1.4.1", "1.4.10", "2.1.1", "2.4.6", "2.4.7", "2.5.8", "3.3.1", "3.3.2", "4.1.2", "4.1.3"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Uncheck everything in example 4 and the group says what is wrong — a rule `required` cannot express. Example 5 locks the same group twice: `disabled` cascades and takes the keyboard with it, `aria-disabled` cascades to nothing and keeps the reason reachable."
+  "demoNote": "Uncheck everything in example 4 and the group says what is wrong — a rule `required` cannot express. Example 5 locks the same group twice: `disabled` cascades and takes the keyboard with it, `aria-disabled` cascades to nothing and keeps the reason reachable.",
+  "contract": {
+    "useWhen": "Related controls under one question, named by a legend.",
+    "aria": {
+      "each control": [
+        "aria-describedby"
+      ],
+      "the error": [
+        "role=alert"
+      ]
+    },
+    "keyboard": [
+      [
+        "Tab",
+        "one stop per control — a fieldset is not one stop"
+      ],
+      [
+        "Space",
+        "toggles a checkbox inside it"
+      ]
+    ],
+    "states": [
+      "invalid",
+      "disabled"
+    ],
+    "failureModes": [
+      "role=group on a fieldset, replacing working semantics with hand-written ones",
+      "aria-label on the fieldset instead of a legend, so the group is named for AT and untitled on screen",
+      "the legend not the first child, where it stops being the name",
+      "the error on the fieldset's own description, which is read inconsistently — put the id on every control",
+      "a legend as a flex item, which older Safari refuses: wrap the body in a div"
+    ],
+    "api": [
+      "AC.createFieldsetGroup(root, options) -> { validate, count, inputs, element, destroy }"
+    ],
+    "seeAlso": [
+      "radio-group",
+      "checkbox",
+      "field"
+    ]
+  }
 }

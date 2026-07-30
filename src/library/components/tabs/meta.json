@@ -18,5 +18,57 @@
   "wcag": ["1.3.1", "1.4.1", "2.1.1", "2.4.3", "2.4.7", "2.5.8", "4.1.2"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Examples 2 to 5 are live. Example 2 asks the browser which elements it will really give focus to and prints every stop three strips have; example 3 counts the panels opened while arrowing across; example 4 names the next thing Tab reaches after the selected tab; example 5 puts a row of links wearing role=tab beside the same links in a nav."
+  "demoNote": "Examples 2 to 5 are live. Example 2 asks the browser which elements it will really give focus to and prints every stop three strips have; example 3 counts the panels opened while arrowing across; example 4 names the next thing Tab reaches after the selected tab; example 5 puts a row of links wearing role=tab beside the same links in a nav.",
+  "contract": {
+    "useWhen": "Swap panels in place. Not for moving between pages; that is jump-nav.",
+    "aria": {
+      "the strip": [
+        "role=tablist",
+        "aria-label"
+      ],
+      "each tab": [
+        "role=tab",
+        "aria-selected",
+        "aria-controls",
+        "tabindex"
+      ],
+      "each panel": [
+        "role=tabpanel",
+        "aria-labelledby",
+        "tabindex=0"
+      ]
+    },
+    "keyboard": [
+      [
+        "ArrowLeft / ArrowRight",
+        "move and select, since the panels are already in the DOM"
+      ],
+      [
+        "Home / End",
+        "first / last tab"
+      ],
+      [
+        "Tab",
+        "one stop for the strip, then into the panel"
+      ]
+    ],
+    "states": [
+      "selected",
+      "disabled"
+    ],
+    "failureModes": [
+      "every tab at tabindex=0, so the strip is as many stops as it has tabs",
+      "unselected panels hidden with opacity, which hides them from nobody — their links are still stops",
+      "no tabindex on the panel, so Tab steps over it and its name is never read",
+      "links wearing role=tab, announcing as a widget while aria-controls names panels nobody built"
+    ],
+    "api": [
+      "AC.createTabs(root, options) -> { select, selected, tabs, panels, destroy }"
+    ],
+    "seeAlso": [
+      "jump-nav",
+      "disclosure",
+      "chip-toggle"
+    ]
+  }
 }

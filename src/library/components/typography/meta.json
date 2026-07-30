@@ -9,5 +9,22 @@
   "wcag": ["1.4.1", "1.4.3", "1.4.4", "1.4.10", "1.4.12", "2.4.6"],
   "status": "stable",
   "files": ["html", "css"],
-  "demoNote": "No JavaScript on this page. Examples 3, 4 and 5 each carry a failure that is live rather than described — the third is a contrast ratio that appears nowhere in the CSS, and the fifth needs one click of a checkbox."
+  "demoNote": "No JavaScript on this page. Examples 3, 4 and 5 each carry a failure that is live rather than described — the third is a contrast ratio that appears nowhere in the CSS, and the fifth needs one click of a checkbox.",
+  "contract": {
+    "useWhen": "Visual text classes that carry no semantics at all.",
+    "failureModes": [
+      "a div wearing a heading class, which is styling and not a heading",
+      "opacity for muted text, which composites against whatever is behind it",
+      "sizes in px, which ignore the browser’s own default size (SC 1.4.4)",
+      "a bare vw inside clamp(), which text-only zoom does not move",
+      "letter-spacing, text-transform and text-shadow left undeclared, so the host page cascades in",
+      "a link in body copy with color alone: it owes 3:1 against the surrounding text, and an underline",
+      "a fixed height on a box of text (SC 1.4.12) — min-height is the fix"
+    ],
+    "seeAlso": [
+      "prose-surface",
+      "focus-ring",
+      "visually-hidden"
+    ]
+  }
 }

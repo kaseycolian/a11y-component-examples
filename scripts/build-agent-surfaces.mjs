@@ -56,8 +56,21 @@ const BUDGETS = {
   'agents/index.md': 3_584,
 };
 
-/** Tier 2 files are per-component, so the budget is per file. Asserted here and in the spec. */
-export const TIER_2_BUDGET = 800;
+/**
+ * Tier 2 files are per-component, so the budget is per file. Asserted here and
+ * in the spec.
+ *
+ * The plan said 800, from the 626-byte median of a docs/component-specs.md
+ * entry. That measured the wrong thing: an entry is prose bullets only, while a
+ * rendered contract also carries ~250 bytes of frame (the do-not-edit header,
+ * the folder line, the WCAG and APG references) plus a keyboard map and a
+ * failure-mode list, neither of which a spec entry had. Written out, the roster
+ * measured 0.8 KB to 1.5 KB, so 800 would have been met by deleting
+ * `failureModes` -- the one field worth the most. This is the measured maximum
+ * rounded up, which leaves the richest component room for about two more entries
+ * and still makes a Tier 2 read cost roughly 450 tokens.
+ */
+export const TIER_2_BUDGET = 1_800;
 
 /* -------------------------------------------------------------------------- */
 /* The manifest                                                               */
@@ -116,6 +129,67 @@ async function readSlots() {
   return Object.fromEntries(SLOTS.map((name) => [name, found.get(name)]));
 }
 
+/**
+ * The shape of a `contract` block. Only `useWhen` and `failureModes` are
+ * required -- a CSS-only component has no keyboard map and no API, and a stub
+ * with empty sections would cost an agent a fetch to learn nothing.
+ */
+const CONTRACT_FIELDS = ['useWhen', 'aria', 'keyboard', 'states', 'failureModes', 'api', 'seeAlso'];
+
+/**
+ * Check the shape of a contract, and nothing about the world.
+ *
+ * A contract is rendered straight into a Tier 2 file, so a malformed one ships
+ * as broken markdown instead of as an error -- and the budget check would then
+ * be measuring garbage. The checks that matter more, that the ARIA is really in
+ * the markup and the keys are really tested, need a browser and a running page;
+ * they live in tests/shared/agent-surfaces.spec.mjs.
+ *
+ * Deliberately no `pattern` field: meta.json already has `apg` with that URL,
+ * and a second place to put it is a second place for it to be wrong.
+ */
+function validateContract(slug, c) {
+  const bad = (msg) => {
+    throw new Error(`${slug}/meta.json "contract" -- ${msg}`);
+  };
+  const strings = (value, field) => {
+    if (!Array.isArray(value) || !value.length) bad(`${field} must be a non-empty array`);
+    if (value.some((s) => typeof s !== 'string' || !s.trim())) {
+      bad(`${field} must hold non-empty strings`);
+    }
+  };
+
+  const unknown = Object.keys(c).filter((key) => !CONTRACT_FIELDS.includes(key));
+  if (unknown.length) bad(`unknown field(s): ${unknown.join(', ')}. Have: ${CONTRACT_FIELDS.join(', ')}`);
+
+  if (typeof c.useWhen !== 'string' || !c.useWhen.trim()) bad('useWhen is required');
+  // It is also the component's row in agents/index.md, where the whole roster
+  // shares one budget, so a paragraph here is spent out of everyone else's line.
+  if (c.useWhen.includes('\n')) bad('useWhen is one line -- it is also the index row');
+
+  // The field an author is most tempted to skip and the one worth the most.
+  // Asserting only that it exists is weak; it is still the check that stops the
+  // block from becoming a restatement of the markup.
+  strings(c.failureModes, 'failureModes');
+
+  if (c.aria !== undefined) {
+    if (!c.aria || typeof c.aria !== 'object' || Array.isArray(c.aria)) {
+      bad('aria must be an object of part -> attributes');
+    }
+    for (const [part, attrs] of Object.entries(c.aria)) strings(attrs, `aria["${part}"]`);
+  }
+  if (c.keyboard !== undefined) {
+    if (!Array.isArray(c.keyboard) || !c.keyboard.length) bad('keyboard must be a non-empty array');
+    for (const pair of c.keyboard) {
+      if (!Array.isArray(pair) || pair.length !== 2) bad('keyboard entries are [key, effect] pairs');
+      strings(pair, 'a keyboard entry');
+    }
+  }
+  for (const field of ['states', 'api', 'seeAlso']) {
+    if (c[field] !== undefined) strings(c[field], field);
+  }
+}
+
 const GROUP_INDEX = new Map(GROUPS.map((g, i) => [g.id, i]));
 
 /**
@@ -149,6 +223,8 @@ async function readComponents() {
       );
     }
 
+    if (meta.contract) validateContract(slug, meta.contract);
+
     components.push({
       slug: meta.slug ?? slug,
       name: meta.name ?? slug,
@@ -159,9 +235,6 @@ async function readComponents() {
       wcag: meta.wcag ?? [],
       status: meta.status ?? 'stable',
       files: meta.files ?? ['html', 'css', 'js'],
-      // Arrives in phase 2, one meta.json at a time. Everything downstream
-      // renders it when present and skips it when absent, so adding contracts
-      // is a data change with no code change.
       contract: meta.contract ?? null,
     });
   }
@@ -224,7 +297,9 @@ function readPath(manifest, rendered) {
       tier: 1,
       kind: 'file',
       path: 'agents/index.md',
-      note: 'The roster. Find your component, then stop reading this file.',
+      // Not "stop reading this file" -- the note is rendered inside AGENTS.md
+      // and llms.txt, where "this file" reads as the wrong one.
+      note: 'The roster. Find your component, then stop.',
     },
     {
       tier: 1,
@@ -272,7 +347,9 @@ const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
 const UNROUTABLE_TAG_SHARE = 0.2;
 
 /**
- * Keywords worth spending an index line on.
+ * Keywords worth spending an index line on, for a component with no `useWhen`
+ * yet. A one-line "what it is for" routes better than three keywords do, so a
+ * row shows tags only as the fallback.
  *
  * Dropped: tags that restate the slug (the row already leads with it), and tags
  * common enough to match everything. `name` is dropped from the row entirely for
@@ -292,35 +369,19 @@ function renderIndex(manifest) {
     for (const tag of c.tags) df.set(tag, (df.get(tag) ?? 0) + 1);
   }
   const ceiling = manifest.components.length * UNROUTABLE_TAG_SHARE;
-  const common = [...df]
-    .filter(([, n]) => n > ceiling)
-    .map(([tag]) => tag)
-    .sort();
 
-  // Where a row points depends on whether Tier 2 exists yet. Saying "read the
-  // slug's own file" before any contract block is written would send an agent
-  // to a 404.
-  const next = manifest.components.some((c) => c.contract)
-    ? 'Pick one, then read `agents/components/<slug>.md` — not this file twice.'
-    : 'Pick one, then read `library/components/<slug>/component.html` and its siblings.';
-
-  const out = [
-    `<!-- ${DO_NOT_EDIT} -->`,
-    '',
-    '# Component index',
-    '',
-    next,
-    '',
-    'Keywords are what tell one component from another, so the ones true of most of the library are',
-    `left off every row: ${common.map((t) => `\`${t}\``).join(', ')}. Assume them.`,
-  ];
-
+  // A row carries its `useWhen` or its keywords, never both: the sentence
+  // already contains the words, so printing them again spends the roster's one
+  // shared budget on a duplicate.
+  const rows = [];
+  let anyTags = false;
   for (const group of manifest.groups) {
-    out.push('', `## ${group.name}`, '');
+    rows.push('', `## ${group.name}`, '');
     for (const c of group.components) {
       const use = c.contract?.useWhen;
-      const tags = routingTags(c, df, ceiling);
-      out.push(
+      const tags = use ? [] : routingTags(c, df, ceiling);
+      if (tags.length) anyTags = true;
+      rows.push(
         [
           `- **${c.slug}**`,
           use ? ` — ${use}` : '',
@@ -331,8 +392,28 @@ function renderIndex(manifest) {
     }
   }
 
-  out.push('');
-  return out.join('\n');
+  // Where a row points depends on whether Tier 2 exists yet. Saying "read the
+  // slug's own file" before any contract block is written would send an agent
+  // to a 404.
+  const next = manifest.components.some((c) => c.contract)
+    ? 'Pick one, then read `agents/components/<slug>.md` — not this file twice.'
+    : 'Pick one, then read `library/components/<slug>/component.html` and its siblings.';
+
+  const out = [`<!-- ${DO_NOT_EDIT} -->`, '', '# Component index', '', next];
+
+  if (anyTags) {
+    const common = [...df]
+      .filter(([, n]) => n > ceiling)
+      .map(([tag]) => tag)
+      .sort();
+    out.push(
+      '',
+      'A row with no sentence of its own falls back to keywords. The ones true of most of the library',
+      `are left off: ${common.map((t) => `\`${t}\``).join(', ')}. Assume them.`,
+    );
+  }
+
+  return [...out, ...rows, ''].join('\n');
 }
 
 /**
@@ -472,7 +553,10 @@ function renderComponent(component, manifest) {
     '',
     c.useWhen,
     '',
-    `Code: \`library/components/${component.slug}/component.{${component.files.join(',')}}\``,
+    // One line for the folder rather than two: the path was being spent twice,
+    // once to point at the code and again to point at docs.md beside it.
+    `In \`library/components/${component.slug}/\` — copy ` +
+      `\`component.{${component.files.join(',')}}\`, read \`docs.md\` for why.`,
   ];
 
   if (c.aria) {
@@ -490,15 +574,23 @@ function renderComponent(component, manifest) {
     out.push('', '## Goes wrong when', '');
     for (const mode of c.failureModes) out.push(`- ${mode}`);
   }
-  if (c.api) out.push('', `**API:** \`${c.api}\``);
+  // Eight components register more than one factory, so this is a list. The
+  // demo-page wiring some of them also register is deliberately not here --
+  // those files say to delete it when you copy.
+  if (c.api?.length === 1) {
+    out.push('', `**API:** \`${c.api[0]}\``);
+  } else if (c.api?.length) {
+    out.push('', '## API', '');
+    for (const signature of c.api) out.push(`- \`${signature}\``);
+  }
 
   const refs = [
+    component.wcag.length && `WCAG ${component.wcag.join(' ')}`,
     component.apg && `[APG](${component.apg})`,
     c.seeAlso?.length && `see also ${c.seeAlso.map((s) => `\`${s}\``).join(', ')}`,
-    component.wcag.length && `WCAG ${component.wcag.join(' ')}`,
-    `why: \`library/components/${component.slug}/docs.md\``,
   ].filter(Boolean);
-  out.push('', refs.join(' · '), '');
+  if (refs.length) out.push('', refs.join(' · '));
+  out.push('');
 
   return out.join('\n');
 }
@@ -636,9 +728,21 @@ async function main() {
   console.log(`build-agent-surfaces: wrote ${rendered.size} surfaces`);
 }
 
-try {
-  await main();
-} catch (err) {
-  console.error(`build-agent-surfaces: ${err.message}`);
-  process.exit(1);
+/**
+ * Only run when invoked as a command.
+ *
+ * `tests/shared/agent-surfaces.spec.mjs` imports TIER_2_BUDGET from here so the
+ * budget is stated once. Without this guard that import *executes* the script --
+ * in write mode, since a Playwright worker's argv has no `--check` -- so several
+ * workers raced each other rewriting agents/, and the loser exited 1 and took
+ * its whole worker down. A module that does work when you import it is a trap
+ * whoever imports it next will also fall into.
+ */
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  try {
+    await main();
+  } catch (err) {
+    console.error(`build-agent-surfaces: ${err.message}`);
+    process.exit(1);
+  }
 }

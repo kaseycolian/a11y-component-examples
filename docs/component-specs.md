@@ -267,11 +267,6 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
 
 ## compositions
 
-### app-url-maker
-- Recreates draft-3's "URL Maker": header, two fields (one an input-group), a result panel, footer actions.
-- **Purpose** Show the pieces composing. Reuse `field`, `text-input`, `input-group`, `button`, `result-panel`.
-- **Gotcha** One `<h1>`-level landmark structure per frame; the composition must not introduce heading-level jumps.
-
 ### app-page-to-markdown
 - Recreates draft-3's "Page → Markdown": `fx-bar-top` header, a radio group, a checkbox, a scrollable `fx-scroll` preview, `fx-bar-bottom` footer.
 - **Gotcha** The preview is a scrollable region — `tabindex="0"` + label. This is the natural home for `prose-surface`.

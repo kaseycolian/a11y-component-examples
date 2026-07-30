@@ -9,5 +9,40 @@
   "wcag": ["1.3.1", "1.4.4", "3.3.1", "3.3.2", "4.1.2", "4.1.3"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Type into the bio field with a screen reader on: the count on screen changes with every keystroke, but nothing is spoken until you pause and are close to the limit. Drag the corner of the growing field and it stops resizing itself."
+  "demoNote": "Type into the bio field with a screen reader on: the count on screen changes with every keystroke, but nothing is spoken until you pause and are close to the limit. Drag the corner of the growing field and it stops resizing itself.",
+  "contract": {
+    "useWhen": "A multi-line field you can still resize, and a counter that is not chatty.",
+    "aria": {
+      "the control": [
+        "aria-describedby"
+      ],
+      "the counter": [
+        "role=status"
+      ]
+    },
+    "keyboard": [
+      [
+        "Tab",
+        "native: moves out of the field. It does not insert a tab"
+      ]
+    ],
+    "states": [
+      "invalid",
+      "over the limit"
+    ],
+    "failureModes": [
+      "resize:none, which is a reflow problem (SC 1.4.4)",
+      "the counter announced per keystroke instead of throttled into a polite region",
+      "a hard maxlength with no warning, which silently drops what someone typed",
+      "the counter as the only sign of the limit, with nothing in the field's description"
+    ],
+    "api": [
+      "AC.createTextarea(root, options) -> { count, refresh, element, destroy }"
+    ],
+    "seeAlso": [
+      "text-input",
+      "field",
+      "live-region"
+    ]
+  }
 }

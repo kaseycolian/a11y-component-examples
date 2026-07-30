@@ -9,5 +9,46 @@
   "wcag": ["1.3.1", "1.4.1", "2.1.1", "2.4.7", "2.5.8", "3.3.1", "4.1.2", "4.1.3"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Tab through a group: every box is its own stop and the arrow keys do nothing, which is correct — any combination is allowed. Toggle one input in example 3 and the parent announces \"mixed\"."
+  "demoNote": "Tab through a group: every box is its own stop and the arrow keys do nothing, which is correct — any combination is allowed. Toggle one input in example 3 and the parent announces \"mixed\".",
+  "contract": {
+    "useWhen": "A native checkbox, kept focusable under whatever you draw over it.",
+    "aria": {
+      "the input": [
+        "type=checkbox"
+      ],
+      "the label": [
+        "for"
+      ]
+    },
+    "keyboard": [
+      [
+        "Space",
+        "toggles"
+      ],
+      [
+        "Tab",
+        "one stop per box — unlike radios, the arrows do nothing"
+      ]
+    ],
+    "states": [
+      "checked",
+      "indeterminate",
+      "disabled",
+      "invalid"
+    ],
+    "failureModes": [
+      "the drawn box replacing the input instead of sitting over it, so nothing is focusable",
+      "display:none or visibility:hidden on the real input, which removes keyboard access",
+      "indeterminate written as an attribute — it exists only as a JS property",
+      "related boxes with no fieldset and legend, so the question is never announced"
+    ],
+    "api": [
+      "AC.createCheckbox(root, options) -> { state, refresh, element, destroy }"
+    ],
+    "seeAlso": [
+      "switch",
+      "radio-group",
+      "fieldset-group"
+    ]
+  }
 }

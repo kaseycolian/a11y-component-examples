@@ -19,5 +19,39 @@
   "wcag": ["1.3.1", "1.4.1", "1.4.10", "2.1.1", "2.4.7", "4.1.2"],
   "status": "stable",
   "files": ["html", "css"],
-  "demoNote": "Every readout here is written by hand and checked against the real accessibility tree by the spec, so it cannot drift. Example 2 puts one long line of code in a surface three ways; example 3 attributes the same quote three ways; example 4 has a typed-in list beside a real one; example 5 clips a box of text and scrolls the same box."
+  "demoNote": "Every readout here is written by hand and checked against the real accessibility tree by the spec, so it cannot drift. Example 2 puts one long line of code in a surface three ways; example 3 attributes the same quote three ways; example 4 has a typed-in list beside a real one; example 5 clips a box of text and scrolls the same box.",
+  "contract": {
+    "useWhen": "A scrolling box of prose, named from the heading inside it.",
+    "aria": {
+      "the surface": [
+        "tabindex=0",
+        "role=region",
+        "aria-labelledby"
+      ],
+      "a pre inside it": [
+        "tabindex=0",
+        "role=region",
+        "aria-label"
+      ]
+    },
+    "keyboard": [
+      [
+        "Tab",
+        "the surface is a stop, and an inner scroller is a second one"
+      ]
+    ],
+    "failureModes": [
+      "overflow-x and nothing else, so Chromium gives it a stop with no role and no name",
+      "all three attributes kept once the surface no longer scrolls — a landmark that does nothing",
+      "overflow:hidden with a fade, which gets no tab stop at all and cannot be scrolled",
+      "the attribution inside the blockquote rather than in a figcaption beside it",
+      "heading rules that leave letter-spacing and text-transform open, so the host page cascades in",
+      "a positive outline-offset on the inner ring, which the surface clips"
+    ],
+    "seeAlso": [
+      "data-table",
+      "typography",
+      "focus-ring"
+    ]
+  }
 }
