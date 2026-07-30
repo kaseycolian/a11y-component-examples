@@ -6,6 +6,8 @@ Background decoration, and the two accessibility rules its own file lacks.
 
 In `library/components/effects/` — copy `component.{html,css}`, read `docs.md` for why.
 
+**Root:** `.ac-fx-scroller`
+
 ## ARIA
 
 - **a scroll container** — `tabindex=0` `role=region` `aria-label`

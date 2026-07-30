@@ -12,6 +12,7 @@
   "demoNote": "Tab into Work email and straight out again, then type something without an @: the error is announced, and the hint stays in aria-describedby the whole time.",
   "contract": {
     "useWhen": "A label, a hint and an error on one control, wired so both stay announced.",
+    "root": [".ac-field"],
     "aria": {
       "the label": [
         "for"

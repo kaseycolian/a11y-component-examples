@@ -12,6 +12,7 @@
   "demoNote": "No JavaScript on this page, and it is meant to be Tabbed through rather than read. Example 4 is broken on purpose and live: three buttons, and only one of them can be followed with a keyboard.",
   "contract": {
     "useWhen": "The visible focus indicator, and what clips or hides one by accident.",
+    "root": [".ac-focus-ring"],
     "keyboard": [
       [
         "Tab",

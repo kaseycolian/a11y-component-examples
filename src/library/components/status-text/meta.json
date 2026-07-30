@@ -21,6 +21,7 @@
   "demoNote": "Examples 2 to 5 are live. Example 2 prints what four identical-looking labels are read out as; example 3 puts the reason for a failure in three places and only one survives; example 4 counts the announcements each list produces; example 5 squeezes the column until one of the two labels stops saying anything.",
   "contract": {
     "useWhen": "A one-word status, at the scale where there is room for nothing else.",
+    "root": [".ac-status"],
     "aria": {
       "the glyph": [
         "aria-hidden=true"

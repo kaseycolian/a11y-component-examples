@@ -6,6 +6,8 @@ In-page links to sections, where focus has to actually land on the target.
 
 In `library/components/jump-nav/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-jump-nav`
+
 ## ARIA
 
 - **the nav** — `aria-label`

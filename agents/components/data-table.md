@@ -6,6 +6,8 @@ A real table: the caption names it, and it scrolls instead of becoming cards.
 
 In `library/components/data-table/` — copy `component.{html,css}`, read `docs.md` for why.
 
+**Root:** `.ac-table`, `.ac-table-scroll`
+
 ## ARIA
 
 - **a column header** — `scope=col`

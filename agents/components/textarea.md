@@ -6,6 +6,8 @@ A multi-line field you can still resize, and a counter that is not chatty.
 
 In `library/components/textarea/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-textarea`
+
 ## ARIA
 
 - **the control** — `aria-describedby`
@@ -15,7 +17,7 @@ In `library/components/textarea/` — copy `component.{html,css,js}`, read `docs
 
 - `Tab` — native: moves out of the field. It does not insert a tab
 
-**States:** invalid, over the limit
+**States:** invalid — aria-invalid=true on the control, set only while the error shows, over the limit
 
 ## Goes wrong when
 

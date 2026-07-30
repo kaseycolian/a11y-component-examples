@@ -6,9 +6,12 @@ Related controls under one question, named by a legend.
 
 In `library/components/fieldset-group/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-group`
+
 ## ARIA
 
 - **each control** — `aria-describedby`
+- **a group that cannot be a fieldset** — `role=group` `aria-labelledby`
 - **the error** — `role=alert`
 
 ## Keyboard
@@ -16,7 +19,7 @@ In `library/components/fieldset-group/` — copy `component.{html,css,js}`, read
 - `Tab` — one stop per control — a fieldset is not one stop
 - `Space` — toggles a checkbox inside it
 
-**States:** invalid, disabled
+**States:** invalid, disabled — aria-disabled=true on the fieldset, which stays focusable so it can say why
 
 ## Goes wrong when
 

@@ -6,6 +6,8 @@ A button that is working, saying so to someone who cannot see the spinner.
 
 In `library/components/loading-button/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-btn-loading`, `.ac-btn-loading-status`
+
 ## ARIA
 
 - **the spinner** — `aria-hidden=true`

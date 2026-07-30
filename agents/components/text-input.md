@@ -6,6 +6,8 @@ A text field, with the type and autocomplete that make it fillable.
 
 In `library/components/text-input/` — copy `component.{html,css}`, read `docs.md` for why.
 
+**Root:** `.ac-input`
+
 ## ARIA
 
 - **the label** — `for`
@@ -15,7 +17,7 @@ In `library/components/text-input/` — copy `component.{html,css}`, read `docs.
 
 - `Tab` — native: nothing here needs a key handler
 
-**States:** invalid, disabled, readonly
+**States:** invalid — aria-invalid=true on the control, set only while the error shows, disabled, readonly
 
 ## Goes wrong when
 

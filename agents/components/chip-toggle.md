@@ -6,9 +6,12 @@ A filter you switch on and off: a button that remembers, not a checkbox.
 
 In `library/components/chip-toggle/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-chip`
+
 ## ARIA
 
 - **each chip** — `type=button` `aria-pressed`
+- **a chip that is on or off rather than pressed** — `role=switch` `aria-checked`
 - **the row** — `role=group` `aria-labelledby`
 
 ## Keyboard

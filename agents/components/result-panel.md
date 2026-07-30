@@ -6,6 +6,8 @@ A computed value, with exactly one thing inside it that talks.
 
 In `library/components/result-panel/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-result`
+
 ## ARIA
 
 - **the panel's region** — `role=status`
@@ -15,6 +17,8 @@ In `library/components/result-panel/` — copy `component.{html,css,js}`, read `
 ## Keyboard
 
 - `Tab` — the copy button is a stop; the value is a code element, not a control
+
+**States:** empty — aria-disabled=true on the copy button, not the disabled attribute, so it keeps its tab stop and can explain itself
 
 ## Goes wrong when
 

@@ -6,6 +6,8 @@ A button whose only label is an attribute, at a size a finger can hit.
 
 In `library/components/icon-button/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-btn-icon`
+
 ## ARIA
 
 - **the button** — `type=button` `aria-label`

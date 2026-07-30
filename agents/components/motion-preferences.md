@@ -6,10 +6,13 @@ One motion token: a page can add the restriction, never override the OS.
 
 In `library/components/motion-preferences/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-switch`, `.ac-motion-scope`
+
 ## ARIA
 
 - **the toggle** — `aria-describedby`
 - **the drawn track** — `aria-hidden=true`
+- **the readout that reports which way it resolved** — `role=status`
 
 ## Keyboard
 

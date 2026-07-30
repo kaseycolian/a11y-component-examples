@@ -12,9 +12,11 @@
   "demoNote": "No JavaScript on this page. Example 4 is four identical-looking buttons where three have no accessible name at all — inspect the accessibility tree, or listen to them.",
   "contract": {
     "useWhen": "Text for screen readers only, in nine declarations that all matter.",
+    "root": [".ac-visually-hidden"],
     "aria": {
       "a clipped announcement": [
-        "role=status"
+        "role=status",
+        "aria-live=polite"
       ]
     },
     "states": [

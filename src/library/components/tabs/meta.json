@@ -21,6 +21,7 @@
   "demoNote": "Examples 2 to 5 are live. Example 2 asks the browser which elements it will really give focus to and prints every stop three strips have; example 3 counts the panels opened while arrowing across; example 4 names the next thing Tab reaches after the selected tab; example 5 puts a row of links wearing role=tab beside the same links in a nav.",
   "contract": {
     "useWhen": "Swap panels in place. Not for moving between pages; that is jump-nav.",
+    "root": [".ac-tabs"],
     "aria": {
       "the strip": [
         "role=tablist",
@@ -44,6 +45,10 @@
         "move and select, since the panels are already in the DOM"
       ],
       [
+        "ArrowUp / ArrowDown",
+        "the same, and the only pair that moves, when the strip is vertical"
+      ],
+      [
         "Home / End",
         "first / last tab"
       ],
@@ -54,7 +59,8 @@
     ],
     "states": [
       "selected",
-      "disabled"
+      "disabled",
+      "vertical — aria-orientation=vertical on the tablist, which swaps which arrows move"
     ],
     "failureModes": [
       "every tab at tabindex=0, so the strip is as many stops as it has tabs",

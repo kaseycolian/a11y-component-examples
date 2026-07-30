@@ -12,7 +12,7 @@ is what this library hands over.
 Tier 0 is this file. Relative paths resolve against it; a `<slug>` comes from the index.
 
 - [agents/index.md](https://kaseycolian.github.io/a11y-component-examples/agents/index.md) — tier 1, 3.2 KB. The roster. Find your component, then stop.
-- [agents/index.json](https://kaseycolian.github.io/a11y-component-examples/agents/index.json) — tier 1, 18.4 KB. Every field, for filtering by tag or SC.
+- [agents/index.json](https://kaseycolian.github.io/a11y-component-examples/agents/index.json) — tier 1, 19.5 KB. Every field, for filtering by tag or SC.
 - `agents/components/<slug>.md` — tier 2, ≤ 1.8 KB. The contract: roles, attributes, keys, states, what goes wrong, the JS API.
 - `library/components/<slug>/component.{html,css,js}` — tier 3, varies. The code. Copy from here.
 - `library/components/<slug>/{docs.md,meta.json}` — tier 4, varies. Why it is built that way. Read when the code surprises you.

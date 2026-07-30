@@ -6,11 +6,14 @@ An inline message: the word carries the tone, the icon carries nothing.
 
 In `library/components/notice/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-notice`
+
 ## ARIA
 
 - **the icon** — `aria-hidden=true`
 - **the container it lands in** — `role=status`
 - **an error that must interrupt** — `role=alert`
+- **the dismiss button, which has no text of its own** — `aria-label`
 
 ## Keyboard
 

@@ -21,6 +21,7 @@
   "demoNote": "Examples 2 to 5 are live. Example 2's notices announce one identical sentence in two tones; example 3 adds the same notice three ways and logs which one a screen reader was given; example 4's alert fired before you arrived, and again on every reload; example 5's close button leaves focus on the document body.",
   "contract": {
     "useWhen": "An inline message: the word carries the tone, the icon carries nothing.",
+    "root": [".ac-notice"],
     "aria": {
       "the icon": [
         "aria-hidden=true"
@@ -30,6 +31,9 @@
       ],
       "an error that must interrupt": [
         "role=alert"
+      ],
+      "the dismiss button, which has no text of its own": [
+        "aria-label"
       ]
     },
     "keyboard": [

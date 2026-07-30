@@ -6,6 +6,8 @@ A button that shows and hides the region right after it.
 
 In `library/components/disclosure/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-disclosure`
+
 ## ARIA
 
 - **the trigger** — `type=button` `aria-expanded` `aria-controls`

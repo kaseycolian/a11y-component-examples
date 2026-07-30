@@ -22,6 +22,7 @@
   "demoNote": "Every readout here is written by hand and checked against the real accessibility tree by the spec, so it cannot drift. Example 2 puts one long line of code in a surface three ways; example 3 attributes the same quote three ways; example 4 has a typed-in list beside a real one; example 5 clips a box of text and scrolls the same box.",
   "contract": {
     "useWhen": "A scrolling box of prose, named from the heading inside it.",
+    "root": [".ac-prose"],
     "aria": {
       "the surface": [
         "tabindex=0",

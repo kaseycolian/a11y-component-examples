@@ -6,6 +6,8 @@ A one-word status, at the scale where there is room for nothing else.
 
 In `library/components/status-text/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-status`
+
 ## ARIA
 
 - **the glyph** — `aria-hidden=true`

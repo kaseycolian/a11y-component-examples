@@ -21,6 +21,7 @@
   "demoNote": "Examples 2 to 5 are live and half wrong on purpose. Example 2's spinner-only button announces nothing; example 3's disabled button drops focus to the document body the moment it is pressed; example 4's renaming button ends up with three different names; example 5's dot is indistinguishable from its resting state once motion is off.",
   "contract": {
     "useWhen": "A button that is working, saying so to someone who cannot see the spinner.",
+    "root": [".ac-btn-loading", ".ac-btn-loading-status"],
     "aria": {
       "the spinner": [
         "aria-hidden=true"

@@ -6,11 +6,13 @@ Announcing a change, to a region that was already being listened to.
 
 In `library/components/live-region/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-lr-region`
+
 ## ARIA
 
 - **polite** — `role=status`
 - **assertive** — `role=alert`
-- **append-only** — `role=log`
+- **append-only** — `role=log` `aria-label`
 
 ## Goes wrong when
 

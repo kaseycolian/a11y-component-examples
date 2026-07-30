@@ -21,6 +21,7 @@
   "demoNote": "Examples 2 to 5 are live. Example 2 prints what four identical-looking badges are read out as; example 3 puts the same badge inside a button and beside it and prints the button's name; example 4 has the badges with no number to read; example 5 counts messages in and logs what a screen reader was handed each time.",
   "contract": {
     "useWhen": "A count on a control, where the digits are not the thing being announced.",
+    "root": [".ac-badge"],
     "aria": {
       "the digits": [
         "aria-hidden=true"

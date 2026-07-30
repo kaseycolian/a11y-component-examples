@@ -6,6 +6,8 @@ A text input with a button joined to it, both reachable at 200% zoom.
 
 In `library/components/input-group/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-input-group`
+
 ## ARIA
 
 - **the input** — `aria-describedby`

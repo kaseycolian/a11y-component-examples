@@ -22,6 +22,7 @@
   "demoNote": "Examples 2 to 5 are live. Example 2 presses the same link into three documents one attribute apart and prints what took focus; example 3 measures the overlap between the heading and the bar stuck above it; example 4 counts scroll events against section changes on one document; example 5 prints the landmark menu two navs produce with and without names.",
   "contract": {
     "useWhen": "In-page links to sections, where focus has to actually land on the target.",
+    "root": [".ac-jump-nav"],
     "aria": {
       "the nav": [
         "aria-label"

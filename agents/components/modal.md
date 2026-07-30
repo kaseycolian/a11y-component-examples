@@ -6,6 +6,8 @@ A native dialog over the page, and the ARIA you must not add to it.
 
 In `library/components/modal/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-modal`
+
 ## ARIA
 
 - **the dialog** — `aria-labelledby`

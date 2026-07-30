@@ -6,9 +6,12 @@ One answer out of a few, where the arrows both move and choose.
 
 In `library/components/radio-group/` — copy `component.{html,css}`, read `docs.md` for why.
 
+**Root:** `.ac-choice`, `.ac-group`
+
 ## ARIA
 
 - **each input** — `type=radio` `name`
+- **the fieldset once it is invalid** — `aria-describedby`
 - **the error** — `role=alert`
 
 ## Keyboard
@@ -16,7 +19,7 @@ In `library/components/radio-group/` — copy `component.{html,css}`, read `docs
 - `ArrowUp / ArrowDown` — move and select in one step, unlike a checkbox
 - `Tab` — one stop for the whole group
 
-**States:** checked, invalid, disabled
+**States:** checked, invalid — aria-invalid=true on each input, set only while the error shows, disabled
 
 ## Goes wrong when
 

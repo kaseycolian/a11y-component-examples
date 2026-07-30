@@ -12,10 +12,14 @@
   "demoNote": "Tab into any group and press the arrow keys: they move and select in one action, and Tab leaves the whole group as one stop. All of that comes from the shared name attribute — there is no script on this page.",
   "contract": {
     "useWhen": "One answer out of a few, where the arrows both move and choose.",
+    "root": [".ac-choice", ".ac-group"],
     "aria": {
       "each input": [
         "type=radio",
         "name"
+      ],
+      "the fieldset once it is invalid": [
+        "aria-describedby"
       ],
       "the error": [
         "role=alert"
@@ -33,7 +37,7 @@
     ],
     "states": [
       "checked",
-      "invalid",
+      "invalid — aria-invalid=true on each input, set only while the error shows",
       "disabled"
     ],
     "failureModes": [

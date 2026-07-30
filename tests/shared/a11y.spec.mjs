@@ -250,6 +250,17 @@ for (const { slug, name } of COMPONENTS) {
       test.setTimeout(180_000);
       const failures = [];
 
+      // Settle the colors before measuring any of them. `.sidebar__link` and
+      // `.code-tab` transition color, background-color and border-color
+      // (site.css), and those transitions are on `var(--dur)` directly rather
+      // than through the motion gate, so `data-motion="off"` does not stop them.
+      // Flipping data-theme and calling axe in the next statement samples
+      // whatever is on screen at that instant -- a value part-way between two
+      // themes that both pass, which can read under 4.5:1. It surfaced as a
+      // failure on a different element and a different theme on each run, which
+      // is the tell that a contrast result is being measured mid-flight.
+      await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; }' });
+
       for (const theme of THEMES) {
         await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme);
         const results = await new AxeBuilder({ page }).withRules(['color-contrast']).analyze();

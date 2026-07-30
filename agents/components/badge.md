@@ -6,6 +6,8 @@ A count on a control, where the digits are not the thing being announced.
 
 In `library/components/badge/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-badge`
+
 ## ARIA
 
 - **the digits** — `aria-hidden=true`

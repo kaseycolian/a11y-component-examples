@@ -21,6 +21,7 @@
   "demoNote": "The regions are drawn as visible boxes so you can watch text land in them; in an app they would be clipped. Example 3 is broken on purpose and live — all three buttons leave the right text in the DOM and none of them announces anything, which is why this bug survives code review. Turn on a screen reader for this page.",
   "contract": {
     "useWhen": "Announcing a change, to a region that was already being listened to.",
+    "root": [".ac-lr-region"],
     "aria": {
       "polite": [
         "role=status"
@@ -29,7 +30,8 @@
         "role=alert"
       ],
       "append-only": [
-        "role=log"
+        "role=log",
+        "aria-label"
       ]
     },
     "failureModes": [

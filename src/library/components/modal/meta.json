@@ -12,6 +12,7 @@
   "demoNote": "Open example 1 and Tab past the last button: focus comes back around, because the browser does that for a dialog opened with showModal(). Example 3 lands focus on the safe answer, never on Delete — Enter is the key people press to make a dialog go away.",
   "contract": {
     "useWhen": "A native dialog over the page, and the ARIA you must not add to it.",
+    "root": [".ac-modal"],
     "aria": {
       "the dialog": [
         "aria-labelledby"

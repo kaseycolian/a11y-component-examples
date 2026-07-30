@@ -12,9 +12,11 @@
   "demoNote": "Flip example 2 and the confirmation arrives politely, without renaming the control. Example 4's locked switch still takes focus and still says why — that is the difference between aria-disabled and disabled.",
   "contract": {
     "useWhen": "An on/off that applies immediately, with the thumb as the second cue.",
+    "root": [".ac-switch"],
     "aria": {
       "the input": [
-        "type=checkbox"
+        "type=checkbox",
+        "aria-describedby"
       ],
       "the drawn track": [
         "aria-hidden=true"

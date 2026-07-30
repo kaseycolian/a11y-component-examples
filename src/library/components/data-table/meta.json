@@ -22,6 +22,7 @@
   "demoNote": "Every readout here is written by hand and checked against the real accessibility tree by the spec, so it cannot drift. Example 2 puts the stacked-card restyle beside the table it came from; example 3 is the same two columns as plain cells, as column headers, and as both; example 4 is one wide table in two wrappers; example 5 names a table four ways, two of which are not names.",
   "contract": {
     "useWhen": "A real table: the caption names it, and it scrolls instead of becoming cards.",
+    "root": [".ac-table", ".ac-table-scroll"],
     "aria": {
       "a column header": [
         "scope=col"

@@ -6,6 +6,8 @@ A scrolling box of prose, named from the heading inside it.
 
 In `library/components/prose-surface/` — copy `component.{html,css}`, read `docs.md` for why.
 
+**Root:** `.ac-prose`
+
 ## ARIA
 
 - **the surface** — `tabindex=0` `role=region` `aria-labelledby`

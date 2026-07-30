@@ -21,10 +21,15 @@
   "demoNote": "Examples 2 to 5 are live. Example 2's fill-only chip has no state left under Windows High Contrast, and the chip beside it puts a tick into its own accessible name; example 3's chip renames itself, so the word and the state disagree; example 5 puts five tab stops next to the toolbar's one.",
   "contract": {
     "useWhen": "A filter you switch on and off: a button that remembers, not a checkbox.",
+    "root": [".ac-chip"],
     "aria": {
       "each chip": [
         "type=button",
         "aria-pressed"
+      ],
+      "a chip that is on or off rather than pressed": [
+        "role=switch",
+        "aria-checked"
       ],
       "the row": [
         "role=group",

@@ -6,6 +6,8 @@ A description on hover and focus, plus the toggletip for touch.
 
 In `library/components/tooltip/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-tooltip-host`
+
 ## ARIA
 
 - **the trigger** — `aria-describedby`

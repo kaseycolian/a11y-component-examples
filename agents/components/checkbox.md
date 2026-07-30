@@ -6,10 +6,13 @@ A native checkbox, kept focusable under whatever you draw over it.
 
 In `library/components/checkbox/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-choice`, `.ac-group`
+
 ## ARIA
 
 - **the input** — `type=checkbox`
 - **the label** — `for`
+- **a group's running count** — `role=status`
 
 ## Keyboard
 

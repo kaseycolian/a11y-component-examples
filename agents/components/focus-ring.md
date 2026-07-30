@@ -6,6 +6,8 @@ The visible focus indicator, and what clips or hides one by accident.
 
 In `library/components/focus-ring/` — copy `component.{html,css}`, read `docs.md` for why.
 
+**Root:** `.ac-focus-ring`
+
 ## Keyboard
 
 - `Tab` — :focus-visible matches this; :focus also matches a mouse press

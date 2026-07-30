@@ -12,6 +12,7 @@
   "demoNote": "No JavaScript on this page. Click inside a frame and press Shift+Tab to reach its link. Example 5 is broken on purpose — both of its failures are live, so you can Tab through them and watch.",
   "contract": {
     "useWhen": "The first focusable thing on the page, and a target that accepts focus.",
+    "root": [".ac-skip-link", ".ac-skip-nav", ".ac-skip-main"],
     "aria": {
       "the target": [
         "tabindex=-1"

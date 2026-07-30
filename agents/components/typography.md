@@ -6,6 +6,8 @@ Visual text classes that carry no semantics at all.
 
 In `library/components/typography/` — copy `component.{html,css}`, read `docs.md` for why.
 
+**Root:** `.ac-t-body`
+
 ## Goes wrong when
 
 - a div wearing a heading class, which is styling and not a heading

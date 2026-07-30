@@ -12,12 +12,14 @@
   "demoNote": "The panel anchors to its trigger at every width, and flips above it when there is no room below. For a panel that rises from the bottom of the screen, see the Drawer component.",
   "contract": {
     "useWhen": "A custom select, for when the native one cannot be styled the way you need.",
+    "root": ["[data-ac-dropdown]", ".ac-dropdown"],
     "aria": {
       "the trigger": [
         "aria-haspopup=listbox",
         "aria-expanded",
         "aria-controls",
-        "aria-labelledby"
+        "aria-labelledby",
+        "aria-describedby"
       ],
       "the panel": [
         "role=listbox",
@@ -46,12 +48,16 @@
         "first / last option"
       ],
       [
-        "Enter",
-        "choose the focused option"
+        "Enter / Space",
+        "open from the trigger, or choose the focused option"
       ],
       [
         "Escape",
         "close, keeping the current value"
+      ],
+      [
+        "Tab",
+        "close and carry on tabbing, from the trigger rather than the hidden panel"
       ]
     ],
     "states": [

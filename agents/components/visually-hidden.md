@@ -6,9 +6,11 @@ Text for screen readers only, in nine declarations that all matter.
 
 In `library/components/visually-hidden/` — copy `component.{html,css}`, read `docs.md` for why.
 
+**Root:** `.ac-visually-hidden`
+
 ## ARIA
 
-- **a clipped announcement** — `role=status`
+- **a clipped announcement** — `role=status` `aria-live=polite`
 
 **States:** clipped, focusable
 

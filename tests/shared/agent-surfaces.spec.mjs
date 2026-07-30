@@ -88,6 +88,37 @@ const KEY_SPELLINGS = { Space: ['Space', "press(' ')", 'press(" ")'] };
 /** A key the browser implements for a native control has no handler to test. */
 const NATIVE = 'native:';
 
+/**
+ * Attributes check 12 does not require a contract to mention.
+ *
+ * `aria-hidden` here is always on decorative content -- an inline `<svg>` glyph,
+ * the `*` beside a required label, a mirror of text that is already announced.
+ * Hiding decoration is a library-wide convention rather than a fact about any one
+ * component, so a row per component would be noise in a byte-budgeted file. The
+ * exemption runs one way only: a contract may still name `aria-hidden`, and test
+ * 2 asserts it against the markup when it does. So this can make a contract
+ * silent about decoration, never wrong about it.
+ */
+const EXEMPT_ARIA = ['aria-hidden'];
+
+/**
+ * Which elements on a demo page are the component itself, per its contract.
+ *
+ * This cannot be derived from the slug. `.ac-<slug>` holds for fifteen
+ * components and fails for eighteen: `checkbox` is `.ac-choice`, `text-input` is
+ * `.ac-input`, `icon-button` is `.ac-btn-icon`, and `dropdown` is a `<select>`
+ * carrying `[data-ac-dropdown]` that the factory wraps at runtime. A scope
+ * guessed from the slug would sweep nothing for more than half the library and
+ * report that as a pass, which is the failure mode this whole suite is built to
+ * avoid -- so the contract declares it and check 12 holds it to it.
+ */
+const OWN_ROOTS = Object.fromEntries(
+  COMPONENTS.filter((c) => c.contract?.root).map((c) => [c.slug, c.contract.root.join(', ')]),
+);
+
+/** Every component's roots, to tell a nested component from this one. */
+const ALL_ROOTS = [...new Set(COMPONENTS.flatMap((c) => c.contract?.root ?? []))].join(', ');
+
 /* --- 1 · every component has a contract, and it fits ---------------------- */
 
 test.describe('contract blocks', () => {
@@ -430,6 +461,98 @@ test.describe('README links', () => {
   });
 });
 
+/* --- 13 and 14 · what component.js does that no contract admits to -------- */
+
+/**
+ * Comments out, string literals in. The comments are where a component argues
+ * about the attribute it deliberately did *not* use and the key it deliberately
+ * did *not* bind, so reading them as behavior gets both backwards.
+ */
+const code = (js) =>
+  js.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1 ');
+
+/**
+ * Every key name a handler could branch on, matched as a plain literal.
+ *
+ * The space bar is the exception and needs a comparison around it: `' '` is a
+ * single-space string, and JS is full of those -- `join(' ')`, `split(' ')`,
+ * concatenating a label. Matched plainly it reported nine components as handling
+ * Space when none of them did.
+ *
+ * The named keys stay plain rather than requiring a comparison, because real
+ * handling is not always written as one. tabs picks its key by orientation:
+ *   var back = vertical ? 'ArrowUp' : 'ArrowLeft';
+ * which is the most valuable finding on this side and matches no comparison shape.
+ */
+const KEY_LITERAL =
+  /['"](Arrow(?:Up|Down|Left|Right)|Home|End|Enter|Escape|Tab|PageUp|PageDown|Backspace|Delete)['"]/g;
+const SPACE_COMPARISON = /(?:===|!==|==|!=|case)\s*['"] ['"]|['"] ['"]\s*(?:===|!==|==|!=)/;
+
+/**
+ * A demo-page wiring factory. These are registered on `global.AC` so the page can
+ * call them, and CLAUDE.md says `api` leaves them out -- they wire up a readout on
+ * one page and mean nothing in the app someone pastes a component into. The `Page`
+ * suffix is what tells them apart, and check 14 is what holds authors to it.
+ */
+const DEMO_FACTORY = /Page$/;
+
+test.describe('what the JS does', () => {
+  test('every key it handles is a key the contract names', () => {
+    const undocumented = [];
+    let scanned = 0;
+
+    for (const { slug, contract, js } of COMPONENTS) {
+      if (!js) continue;
+      const source = code(js);
+      const documented = new Set(
+        (contract?.keyboard ?? []).flatMap(([keys]) => keys.split('/').map((k) => k.trim())),
+      );
+
+      const handled = new Set();
+      for (const match of source.matchAll(KEY_LITERAL)) handled.add(match[1]);
+      if (SPACE_COMPARISON.test(source)) handled.add('Space');
+      scanned += handled.size;
+
+      for (const key of [...handled].sort()) {
+        if (!documented.has(key)) undocumented.push(`${slug}: ${key}`);
+      }
+    }
+
+    expect(scanned, 'no key literal found in any component.js -- the check scanned nothing').toBeGreaterThan(20);
+    expect(
+      undocumented,
+      `handled in component.js, absent from the contract's keyboard map:\n  ${undocumented.join('\n  ')}`,
+    ).toEqual([]);
+  });
+
+  test('every factory it registers is one the contract claims', () => {
+    const undocumented = [];
+    let scanned = 0;
+
+    for (const { slug, contract, js } of COMPONENTS) {
+      if (!js) continue;
+      const claimed = new Set(
+        (contract?.api ?? []).map((signature) => signature.match(/^AC\.(\w+)\s*\(/)?.[1]),
+      );
+
+      for (const [, name] of code(js).matchAll(/\bglobal\.AC\.(\w+)\s*=/g)) {
+        scanned++;
+        if (claimed.has(name) || DEMO_FACTORY.test(name)) continue;
+        undocumented.push(`${slug}: AC.${name}`);
+      }
+    }
+
+    // notice and result-panel register three factories each, so a new public one
+    // slipping in undocumented is a live risk rather than a hypothetical.
+    expect(scanned, 'no global.AC registration found at all -- the check scanned nothing').toBeGreaterThan(20);
+    expect(
+      undocumented,
+      `registered on global.AC, claimed by no contract api -- document it, or name it ` +
+        `create<Name>Page if it only wires up the demo:\n  ${undocumented.join('\n  ')}`,
+    ).toEqual([]);
+  });
+});
+
 /* --- 7 · the generated surfaces match their sources ---------------------- */
 
 test.describe('generated surfaces', () => {
@@ -452,7 +575,7 @@ test.describe('generated surfaces', () => {
   });
 });
 
-/* --- 2 and 6 · in the browser -------------------------------------------- */
+/* --- 2, 6 and 12 · in the browser ---------------------------------------- */
 
 for (const { slug, name, contract } of COMPONENTS) {
   if (!contract) continue;
@@ -497,6 +620,91 @@ for (const { slug, name, contract } of COMPONENTS) {
         `claimed by the contract, absent from the demo outside a broken example:\n  ${named.join(
           '\n  ',
         )}`,
+      ).toEqual([]);
+    });
+
+    test('every role and attribute in the shipped markup is in the contract', async ({ page }) => {
+      await page.goto(PAGE);
+
+      // The other direction, and the one a component edit breaks. Test 2 proves
+      // the contract is not lying; this proves it is not silent -- ARIA added to
+      // a component after its contract was written is agent knowledge nobody
+      // wrote down, and `check:agents` cannot see it because the generator never
+      // opens component.html or component.js.
+      //
+      // In the browser rather than over component.html, because the attributes
+      // most worth catching are the ones the factory sets at runtime, and an
+      // attribute that lands on an element has a position in the DOM that
+      // closest() can classify. Read statically there is no way to tell this
+      // component's ARIA from the demo-page wiring sitting in the same file.
+      const { found, roots } = await page.evaluate(
+        ({ ours, every, exempt }) => {
+          const hits = new Map();
+          for (const el of document.querySelectorAll(`${ours}, ${ours} *`)) {
+            // The markup you must not copy makes no claim about the contract.
+            if (el.closest('[data-ac-demo-broken]')) continue;
+            // A component nested in the demo -- text-input inside field, or the
+            // switch that motion-preferences reuses as its toggle -- owns its own
+            // ARIA, and its own contract is where that is checked.
+            if (!el.closest(every)?.matches(ours)) continue;
+
+            for (const { name } of el.attributes) {
+              if (name !== 'role' && !name.startsWith('aria-')) continue;
+              if (exempt.includes(name)) continue;
+              const where = `<${el.tagName.toLowerCase()}>${
+                typeof el.className === 'string' && el.className.trim()
+                  ? ` .${el.className.trim().split(/\s+/).join('.')}`
+                  : ''
+              }`;
+              if (!hits.has(name)) hits.set(name, where);
+            }
+          }
+          return { found: [...hits], roots: document.querySelectorAll(ours).length };
+        },
+        { ours: OWN_ROOTS[slug], every: ALL_ROOTS, exempt: EXEMPT_ARIA },
+      );
+
+      // Any mention counts, not just an `aria` token: `states` names the
+      // attribute inline where one is transient -- "invalid -- aria-invalid=true
+      // only while a message shows" -- and that is a real claim, written where
+      // CLAUDE.md says to write it.
+      const claimed = JSON.stringify(contract);
+      const undocumented = found
+        .filter(([name]) => !claimed.includes(name))
+        .map(([name, where]) => `${name} on ${where}`);
+
+      // Two guards, because a sweep that reaches nothing passes forever.
+      //
+      // The first is the scope itself: a renamed class, and `root` now selects
+      // an element that is not on the page. The second is stronger and is why
+      // `root` is worth declaring at all -- if the contract names ARIA, the sweep
+      // has to find some of it, which proves the selector landed on the component
+      // rather than on some wrapper that merely contains it.
+      expect(roots, `contract.root selects nothing on the page: ${OWN_ROOTS[slug]}`).toBeGreaterThan(
+        0,
+      );
+      // Only where there is something to find: a contract may name nothing but
+      // plain HTML -- checkbox's whole `aria` block is `type=checkbox` and `for`,
+      // which is the point it is making -- and `aria-hidden` is swept out above.
+      const claimsAria = Object.values(contract.aria ?? {})
+        .flat()
+        .some((token) => {
+          const name = token.split('=')[0];
+          return (name === 'role' || name.startsWith('aria-')) && !EXEMPT_ARIA.includes(name);
+        });
+      if (claimsAria) {
+        const claimedHits = found.filter(([name]) => claimed.includes(name));
+        expect(
+          claimedHits.length,
+          `contract.root (${OWN_ROOTS[slug]}) matched ${roots} element(s), but none of the ARIA ` +
+            `the contract names is inside it -- the scope is reaching past the component`,
+        ).toBeGreaterThan(0);
+      }
+
+      expect(
+        undocumented,
+        `in the shipped markup, mentioned nowhere in the contract -- add it to \`aria\`, or to ` +
+          `\`states\` if it only appears in one state:\n  ${undocumented.join('\n  ')}`,
       ).toEqual([]);
     });
 

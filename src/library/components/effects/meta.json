@@ -24,6 +24,7 @@
   "demoNote": "The one page here whose subject is not a component this library owns: these five classes ship in theme-service's effects.css. No JavaScript. Examples 2 and 3 are broken on purpose and live, and example 5 is about the header's Reduce motion toggle.",
   "contract": {
     "useWhen": "Background decoration, and the two accessibility rules its own file lacks.",
+    "root": [".ac-fx-scroller"],
     "aria": {
       "a scroll container": [
         "tabindex=0",

@@ -6,9 +6,11 @@ An on/off that applies immediately, with the thumb as the second cue.
 
 In `library/components/switch/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-switch`
+
 ## ARIA
 
-- **the input** — `type=checkbox`
+- **the input** — `type=checkbox` `aria-describedby`
 - **the drawn track** — `aria-hidden=true`
 
 ## Keyboard

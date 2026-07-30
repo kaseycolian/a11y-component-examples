@@ -6,6 +6,8 @@ The first focusable thing on the page, and a target that accepts focus.
 
 In `library/components/skip-link/` — copy `component.{html,css}`, read `docs.md` for why.
 
+**Root:** `.ac-skip-link`, `.ac-skip-nav`, `.ac-skip-main`
+
 ## ARIA
 
 - **the target** — `tabindex=-1`

@@ -255,7 +255,21 @@ const meta = `{
   "apg": null,
   "wcag": [],
   "status": "draft",
-  "files": [${withJs ? '"html", "css", "js"' : '"html", "css"'}]
+  "files": [${withJs ? '"html", "css", "js"' : '"html", "css"'}],
+  "contract": {
+    "useWhen": "TODO: one line -- when to reach for this rather than the nearest alternative. It is also this component's row in the agent index, where the whole roster shares one budget.",
+    "root": [".ac-${slug}"],
+    "failureModes": [
+      "TODO: how this pattern goes wrong in someone else's app -- not what your demo happens to show"
+    ]${
+      withJs
+        ? `,
+    "api": [
+      "AC.create${pascal}(root, options) -> { destroy }"
+    ]`
+        : ''
+    }
+  }
 }
 `;
 
@@ -369,9 +383,11 @@ console.log(`new-component: created src/library/components/${slug}/`);
 for (const [file] of files) console.log(`  ${file}`);
 console.log(`
 Next:
-  1. Write the "contract" block in meta.json -- the aria, keyboard, states,
-     failureModes and api this component owes. CLAUDE.md > Component folder shape
-     says what it must carry; the suite asserts it against your own markup.
+  1. Fill in the "contract" block in meta.json. The three required fields are
+     scaffolded; add aria, keyboard and states as the component grows. You do not
+     have to guess what is missing -- the suite reads your own markup and JS and
+     names anything they do that the contract does not admit to. Keep "root"
+     pointing at your component's real elements if you rename the class.
   2. Fill in the rest of meta.json (summary, tags, apg, wcag) and flip status to
      "stable". The summary has its own voice rule -- CLAUDE.md > Writing style.
   3. npm run agents      (renders agents/components/${slug}.md from that contract)

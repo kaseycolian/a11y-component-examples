@@ -2,14 +2,14 @@
 
 Why the agent-facing side of this library is shaped the way it is, and what it is made of.
 
-**Status: built, and this record matches it.** Phases 0 through 6 are done — the generator runs, all four
-tiers ship, every component has a contract, the cross-cutting surfaces are written, all three Tier 0
-doors are rendered from one preamble, the entry docs say which audience they serve, and
-`npm run check:agents` plus `tests/shared/agent-surfaces.spec.mjs` gate them in CI. What each surface
-measured against its budget is in **What the layer costs, measured**. One phase is left: **7**, coupling a
-component edit to its agent-side knowledge, specified at the bottom of this file and not yet designed.
-The checklist below is the source of truth for how far it got; update it as each phase lands, and record
-what surprised you in the **What phase N cost** sections.
+**Status: built and complete, and this record matches it.** All eight phases are done — the generator
+runs, all four tiers ship, every component has a contract, the cross-cutting surfaces are written, all
+three Tier 0 doors are rendered from one preamble, the entry docs say which audience they serve, and
+a component edit is now coupled to its agent-side knowledge in both directions. `npm run check:agents`
+plus `tests/shared/agent-surfaces.spec.mjs` gate all of it in CI. What each surface measured against its
+budget is in **What the layer costs, measured**. The checklist below is the source of truth for how far
+it got; keep it current as the library grows, and record what surprised you in the **What phase N cost**
+sections.
 
 This is a contributor document. An agent *consuming* the library should read `AGENTS.md` and
 `agents/`, never this file — the same way it should never read `BUILD-STATUS.md`.
@@ -250,9 +250,12 @@ one names the part and the selector it could not find.
       `agents/`. One of the two items that was to be recorded as open got closed instead, because this
       phase's one required edit made it worse; the other is recorded as open. Phase 6 also found real
       drift, in `BUILD-STATUS.md` and in `scripts/new-component.mjs`. See **What phase 6 cost**.
-- [ ] **7 · Couple a component edit to its agent-side knowledge.** Requested after phase 1 landed, to
-      be designed once phases 2–6 are done. See "Phase 7 — the requirement" below; it is not designed
-      yet, and the gap it closes is real rather than hypothetical.
+- [x] **7 · Couple a component edit to its agent-side knowledge.** Requested after phase 1 landed, and
+      designed only once phases 2–6 were done, because the contract block is what an edit has to keep in
+      step. Three checks that read the component and report what the contract does not admit to, one
+      fingerprint for the single edit no check can see, and the obligation written down as a table.
+      It also added `contract.root`, without which the ARIA check would have swept nothing for more than
+      half the library. See **Phase 7 — the coupling, as built**, and **What phase 7 cost**.
 
 **Deferred: an MCP server.** Files work for every agent with no runtime, and a server would be a
 second thing to keep accurate. The manifest the generator already builds is the natural backing for
@@ -262,10 +265,10 @@ one when it is wanted.
 
 ## What the layer costs, measured
 
-Measured 2026-07-30 against the budgets in **The read path** above, KB = 1024 throughout. These are
-current values. The five **What phase N cost** tables below are snapshots of the day each phase landed
-and are deliberately *not* merged into this one — three surfaces moved after their table was written, so
-a merge would present history as the present.
+Measured 2026-07-30 after phase 7, against the budgets in **The read path** above, KB = 1024 throughout.
+These are current values. The six **What phase N cost** tables below are snapshots of the day each phase
+landed and are deliberately *not* merged into this one — several surfaces moved after their table was
+written, so a merge would present history as the present.
 
 | Tier | Surface | Budget | Measured | Spare |
 | --- | --- | --- | --- | --- |
@@ -273,7 +276,7 @@ a merge would present history as the present.
 | 0 | `agents/llms.txt` | 2,560 B | 2,495 B | 65 B |
 | 0 | `.claude/skills/a11y-library/SKILL.md` | 3,072 B | 2,831 B | 241 B |
 | 1 | `agents/index.md` | 3,584 B | 3,253 B | 331 B |
-| 2 | `agents/components/<slug>.md` | 1,800 B each | 853–1,538 B, median 1,121 | 262 B on `dropdown`, the largest |
+| 2 | `agents/components/<slug>.md` | 1,800 B each | 909–1,725 B, median 1,177 | **75 B on `dropdown`**, the largest |
 | 4 | `agents/pitfalls.md` | 16 KB | 14.7 KB | 1.3 KB |
 | 4 | `agents/testing.md` | 12 KB | 9.9 KB | 2.1 KB |
 | 4 | `agents/verify.md` | 8 KB | 5.8 KB | 2.2 KB |
@@ -283,30 +286,39 @@ Bytes rather than KB in the top half, because bytes are what the generator compa
 are thin enough that rounding hides them. **Every budget held, and only one was ever raised** — the
 skill's, mis-sized by analogy with `AGENTS.md`, which has no frontmatter; see finding 1 under phase 4.
 
-**The claim at the top of this file, measured for the first time.** Tier 0 → Tier 1 → one Tier 2 file is
-**6.4 to 7.1 KB**, 6.8 KB for `tabs`: about 1.7k tokens at four bytes per token, so *"under ~2k tokens"*
-holds. Read it as bytes rather than tokens — markdown tables tokenize worse than prose, and the
+**Tier 2 is now the tight one.** `dropdown.md` has 75 bytes spare, down from 262 before phase 7 added a
+`Root:` line to every file and three contract rows to that one. It is the first surface likely to need a
+budget conversation, and the honest fix when it comes is cutting a `failureModes` entry rather than
+raising 1,800 — the budget is what has kept these files answers instead of documents.
+
+**The claim at the top of this file.** Tier 0 → Tier 1 → one Tier 2 file is **6.8 to 7.2 KB**, 7.0 KB for
+`tabs`: about 1.8k tokens at four bytes per token, so *"under ~2k tokens"* still holds, with less room
+than before. Read it as bytes rather than tokens — markdown tables tokenize worse than prose, and the
 conversion is the soft part of that sentence, not the measurement.
 
-**The map against the territory.** `AGENTS.md` + `agents/` + the skill is **100.6 KB across 42 files**,
-against a `src/library/` of **1,829.4 KB** — 5.5%. Those 42 files are exactly what `check:agents` reports
+**The map against the territory.** `AGENTS.md` + `agents/` + the skill is **98.7 KB across 42 files**,
+against a `src/library/` of **1,832.9 KB** — 5.4%. Those 42 files are exactly what `check:agents` reports
 matching, which is the cheapest available proof that nothing generated is unaccounted for.
 
-**`agents/index.json` is 18.4 KB and is not on the read path.** It is the machine copy, for filtering the
+**`agents/index.json` is 19.5 KB and is not on the read path.** It is the machine copy, for filtering the
 roster; no agent reads it to answer a question. Phase 1 recorded it rendering to more than five times
-`index.md`, and the contract blocks have widened that gap — still not a problem, for the same reason.
+`index.md`, and the contract blocks have widened that gap — still not a problem, for the same reason. It
+is also where phase 7 put the one fingerprint in the layer, on the same argument: off the read path, so
+bookkeeping there costs an agent nothing.
 
 **What the layer cost to build.** The hand-written side is `docs/agents/` at 43.6 KB across five files;
-the machinery is `scripts/build-agent-surfaces.mjs` at 39.1 KB and
-`tests/shared/agent-surfaces.spec.mjs` at 21.5 KB, so rendering and checking the sources costs about 1.4×
-the sources themselves. The rendering is close to 1:1 by design rather than by accident: the four
+the machinery is `scripts/build-agent-surfaces.mjs` at 43.8 KB and
+`tests/shared/agent-surfaces.spec.mjs` at 31.0 KB, so rendering and checking the sources costs about 1.7×
+the sources themselves — phase 7 moved that ratio from 1.4×, and all of the growth is in the spec.
+Checking a claim against reality costs more than making the claim, which is the trade the whole layer is.
+The rendering is close to 1:1 by design rather than by accident: the four
 `.src.md` files total 39.3 KB and render to 35.4 KB, losing only the markers and the editorial headers,
 because the split is on markers and the prose passes through byte for byte. `preamble.md` is the exception
 in the other direction — 4.3 KB rendering to 7.6 KB, because it is rendered three times. Everything else,
 the index and every Tier 2 file, comes from `meta.json`.
 
-**`meta.json` grew more than the plan predicted** — 30 KB to an estimated ~50 KB, landing at **64.6 KB**
-across the roster, of which the `contract` blocks are 26.9 KB minified. The estimate was low because
+**`meta.json` grew more than the plan predicted** — 30 KB to an estimated ~50 KB, landing at **67.2 KB**
+across the roster, of which the `contract` blocks are 29.0 KB minified. The estimate was low because
 `failureModes` and `aria` run richer per component than the sketched example did. It still costs nothing,
 for the reason the plan gave: an agent reads `index.md` and then one Tier 2 file, and neither is a
 `meta.json`.
@@ -803,9 +815,84 @@ both before and after. Seven things worth keeping:
 **chromium 1127/1127** (1126 before; the new test is the difference).
 
 **Deliberately not done:** `scripts/new-component.mjs` does not yet scaffold an empty `contract` block.
-That is a phase 7 bullet already and phase 7's design decides the shape. What phase 6 did to that file is
-routing and instructions only — five wrong pointers, and the missing `npm run agents` step — which cost
-nothing to fix now and pre-empt nothing.
+That was a phase 7 bullet already and phase 7's design decided the shape — it scaffolds the three
+required fields and leaves the rest to the checks. What phase 6 did to that file is routing and
+instructions only — five wrong pointers, and the missing `npm run agents` step — which cost nothing to
+fix now and pre-empted nothing.
+
+---
+
+## What phase 7 cost
+
+**1 · The convention the whole design rested on was not real, and one query said so.** The plan scoped
+the ARIA check to `.ac-<slug>`, which reads like a rule this repo enforces. It holds for 15 of 33
+components. The other 18 anchor on an abbreviation — `checkbox` is `.ac-choice`, `text-input` is
+`.ac-input`, `icon-button` is `.ac-btn-icon`, `status-text` is `.ac-status` — and `dropdown` has no
+`ac-dropdown` class in its markup at all: the root is an `.ac-field` carrying `[data-ac-dropdown]`, and
+the factory builds the rest at runtime. A check scoped that way would have swept nothing for more than
+half the library **and reported it as a pass**. It cost one query to find and reshaped the phase, adding
+`contract.root` and 33 declarations. The lesson is not "check your assumptions" but something narrower:
+**a convention stated in `CLAUDE.md` is a rule for new code, not a description of old code.** The
+`ac-<name>__<part>` rule is real; `<name>` was never promised to be the slug.
+
+**2 · An early probe misfiled real component parts as demo scaffolding, and nearly hid the finding
+above.** Bucketing unclaimed ARIA by "is it inside `.ac-<slug>`", the first sweep put `checkbox`'s
+`.ac-choice__input` and `radio-group`'s `.ac-group` in a bucket labeled *demo scaffolding* — 60 hits that
+looked like noise and were substantially real. The bucket names came from the assumption, so the output
+confirmed it. What broke the loop was a different question — *how many components have a `.ac-<slug>`
+element at all* — whose answer had no room for interpretation. **When a probe's categories come from the
+hypothesis, it can only agree with you.** Ask something countable instead.
+
+**3 · The checks found 14 real omissions, and the two best were already written down for humans.**
+`tabs` supports a vertical strip: its JS reads `aria-orientation` and swaps the arrow keys, its spec
+presses ArrowUp and ArrowDown, and `docs.md` has a table row explaining it. `dropdown`'s `docs.md`
+documents Space and Tab in its keyboard table. In both cases only the contract was silent, so the
+agent-facing file said `tabs` responds to ArrowLeft and ArrowRight and nothing else. **That is the
+requirement's exact scenario — the human side current, the agent side not — sitting in the library
+already, twice.** It is also the answer to whether the gap was hypothetical.
+
+The other 12: `aria-describedby` on `dropdown`'s trigger and `switch`'s input, `aria-label` on `notice`'s
+icon-only dismiss button, `aria-invalid` on four controls, `role=switch`/`aria-checked` on `chip-toggle`'s
+switch variant, `aria-live` on `visually-hidden`'s region, `role=status` on `checkbox`'s running count and
+`motion-preferences`' readout, `aria-labelledby` on `fieldset-group`'s div-based group, and `aria-disabled`
+on `result-panel`'s copy button.
+
+**4 · Two checks handed work to each other, which is the coupling behaving correctly.** Adding
+`dropdown`'s Space and Tab to the contract made check 3 fail — a documented key must be pressed by the
+component's own spec — so the phase also wrote the two tests that never existed for keys the component
+has always handled. Neither check is interesting alone. Together they close the loop: the JS obliges the
+contract, and the contract obliges the spec.
+
+**5 · The guard found two roots I drew too small, which is the guard being worth having.** Requiring that
+the scope contain at least one attribute the contract *does* claim caught `loading-button` (its
+`role=status` region is a sibling of the button) and `skip-link` (its `aria-label` is on the nav around
+the links). Both were fixed by widening `root`. It also fired on `checkbox`, correctly and uselessly —
+its entire `aria` block is `type=checkbox` and `for`, no ARIA at all — so the guard now applies only where
+the contract names something it could find. **A guard that never fires is decoration; one that fires
+where it cannot apply is noise. This one needed both edges.**
+
+**6 · `process.exit(1)` inside a `try` skips the `finally`.** The first red-probe run hit a bad anchor,
+exited, and left `disclosure/component.html` patched. Nothing was lost — the patch was one attribute and
+`git status` showed it — but a probe that breaks files on purpose has to restore them on *every* path.
+Throw, do not exit.
+
+**7 · The verification run found a flake that was never phase 7's, and it had been there all along.**
+`effects › contrast holds in every theme` failed, then failed again on a *different element in a
+different theme* — the signature of a value measured mid-flight. `tests/shared/a11y.spec.mjs` sets
+`data-theme` and calls axe in the next statement, while `.sidebar__link` and `.code-tab` transition
+`color` and `background-color`, so axe read a color part-way between two themes that both pass. Nothing
+in this phase touches the shell, the themes or that test; it is timing, which is why 1127/1127 held
+before. Fixed in the test by disabling transitions for the sweep. The stylesheet's own half of it —
+those transitions are not behind the motion gate — is a human-page file and is recorded under **Still
+open** rather than changed.
+
+**8 · Tier 2's margin is now 75 bytes.** `dropdown.md` went from 262 bytes spare to 75: a `Root:` line on
+every file, plus that component's three new contract rows. Recorded in **What the layer costs, measured**
+rather than acted on, because the budget is doing its job — but the next contract row anywhere near
+`dropdown` will need something cut, and cutting is the intended response.
+
+**Verified:** `check:tokens` 34 files clean · `check:agents` 42 surfaces match · `npm run build` 35 pages ·
+**chromium 1164/1164** (1127 before; +33 for check 12, +2 for checks 13 and 14, +2 dropdown specs).
 
 ---
 
@@ -869,68 +956,89 @@ writes prose:
 
 ---
 
-## Phase 7 — the requirement
+## Phase 7 — the coupling, as built
 
 Requested verbatim: *"add a pattern when any of the components are updated, that the agent side of the
 component knowledge is also updated. That way the agent's information stays in sync with the human
 information. The UI is where the information would be updated, so the agents' documentation needs to be
 updated to match."*
 
-**Design it after phases 2–6, not before** — phase 2 defines the contract block, and the contract block
-is what a component edit has to keep in step, so designing the coupling first would be guessing at its
-own input. Phases 2–6 are now done and this section was written before any of them; what follows is
-re-checked against what shipped, as of phase 6.
+**Designed after phases 2–6, not before** — phase 2 defines the contract block, and the contract block
+is what a component edit has to keep in step, so designing the coupling first would have been guessing at
+its own input.
 
-**The gap is real and the generator cannot close it.** `check:agents` couples `meta.json`,
-`docs/agents/preamble.md` and the four `docs/agents/*.src.md` files to the generated surfaces — those are
-every file the generator reads. It never opens `component.html`, `component.css` or `component.js`. So
-renaming an ARIA attribute, deleting a keyboard handler, or renaming a factory changes nothing the
-generator can see, and `check:agents` passes with the agent surfaces now lying about the component.
+**The gap it closes.** `check:agents` couples `meta.json`, `docs/agents/preamble.md` and the four
+`docs/agents/*.src.md` files to the generated surfaces — those are every file the generator reads. It
+never opens `component.html`, `component.css` or `component.js`. Phase 2's tests 2–4 assert a contract
+against the real markup, the real spec and the real `global.AC` registrations, and phase 3 added two
+checks reaching into component files from the other direction. **What none of them covered is a component
+whose new behavior nobody documented** — they verify claims, and silence makes no claim. So the shape of
+phase 7 is the reverse of phase 2: read the component, report what the contract does not admit to.
 
-**What already closes part of it, so a design does not re-buy it.** Phase 2's tests 2–4 assert a contract
-against the real markup, the real spec and the real `global.AC` registrations. Phase 3 added two checks
-that reach into component files from the other direction: every component a pitfall names by possessive
-must exist, and every `[MARKER]` a pitfall points at must still be in that component's CSS or JS. **What
-none of them cover is a component whose contract was never written, or whose new behavior nobody
-documented** — the checks verify claims, and silence makes no claim.
+**What shipped**
 
-Directions worth weighing when it is designed, recorded here so the thinking is not redone:
+- **`contract.root`** — the selector(s) that *are* the component. New required field, on all 33. Every
+  ARIA check scopes to it. Not optional and not derivable; see finding 1 below.
+- **Check 12 · ARIA in the markup that no contract mentions.** In the browser, because the attributes
+  most worth catching are the ones a factory sets at runtime, and an attribute that lands on an element
+  has a DOM position `closest()` can classify — statically there is no way to tell a component's own ARIA
+  from the demo-page wiring in the same file. Excludes `[data-ac-demo-broken]` subtrees and any nested
+  component's root. `aria-hidden` is exempt: every instance is decorative, which is a library-wide
+  convention rather than a fact about one component. **That exemption runs one way** — a contract may
+  still name `aria-hidden`, and test 2 asserts it when one does — so it can make a contract silent about
+  decoration, never wrong about it.
+- **Check 13 · keys `component.js` handles that no contract names.** Static, comments stripped, because
+  comments are where a component argues about the key it deliberately did *not* bind.
+- **Check 14 · factories on `global.AC` that no `api` claims.** Exempts the `create<Name>Page` suffix,
+  turning an undocumented practice into a convention this check now enforces.
+- **The `summary` → `useWhen` receipt.** An eight-character hash of each `summary` in
+  `agents/index.json`, and a drift report that names the component and the field. The one edit the
+  requirement literally names, and the only one no structural check can see.
+- **The obligation as a table** in `CLAUDE.md` > **Component folder shape**, and the pre-commit list in
+  `docs/authoring-a-component.md` extended with `npm run agents` and the `agent-surfaces` run.
+- **`scripts/new-component.mjs` scaffolds a `contract` block** with the three required fields, and its
+  printed steps say the suite will name whatever is missing rather than listing it up front.
 
-- **Fingerprint each component's real files into the manifest.** A short content hash of
-  `component.{html,css,js}` + `docs.md` per component, in `agents/index.json`. Any component edit
-  changes its hash, so `check:agents` fails until someone regenerates — which puts the component change
-  and the agent-side change in the same commit, by construction. It also gives a fetch-based agent a
-  cache key, which is real value rather than bookkeeping. Cost: `check:agents` then fails on a
-  pure-CSS tweak that changed no contract, and the regeneration is a receipt rather than a real content
-  update. Normalize CRLF and strip the BOM before hashing, or the hash is platform-dependent. Exclude
-  `tests/` — a test-only edit changes no agent knowledge.
-- **Make the failure message teach the pattern.** Whichever mechanism is chosen, the drift report
-  should name *which components' files moved* and what to revisit, not just say `stale index.json`.
-  That is where most of the value is.
-- **A path-based CI check** — fail a PR that touches `src/library/components/` without touching
-  `agents/`. Rejected on first look: it needs a base ref, so it does not work locally or on a direct
-  push, and touching any unrelated file under `agents/` satisfies it.
-- **Document the pattern for humans, because the mechanical part cannot do it all.** A `summary`
-  rewritten for the UI page does not appear in any agent surface, so no check can tell that the
-  component's one-line `useWhen` is now stale. That needs a stated convention — an edit-to-obligation
-  table in `CLAUDE.md` and `docs/authoring-a-component.md`: change the roles in `component.html` →
-  revisit `contract.aria`; change a key handler → `contract.keyboard` and the spec; rename the factory
-  → `contract.api`; rewrite the `summary` → `contract.useWhen`. Phase 2 landed the first three as one
-  sentence in `CLAUDE.md`'s "Component folder shape"; the `summary` → `useWhen` row is the one still
-  missing, and it is the row no check can ever cover.
-- **`scripts/new-component.mjs` should scaffold an empty `contract` block**, so a new component starts
-  with the obligation visible rather than discovering it at review. Still true as of phase 6 — the
-  scaffolder writes no `contract` at all, so test 1 fails on a new component until someone adds one by
-  hand, which is a discoverable-at-review obligation exactly where the plan said it should not be. Phase 6
-  made the obligation visible in that file's own output — step 1 of what it prints is now writing the
-  block, and step 3 is `npm run agents` — and left the block itself to this phase.
+**Rejected: fingerprinting every component file.** The plan carried it as the leading option — a hash of
+`component.{html,css,js}` + `docs.md` per component, so any edit fails `check:agents` until someone
+regenerates, putting both changes in one commit by construction. It was rejected once the three checks
+above existed. It fires on a CSS tweak that changed no contract, and its fix is a regeneration nobody has
+to read — which trains exactly the reflex the other three depend on people not having. The reverse checks
+cover the agent-visible surface directly and stay quiet otherwise. A content hash as a **cache key** for
+fetch-based agents is still worth having and is deferred with the MCP server, which is the consumer that
+would justify it.
+
+**Rejected: a static ARIA scan of `component.js`.** It would catch an attribute the component only
+*reads* — `tabs` picks its arrow keys from an `aria-orientation` no demo sets. Measured: 16 hits, 12 of
+them demo-page wiring, and cutting the `create*Page` factories removed only 2, because demo wiring lives
+in dozens of top-level helpers (`say`, `out`, `watch`, `logAdd`) with no naming convention. All
+exemption, no signal. `tabs` was fixed by hand instead and the limitation recorded under **Still open**.
+
+**Rejected: a path-based CI check** — fail a PR that touches `src/library/components/` without touching
+`agents/`. Rejected on first look and never revisited: it needs a base ref, so it does not work locally
+or on a direct push, and touching any unrelated file under `agents/` satisfies it.
 
 ---
 
 ## Still open
 
-Two things this work found and did not close. Everything else it found is either fixed or is phase 7's
-subject, listed in **Phase 7 — the requirement** above and not repeated here.
+Four things this work found and did not close.
+
+**An attribute a component only *reads* is invisible to every check here.** `tabs` takes
+`aria-orientation` as an input — nothing sets it, the JS branches on it — so check 12 cannot see it in
+the DOM and the static scan that would catch it was rejected as all-exemption (see **Phase 7 — the
+coupling, as built**). It was documented by hand, in `states`. Any future knob of that shape has to be
+too: a configuration attribute the component consumes rather than produces has no mechanical trace, and
+the honest position is that the coupling covers what a component *does*, not what it can be told.
+
+**The shell's color transitions are not behind the motion gate.** `src/site/styles/site.css` transitions
+`color`, `background-color` and `border-color` on `var(--dur)` directly — `.sidebar__link` and
+`.code-tab` — rather than on `calc(var(--motion) * var(--dur))` the way every component does. So a
+visitor who has asked for reduced motion still gets an animated theme change in the shell, and
+`emulateMedia({ reducedMotion: 'reduce' })` does not stop it in a test. Phase 7 met this as a flaky
+contrast failure and fixed the *measurement*, in `tests/shared/a11y.spec.mjs`; the stylesheet itself is a
+human-facing page file and is left alone under the standing constraint. Two lines to fix in a session
+that has reason to be in that file.
 
 **A scaffold from `npm run new:component` publishes itself.** Found during phase 1. Neither
 `src/site/pages/components/index.astro` nor `src/site/components/ComponentNav.astro` filters on

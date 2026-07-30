@@ -55,7 +55,8 @@
       "apg": null,
       "files": ["html", "css"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "2aa931c4"
     },
     {
       "slug": "visually-hidden",
@@ -67,7 +68,8 @@
       "apg": null,
       "files": ["html", "css"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "efc1e99a"
     },
     {
       "slug": "focus-ring",
@@ -79,7 +81,8 @@
       "apg": null,
       "files": ["html", "css"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "a176c3ba"
     },
     {
       "slug": "live-region",
@@ -91,7 +94,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/practices/live-regions/",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "e17daa1a"
     },
     {
       "slug": "typography",
@@ -103,7 +107,8 @@
       "apg": null,
       "files": ["html", "css"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "4bcfd576"
     },
     {
       "slug": "motion-preferences",
@@ -115,7 +120,8 @@
       "apg": null,
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "74afc318"
     },
     {
       "slug": "effects",
@@ -127,7 +133,8 @@
       "apg": null,
       "files": ["html", "css"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "e92973bc"
     },
     {
       "slug": "button",
@@ -139,7 +146,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/button/",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "369c83da"
     },
     {
       "slug": "icon-button",
@@ -151,7 +159,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/button/",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "45e3712d"
     },
     {
       "slug": "loading-button",
@@ -163,7 +172,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/button/",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "04c6fd78"
     },
     {
       "slug": "chip-toggle",
@@ -175,7 +185,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/button/",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "1e18b511"
     },
     {
       "slug": "field",
@@ -187,7 +198,8 @@
       "apg": null,
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "4af45f3b"
     },
     {
       "slug": "text-input",
@@ -199,7 +211,8 @@
       "apg": null,
       "files": ["html", "css"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "ab81d96f"
     },
     {
       "slug": "input-group",
@@ -211,7 +224,8 @@
       "apg": null,
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "cd00b12d"
     },
     {
       "slug": "textarea",
@@ -223,7 +237,8 @@
       "apg": null,
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "527dfab4"
     },
     {
       "slug": "native-select",
@@ -235,7 +250,8 @@
       "apg": null,
       "files": ["html", "css"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "869a47a9"
     },
     {
       "slug": "radio-group",
@@ -247,7 +263,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/radio/",
       "files": ["html", "css"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "aa5f089d"
     },
     {
       "slug": "checkbox",
@@ -259,7 +276,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "7338d767"
     },
     {
       "slug": "switch",
@@ -271,7 +289,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/switch/",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "5d980491"
     },
     {
       "slug": "fieldset-group",
@@ -283,7 +302,8 @@
       "apg": "https://www.w3.org/WAI/tutorials/forms/grouping/",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "8c971969"
     },
     {
       "slug": "disclosure",
@@ -295,7 +315,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "1525cfbf"
     },
     {
       "slug": "dropdown",
@@ -307,7 +328,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "1e56c7cd"
     },
     {
       "slug": "modal",
@@ -319,7 +341,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "7b5d3172"
     },
     {
       "slug": "drawer",
@@ -331,7 +354,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "93f8cf27"
     },
     {
       "slug": "tooltip",
@@ -343,7 +367,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "85a53256"
     },
     {
       "slug": "tabs",
@@ -355,7 +380,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/tabs/",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "cedc4277"
     },
     {
       "slug": "jump-nav",
@@ -367,7 +393,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/HTML/nav.html",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "288e3b5c"
     },
     {
       "slug": "notice",
@@ -379,7 +406,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/alert/",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "7365cb9a"
     },
     {
       "slug": "status-text",
@@ -391,7 +419,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/practices/live-regions/",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "f20799f9"
     },
     {
       "slug": "badge",
@@ -403,7 +432,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/practices/names-and-descriptions/",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "f23b2f84"
     },
     {
       "slug": "result-panel",
@@ -415,7 +445,8 @@
       "apg": "https://www.w3.org/WAI/ARIA/apg/practices/live-regions/",
       "files": ["html", "css", "js"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "ec828245"
     },
     {
       "slug": "data-table",
@@ -427,7 +458,8 @@
       "apg": "https://www.w3.org/WAI/tutorials/tables/",
       "files": ["html", "css"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "301d2548"
     },
     {
       "slug": "prose-surface",
@@ -439,7 +471,8 @@
       "apg": "https://www.w3.org/WAI/WCAG22/Understanding/info-and-relationships.html",
       "files": ["html", "css"],
       "status": "stable",
-      "hasContract": true
+      "hasContract": true,
+      "_summaryRev": "c128d7dc"
     }
   ]
 }

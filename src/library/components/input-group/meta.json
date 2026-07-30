@@ -12,6 +12,7 @@
   "demoNote": "Zoom to 200% and watch the addon push the field narrower instead of covering the text. The password button changes its name rather than carrying aria-pressed, and the copy confirmation goes to a live region rather than rewriting the button.",
   "contract": {
     "useWhen": "A text input with a button joined to it, both reachable at 200% zoom.",
+    "root": [".ac-input-group"],
     "aria": {
       "the input": [
         "aria-describedby"

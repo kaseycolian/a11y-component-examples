@@ -11,6 +11,7 @@
   "files": ["html", "css", "js"],
   "contract": {
     "useWhen": "A button that shows and hides the region right after it.",
+    "root": [".ac-disclosure"],
     "aria": {
       "the trigger": [
         "type=button",

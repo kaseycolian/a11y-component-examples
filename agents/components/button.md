@@ -6,6 +6,8 @@ A real button, plus why a div with a click handler is not one.
 
 In `library/components/button/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-btn`
+
 ## ARIA
 
 - **the control** — `type=button`

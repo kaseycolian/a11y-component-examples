@@ -6,6 +6,8 @@ A panel from a screen edge. The whole component is the focus management.
 
 In `library/components/drawer/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-drawer`
+
 ## ARIA
 
 - **the trigger** — `type=button` `aria-expanded` `aria-controls`

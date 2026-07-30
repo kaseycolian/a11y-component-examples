@@ -11,9 +11,9 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-30 (**the agent layer is through phase 6 — only phase 7 is left**, see item 5;
-suite is **1127/1127** in Chromium. Playwright **firefox is installed but has never been run**,
-webkit is not installed; the `summary` voice changed on 2026-07-28, see item 0a)
+Last updated: 2026-07-30 (**the agent layer is complete — all eight phases**, see item 5; suite is
+**1164/1164** in Chromium. Playwright **firefox is installed but has never been run**, webkit is not
+installed; the `summary` voice changed on 2026-07-28, see item 0a)
 
 ---
 
@@ -36,19 +36,21 @@ the reader's problem rather than the ARIA attribute, and **never enumerating or 
 examples**. `status-text` onward is written to it; everything earlier is the sweep in item 0a. The
 same session tightened the on-page copy rule (item 0b).
 
-**In progress, and it is not a component.** The **agent-facing layer** — `docs/agent-layer.md` is the
-record and item 5 below tracks it. It is the current work, ahead of batch F. Read that file before
-touching `AGENTS.md`, `agents/`, `.claude/`, or `scripts/build-agent-surfaces.mjs`; the short version
-is that agents get a four-tier read path with hard token budgets, every surface is rendered from one
-manifest so they cannot drift, and the human pages are not touched. **Phases 0 through 6 are done** —
-all four tiers ship, every component has a `contract` block, the cross-cutting surfaces
-(`agents/{pitfalls,conventions,verify,testing}.md`) are written, a generated Claude Code skill at
-`.claude/skills/a11y-library/SKILL.md` is the third Tier 0 door, `CLAUDE.md` and `README.md` say which
-audience they serve, `npm run check:agents` fails if any surface drifts from its source, and
-`tests/shared/agent-surfaces.spec.mjs` fails if a contract lies about the markup. **Phase 7 is the only
-one left: couple a component edit to its agent-side knowledge** — the design record specifies it and it is
-not yet designed. Nothing under `agents/`, `AGENTS.md` or `.claude/skills/` is hand-editable; edit a file
-in `docs/agents/` or a `meta.json`, then run `npm run agents`.
+**Done, and it is not a component.** The **agent-facing layer** — `docs/agent-layer.md` is the record and
+item 5 below tracks it. Read that file before touching `AGENTS.md`, `agents/`, `.claude/`, or
+`scripts/build-agent-surfaces.mjs`; the short version is that agents get a four-tier read path with hard
+token budgets, every surface is rendered from one manifest so they cannot drift, and the human pages are
+not touched. **All eight phases are done** — all four tiers ship, every component has a `contract` block,
+the cross-cutting surfaces (`agents/{pitfalls,conventions,verify,testing}.md`) are written, a generated
+Claude Code skill at `.claude/skills/a11y-library/SKILL.md` is the third Tier 0 door, `CLAUDE.md` and
+`README.md` say which audience they serve, `npm run check:agents` fails if any surface drifts from its
+source, and `tests/shared/agent-surfaces.spec.mjs` fails if a contract lies about the markup **or is
+silent about it** — phase 7 added the reverse direction, so ARIA, a key handler or a factory added to a
+component fails until its contract catches up. Nothing under `agents/`, `AGENTS.md` or `.claude/skills/`
+is hand-editable; edit a file in `docs/agents/` or a `meta.json`, then run `npm run agents`.
+
+**If you edit a component, its contract is part of the edit.** `CLAUDE.md` > **Component folder shape**
+has the table of which change obliges which field. Batch F is the next work.
 
 **This file is a build log and only that.** It is where progress, the roster checklist, the ordered next
 steps and the repo-local gotchas live. It is never where a component's behavior is looked up — that is
@@ -953,7 +955,7 @@ dated; mark untested combinations untested rather than assuming they pass), `doc
 ticked. What is genuinely left is filling `at-support.md`'s matrix, which needs a real screen reader
 rather than a keyboard.
 
-### 5. The agent-facing layer — **built through phase 6, only phase 7 left, see `docs/agent-layer.md`**
+### 5. The agent-facing layer — **built, all eight phases, see `docs/agent-layer.md`**
 
 The library has two audiences and only the human one was built for. An agent arriving before this work
 found no `AGENTS.md`, no index, no `llms.txt`, a 1.42 MB corpus, and a `CLAUDE.md` telling it to read
@@ -961,16 +963,26 @@ this 113 KB file first. The design record has the measurements, the four-tier re
 budgets, the one-manifest generator that keeps every surface in sync, and the accuracy tests that
 assert the hand-written contracts against the real markup.
 
-**Phases 0 through 6 are done.** All four tiers ship — `AGENTS.md` at 2.4 KB, `agents/index.md` at
+**All eight phases are done.** All four tiers ship — `AGENTS.md` at 2.4 KB, `agents/index.md` at
 3.2 KB, `agents/index.json`, `agents/llms.txt`, and a per-component contract in
-`agents/components/<slug>.md` at 0.8–1.5 KB — plus the four cross-cutting Tier 4 surfaces,
+`agents/components/<slug>.md` at 0.9–1.7 KB — plus the four cross-cutting Tier 4 surfaces,
 `agents/{pitfalls,conventions,verify,testing}.md`, and a generated Claude Code skill at
 `.claude/skills/a11y-library/SKILL.md` (2.8 KB) that is Tier 0's third door. All of it is rendered by
 `scripts/build-agent-surfaces.mjs` and gated by `npm run check:agents` in `verify` and in CI, plus
 `tests/shared/agent-surfaces.spec.mjs` in the suite. **Answering "how do I build an accessible X" costs
-an agent 6.4–7.1 KB** — Tier 0, the index, and one contract — against a `src/library/` of 1,829 KB.
-Phase 7 is the last item on the checklist at the bottom of that file; keep it current there rather than
-duplicating it here.
+an agent 6.8–7.2 KB** — Tier 0, the index, and one contract — against a `src/library/` of 1,833 KB.
+
+Two things from phase 7 that outlive it:
+
+- **A component edit is now an edit to its contract too, and three checks enforce it.** They read
+  `component.html` in a browser and `component.js` as text, and report ARIA, keys or factories the
+  contract does not admit to. `CLAUDE.md` > **Component folder shape** has the table of which change
+  obliges which field. The one row nothing can check is `summary` → `contract.useWhen`: a fingerprint in
+  `agents/index.json` fires, names the component, and leaves the judgement to a person.
+- **`contract.root` is required, and `.ac-<slug>` is not what you think.** Every ARIA check scopes to
+  the selectors a contract declares, because the class cannot be derived from the slug — it holds for 15
+  of 33 components and fails for the rest. Rename a component's root class and `root` moves with it, or
+  the check quietly stops checking. That is what its two guards exist to prevent.
 
 One thing from phase 6 that outlives it:
 
@@ -1135,6 +1147,20 @@ homes it belongs to, not in all of them.
   a gotcha total was counted by eye at 62 against an actual 69. All three were plausible and internally
   consistent, which is why none was caught by reading. Measure with `stat` in a loop, after the last edit,
   and paste the output.
+- **A convention in `CLAUDE.md` describes new code, not old code.** `.ac-<slug>` reads like a rule this
+  repo enforces; it is true for 15 of 33 components. The rest anchor on an abbreviation — `checkbox` is
+  `.ac-choice`, `text-input` is `.ac-input` — and `dropdown` has no `ac-dropdown` class in its markup at
+  all. A phase-7 check scoped that way would have swept nothing for over half the library and reported a
+  pass. Before building anything that assumes a naming convention holds, **count how many components
+  actually satisfy it.** One query, and it reshaped the phase.
+- **A probe whose buckets come from your hypothesis can only agree with you.** Sorting unclaimed ARIA
+  into "component" and "demo scaffolding" by whether it sat inside `.ac-<slug>` filed `checkbox`'s real
+  inputs as scaffolding and made 60 real hits look like noise. What broke it was a question with no room
+  for interpretation — *how many components have that element at all* — rather than a better bucket. Ask
+  something countable.
+- **`process.exit()` inside a `try` skips the `finally`.** A probe that patches files on purpose must
+  restore them on every path, and exit is not a path — it terminates immediately. The first phase-7 red
+  probe left a patched `component.html` behind that way. Throw instead; let `finally` run.
 - **Never round-trip a repo file through PowerShell.** `Get-Content -Raw` then
   `Set-Content -Encoding utf8` re-encodes UTF-8 as Latin-1 on 5.1 and adds a BOM: every `—` becomes
   `â€"`, every `…` becomes `â€¦`. It survives `git diff --stat`, renders as garbage, and in a

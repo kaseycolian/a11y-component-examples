@@ -12,6 +12,7 @@
   "demoNote": "No JavaScript on this page. Examples 3, 4 and 5 each carry a failure that is live rather than described — the third is a contrast ratio that appears nowhere in the CSS, and the fifth needs one click of a checkbox.",
   "contract": {
     "useWhen": "Visual text classes that carry no semantics at all.",
+    "root": [".ac-t-body"],
     "failureModes": [
       "a div wearing a heading class, which is styling and not a heading",
       "opacity for muted text, which composites against whatever is behind it",

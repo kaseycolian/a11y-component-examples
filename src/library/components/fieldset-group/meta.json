@@ -12,9 +12,14 @@
   "demoNote": "Uncheck everything in example 4 and the group says what is wrong — a rule `required` cannot express. Example 5 locks the same group twice: `disabled` cascades and takes the keyboard with it, `aria-disabled` cascades to nothing and keeps the reason reachable.",
   "contract": {
     "useWhen": "Related controls under one question, named by a legend.",
+    "root": [".ac-group"],
     "aria": {
       "each control": [
         "aria-describedby"
+      ],
+      "a group that cannot be a fieldset": [
+        "role=group",
+        "aria-labelledby"
       ],
       "the error": [
         "role=alert"
@@ -32,7 +37,7 @@
     ],
     "states": [
       "invalid",
-      "disabled"
+      "disabled — aria-disabled=true on the fieldset, which stays focusable so it can say why"
     ],
     "failureModes": [
       "role=group on a fieldset, replacing working semantics with hand-written ones",

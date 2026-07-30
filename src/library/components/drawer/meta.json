@@ -12,6 +12,7 @@
   "demoNote": "Same behavior on a phone and on a desktop — that is what separates it from the Dropdown, which anchors to its trigger at every width. Open one and press Tab repeatedly: in the first three, focus cannot leave.",
   "contract": {
     "useWhen": "A panel from a screen edge. The whole component is the focus management.",
+    "root": [".ac-drawer"],
     "aria": {
       "the trigger": [
         "type=button",

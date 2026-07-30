@@ -12,6 +12,7 @@
   "demoNote": "No JavaScript on this page. A text input that needs a script to be accessible is a broken one.",
   "contract": {
     "useWhen": "A text field, with the type and autocomplete that make it fillable.",
+    "root": [".ac-input"],
     "aria": {
       "the label": [
         "for"
@@ -28,7 +29,7 @@
       ]
     ],
     "states": [
-      "invalid",
+      "invalid — aria-invalid=true on the control, set only while the error shows",
       "disabled",
       "readonly"
     ],

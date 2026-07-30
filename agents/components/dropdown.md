@@ -6,9 +6,11 @@ A custom select, for when the native one cannot be styled the way you need.
 
 In `library/components/dropdown/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `[data-ac-dropdown]`, `.ac-dropdown`
+
 ## ARIA
 
-- **the trigger** — `aria-haspopup=listbox` `aria-expanded` `aria-controls` `aria-labelledby`
+- **the trigger** — `aria-haspopup=listbox` `aria-expanded` `aria-controls` `aria-labelledby` `aria-describedby`
 - **the panel** — `role=listbox` `aria-labelledby`
 - **an option** — `role=option` `aria-selected` `tabindex=-1`
 - **a disabled option** — `aria-disabled=true`
@@ -18,8 +20,9 @@ In `library/components/dropdown/` — copy `component.{html,css,js}`, read `docs
 
 - `ArrowDown / ArrowUp` — move between options
 - `Home / End` — first / last option
-- `Enter` — choose the focused option
+- `Enter / Space` — open from the trigger, or choose the focused option
 - `Escape` — close, keeping the current value
+- `Tab` — close and carry on tabbing, from the trigger rather than the hidden panel
 
 **States:** open, selected, disabled option
 

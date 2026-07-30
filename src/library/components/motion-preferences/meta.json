@@ -21,12 +21,16 @@
   "demoNote": "The toggle in example 2 controls every example on this page, and the readout under it names the three signals that produced the answer. Example 5 is broken on purpose and live: one extra CSS rule that beats your operating system, with a button that proves it.",
   "contract": {
     "useWhen": "One motion token: a page can add the restriction, never override the OS.",
+    "root": [".ac-switch", ".ac-motion-scope"],
     "aria": {
       "the toggle": [
         "aria-describedby"
       ],
       "the drawn track": [
         "aria-hidden=true"
+      ],
+      "the readout that reports which way it resolved": [
+        "role=status"
       ]
     },
     "keyboard": [

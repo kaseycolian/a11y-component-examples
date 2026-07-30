@@ -12,6 +12,7 @@
   "demoNote": "Press Esc with the pointer still on a trigger, then move the pointer from a trigger onto its bubble — those two are what most tooltips fail. Example 3 is the native title attribute, kept as a comparison; example 4 is the version that works on a phone.",
   "contract": {
     "useWhen": "A description on hover and focus, plus the toggletip for touch.",
+    "root": [".ac-tooltip-host"],
     "aria": {
       "the trigger": [
         "aria-describedby"

@@ -140,6 +140,14 @@ In a test, `emulateMedia({ reducedMotion: 'reduce' })` before the run, or an ass
 flushes the style it was just handed. Worth recognizing on sight: it looks exactly like forced colors
 ignoring the stylesheet, and cost the best part of an hour here.
 
+**An axe contrast sweep after a theme switch is the same bug at page scale, and reduced motion may not
+fix it.** Setting `data-theme` and calling `analyze()` in the next statement measures every transitioning
+element mid-flip, so a color part-way between two themes that both pass can read under 4.5:1. It shows up
+as a failure on a *different element and a different theme on each run* — that inconsistency is the
+diagnosis, not noise to retry past. Reduced-motion emulation only helps where the transition is actually
+gated on it; a `transition: color var(--dur)` written without the gate keeps running. Inject
+`*, *::before, *::after { transition: none !important; }` before the sweep instead.
+
 <!-- item: A settle-poll that starts in the same frame as the scroll reports the state before it -->
 
 "scrollTop has not changed for three frames" is true immediately after

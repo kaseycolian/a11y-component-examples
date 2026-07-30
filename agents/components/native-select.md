@@ -6,6 +6,8 @@ The native select, which is the better default on a phone.
 
 In `library/components/native-select/` — copy `component.{html,css}`, read `docs.md` for why.
 
+**Root:** `.ac-select`
+
 ## ARIA
 
 - **the control** — `aria-describedby`
@@ -15,7 +17,7 @@ In `library/components/native-select/` — copy `component.{html,css}`, read `do
 
 - `ArrowDown / Home` — native: the OS picker owns all of it
 
-**States:** invalid, disabled
+**States:** invalid — aria-invalid=true on the control, set only while the error shows, disabled
 
 ## Goes wrong when
 

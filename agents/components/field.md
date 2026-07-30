@@ -6,6 +6,8 @@ A label, a hint and an error on one control, wired so both stay announced.
 
 In `library/components/field/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-field`
+
 ## ARIA
 
 - **the label** — `for`

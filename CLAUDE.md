@@ -24,6 +24,7 @@ to look up how a component behaves.
 | The ARIA contract + keyboard map for a **built** component | `agents/components/<slug>.md` — generated from its `meta.json` and asserted against the shipped markup |
 | The up-front design decisions behind one, and its CSS gotchas | `docs/component-specs.md` (read one entry, not the file) |
 | What a component assumes about the page it lands in | `agents/conventions.md` — the reasoning behind **Non-negotiable conventions** below |
+| What to run after a change, and what a failure means | `docs/sync-process.md` |
 | Why the agent-facing layer is shaped the way it is | `docs/agent-layer.md` |
 | Original design rationale | `C:\Users\kasey\.claude\plans\this-will-be-a-curious-pnueli.md` |
 
@@ -90,17 +91,35 @@ src/library/components/<slug>/
 
 `meta.json` `group` must be one of the ids in `src/site/lib/groups.mjs` `GROUPS`.
 
-`meta.json` `contract` is the agent-facing ARIA contract — `useWhen`, `aria`, `keyboard`, `states`,
-`failureModes`, `api`, `seeAlso` — and it renders to `agents/components/<slug>.md`. It is **asserted
-against the component**, so three of its fields carry an obligation:
+`meta.json` `contract` is the agent-facing ARIA contract — `useWhen`, `root`, `aria`, `keyboard`,
+`states`, `failureModes`, `api`, `seeAlso` — and it renders to `agents/components/<slug>.md`. It is
+**asserted against the component**, so four of its fields carry an obligation:
 
+- `root` is the selector(s) that *are* this component on its demo page. It cannot be guessed from the
+  slug — `checkbox` is `.ac-choice`, `text-input` is `.ac-input`, `dropdown` is a `<select>` carrying
+  `[data-ac-dropdown]` — and every ARIA check scopes itself to it, so a wrong one checks nothing.
 - `aria` is what must be in the markup you copy. An attribute that exists only in a transient state
-  (`aria-busy` while pending, `aria-invalid` after a failed validation) goes in `states`.
+  (`aria-busy` while pending, `aria-invalid` after a failed validation) goes in `states`, named there:
+  `"invalid — aria-invalid=true on the control, set only while the error shows"`.
 - a key in `keyboard` must be pressed by `tests/<slug>.spec.mjs`, unless its effect starts `native:`.
-- `api` names factories really registered as `global.AC.<name>`; the demo-page wiring is left out.
+- `api` names factories really registered as `global.AC.<name>`; demo-page wiring is left out, and is
+  what the `create<Name>Page` suffix is for.
 
-Change the roles in `component.html`, a key handler, or a factory name, and revisit the contract in the
-same commit — `tests/shared/agent-surfaces.spec.mjs` is what tells you if you didn't.
+**Edit the component, revisit its contract in the same commit.** The generator never opens
+`component.html`, `component.css` or `component.js`, so `check:agents` cannot see any of this —
+`tests/shared/agent-surfaces.spec.mjs` is what tells you, and it reads the component both ways.
+
+| You changed | Revisit | What tells you |
+| --- | --- | --- |
+| a role or `aria-*` in `component.html` | `contract.aria`, or `states` if it is transient | checks 2 and 12 |
+| the class on a component element | `contract.root` | check 12 — it fails rather than silently sweeping nothing |
+| a key handler in `component.js` | `contract.keyboard` **and** the spec | checks 3 and 13 |
+| a factory name | `contract.api` | checks 4 and 14 |
+| the `summary` | `contract.useWhen` — the agent-facing version of the same sentence | `check:agents`, which names the component |
+
+The last row is the one no check can really cover: `summary` renders into no agent surface, so nothing
+can tell whether the two still agree. What fires is a fingerprint — the failure says *the summary
+changed, go reread `useWhen`*, and only a person can decide whether it still holds.
 
 ## Non-negotiable conventions
 

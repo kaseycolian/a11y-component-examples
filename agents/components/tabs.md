@@ -6,6 +6,8 @@ Swap panels in place. Not for moving between pages; that is jump-nav.
 
 In `library/components/tabs/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
+**Root:** `.ac-tabs`
+
 ## ARIA
 
 - **the strip** — `role=tablist` `aria-label`
@@ -15,10 +17,11 @@ In `library/components/tabs/` — copy `component.{html,css,js}`, read `docs.md`
 ## Keyboard
 
 - `ArrowLeft / ArrowRight` — move and select, since the panels are already in the DOM
+- `ArrowUp / ArrowDown` — the same, and the only pair that moves, when the strip is vertical
 - `Home / End` — first / last tab
 - `Tab` — one stop for the strip, then into the panel
 
-**States:** selected, disabled
+**States:** selected, disabled, vertical — aria-orientation=vertical on the tablist, which swaps which arrows move
 
 ## Goes wrong when
 

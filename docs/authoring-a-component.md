@@ -1,8 +1,10 @@
 # Authoring a component
 
-`component-specs.md` says *what* to build. `CLAUDE.md` says what the code must satisfy. This file is
-about the parts that are judgement rather than rule: what makes a good demo, how to write the docs,
-and what a useful test actually asserts.
+`CLAUDE.md` says what the code must satisfy, and the `contract` block in `meta.json` is what the
+component owes its agent-facing side. `component-specs.md` has the up-front design decisions, for the
+components it has an entry for — it predates most of the library, so a new slug will not be in it.
+This file is about the parts that are judgement rather than rule: what makes a good demo, how to write
+the docs, and what a useful test actually asserts.
 
 Start with `npm run new:component -- <slug> --group <id> --name "Name"`.
 
@@ -116,9 +118,17 @@ Run the definition-of-done checklist at the bottom of `component-specs.md`, then
 
 ```sh
 npm run check:tokens
+npm run agents          # renders agents/components/<slug>.md from the contract block
+npm run check:agents
 npm run build
 npx playwright test --project=chromium <slug>
+npx playwright test --project=chromium agent-surfaces
 ```
+
+That last one is the half people skip. It reads your markup and your JS and reports anything they do
+that the contract does not admit to — an `aria-*` you added, a key you bound, a factory you exported.
+`CLAUDE.md` > **Component folder shape** has the table of which edit obliges which field, and
+`sync-process.md` decodes the failures.
 
 And open it in a browser. Tab through it with your eyes closed for a moment — if you cannot tell
 where you are, neither can anyone else.

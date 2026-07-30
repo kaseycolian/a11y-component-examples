@@ -12,6 +12,7 @@
   "demoNote": "Type into the bio field with a screen reader on: the count on screen changes with every keystroke, but nothing is spoken until you pause and are close to the limit. Drag the corner of the growing field and it stops resizing itself.",
   "contract": {
     "useWhen": "A multi-line field you can still resize, and a counter that is not chatty.",
+    "root": [".ac-textarea"],
     "aria": {
       "the control": [
         "aria-describedby"
@@ -27,7 +28,7 @@
       ]
     ],
     "states": [
-      "invalid",
+      "invalid — aria-invalid=true on the control, set only while the error shows",
       "over the limit"
     ],
     "failureModes": [

@@ -31,6 +31,7 @@
  */
 import { readFile, writeFile, mkdir, rm, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, posix } from 'node:path';
 
@@ -297,7 +298,16 @@ function renderProse(surface, { lede, groups }) {
  * required -- a CSS-only component has no keyboard map and no API, and a stub
  * with empty sections would cost an agent a fetch to learn nothing.
  */
-const CONTRACT_FIELDS = ['useWhen', 'aria', 'keyboard', 'states', 'failureModes', 'api', 'seeAlso'];
+const CONTRACT_FIELDS = [
+  'useWhen',
+  'root',
+  'aria',
+  'keyboard',
+  'states',
+  'failureModes',
+  'api',
+  'seeAlso',
+];
 
 /**
  * Check the shape of a contract, and nothing about the world.
@@ -334,6 +344,19 @@ function validateContract(slug, c) {
   // Asserting only that it exists is weak; it is still the check that stops the
   // block from becoming a restatement of the markup.
   strings(c.failureModes, 'failureModes');
+
+  // Which elements on the page are this component. Required, because it cannot
+  // be derived: `.ac-<slug>` is true for fifteen components and false for
+  // eighteen, which anchor on an abbreviation -- `.ac-choice`, `.ac-input`,
+  // `.ac-ib__verdict` -- and dropdown's root is an `.ac-field` carrying
+  // `data-ac-dropdown`. Check 12 scopes its sweep to this, so a component
+  // without one would be swept for nothing and pass.
+  strings(c.root, 'root');
+  for (const selector of c.root) {
+    if (!selector.startsWith('.') && !selector.startsWith('[')) {
+      bad(`root "${selector}" must be a class or attribute selector`);
+    }
+  }
 
   if (c.aria !== undefined) {
     if (!c.aria || typeof c.aria !== 'object' || Array.isArray(c.aria)) {
@@ -391,6 +414,12 @@ async function readComponents() {
     components.push({
       slug: meta.slug ?? slug,
       name: meta.name ?? slug,
+      // Read for its fingerprint alone. `summary` is the human page lede and
+      // renders into no agent surface -- `useWhen` is the agent-facing version of
+      // the same sentence, written separately and much shorter. That is exactly
+      // why a rewritten summary can leave useWhen stale with nothing to notice:
+      // it is the one component edit no structural check can see.
+      summary: meta.summary ?? '',
       group: meta.group,
       order: meta.order ?? 100,
       tags: meta.tags ?? [],
@@ -608,6 +637,17 @@ const compactScalarArrays = (json) =>
     `[${items.replace(/,\n\s+/g, ', ')}]`,
   );
 
+/**
+ * Eight hex characters of the summary. Long enough that a rewrite always moves
+ * it, short enough to stay out of the way in a file people read.
+ *
+ * Whitespace is normalized first so a re-wrapped paragraph -- the same sentence
+ * across different line widths -- is not reported as a change. The `summary` is
+ * one JSON string, but it is edited in a wrapped file by hand.
+ */
+const summaryRev = (summary) =>
+  createHash('sha256').update(summary.replace(/\s+/g, ' ').trim()).digest('hex').slice(0, 8);
+
 function renderIndexJson(manifest) {
   const body = {
     _generated: DO_NOT_EDIT,
@@ -632,6 +672,15 @@ function renderIndexJson(manifest) {
       files: c.files,
       status: c.status,
       hasContract: Boolean(c.contract),
+      // Bookkeeping, not agent data -- hence the underscore, as on _generated.
+      // This is the receipt that couples the human lede to its agent-facing
+      // counterpart: change the summary and this moves, `check:agents` fails,
+      // and the failure names the useWhen to reread. It is deliberately the only
+      // fingerprint in the layer. Hashing the component files as well was
+      // considered and rejected: it fails on a CSS tweak that changed no
+      // contract, and its fix is a regeneration nobody has to read, which trains
+      // exactly the reflex the other checks depend on people not having.
+      _summaryRev: summaryRev(c.summary),
     })),
   };
   return `${compactScalarArrays(JSON.stringify(body, null, 2))}\n`;
@@ -801,6 +850,11 @@ function renderComponent(component, manifest) {
     // once to point at the code and again to point at docs.md beside it.
     `In \`library/components/${component.slug}/\` — copy ` +
       `\`component.{${component.files.join(',')}}\`, read \`docs.md\` for why.`,
+    '',
+    // What to look for in that markup. The class is not derivable from the slug
+    // -- more than half the library anchors on an abbreviation -- so an agent
+    // that has not fetched component.html cannot guess it.
+    `**Root:** \`${c.root.join('`, `')}\``,
   ];
 
   if (c.aria) {
@@ -940,6 +994,53 @@ function budgetProblems(rendered) {
   return problems;
 }
 
+const INDEX_JSON = 'agents/index.json';
+
+/**
+ * Which components' summaries moved since the surfaces were last generated.
+ *
+ * The point of the whole receipt is this message, not the failure: `stale
+ * agents/index.json` tells someone to run a command, which they would do without
+ * reading anything. Naming the component and the field to reread is the part
+ * that couples the edit to the knowledge.
+ *
+ * Compared against the file on disk, so it reports nothing on a first
+ * generation or if either side is unparseable -- a missing receipt should never
+ * be what stops a build.
+ */
+async function summariesThatMoved(rendered) {
+  const file = resolve(root, INDEX_JSON);
+  if (!existsSync(file) || !rendered.has(INDEX_JSON)) return [];
+
+  let before;
+  let after;
+  try {
+    before = JSON.parse(await readFile(file, 'utf8'));
+    after = JSON.parse(rendered.get(INDEX_JSON));
+  } catch {
+    return [];
+  }
+
+  // A component with no recorded rev is new, or predates the receipt. Neither is
+  // drift, and reporting it as such would name all 33 the first time and teach
+  // everyone to ignore the message.
+  const was = new Map((before.components ?? []).map((c) => [c.slug, c._summaryRev]));
+  return (after.components ?? [])
+    .filter((c) => was.get(c.slug) !== undefined && was.get(c.slug) !== c._summaryRev)
+    .map((c) => c.slug);
+}
+
+/** The one drift report worth more than "run the command again". */
+function reportSummaryDrift(slugs) {
+  if (!slugs.length) return;
+  console.error('');
+  console.error('  The summary changed on:');
+  for (const slug of slugs) console.error(`    ${slug}`);
+  console.error('  That is the page lede. `contract.useWhen` is the agent-facing version of the');
+  console.error('  same sentence, and nothing else in this run can tell you whether it still');
+  console.error('  agrees. Reread it in src/library/components/<slug>/meta.json.');
+}
+
 async function main() {
   const check = process.argv.includes('--check');
   const { rendered } = await plan();
@@ -978,10 +1079,15 @@ async function main() {
     if (!rendered.has(path)) drift.push(`orphan   ${path}`);
   }
 
+  // Read before anything is written: write mode replaces index.json, which is
+  // the only record of what the summaries used to be.
+  const movedSummaries = await summariesThatMoved(rendered);
+
   if (check) {
     if (drift.length) {
       console.error('build-agent-surfaces: the agent surfaces do not match their sources');
       for (const line of drift) console.error(`  ${line}`);
+      reportSummaryDrift(movedSummaries);
       console.error('  Run `npm run agents` and commit the result.');
       process.exit(1);
     }
@@ -1011,6 +1117,9 @@ async function main() {
     console.log(`  ${kb(bytes(text)).padStart(8)}  ${path}${room}`);
   }
   console.log(`build-agent-surfaces: wrote ${rendered.size} surfaces`);
+  // Regenerating is what clears the receipt, so this is the last moment the
+  // reminder can be given to whoever is about to commit.
+  reportSummaryDrift(movedSummaries);
 }
 
 /**

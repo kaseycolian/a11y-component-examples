@@ -12,6 +12,7 @@
   "demoNote": "No JavaScript on this page. Open one on a phone and you get the OS picker: full height, scrollable, with the platform's own screen reader behavior. That is the thing a custom listbox gives up.",
   "contract": {
     "useWhen": "The native select, which is the better default on a phone.",
+    "root": [".ac-select"],
     "aria": {
       "the control": [
         "aria-describedby"
@@ -27,7 +28,7 @@
       ]
     ],
     "states": [
-      "invalid",
+      "invalid — aria-invalid=true on the control, set only while the error shows",
       "disabled"
     ],
     "failureModes": [

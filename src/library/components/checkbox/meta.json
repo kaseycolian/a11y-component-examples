@@ -12,12 +12,16 @@
   "demoNote": "Tab through a group: every box is its own stop and the arrow keys do nothing, which is correct — any combination is allowed. Toggle one input in example 3 and the parent announces \"mixed\".",
   "contract": {
     "useWhen": "A native checkbox, kept focusable under whatever you draw over it.",
+    "root": [".ac-choice", ".ac-group"],
     "aria": {
       "the input": [
         "type=checkbox"
       ],
       "the label": [
         "for"
+      ],
+      "a group's running count": [
+        "role=status"
       ]
     },
     "keyboard": [

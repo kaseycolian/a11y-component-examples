@@ -21,6 +21,7 @@
   "demoNote": "Examples 2 to 5 are live. Example 2 measures how narrow the same URL is willing to be under three wrapping rules; example 3 builds one link into two panels and counts what a screen reader was handed by each; example 4 has three copy buttons reporting the same copy three ways; example 5 presses Copy on a panel that has nothing in it.",
   "contract": {
     "useWhen": "A computed value, with exactly one thing inside it that talks.",
+    "root": [".ac-result"],
     "aria": {
       "the panel's region": [
         "role=status"
@@ -32,6 +33,9 @@
         "aria-describedby"
       ]
     },
+    "states": [
+      "empty — aria-disabled=true on the copy button, not the disabled attribute, so it keeps its tab stop and can explain itself"
+    ],
     "keyboard": [
       [
         "Tab",
