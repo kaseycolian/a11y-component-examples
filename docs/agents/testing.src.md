@@ -68,6 +68,16 @@ everything else as `rgb()` with 0–255 ones, so a helper that assumes one forma
 for every pair and the check is dead. Run axe's `color-contrast` rule instead, which also composites
 translucent backgrounds and walks the ancestors for the real backdrop.
 
+<!-- item: A rule that throws returns zero violations, which reads as a clean page -->
+
+When a check errors, axe abandons that rule for the **whole page**: one node in `incomplete` carrying
+an `error-occurred` check, no violations, and no passes. `expect(violations).toEqual([])` is green
+against a page nothing was measured on. Assert on `incomplete` for `error-occurred` too. `color-contrast`
+is the one that throws, because it builds a grid of the page and an `overflow: hidden` ancestor clips
+what goes in it: a horizontally scrollable `<pre>` inside one puts its own midpoint outside its grid —
+`Element midpoint exceeds the grid bounds`. `overflow: clip` on the ancestor paints the same and is not
+in that code path.
+
 <!-- item: An implicit role is invisible to ARIA reflection -->
 
 `el.role` returns the *attribute*, so an `<output>` — which has an implicit `role="status"` — reads

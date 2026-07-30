@@ -45,6 +45,7 @@
      than the badge's 12%. 65% is the first that clears everything; 60% is that
      with headroom. Use these for text; keep the raw accent for borders and
      tints, which are decoration and have no ratio to clear. */
+  --accent-pink-text: color-mix(in srgb, var(--accent-pink) 60%, var(--text));
   --accent-green-text: color-mix(in srgb, var(--accent-green) 60%, var(--text));
   --accent-blue-text: color-mix(in srgb, var(--accent-blue) 60%, var(--text));
   --accent-purple-text: color-mix(in srgb, var(--accent-purple) 60%, var(--text));
@@ -200,7 +201,14 @@ body {
   font-style: italic;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--accent-pink);
+  /* The mixed accent, not the raw one, and the size is why. At the clamp's
+     ceiling this is 27px and bold, so SC 1.4.3 asks 3:1 of it -- but below
+     460px it shrinks to fit the header beside the settings, drops under the
+     18.66px large-text floor, and the threshold becomes 4.5:1 for the same
+     color. The raw pink measured 4.44:1 there, against its own glow warming
+     the backdrop. A brand that is only legal because it is large is a brand
+     that fails when it stops being large. */
+  color: var(--accent-pink-text);
   text-shadow: var(--tglow-pink);
 }
 
@@ -466,11 +474,19 @@ code {
 
 /* --- Panels ------------------------------------------------------------------ */
 
+/* `clip`, not `hidden`, and the reason is the test suite rather than the look:
+   the two paint identically here, but axe treats an overflow:hidden ancestor as
+   a clip on every rect it registers in its grid. The code panel is a
+   horizontally scrollable <pre>, so its Shiki spans get their own sub-grid, and
+   a long line clipped by the panel puts its own midpoint outside that sub-grid
+   -- which throws "Element midpoint exceeds the grid bounds" and makes axe skip
+   the whole color-contrast rule for the page. `clip` is not in that code path:
+   it clips the corners the same way, and the sweep sees the page. */
 .panel {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg-panel);
-  overflow: hidden;
+  overflow: clip;
 }
 
 .panel__head {

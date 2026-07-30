@@ -7,6 +7,17 @@
  * regression in the library shows up as a broken site rather than a red test.
  */
 import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+
+const THEMES = JSON.parse(
+  readFileSync(
+    resolve(dirname(fileURLToPath(import.meta.url)), '../src/site/theme/themes.index.json'),
+    'utf8',
+  ),
+).families.flatMap((family) => [family.dark, family.light]).filter(Boolean);
 
 // Two Dropdowns live in the header now, so each locator names which one.
 const picker = (page) => page.locator('[data-theme-control] .ac-dropdown');
@@ -170,6 +181,35 @@ test('--header-h covers the real header at every width, so anchors clear it', as
     // scroll-margin absorbs it.
     expect(real - token, `at ${width}px`).toBeLessThanOrEqual(2);
   }
+});
+
+test('the header holds its contrast at 320px, where the brand stops being large text', async ({
+  page,
+}) => {
+  // The one width the shared gate does not run axe at, and the one where SC
+  // 1.4.3 changes its mind about the header: the brand shrinks to fit beside
+  // the settings, crosses under the 18.66px bold floor, and the threshold it
+  // is measured against goes from 3:1 to 4.5:1 without the color moving. The
+  // raw accent sat at 4.44:1 there. Per theme, because a threshold this close
+  // is a per-theme question.
+  test.setTimeout(120_000);
+  await page.goto('components/disclosure/');
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; }' });
+
+  const failures = [];
+  for (const theme of THEMES) {
+    await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme);
+    const results = await new AxeBuilder({ page })
+      .include('.site-header')
+      .withRules(['color-contrast'])
+      .analyze();
+    for (const node of results.violations.flatMap((r) => r.nodes)) {
+      failures.push(`${theme}: ${node.target.at(-1)} — ${node.any[0]?.message}`);
+    }
+  }
+
+  expect(failures, `header contrast at 320px:\n  ${failures.join('\n  ')}`).toEqual([]);
 });
 
 test('swatches carry each theme real accents from theme.css', async ({ page }) => {

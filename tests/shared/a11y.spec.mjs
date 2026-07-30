@@ -154,6 +154,25 @@ async function partition(page, violations, undetermined = []) {
   }, { found: flat, unresolved });
 }
 
+/**
+ * Rules axe gave up on, from the `error-occurred` check it files when an
+ * evaluate throws.
+ *
+ * It is one incomplete node and *no* violations and *no* passes: axe abandons
+ * the rule for the whole page, so a sweep that only looks at `violations` reads
+ * a thrown rule as a clean page. Everything below has to fail on it instead --
+ * for the deliberate failures it looks like the demo was repaired, and for the
+ * theme sweep it looks like ten themes passed.
+ */
+const skippedRules = (results) =>
+  results.incomplete.flatMap((result) =>
+    result.nodes.flatMap((node) =>
+      [...(node.none ?? []), ...(node.any ?? []), ...(node.all ?? [])]
+        .filter((check) => check.id === 'error-occurred')
+        .map((check) => `${result.id}: ${check.data?.message ?? 'threw'}\n    at ${selectorOf(node)}`),
+    ),
+  );
+
 const describeNodes = (nodes) =>
   nodes.map((n) => `  ${n.rule} (${n.impact}) ${n.selector} ${n.note ?? ''}\n    ${n.html}`).join('\n');
 
@@ -265,6 +284,12 @@ for (const { slug, name } of COMPONENTS) {
 
     test('axe finds nothing the page has not already claimed', async ({ page }) => {
       const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
+
+      const skipped = skippedRules(results);
+      expect(skipped, `axe abandoned a rule, so it checked nothing:\n  ${skipped.join('\n  ')}`).toEqual(
+        [],
+      );
+
       const { expected, unexpected, unclaimed } = await partition(
         page,
         results.violations,
@@ -299,6 +324,9 @@ for (const { slug, name } of COMPONENTS) {
       for (const theme of THEMES) {
         await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme);
         const results = await new AxeBuilder({ page }).withRules(['color-contrast']).analyze();
+        for (const skipped of skippedRules(results)) {
+          failures.push(`${theme}: axe abandoned the rule -- ${skipped}`);
+        }
         const { unexpected } = await partition(page, results.violations);
         for (const node of unexpected) {
           failures.push(`${theme}: ${node.selector}\n    ${node.html}`);

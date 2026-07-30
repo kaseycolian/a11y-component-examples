@@ -1166,15 +1166,34 @@ homes it belongs to, not in all of them.
   showing its failure for the wrong reason. **Measure the headroom, not just the outcome**: force the
   demo through several wide faces and check the margin in *lines*, then assert that margin in the spec
   so the drift fails where it started. The suite now asserts a spare line at rest.
+- **`claimed as broken but axe found nothing` on typography meant axe checked nothing at all.** The
+  real cause, after `opacity: 0.45 → 0.4` failed to move CI: `.panel` carried `overflow: hidden`, and
+  axe intersects every rect it registers in its grid with each overflow-hidden ancestor. The code panel
+  is a horizontally scrollable `<pre>`, which gets its own sub-grid, so a long Shiki line clipped by
+  the panel had its midpoint outside that sub-grid — `Element midpoint exceeds the grid bounds`, and
+  axe **abandons the whole `color-contrast` rule for the page**. One incomplete node, zero violations,
+  zero passes. The Ubuntu runner reached it at 1280 because its monospace fallback is wider than
+  Cascadia; Windows only reproduced below ~1100px. `overflow: clip` is not in that code path and paints
+  the same. Two lessons worth more than the fix: **a rule that throws reads exactly like a clean page**
+  — the gate now fails on axe's `error-occurred` check, in both axe tests — and the panel had been
+  hiding **over half the page from every contrast sweep** at every width (366 nodes checked, 894 after).
+  A green contrast run is worth nothing until you know how many nodes it looked at.
+- **A color that passes only because the text is large fails when a media query shrinks it.** Found by
+  the sweep the `overflow: clip` fix unblocked. `.site-brand__mark` is `clamp(1.35rem … 1.7rem)` and
+  weight 900, so at wide widths it is large text and SC 1.4.3 asks 3:1 of it. Below 460px it shrinks to
+  fit beside the settings, crosses under the 18.66px bold floor, and the same pink is suddenly measured
+  against 4.5:1 — it failed in **four of the ten themes**, worst 3.15:1 in `acid-arcade-light`, and the
+  default theme was the *mildest* of them at 4.44:1. `--accent-pink-text` (the mixed accent the other
+  three accents already had) clears it everywhere, worst case 5.25:1. Two things to carry: a clamped
+  font-size means the threshold is clamped too, so measure at the smallest step; and the shared gate
+  runs axe at 1280 only, so 320px contrast is checked in `tests/site-header.spec.mjs` and nowhere else.
 - **A deliberate failure has to fail by a margin, in the theme the gate measures.** Same lesson as the
-  line-count one, on the other axis. `typography`'s opacity paragraph is claimed as a live
-  `color-contrast` failure, and the gate asserts axe still reports it. At `opacity: 0.45` it measured
-  **4.36:1 against a 4.5:1 threshold** — and of the ten themes, the narrowest margin belonged to
-  `acid-arcade-dark`, which is the default and therefore the one the gate runs in. Every other theme
-  had three times the room. CI reported `claimed as broken but axe found nothing`, which reads like the
-  demo was repaired and is really the checker landing on the other side of a rounding boundary. When a
-  demo is *supposed* to fail a numeric threshold, measure it in **every** theme and pick a value that
-  fails all of them clearly; 0.4 puts the worst at 3.7:1.
+  line-count one, on the other axis. `typography`'s opacity paragraph measured **4.36:1 against a
+  4.5:1 threshold** at `opacity: 0.45`, and of the ten themes the narrowest margin belonged to
+  `acid-arcade-dark`, which is the default and therefore the one the gate runs in. It was not what CI
+  was reporting — see above — but a demo one rounding boundary from passing is a demo that will break
+  on someone's machine. When a demo is *supposed* to fail a numeric threshold, measure it in **every**
+  theme and pick a value that fails all of them clearly; 0.4 puts the worst at 3.7:1.
 - **A probe that patches files must rebuild after it restores them.** The red probe for the above left
   `dist/` built from the patched source, so the next run served a page with a stylesheet missing —
   which produced page-wide contrast violations that looked like a real finding and cost a detour. If
