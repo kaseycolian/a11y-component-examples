@@ -36,6 +36,15 @@ the reader's problem rather than the ARIA attribute, and **never enumerating or 
 examples**. `status-text` onward is written to it; everything earlier is the sweep in item 0a. The
 same session tightened the on-page copy rule (item 0b).
 
+**In progress, and it is not a component.** The **agent-facing layer** — `docs/agent-layer.md` is the
+record and item 5 below tracks it. It is the current work, ahead of batch F. Read that file before
+touching `AGENTS.md`, `agents/`, `.claude/`, or `scripts/build-agent-surfaces.mjs`; the short version
+is that agents get a four-tier read path with hard token budgets, every surface is rendered from one
+manifest so they cannot drift, and the human pages are not touched. **Phases 0 and 1 are done** —
+`npm run agents` writes the surfaces, `npm run check:agents` fails if any of them drifts from its
+source, and **phase 2 is next: a `contract` block per `meta.json`, plus the accuracy tests.** Nothing
+under `agents/` or `AGENTS.md` is hand-editable; edit `docs/agents/preamble.md` or a `meta.json`.
+
 ### The steps, in order
 
 **Step 1 — batch F**, `app-url-maker` then `app-page-to-markdown`. They compose the others and every
@@ -931,6 +940,39 @@ with the gate but are left in place — they are cheap and they name the compone
 dated; mark untested combinations untested rather than assuming they pass), `docs/wcag-mapping.md`
 (outcomes + SC + contrast in both WCAG 2.x ratio and APCA Lc, for the eventual WCAG 3 migration).
 
+**All three of these exist and are substantive** — written at some point without this item being
+ticked. What is genuinely left is filling `at-support.md`'s matrix, which needs a real screen reader
+rather than a keyboard.
+
+### 5. The agent-facing layer — **in progress, see `docs/agent-layer.md`**
+
+The library has two audiences and only the human one was built for. An agent arriving before this work
+found no `AGENTS.md`, no index, no `llms.txt`, a 1.42 MB corpus, and a `CLAUDE.md` telling it to read
+this 113 KB file first. The design record has the measurements, the four-tier read path with its token
+budgets, the one-manifest generator that keeps every surface in sync, and the accuracy tests that
+assert the hand-written contracts against the real markup.
+
+**Phases 0 and 1 are done.** Tier 0 and Tier 1 ship — `AGENTS.md` at 2.4 KB, `agents/index.md` at
+3.2 KB, `agents/index.json`, `agents/llms.txt` — all rendered by `scripts/build-agent-surfaces.mjs`
+and gated by `npm run check:agents` in `verify` and in CI. Phases 2–6 are the checklist at the bottom
+of that file; keep it current there rather than duplicating it here.
+
+Three things from phase 1 that outlive it:
+
+- **`GROUPS` moved to `src/site/lib/groups.mjs`.** `registry.mjs` re-exports it and now only holds the
+  glob. Anything that runs under plain Node — the generator, any future script — imports groups.mjs,
+  because `import.meta.glob` makes `registry.mjs` loadable by Astro alone.
+- **The generator refuses mojibake in any file it reads.** PowerShell 5.1's
+  `Set-Content -Encoding utf8` re-encodes a file it round-trips, and `—` becomes `â€"`. It corrupted
+  `preamble.md` and `tabs/meta.json` during the phase and reached a generated surface unnoticed. Never
+  round-trip a repo file through `Get-Content -Raw` / `Set-Content`; use the editor, or
+  `git checkout --` to undo it.
+- **`app-url-maker` was deleted** rather than filtered. It was a `new:component` scaffold from the
+  halted batch F, never committed, and the next build would have published its `TODO:` summary. The
+  gap it exposed is still open: nothing filters `status !== 'draft'` out of the human index, nav or
+  `getStaticPaths`, so scaffolding a component can still publish placeholder prose. Worth closing next
+  time those pages are open.
+
 ### 4. Final verification
 
 `npm run verify`, install the other two browsers, manual keyboard + screen reader pass, check at
@@ -966,6 +1008,13 @@ It must match `npm run preview` exactly, base path included.
 
 - **Node is not on the inherited PATH.** Prefix PowerShell calls with
   `$env:Path = "C:\nvm4w\nodejs;$env:Path"`.
+- **Never round-trip a repo file through PowerShell.** `Get-Content -Raw` then
+  `Set-Content -Encoding utf8` re-encodes UTF-8 as Latin-1 on 5.1 and adds a BOM: every `—` becomes
+  `â€"`, every `…` becomes `â€¦`. It survives `git diff --stat`, renders as garbage, and in a
+  `meta.json` also breaks `JSON.parse` on the BOM. It hit `preamble.md` and `tabs/meta.json` while
+  phase 1 of the agent layer was being tested, and the only visible symptom was a generated file
+  growing 23 bytes. Use the editor to change a file; use `git checkout --` to undo one.
+  `build-agent-surfaces.mjs` now throws on `â€` in any source it reads.
 - **Astro's `<Code>` component does not inherit `markdown.shikiConfig`.** They are configured
   separately, and a `<Code>` given no `themes` falls back to a single hardcoded `github-dark`
   written as inline `style="color:#…"` on every token — which beats any stylesheet. So a page can

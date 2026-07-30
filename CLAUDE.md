@@ -11,6 +11,7 @@ next steps, and the gotchas already solved.
 | --- | --- |
 | What's done, what's next | `docs/BUILD-STATUS.md` |
 | The ARIA contract + keyboard map for a specific component | `docs/component-specs.md` (read one entry, not the file) |
+| Why the agent-facing layer is shaped the way it is | `docs/agent-layer.md` |
 | Original design rationale | `C:\Users\kasey\.claude\plans\this-will-be-a-curious-pnueli.md` |
 
 To start a component: `npm run new:component -- <slug> --group <id> --name "Name"`. The templates
@@ -32,12 +33,21 @@ src/library/     THE PRODUCT. Zero Astro. Pure vanilla. Never imports from src/s
 src/site/        Astro shell (srcDir points here). Never contains component code.
 src/site/theme/  Vendored theme-service files. See THEME-SERVICE.md before touching.
 scripts/         sync-library (src -> public), check-tokens (linter), new-component (scaffolder),
-                 rehype-scrollable-tables (wraps docs.md tables so pages don't overflow at 320px)
+                 build-agent-surfaces (renders AGENTS.md + agents/), rehype-scrollable-tables
+                 (wraps docs.md tables so pages don't overflow at 320px)
 tests/           Site-shell specs (site-header) + the shared a11y gate every component must pass.
+AGENTS.md        GENERATED. The agent read path. Edit docs/agents/preamble.md, run npm run agents.
+agents/          GENERATED, committed. The index and the per-component contracts agents read.
+docs/agents/     Hand-written sources for the above.
 ```
 
-`public/library/` and `public/theme/` are **generated** by `scripts/sync-library.mjs` and
-gitignored. Edit the source, never the copy.
+**`AGENTS.md` and everything under `agents/` are output, never input.** `npm run check:agents`
+re-renders them and fails CI on any difference, so a hand-edit is reverted work. Edit
+`docs/agents/preamble.md` or a `meta.json`, then `npm run agents`. The layer has hard byte budgets and
+the generator fails when prose pushes a surface over one — `docs/agent-layer.md` says why.
+
+`public/library/`, `public/theme/`, `public/agents/` and `public/llms.txt` are **generated** by
+`scripts/sync-library.mjs` and gitignored. Edit the source, never the copy.
 
 ## Component folder shape
 
@@ -202,10 +212,12 @@ enough for a person or an agent to start from. Don't apologize for it beyond tha
 
 ```sh
 npm run dev            # localhost:4321/a11y-component-examples/
-npm run build          # prebuild syncs library -> public
+npm run build          # prebuild syncs library + agents -> public
 npm run check:tokens   # the color linter
+npm run agents         # render AGENTS.md + agents/ (run after editing any meta.json)
+npm run check:agents   # --check: fail if a surface drifted from its source
 npm test               # Playwright a11y gate
-npm run verify         # all three
+npm run verify         # both linters, then build, then test
 ```
 
 ## Deliberate deviations (do not "fix" these)
