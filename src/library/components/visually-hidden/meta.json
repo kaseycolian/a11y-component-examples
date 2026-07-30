@@ -9,5 +9,32 @@
   "wcag": ["1.1.1", "1.3.1", "2.4.4", "2.5.3", "4.1.2"],
   "status": "stable",
   "files": ["html", "css"],
-  "demoNote": "No JavaScript on this page. Example 4 is four identical-looking buttons where three have no accessible name at all — inspect the accessibility tree, or listen to them."
+  "demoNote": "No JavaScript on this page. Example 4 is four identical-looking buttons where three have no accessible name at all — inspect the accessibility tree, or listen to them.",
+  "contract": {
+    "useWhen": "Text for screen readers only, in nine declarations that all matter.",
+    "root": [".ac-visually-hidden"],
+    "aria": {
+      "a clipped announcement": [
+        "role=status",
+        "aria-live=polite"
+      ]
+    },
+    "states": [
+      "clipped",
+      "focusable"
+    ],
+    "failureModes": [
+      "display:none, visibility:hidden or the hidden attribute — all three leave the tree",
+      "visibility:hidden keeping its layout box, so the labeled button is stretched by text nobody reads",
+      "width and height at 0 rather than 1px, which can drop out of the accessibility tree",
+      "no white-space:nowrap, so the text wraps inside 1px and is read letter by letter",
+      "aria-label as a shorter spelling: it needs a naming role, replaces the whole name (SC 2.5.3), and is invisible to translation",
+      ":focus instead of :focus-within on the focusable variant, when the focusable thing is inside"
+    ],
+    "seeAlso": [
+      "skip-link",
+      "icon-button",
+      "status-text"
+    ]
+  }
 }

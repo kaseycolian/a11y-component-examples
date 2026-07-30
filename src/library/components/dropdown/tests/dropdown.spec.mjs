@@ -97,6 +97,34 @@ test('Escape closes without changing the value and restores focus', async ({ pag
   await expect(toggle).toBeFocused();
 });
 
+test('Space opens the panel, and chooses the focused option', async ({ page }) => {
+  const { native, toggle, panel } = env(page);
+
+  await toggle.press(' ');
+  await expect(panel).toBeVisible();
+
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press(' ');
+
+  await expect(panel).toBeHidden();
+  await expect(native).not.toHaveValue('prod');
+});
+
+test('Tab closes the panel and carries on from the trigger', async ({ page }) => {
+  const { native, toggle, panel } = env(page);
+
+  await toggle.press('Enter');
+  await expect(panel).toBeVisible();
+
+  // Focus is on an option inside a panel that is about to be hidden, so the
+  // component moves it back to the trigger first and lets the browser tab on
+  // from there. Landing on <body> instead is the bug this asserts against.
+  await page.keyboard.press('Tab');
+  await expect(panel).toBeHidden();
+  await expect(native).toHaveValue('prod');
+  await expect(page.locator('body')).not.toBeFocused();
+});
+
 test('type-ahead jumps to a matching option', async ({ page }) => {
   const { toggle, options } = env(page);
 

@@ -4,13 +4,28 @@ A public, GitHub Pages–hosted reference library of WCAG 2.2 AA accessible UI c
 HTML/CSS/JS. Visitors browse, interact, and **copy** code into their own app. Not a playground —
 code is read-only.
 
-**When resuming, read `docs/BUILD-STATUS.md` first** — progress, the roster checklist, the ordered
-next steps, and the gotchas already solved.
+**This file is the contributing contract, and it is the only thing it is.** You are working *on* the
+library: adding a component, changing one, or building the site around it. Consuming the library —
+copying a component into some other app — is a different contract with its own entry point, `AGENTS.md`,
+which is a fraction of the size and written for exactly that. Nothing in this file is needed to consume
+the library, and none of it should be paraphrased into `agents/`.
+
+The two contracts share one thing: **where a component's behavior comes from.** That is
+`agents/components/<slug>.md` and the component's own files, for both audiences. Neither
+`docs/BUILD-STATUS.md` nor this file answers what a component does.
+
+**When resuming build work, read `docs/BUILD-STATUS.md` first** — progress, the roster checklist, the
+ordered next steps, and the gotchas already solved. It is a build log and nothing else: never the place
+to look up how a component behaves.
 
 | Need | File |
 | --- | --- |
 | What's done, what's next | `docs/BUILD-STATUS.md` |
-| The ARIA contract + keyboard map for a specific component | `docs/component-specs.md` (read one entry, not the file) |
+| The ARIA contract + keyboard map for a **built** component | `agents/components/<slug>.md` — generated from its `meta.json` and asserted against the shipped markup |
+| The up-front design decisions behind one, and its CSS gotchas | `docs/component-specs.md` (read one entry, not the file) |
+| What a component assumes about the page it lands in | `agents/conventions.md` — the reasoning behind **Non-negotiable conventions** below |
+| What to run after a change, and what a failure means | `docs/sync-process.md` |
+| Why the agent-facing layer is shaped the way it is | `docs/agent-layer.md` |
 | Original design rationale | `C:\Users\kasey\.claude\plans\this-will-be-a-curious-pnueli.md` |
 
 To start a component: `npm run new:component -- <slug> --group <id> --name "Name"`. The templates
@@ -32,12 +47,35 @@ src/library/     THE PRODUCT. Zero Astro. Pure vanilla. Never imports from src/s
 src/site/        Astro shell (srcDir points here). Never contains component code.
 src/site/theme/  Vendored theme-service files. See THEME-SERVICE.md before touching.
 scripts/         sync-library (src -> public), check-tokens (linter), new-component (scaffolder),
+                 build-agent-surfaces (renders AGENTS.md + agents/ + the skill),
                  rehype-scrollable-tables (wraps docs.md tables so pages don't overflow at 320px)
 tests/           Site-shell specs (site-header) + the shared a11y gate every component must pass.
+AGENTS.md        GENERATED. The agent read path. Edit docs/agents/, run npm run agents.
+agents/          GENERATED, committed. The index, the per-component contracts, and the four
+                 cross-cutting surfaces (pitfalls, conventions, verify, testing) agents read.
+.claude/skills/  GENERATED, committed. The same read path as a Claude Code skill.
+docs/agents/     Hand-written sources for the above: preamble.md + four *.src.md.
 ```
 
-`public/library/` and `public/theme/` are **generated** by `scripts/sync-library.mjs` and
-gitignored. Edit the source, never the copy.
+**`AGENTS.md`, everything under `agents/`, and the skill are output, never input.** `npm run
+check:agents` re-renders them and fails CI on any difference, so a hand-edit is reverted work. Edit a
+file in `docs/agents/` or a `meta.json`, then `npm run agents`. The layer has hard byte budgets and the
+generator fails when prose pushes a surface over one — `docs/agent-layer.md` says why.
+
+**Nothing may clear `.claude/`.** The generator rebuilds `agents/` from scratch each run; giving
+`.claude/` the same treatment would delete `settings.local.json`, which is machine-specific, gitignored,
+and unrecoverable. The skill is written in place, and a file under `.claude/skills/` counts as the
+generator's only if it carries the do-not-edit marker — so a skill of your own beside it is safe.
+
+**An accessibility finding has four homes and belongs in exactly one.** A fact about the platform that
+makes correct-looking markup wrong → `docs/agents/pitfalls.src.md`. A fact about Playwright or axe that
+makes a correct assertion wrong → `testing.src.md`. Something a copied component assumes about the page
+it lands in → `conventions.src.md`. Anything about working *on* this repo → the gotchas list in
+`docs/BUILD-STATUS.md`. Writing it twice is the drift this layer exists to prevent. Only one overlap is
+checked — the CSS shapes shared with **Non-negotiable conventions** below — so the rest is on you.
+
+`public/library/`, `public/theme/`, `public/agents/` and `public/llms.txt` are **generated** by
+`scripts/sync-library.mjs` and gitignored. Edit the source, never the copy.
 
 ## Component folder shape
 
@@ -46,14 +84,53 @@ src/library/components/<slug>/
   component.html   canonical accessible markup (a fragment, not a document)
   component.css    scoped to .ac-<slug>
   component.js     IIFE -> window.AC.create<Name> + auto-init block
-  meta.json        slug, name, group, order, summary, tags, apg, wcag, status, files
+  meta.json        slug, name, group, order, summary, tags, apg, wcag, status, files, contract
   docs.md          rendered on the page below the code panel
   tests/<slug>.spec.mjs
 ```
 
-`meta.json` `group` must be one of the ids in `src/site/lib/registry.mjs` `GROUPS`.
+`meta.json` `group` must be one of the ids in `src/site/lib/groups.mjs` `GROUPS`.
+
+`meta.json` `contract` is the agent-facing ARIA contract — `useWhen`, `root`, `aria`, `keyboard`,
+`states`, `failureModes`, `api`, `seeAlso` — and it renders to `agents/components/<slug>.md`. It is
+**asserted against the component**, so four of its fields carry an obligation:
+
+- `root` is the selector(s) that *are* this component on its demo page. It cannot be guessed from the
+  slug — `checkbox` is `.ac-choice`, `text-input` is `.ac-input`, `dropdown` is a `<select>` carrying
+  `[data-ac-dropdown]` — and every ARIA check scopes itself to it, so a wrong one checks nothing.
+- `aria` is what must be in the markup you copy. An attribute that exists only in a transient state
+  (`aria-busy` while pending, `aria-invalid` after a failed validation) goes in `states`, named there:
+  `"invalid — aria-invalid=true on the control, set only while the error shows"`.
+- a key in `keyboard` must be pressed by `tests/<slug>.spec.mjs`, unless its effect starts `native:`.
+- `api` names factories really registered as `global.AC.<name>`; demo-page wiring is left out, and is
+  what the `create<Name>Page` suffix is for.
+
+**Edit the component, revisit its contract in the same commit.** The generator never opens
+`component.html`, `component.css` or `component.js`, so `check:agents` cannot see any of this —
+`tests/shared/agent-surfaces.spec.mjs` is what tells you, and it reads the component both ways.
+
+| You changed | Revisit | What tells you |
+| --- | --- | --- |
+| a role or `aria-*` in `component.html` | `contract.aria`, or `states` if it is transient | checks 2 and 12 |
+| the class on a component element | `contract.root` | check 12 — it fails rather than silently sweeping nothing |
+| a key handler in `component.js` | `contract.keyboard` **and** the spec | checks 3 and 13 |
+| a factory name | `contract.api` | checks 4 and 14 |
+| the `summary` | `contract.useWhen` — the agent-facing version of the same sentence | `check:agents`, which names the component |
+
+The last row is the one no check can really cover: `summary` renders into no agent surface, so nothing
+can tell whether the two still agree. What fires is a fingerprint — the failure says *the summary
+changed, go reread `useWhen`*, and only a person can decide whether it still holds.
 
 ## Non-negotiable conventions
+
+The rules and the shapes to type, with what enforces each. `agents/conventions.md` is the same set
+written to whoever is pasting a component *out*, with the reasoning attached — read that one when you
+need to decide whether a rule applies somewhere else, or to explain why it exists.
+
+**The three CSS shapes below also appear in `docs/agents/conventions.src.md`, verbatim.** That is a
+deliberate duplication — one file is a checklist and the other is an explanation — and
+`tests/shared/agent-surfaces.spec.mjs` asserts they still match, treating this file as canonical. Change
+a token name, a percentage or a duration here, and change it there in the same commit.
 
 **CSS — every color is a three-level chain.** `scripts/check-tokens.mjs` fails CI otherwise.
 
@@ -202,10 +279,12 @@ enough for a person or an agent to start from. Don't apologize for it beyond tha
 
 ```sh
 npm run dev            # localhost:4321/a11y-component-examples/
-npm run build          # prebuild syncs library -> public
+npm run build          # prebuild syncs library + agents -> public
 npm run check:tokens   # the color linter
+npm run agents         # render AGENTS.md + agents/ (run after editing any meta.json)
+npm run check:agents   # --check: fail if a surface drifted from its source
 npm test               # Playwright a11y gate
-npm run verify         # all three
+npm run verify         # both linters, then build, then test
 ```
 
 ## Deliberate deviations (do not "fix" these)

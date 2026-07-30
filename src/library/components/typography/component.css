@@ -156,9 +156,10 @@
 
    1. opacity for muted text. It composites against whatever is behind the
       element, so the contrast ratio is not written down anywhere: this one
-      declaration is 4.1:1 on the library's dark surface and 3.0:1 on its light
-      one. Nothing in the CSS says so, no linter can see it, and it changes
-      when a designer changes a background two levels up. Set a color.
+      declaration is 3.7:1 at best across the library's dark surfaces and 2.5:1
+      on its light ones. Nothing in the CSS says so, no linter can see it, and
+      it changes when a designer changes a background two levels up. Set a
+      color.
 
    2. A link identified by color alone. Against this theme's background it is
       13:1, which is the number people check and it passes easily. Against the
@@ -171,8 +172,14 @@
       after each paragraph. overflow: hidden means no scrollbar, no error, and
       nothing to see in a screenshot. Use min-height. */
 
+/* The value is load-bearing, and not for the look of it. A demo that ships a
+   deliberate failure has to fail decisively in *every* theme, because the a11y
+   gate asserts the failure is still firing. At 0.45 this landed at 4.36:1 in
+   acid-arcade-dark -- the library's default, so the one the gate measures --
+   against a 4.5:1 threshold, the narrowest margin of the ten themes. 0.4 puts
+   the worst theme at 3.7:1. Measure across every theme before touching it. */
 .ac-t-broken-faint {
-  opacity: 0.45;
+  opacity: 0.4;
 }
 
 .ac-t-broken-link {
@@ -187,7 +194,7 @@
 }
 
 .ac-t-broken-clip {
-  height: 13.5rem;
+  height: 14rem;
   overflow: hidden;
 }
 
@@ -231,10 +238,10 @@
 
 /* Example 5's boxes are a fixed width, and its columns are wide enough to hold
    them, so the only thing that differs between the two boxes is the height
-   rule. Let them reflow freely and the left one clips at some widths and not
-   others, which would make the demo an argument about column width. */
+   rule. Let them reflow freely and the clipping box clips at some widths and
+   not others, which would make the demo an argument about column width. */
 .ac-t-pair--boxes {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
   justify-items: start;
 }
 
@@ -247,12 +254,20 @@
   background: var(--ac-bg, var(--bg, #070110));
 }
 
-/* min-height, not height — the point of example 5's right-hand box is that it
-   has nowhere to clip from. */
+/* min-height, not height — the point of example 5's second box is that it has
+   nowhere to clip from.
+
+   The width is what keeps the example honest across machines. At 15rem the two
+   paragraphs landed exactly on the 3-line/4-line boundary, so a browser without
+   Trebuchet or Segoe fell through to a wider fallback, wrapped to 4 lines each,
+   and the clipping box was already clipping before the checkbox was ticked —
+   the demo showed its failure for the wrong reason, and CI failed on Linux.
+   17rem puts every face in the stack at 3 lines with a line to spare, and the
+   spacing toggle still overflows 14rem by more than a line. */
 .ac-t-box {
-  width: 15rem;
+  width: 17rem;
   max-width: 100%;
-  min-height: 13.5rem;
+  min-height: 14rem;
 }
 
 .ac-t-specimen__note,

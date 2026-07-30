@@ -18,5 +18,45 @@
   "wcag": ["1.1.1", "2.5.3", "2.5.8", "4.1.2"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Examples 3 to 5 are live and half wrong on purpose. Two of example 3's four buttons have no accessible name at all, and the readout under each one says where its name came from; example 4's second button cannot be reached by saying the word printed under it; example 5's third button is shrink-wrapped to its glyph and lands under the 24px floor."
+  "demoNote": "Examples 3 to 5 are live and half wrong on purpose. Two of example 3's four buttons have no accessible name at all, and the readout under each one says where its name came from; example 4's second button cannot be reached by saying the word printed under it; example 5's third button is shrink-wrapped to its glyph and lands under the 24px floor.",
+  "contract": {
+    "useWhen": "A button whose only label is an attribute, at a size a finger can hit.",
+    "root": [".ac-btn-icon"],
+    "aria": {
+      "the button": [
+        "type=button",
+        "aria-label"
+      ],
+      "the glyph": [
+        "aria-hidden=true",
+        "focusable=false"
+      ]
+    },
+    "keyboard": [
+      [
+        "Enter / Space",
+        "native: it is a <button>"
+      ]
+    ],
+    "states": [
+      "hover",
+      "focus-visible",
+      "disabled"
+    ],
+    "failureModes": [
+      "no name at all, so it announces as a bare button",
+      "the aria-label on the wrapper instead of on the button",
+      "a visible word left out of the name (SC 2.5.3 Label in Name)",
+      "shrink-wrapped to the glyph, under the 24px floor (SC 2.5.8)",
+      "the SVG left in the name, which gives it a second and worse half"
+    ],
+    "api": [
+      "AC.createIconButton(root) -> { refresh, resolveName, element, destroy }"
+    ],
+    "seeAlso": [
+      "button",
+      "tooltip",
+      "visually-hidden"
+    ]
+  }
 }

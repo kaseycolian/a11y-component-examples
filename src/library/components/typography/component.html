@@ -145,8 +145,9 @@
        The third line is the failure, and it is opacity rather than a color on
        purpose. opacity composites against whatever happens to be behind the
        element, so the ratio is not written anywhere and cannot be read off the
-       CSS or linted for. The same one declaration is 4.1:1 on this dark surface
-       and 3.0:1 on the light one. Set a color.
+       CSS or linted for. The same one declaration is 3.7:1 at best on a dark
+       surface and 2.5:1 on a light one, and it moves with the theme. Set a
+       color.
        ====================================================================== -->
   <div class="ac-demo">
     <h3 class="ac-demo__title">3 &middot; Muted text has a floor</h3>
@@ -168,8 +169,8 @@
       <li><code>ac-t-body</code> &mdash; 17:1</li>
       <li><code>ac-t-muted</code> &mdash; 9.5:1, and it is a color</li>
       <li>
-        <code>opacity: 0.45</code> &mdash; <strong>4.1:1 here, 3.0:1 in the
-        light theme</strong>, and neither number appears in the CSS
+        <code>opacity: 0.4</code> &mdash; <strong>3.7:1 at best, 2.5:1 in the
+        light themes</strong>, and no number appears in the CSS
       </li>
     </ol>
 

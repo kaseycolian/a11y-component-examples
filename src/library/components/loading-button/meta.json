@@ -18,5 +18,41 @@
   "wcag": ["1.4.1", "2.1.1", "2.2.2", "2.4.3", "2.5.3", "4.1.2"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Examples 2 to 5 are live and half wrong on purpose. Example 2's spinner-only button announces nothing; example 3's disabled button drops focus to the document body the moment it is pressed; example 4's renaming button ends up with three different names; example 5's dot is indistinguishable from its resting state once motion is off."
+  "demoNote": "Examples 2 to 5 are live and half wrong on purpose. Example 2's spinner-only button announces nothing; example 3's disabled button drops focus to the document body the moment it is pressed; example 4's renaming button ends up with three different names; example 5's dot is indistinguishable from its resting state once motion is off.",
+  "contract": {
+    "useWhen": "A button that is working, saying so to someone who cannot see the spinner.",
+    "root": [".ac-btn-loading", ".ac-btn-loading-status"],
+    "aria": {
+      "the spinner": [
+        "aria-hidden=true"
+      ],
+      "a sibling region": [
+        "role=status"
+      ]
+    },
+    "keyboard": [
+      [
+        "Enter / Space",
+        "native: aria-disabled blocks the handler, so a second press does nothing"
+      ]
+    ],
+    "states": [
+      "idle",
+      "busy — aria-busy=true and aria-disabled=true, set only while pending"
+    ],
+    "failureModes": [
+      "no aria-busy and no region, so the only cue is an animation",
+      "the disabled attribute while pending, which drops focus and announces nothing",
+      "the label swapped to a progress word, renaming the control mid-press",
+      "the spinner as the only cue, gone under forced colors and reduced motion"
+    ],
+    "api": [
+      "AC.createLoadingButton(root) -> { setBusy, refresh, element, destroy }"
+    ],
+    "seeAlso": [
+      "button",
+      "live-region",
+      "status-text"
+    ]
+  }
 }

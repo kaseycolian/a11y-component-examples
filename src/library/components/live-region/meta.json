@@ -18,5 +18,38 @@
   "wcag": ["1.4.1", "3.3.1", "4.1.3"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "The regions are drawn as visible boxes so you can watch text land in them; in an app they would be clipped. Example 3 is broken on purpose and live — all three buttons leave the right text in the DOM and none of them announces anything, which is why this bug survives code review. Turn on a screen reader for this page."
+  "demoNote": "The regions are drawn as visible boxes so you can watch text land in them; in an app they would be clipped. Example 3 is broken on purpose and live — all three buttons leave the right text in the DOM and none of them announces anything, which is why this bug survives code review. Turn on a screen reader for this page.",
+  "contract": {
+    "useWhen": "Announcing a change, to a region that was already being listened to.",
+    "root": [".ac-lr-region"],
+    "aria": {
+      "polite": [
+        "role=status"
+      ],
+      "assertive": [
+        "role=alert"
+      ],
+      "append-only": [
+        "role=log",
+        "aria-label"
+      ]
+    },
+    "failureModes": [
+      "the region injected already holding its text, so nothing changed after it was observed",
+      "display:none on the region, which is not in the tree to change",
+      "cleared and set in the same tick, which is reported as one state",
+      "one requestAnimationFrame — it runs before paint, so both writes still batch",
+      "aria-live written by hand instead of the role, losing aria-atomic and the name",
+      "assertive for anything merely important, rather than for what stops being useful in seconds"
+    ],
+    "api": [
+      "AC.createAnnouncer(options) -> { announce, element, assertiveElement, destroy }",
+      "AC.speak(el, text)"
+    ],
+    "seeAlso": [
+      "status-text",
+      "notice",
+      "loading-button"
+    ]
+  }
 }

@@ -1,0 +1,207 @@
+# Testing — source
+
+Hand-written source for `agents/testing.md`. Same marker format as `pitfalls.src.md`: `<!-- lede -->`,
+`<!-- group: … -->`, `<!-- item: Title -->`, everything above the first marker dropped. Then
+`npm run agents`.
+
+These are harness findings, and the line between this file and `pitfalls.src.md` is worth holding. A
+pitfall is a fact about the platform that makes correct-looking *markup* wrong. An entry here is a
+fact about the tools that makes a correct *assertion* wrong — usually because the obvious assertion
+fails on markup that is right, which is the worst kind, since the fix that makes it pass breaks the
+component. Success criteria are not tagged here; nothing in this file is a failure of one.
+
+<!-- lede -->
+
+For writing the tests, not for building the component. Everything here is a place where the obvious
+assertion is wrong — where it fails on correct markup, or worse, passes against a page the test never
+actually reached. Playwright and axe unless something else is named.
+
+`agents/verify.md` is the checklist these findings are the footnotes to.
+
+<!-- group: Playwright's own traps -->
+
+<!-- item: `test.use({ forcedColors })` and `test.use({ reducedMotion })` are accepted and ignored -->
+
+In Playwright 1.62 on Chromium both are accepted at the fixture level and neither reaches the page:
+`matchMedia('(forced-colors: active)')` still reports `false` inside it. So every assertion in the
+block is made against the ordinary stylesheet and **passes for the wrong reason**, which is worse than
+failing. Use `await page.emulateMedia({ forcedColors: 'active' })` or `{ reducedMotion: 'reduce' }` in
+a `beforeEach` instead. Always.
+
+<!-- item: `toBeDisabled()` treats `aria-disabled="true"` as disabled -->
+
+So it cannot prove that a control is only *soft* disabled and therefore still focusable, which is the
+whole point of using `aria-disabled` rather than the attribute. Assert on the `disabled` attribute
+directly.
+
+<!-- item: Actionability checks honor `aria-disabled` too -->
+
+A click on a soft-disabled control hangs for the full timeout with "element is not enabled" —
+including a click on a `<label>` or a decorative `<span>` inside one, because it resolves to the
+associated input. That is correct behavior and the same reason a screen reader says "unavailable", so
+do not weaken the markup to make the test pass: use `{ force: true }` and say in a comment that the
+component's own `preventDefault` is what the assertion is really about.
+
+<!-- item: `reuseExistingServer` only checks that the port answers -->
+
+A preview server left running from an earlier step serves a stale build, and the suite then passes or
+fails against the wrong bytes with nothing to suggest it. If your server does not rebuild on start,
+kill it before a run.
+
+<!-- item: Playwright does not walk up to find its config -->
+
+`npm` finds `package.json` from any subdirectory, so a shell left in a subfolder produces
+`Project(s) "chromium" not found. Available projects: ""` — which reads like a config error and is a
+working directory. Run from the repo root.
+
+<!-- group: Asking the accessibility tree -->
+
+<!-- item: `new AxeBuilder({ page })` needs a page from `browser.newContext()` -->
+
+Not `browser.newPage()`. The error message says so, and it only bites throwaway scripts — the
+Playwright `page` fixture is already contexted.
+
+<!-- item: Do not hand-roll a contrast helper -->
+
+`getComputedStyle` returns a `color-mix()` result as `color(srgb r g b)` with 0–1 components and
+everything else as `rgb()` with 0–255 ones, so a helper that assumes one format silently reports 1.0
+for every pair and the check is dead. Run axe's `color-contrast` rule instead, which also composites
+translucent backgrounds and walks the ancestors for the real backdrop.
+
+<!-- item: A rule that throws returns zero violations, which reads as a clean page -->
+
+When a check errors, axe abandons that rule for the **whole page**: one node in `incomplete` carrying
+an `error-occurred` check, no violations, and no passes. `expect(violations).toEqual([])` is green
+against a page nothing was measured on. Assert on `incomplete` for `error-occurred` too. `color-contrast`
+is the one that throws, because it builds a grid of the page and an `overflow: hidden` ancestor clips
+what goes in it: a horizontally scrollable `<pre>` inside one puts its own midpoint outside its grid —
+`Element midpoint exceeds the grid bounds`. `overflow: clip` on the ancestor paints the same and is not
+in that code path.
+
+<!-- item: An implicit role is invisible to ARIA reflection -->
+
+`el.role` returns the *attribute*, so an `<output>` — which has an implicit `role="status"` — reads
+`null`, and the region you were looking for is the one you cannot find. Use `locator.ariaSnapshot()`,
+where an `<output>` snapshots as `- status: …` and a `<code>` as `- code: …`, or CDP
+`Accessibility.getPartialAXTree`, which also reports the `live` property. `ariaSnapshot()` computes
+roles from the element, though, so it does **not** report a browser demotion: a `<table>` Chromium
+exposed as `LayoutTable` still snapshots as a table. Only the AX tree shows that.
+
+<!-- item: A `[hidden]` element has no accessible name -->
+
+`toHaveAccessibleName` returns `""` for it, which is correct — it is out of the accessibility tree,
+which is the whole reason to hide it that way — and it means the assertion that proves the markup is
+right *fails* on the tab panel that is not showing. Select it first, then assert.
+
+<!-- item: `includeHidden: true` matches the hidden native control -->
+
+`getByRole('option', { includeHidden: true })` also matches the `<option>` elements of the visually
+hidden native `<select>` behind a custom listbox, and trips strict mode. Scope the locator rather than
+widening it.
+
+<!-- item: `textContent` includes decoration -->
+
+A listbox option reads `"Acid Arcade✓"` once a tick element or a `::before` is in it, so an anchored
+`hasText` regex fails on markup that is fine. Match on the accessible name.
+
+<!-- item: `innerText` includes clipped text -->
+
+It only drops `display: none` and `visibility: hidden`, so it cannot prove that something is off
+screen. Use geometry — `boundingBox()`, or a `getBoundingClientRect` diff — for "not visible", and
+`toHaveAccessibleName` for "still announced".
+
+<!-- group: Live regions and mutations -->
+
+<!-- item: `textContent = <the same string>` still mutates the DOM -->
+
+The old text node is removed and a new one inserted, so a `MutationObserver` fires even though the
+announced value never changed. A test that counts mutations therefore cannot tell a working live region
+from a silent one. Assert that the region is **observed empty** between two identical messages instead.
+
+<!-- item: An empty live region is 0px tall, so `toBeVisible()` reports it hidden -->
+
+Playwright's visibility check is geometric, and a correctly built `role="status"` container is empty by
+definition until something lands in it — so the assertion that proves the pattern is right *fails*, and
+both obvious fixes (a `min-height`, or moving the role onto the message) break the component. Assert
+the negative: `display` is not `none`, `visibility` is not `hidden`, there is no `[hidden]` attribute,
+and `isConnected` is true. Any sweep that asserts every element it finds is visible will fail on every
+live region on the page.
+
+<!-- group: Timing -->
+
+<!-- item: Any geometry read on something with a motion-gated entrance needs polling -->
+
+`boundingBox()` a frame after a dialog opens measures the control mid-entrance and reports it under
+44px. `expect.poll`, and not only for the first read.
+
+<!-- item: A dialog's `close` event is queued, not dispatched synchronously -->
+
+So reading `document.documentElement.style.overflow` immediately after Escape races the unlock, and the
+test fails about one run in four — which reads as flake and is a real ordering bug in the test. Any
+assertion about state after a dialog closes needs polling.
+
+<!-- item: A computed *color* read right after a state flip is the transition, not the state -->
+
+A color transition gated at 150ms means `getComputedStyle` reports the animating value, so flipping
+`aria-pressed` and reading `backgroundColor` in the same tick returns a color neither state ever has —
+and properties listed later in the `transition` shorthand can look as though they never changed at all.
+In a test, `emulateMedia({ reducedMotion: 'reduce' })` before the run, or an assertion that retries
+(`toHaveCSS`). In page code, set `el.style.transition = 'none'`, read, restore; `getComputedStyle`
+flushes the style it was just handed. Worth recognizing on sight: it looks exactly like forced colors
+ignoring the stylesheet, and cost the best part of an hour here.
+
+**An axe contrast sweep after a theme switch is the same bug at page scale, and reduced motion may not
+fix it.** Setting `data-theme` and calling `analyze()` in the next statement measures every transitioning
+element mid-flip, so a color part-way between two themes that both pass can read under 4.5:1. It shows up
+as a failure on a *different element and a different theme on each run* — that inconsistency is the
+diagnosis, not noise to retry past. Reduced-motion emulation only helps where the transition is actually
+gated on it; a `transition: color var(--dur)` written without the gate keeps running. Inject
+`*, *::before, *::after { transition: none !important; }` before the sweep instead.
+
+<!-- item: A settle-poll that starts in the same frame as the scroll reports the state before it -->
+
+"scrollTop has not changed for three frames" is true immediately after
+`scrollTo({ behavior: 'smooth' })` and after a fragment jump, because both begin *after* the frame they
+were requested in — so the callback fires against the old position and it looks as though nothing ran.
+Wait for a move to have been *seen*, or for a generous number of frames without one, before calling
+anything settled.
+
+<!-- group: When the browser disagrees with the code -->
+
+<!-- item: `el.focus()` and a read of `document.activeElement` is ground truth -->
+
+A selector can only list the elements that are *usually* focusable, and every interesting case is one
+that is unusually focusable or unusually not — a link inside an `opacity: 0` panel, a scroll container
+Chromium handed a stop to, a `[hidden]` box that still carries `tabindex="0"`. Asking the browser
+answers all of them: `el.focus({ preventScroll: true })`, then `document.activeElement === el`.
+
+Two rules come with it. Focus on something that cannot take it is a no-op rather than a move, so the
+probe has to `blur()` and restore focus itself or it parks a keyboard reader wherever it finished. And
+**focusable is not tabbable**: filter on `el.tabIndex >= 0` first, which is exactly the distinction a
+roving tabindex trades on. Then prove the walk again with real `page.keyboard.press('Tab')` rather than
+trusting the probe.
+
+<!-- item: Chromium's forced-colors emulation does not repaint author backgrounds -->
+
+Under `emulateMedia({ forcedColors: 'active' })` the media query matches and the `@media` block
+applies, but `getComputedStyle` still returns the author's own `color-mix` for anything the block did
+not override. So a forced-colors test can assert **that the block took effect** and cannot assert that
+the platform dropped a tint. Write it as "the repaired element differs from the one left alone", never
+as "the tint is gone".
+
+<!-- item: Headless Chromium paints overlay scrollbars -->
+
+`offsetWidth - clientWidth` is `0`, no scrollbar is drawn, and a screenshot of a scroll region shows
+nothing at all — so styling that works looks broken. A headed launch shows the real gutter.
+`getComputedStyle(el, '::-webkit-scrollbar-thumb')` resolves in both modes, so assert scrollbar
+*colors*, never scrollbar geometry.
+
+<!-- item: When the DOM is in a state nothing in the code appears to produce, patch the setter -->
+
+`panels[i].hidden = !on` survived a rename of `on` to `isOn`, because `on` resolved to the file's own
+`on(el, type, fn)` listener helper — so `!on` was `false` on every iteration, every panel stayed
+visible, there was no error and nothing looked wrong in the source. Every test written at that point
+passed. What found it in one run: patch the property on the prototype from `addInitScript` and log
+`new Error().stack` on every set. The general shape, a leftover identifier that resolves to a
+*function* in scope, is invisible to `undefined` checks — functions are truthy and negating one is
+always `false`.

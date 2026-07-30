@@ -11,9 +11,9 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-29 (**the shared a11y gate landed — item 2 is done** and it found a great deal;
-suite is **1046/1046** in Chromium. Playwright **firefox is installed but has never been run**,
-webkit is not installed; the `summary` voice changed on 2026-07-28, see item 0a)
+Last updated: 2026-07-30 (**the agent layer is complete — all eight phases**, see item 5; suite is
+**1164/1164** in Chromium. Playwright **firefox is installed but has never been run**, webkit is not
+installed; the `summary` voice changed on 2026-07-28, see item 0a)
 
 ---
 
@@ -36,13 +36,34 @@ the reader's problem rather than the ARIA attribute, and **never enumerating or 
 examples**. `status-text` onward is written to it; everything earlier is the sweep in item 0a. The
 same session tightened the on-page copy rule (item 0b).
 
+**Done, and it is not a component.** The **agent-facing layer** — `docs/agent-layer.md` is the record and
+item 5 below tracks it. Read that file before touching `AGENTS.md`, `agents/`, `.claude/`, or
+`scripts/build-agent-surfaces.mjs`; the short version is that agents get a four-tier read path with hard
+token budgets, every surface is rendered from one manifest so they cannot drift, and the human pages are
+not touched. **All eight phases are done** — all four tiers ship, every component has a `contract` block,
+the cross-cutting surfaces (`agents/{pitfalls,conventions,verify,testing}.md`) are written, a generated
+Claude Code skill at `.claude/skills/a11y-library/SKILL.md` is the third Tier 0 door, `CLAUDE.md` and
+`README.md` say which audience they serve, `npm run check:agents` fails if any surface drifts from its
+source, and `tests/shared/agent-surfaces.spec.mjs` fails if a contract lies about the markup **or is
+silent about it** — phase 7 added the reverse direction, so ARIA, a key handler or a factory added to a
+component fails until its contract catches up. Nothing under `agents/`, `AGENTS.md` or `.claude/skills/`
+is hand-editable; edit a file in `docs/agents/` or a `meta.json`, then run `npm run agents`.
+
+**If you edit a component, its contract is part of the edit.** `CLAUDE.md` > **Component folder shape**
+has the table of which change obliges which field. Batch F is the next work.
+
+**This file is a build log and only that.** It is where progress, the roster checklist, the ordered next
+steps and the repo-local gotchas live. It is never where a component's behavior is looked up — that is
+`agents/components/<slug>.md` and the component's own files, for contributors as much as for agents.
+Every agent-facing surface names this file exactly once, in the rule forbidding it.
+
 ### The steps, in order
 
-**Step 1 — batch F**, `app-url-maker` then `app-page-to-markdown`. They compose the others and every
-piece they need now exists. `app-page-to-markdown`'s scrollable preview is `prose-surface` plus
-`effects`' `fx-scroll` and its `[PATCH]` ring — build it out of those rather than from scratch. The
-gate now covers each new component the moment its folder exists, so a batch F page that ships an
-accent as text, or a target under 24px, is red before it is reviewed.
+**Step 1 — batch F**, `app-page-to-markdown`. It composes the others and every piece it needs now
+exists. Its scrollable preview is `prose-surface` plus `effects`' `fx-scroll` and its `[PATCH]` ring —
+build it out of those rather than from scratch. The gate now covers each new component the moment its
+folder exists, so a batch F page that ships an accent as text, or a target under 24px, is red before
+it is reviewed.
 
 **Then** item 3 (docs) and item 4 (deploy), plus the two copy sweeps 0a and 0b, which can land any
 time and pair naturally with each other.
@@ -114,7 +135,7 @@ Build in this order. The order is the dependency graph, not a preference.
 | ~~**C**~~ | ~~`notice` → `status-text` → `badge` → `result-panel`~~ | **Done.** Closed `feedback-status` |
 | ~~**D**~~ | ~~`tabs` → `jump-nav`~~ | **Done.** Closed `navigation` |
 | ~~**E**~~ | ~~`data-table` → `prose-surface`~~ | **Done.** Closed `data-display` |
-| **F** | `app-url-maker` → `app-page-to-markdown` | **last.** They compose the others and cannot be built before them |
+| **F** | `app-page-to-markdown` | **last.** It composes the others and cannot be built before them |
 
 Cross-batch notes that will otherwise be rediscovered:
 
@@ -677,8 +698,8 @@ take their logic and not their layout. See item 1 under remaining work.
   silent, and the DOM afterwards is identical, which is why that bug survives review. Example 4's
   `role="alert"` is server rendered and populated, and the log records it firing before the visitor
   did anything. Four findings. **An empty live region is 0px tall, so Playwright calls it hidden** —
-  see the gotcha below; that is the correct state for a screen reader and `toBeVisible()` cannot
-  express it. **Under forced colors all four tones collapse into one** — every accent becomes
+  see `docs/agents/testing.src.md`; that is the correct state for a screen reader and
+  `toBeVisible()` cannot express it. **Under forced colors all four tones collapse into one** — every accent becomes
   `CanvasText` and the `color-mix` tint is dropped — and the `[FORCED]` block deliberately does
   *not* put the difference back, because nothing can; that is the prefix-word argument in one
   screenshot. **A polite region populated at page load is not announced**, so a server-rendered
@@ -795,7 +816,6 @@ take their logic and not their layout. See item 1 under remaining work.
 **`data-display` is complete.**
 
 ### compositions
-- [ ] `app-url-maker`
 - [ ] `app-page-to-markdown`
 
 ---
@@ -931,6 +951,155 @@ with the gate but are left in place — they are cheap and they name the compone
 dated; mark untested combinations untested rather than assuming they pass), `docs/wcag-mapping.md`
 (outcomes + SC + contrast in both WCAG 2.x ratio and APCA Lc, for the eventual WCAG 3 migration).
 
+**All three of these exist and are substantive** — written at some point without this item being
+ticked. What is genuinely left is filling `at-support.md`'s matrix, which needs a real screen reader
+rather than a keyboard.
+
+### 5. The agent-facing layer — **built, all eight phases, see `docs/agent-layer.md`**
+
+The library has two audiences and only the human one was built for. An agent arriving before this work
+found no `AGENTS.md`, no index, no `llms.txt`, a 1.42 MB corpus, and a `CLAUDE.md` telling it to read
+this 113 KB file first. The design record has the measurements, the four-tier read path with its token
+budgets, the one-manifest generator that keeps every surface in sync, and the accuracy tests that
+assert the hand-written contracts against the real markup.
+
+**All eight phases are done.** All four tiers ship — `AGENTS.md` at 2.4 KB, `agents/index.md` at
+3.2 KB, `agents/index.json`, `agents/llms.txt`, and a per-component contract in
+`agents/components/<slug>.md` at 0.9–1.7 KB — plus the four cross-cutting Tier 4 surfaces,
+`agents/{pitfalls,conventions,verify,testing}.md`, and a generated Claude Code skill at
+`.claude/skills/a11y-library/SKILL.md` (2.8 KB) that is Tier 0's third door. All of it is rendered by
+`scripts/build-agent-surfaces.mjs` and gated by `npm run check:agents` in `verify` and in CI, plus
+`tests/shared/agent-surfaces.spec.mjs` in the suite. **Answering "how do I build an accessible X" costs
+an agent 6.8–7.2 KB** — Tier 0, the index, and one contract — against a `src/library/` of 1,833 KB.
+
+Two things from phase 7 that outlive it:
+
+- **A component edit is now an edit to its contract too, and three checks enforce it.** They read
+  `component.html` in a browser and `component.js` as text, and report ARIA, keys or factories the
+  contract does not admit to. `CLAUDE.md` > **Component folder shape** has the table of which change
+  obliges which field. The one row nothing can check is `summary` → `contract.useWhen`: a fingerprint in
+  `agents/index.json` fires, names the component, and leaves the judgement to a person.
+- **`contract.root` is required, and `.ac-<slug>` is not what you think.** Every ARIA check scopes to
+  the selectors a contract declares, because the class cannot be derived from the slug — it holds for 15
+  of 33 components and fails for the rest. Rename a component's root class and `root` moves with it, or
+  the check quietly stops checking. That is what its two guards exist to prevent.
+
+One thing from phase 6 that outlives it:
+
+- **A fact stated in three places gets corrected in two.** Phase 5 made the accessibility findings a
+  four-homes rule and added a check for the one overlap that is mechanizable; it updated `CLAUDE.md` and
+  the design record and left the copy in this file saying "three homes" and "nothing checks for it". Phase
+  6 found it by reading, not by any check. Same session found `scripts/new-component.mjs` still sending a
+  new component's author to `docs/component-specs.md` for the contract — the misrouting phase 5 fixed in
+  `CLAUDE.md` — in its own header and inside the spec template it writes. **When you correct a
+  convention, grep for it.** The layer mechanizes the overlaps it knows about; the rest is on the person
+  making the change.
+
+Two things from phase 5 that outlive it:
+
+- **`CLAUDE.md` and `agents/conventions.md` state the same conventions on purpose**, one as a checklist
+  for whoever adds a component and one as an explanation for whoever pastes one out. The three canonical
+  CSS shapes — the token chain, the accent mixed toward `--text`, the motion `calc()` — are duplicated
+  verbatim, `CLAUDE.md` is canonical, and `tests/shared/agent-surfaces.spec.mjs` asserts they still
+  match. Change a token name, a percentage or a duration in one and change the other in the same commit.
+- **`docs/component-specs.md` is a pre-build planning record, not a component reference.** It decided
+  the patterns before they were built and has no entry for `disclosure`, `dropdown` or `field`. For a
+  built component's ARIA contract and keyboard map, `agents/components/<slug>.md` is the generated,
+  asserted answer; go to `component-specs.md` for the design reasoning and the CSS gotchas it carries
+  that a contract does not.
+
+Two things from phase 4 that outlive it:
+
+- **Never let a generator clear `.claude/`.** `npm run agents` rebuilds `agents/` from scratch so a
+  deleted component cannot leave an authoritative-looking file behind. `.claude/` must never get the
+  same treatment: `settings.local.json` lives there, and it is machine-specific and gitignored and so
+  unrecoverable. The skill is written in place, and a leftover from a renamed skill folder is caught
+  instead by ownership-by-signature — a file under `.claude/skills/` is the generator's only if it
+  carries the do-not-edit marker, which also leaves a hand-written skill of your own alone.
+- **`.claude/skills/a11y-library/SKILL.md` is generated**, from `docs/agents/preamble.md`'s two
+  `skill-*` slots. Hand-edit it and `npm run check:agents` reverts your work. Its `description` is the
+  routing mechanism Claude Code matches against a request, which makes it the one string in this repo
+  where keyword coverage beats brevity — and its pattern nouns are a trigger net, not a roster, so do
+  not sync them to `agents/index.md`.
+
+One thing from phase 3 that outlives it:
+
+- **The accessibility findings have four homes now, and a new one belongs in exactly one.** A fact
+  about the platform that makes correct-looking markup wrong goes in `docs/agents/pitfalls.src.md`. A
+  fact about Playwright or axe that makes a correct assertion wrong goes in `testing.src.md`. Something a
+  copied component assumes about the page it lands in goes in `conventions.src.md`. Anything
+  about working *on* this repo stays in the gotchas list here. Writing it in two places is the drift
+  the layer exists to prevent, and only one overlap is checked — the CSS shapes shared with `CLAUDE.md`.
+
+Two things from phase 2 that outlive it:
+
+- **A contract's `aria` block is what must be in the markup you copy** — so an attribute that exists
+  only in a transient state (`aria-busy` while pending, `aria-invalid` after a failed validation)
+  belongs in `states`, not `aria`. The browser check asserts against the initialized demo at rest and
+  will fail otherwise. It caught `loading-button` in the same session the rule was written down.
+- **A key documented in a contract must be pressed by that component's own spec**, unless its effect
+  starts `native:` — the browser owns those, and testing them would be testing Chromium. Adding a key
+  to a `contract.keyboard` therefore means adding a press to `tests/<slug>.spec.mjs`.
+
+Three things from phase 1 that outlive it:
+
+- **`GROUPS` moved to `src/site/lib/groups.mjs`.** `registry.mjs` re-exports it and now only holds the
+  glob. Anything that runs under plain Node — the generator, any future script — imports groups.mjs,
+  because `import.meta.glob` makes `registry.mjs` loadable by Astro alone.
+- **The generator refuses mojibake in any file it reads.** PowerShell 5.1's
+  `Set-Content -Encoding utf8` re-encodes a file it round-trips, and `—` becomes `â€"`. It corrupted
+  `preamble.md` and `tabs/meta.json` during the phase and reached a generated surface unnoticed. Never
+  round-trip a repo file through `Get-Content -Raw` / `Set-Content`; use the editor, or
+  `git checkout --` to undo it.
+- **A `new:component` scaffold can publish itself.** Nothing filters `status !== 'draft'` out of the
+  human index, the nav or `getStaticPaths`, so an untouched scaffold reaches the site as a card and a
+  sidebar row reading its own `TODO:` placeholder summary, plus an empty page — and the a11y gate
+  starts driving it. Found during phase 1, with a scaffold that was sitting in the tree; deleting it
+  was the fix that session, but the gap is still open. Worth closing next time those pages are open.
+  The agent surfaces are covered either way: the generator carries `status` through to
+  `agents/index.{md,json}` and marks any non-stable component on its index row.
+
+### 6. Lint the gotchas that can be linted
+
+Surveyed after phase 3, when the gotchas list was cut to the 19 that are about working *on* this repo.
+Five of those 19 are already handled and the entry is only the explanation; six more are irreducible
+environment facts. What is left is below, ranked, with the measurements so they do not need repeating.
+
+Worth a check:
+
+1. **Encoding, repo-wide.** `build-agent-surfaces.mjs` throws on `â€` only in what it reads — the five
+   files in `docs/agents/` and every `meta.json` — so every `component.*`, every `docs.md` and this file
+   are unguarded, and a 98 KB prose file is exactly what gets round-tripped. The only trap on the list
+   that silently corrupts the product. Needs an allowlist, and re-measured on 2026-07-30 it is **three
+   files, ten lines**: four in `scripts/build-agent-surfaces.mjs` (the guard's own doc comment, condition
+   and message), two in `docs/agent-layer.md`'s record of the incident, and four in this file. Same shape
+   as `data-ac-demo-broken`. **Re-measure again before writing the check rather than trusting the number**
+   — it has now been wrong twice: an earlier version said two files, having forgotten the one it was
+   written in, and the eight-line count went stale within the month.
+2. **"What you see is what you copy", asserted.** Rule 1 of `CLAUDE.md` and nothing enforces it.
+   `src/` → `public/` is byte-identical — measured, 89 of 89 files — but that is the sync, not the
+   page. The open edge is the inlined `<style>` / `<script>`: drop `is:inline` and Astro bundles it,
+   so the demo stops being the thing the code panel shows. Compare the page's inlined CSS against the
+   served file.
+3. **Readout-key uniqueness.** 159 keys across 14 components, currently **no duplicates anywhere**, so
+   this is a green guard rather than a discovery. It bit once before shipping.
+
+Worth eliminating instead of documenting:
+
+4. **Node's PATH** → `.claude/settings.local.json`, which `.gitignore` already excludes. `C:\nvm4w\nodejs`
+   is machine-specific and this repo is public, so it must not be the committed `settings.json`.
+5. **`scripts/shots.mjs <slug>`** — the screenshot entry is a recipe with two failure modes and says it
+   has been rewritten repeatedly. One command deletes both.
+6. **`npm run clean`** — `.astro` and `dist`, so the stale-cache incantation is a script.
+
+**Do not write a lint for `getPropertyValue('--ac-` in a spec.** Five specs do it and all five are
+correct: they read `--ac-badge-accent`, `--ac-notice-accent`, `--ac-status-accent`,
+`--ac-tooltip-arrow-x` and `--ac-motion` on `motion-preferences`' own scope, every one set by that
+component's own `component.css`. The gotcha is narrower than it reads — it is about a token *only*
+`tokens.css` would have set. The lint would be five false positives out of five hits, and "fixing"
+them would break five working tests. Also verified while surveying: **0 of 68 built pages** contain
+`style="color:#`, so `code-theme.mjs` is holding and a shiki check would be a green guard too.
+
 ### 4. Final verification
 
 `npm run verify`, install the other two browsers, manual keyboard + screen reader pass, check at
@@ -964,8 +1133,82 @@ It must match `npm run preview` exactly, base path included.
 
 ## Gotchas already solved — do not rediscover these
 
+Working *on* this repo. The transferable accessibility findings moved to
+`docs/agents/pitfalls.src.md`, the harness findings to `docs/agents/testing.src.md`, and what a copied
+component assumes about its page to `docs/agents/conventions.src.md` — all of which render to the
+`agents/` surfaces an agent reads, see `docs/agent-layer.md`. A new finding goes in whichever of the four
+homes it belongs to, not in all of them.
+
 - **Node is not on the inherited PATH.** Prefix PowerShell calls with
   `$env:Path = "C:\nvm4w\nodejs;$env:Path"`.
+- **Never write a size or a count into a doc by hand.** Three of them were wrong here, each by a
+  different mechanism: four rows divided bytes by 1000 while the budget beside them used 1024; one row
+  quoted the number out of the generator's budget-failure message, describing a file two edits stale; and
+  a gotcha total was counted by eye at 62 against an actual 69. All three were plausible and internally
+  consistent, which is why none was caught by reading. Measure with `stat` in a loop, after the last edit,
+  and paste the output.
+- **A convention in `CLAUDE.md` describes new code, not old code.** `.ac-<slug>` reads like a rule this
+  repo enforces; it is true for 15 of 33 components. The rest anchor on an abbreviation — `checkbox` is
+  `.ac-choice`, `text-input` is `.ac-input` — and `dropdown` has no `ac-dropdown` class in its markup at
+  all. A phase-7 check scoped that way would have swept nothing for over half the library and reported a
+  pass. Before building anything that assumes a naming convention holds, **count how many components
+  actually satisfy it.** One query, and it reshaped the phase.
+- **A probe whose buckets come from your hypothesis can only agree with you.** Sorting unclaimed ARIA
+  into "component" and "demo scaffolding" by whether it sat inside `.ac-<slug>` filed `checkbox`'s real
+  inputs as scaffolding and made 60 real hits look like noise. What broke it was a question with no room
+  for interpretation — *how many components have that element at all* — rather than a better bucket. Ask
+  something countable.
+- **A demo tuned to an exact line count breaks on someone else's fonts.** `typography`'s example 5
+  clips a fixed-height box when the reader forces SC 1.4.12 spacing. Its box was 15rem wide, which put
+  the two paragraphs exactly on the 3-line/4-line boundary in Trebuchet — so on the Ubuntu CI runner,
+  where the stack falls through to a wider fallback, both paragraphs wrapped to 4 lines and the box was
+  already clipping before the checkbox was ticked. Green on Windows, red on CI, and the demo was
+  showing its failure for the wrong reason. **Measure the headroom, not just the outcome**: force the
+  demo through several wide faces and check the margin in *lines*, then assert that margin in the spec
+  so the drift fails where it started. The suite now asserts a spare line at rest.
+- **`claimed as broken but axe found nothing` on typography meant axe checked nothing at all.** The
+  real cause, after `opacity: 0.45 → 0.4` failed to move CI: `.panel` carried `overflow: hidden`, and
+  axe intersects every rect it registers in its grid with each overflow-hidden ancestor. The code panel
+  is a horizontally scrollable `<pre>`, which gets its own sub-grid, so a long Shiki line clipped by
+  the panel had its midpoint outside that sub-grid — `Element midpoint exceeds the grid bounds`, and
+  axe **abandons the whole `color-contrast` rule for the page**. One incomplete node, zero violations,
+  zero passes. The Ubuntu runner reached it at 1280 because its monospace fallback is wider than
+  Cascadia; Windows only reproduced below ~1100px. `overflow: clip` is not in that code path and paints
+  the same. Two lessons worth more than the fix: **a rule that throws reads exactly like a clean page**
+  — the gate now fails on axe's `error-occurred` check, in both axe tests — and the panel had been
+  hiding **over half the page from every contrast sweep** at every width (366 nodes checked, 894 after).
+  A green contrast run is worth nothing until you know how many nodes it looked at.
+- **A color that passes only because the text is large fails when a media query shrinks it.** Found by
+  the sweep the `overflow: clip` fix unblocked. `.site-brand__mark` is `clamp(1.35rem … 1.7rem)` and
+  weight 900, so at wide widths it is large text and SC 1.4.3 asks 3:1 of it. Below 460px it shrinks to
+  fit beside the settings, crosses under the 18.66px bold floor, and the same pink is suddenly measured
+  against 4.5:1 — it failed in **four of the ten themes**, worst 3.15:1 in `acid-arcade-light`, and the
+  default theme was the *mildest* of them at 4.44:1. `--accent-pink-text` (the mixed accent the other
+  three accents already had) clears it everywhere, worst case 5.25:1. Two things to carry: a clamped
+  font-size means the threshold is clamped too, so measure at the smallest step; and the shared gate
+  runs axe at 1280 only, so 320px contrast is checked in `tests/site-header.spec.mjs` and nowhere else.
+- **A deliberate failure has to fail by a margin, in the theme the gate measures.** Same lesson as the
+  line-count one, on the other axis. `typography`'s opacity paragraph measured **4.36:1 against a
+  4.5:1 threshold** at `opacity: 0.45`, and of the ten themes the narrowest margin belonged to
+  `acid-arcade-dark`, which is the default and therefore the one the gate runs in. It was not what CI
+  was reporting — see above — but a demo one rounding boundary from passing is a demo that will break
+  on someone's machine. When a demo is *supposed* to fail a numeric threshold, measure it in **every**
+  theme and pick a value that fails all of them clearly; 0.4 puts the worst at 3.7:1.
+- **A probe that patches files must rebuild after it restores them.** The red probe for the above left
+  `dist/` built from the patched source, so the next run served a page with a stylesheet missing —
+  which produced page-wide contrast violations that looked like a real finding and cost a detour. If
+  the probe leans on Playwright's `webServer` to build, it must also stop any preview server already
+  holding port 4321, or `reuseExistingServer` hands it the stale one.
+- **`process.exit()` inside a `try` skips the `finally`.** A probe that patches files on purpose must
+  restore them on every path, and exit is not a path — it terminates immediately. The first phase-7 red
+  probe left a patched `component.html` behind that way. Throw instead; let `finally` run.
+- **Never round-trip a repo file through PowerShell.** `Get-Content -Raw` then
+  `Set-Content -Encoding utf8` re-encodes UTF-8 as Latin-1 on 5.1 and adds a BOM: every `—` becomes
+  `â€"`, every `…` becomes `â€¦`. It survives `git diff --stat`, renders as garbage, and in a
+  `meta.json` also breaks `JSON.parse` on the BOM. It hit `preamble.md` and `tabs/meta.json` while
+  phase 1 of the agent layer was being tested, and the only visible symptom was a generated file
+  growing 23 bytes. Use the editor to change a file; use `git checkout --` to undo one.
+  `build-agent-surfaces.mjs` now throws on `â€` in any source it reads.
 - **Astro's `<Code>` component does not inherit `markdown.shikiConfig`.** They are configured
   separately, and a `<Code>` given no `themes` falls back to a single hardcoded `github-dark`
   written as inline `style="color:#…"` on every token — which beats any stylesheet. So a page can
@@ -973,46 +1216,11 @@ It must match `npm run preview` exactly, base path included.
   file to suggest it. `src/site/lib/code-theme.mjs` exists to keep the two consumers in step.
   Check by grepping the built HTML: `astro-code-themes` in the class list means the dual-theme
   custom properties were emitted, and `style="color:#` anywhere means they were not.
-- **A misspelled theme token does not fail, it goes quiet.** `var(--ac-x, var(--typo, #literal))`
-  resolves to the literal in every theme, forever. In a dark theme that is invisible, because the
-  standalone literals *are* dark-theme colors — `--bg-elev` (the token is `--bg-elevated`) sat in
-  `tooltip` unnoticed until an axe run in a light theme reported **1.01:1**. `check-tokens.mjs` now
-  fails on any middle token no stylesheet defines.
-- **A theme accent used as text fails SC 1.4.3 in the light themes.** The palette is drawn to be
-  vivid against a dark page, so on a light surface an accent lands at 2.7–4.2:1, and worse on a tint
-  of itself. Mix it toward `--text` — that raises contrast in *both* modes, because `--text` is the
-  one color a theme guarantees contrasts with its own background (`focus-ring`'s two-tone ring rests
-  on the same fact). Measured: raw fails 7 of 40 theme×accent combinations, 80% clears a 12% tint,
-  65% clears a 16% one. Borders and tints keep the raw accent.
-- **A `<code>` with a tinted background and no color of its own loses contrast.**
-  `background: color-mix(in srgb, var(--text) 10%, transparent)` pulls the surface *toward* the text
-  color, so inherited muted text inside it measured 2.28:1 in every theme. Whatever sets a tint from
-  the text color has to set a color too.
-- **ARIA in HTML allows no live-region role on a list element.** `<ol role="log">` is invalid;
-  `role="log"` goes on a wrapping `<div>` and the `<ol>` stays a list inside it. axe reports it as
-  `aria-allowed-role`, which is easy to read as a false positive and is not.
 - **A blanket fix will reach the example that exists to be broken.** The codemod that mixed every
   accent-as-text toward `--text` repaired `typography`'s color-only link, whose whole argument is
   1.27:1 against the sentence around it. Caught by that component's own spec. The general rule: a
   broken variant needs a comment saying it must stay broken, and the gate has to *assert* the
   failure rather than skip it — same shape as a `[FORCED]` block reaching a broken variant.
-- **`el.disabled` is false for an input inside `<fieldset disabled>`** — already recorded for
-  `radio-group`, and it caught the shared gate on its first run too: eight healthy controls reported
-  as unfocusable and ringless. Any sweep over "the things a keyboard reaches" has to filter on
-  `el.matches(':disabled')`.
-- **SC 2.5.8 has exceptions, and a sweep written without them reports the spec rather than the
-  page.** It applies to *pointer* targets, so a focusable heading or scroll region is not one; a
-  link inside a sentence is exempt (its size is constrained by the line-height around it); and a
-  native checkbox or radio is user-agent sized. Without those three the gate flagged 60 perfectly
-  fine elements. A link *alone* in a paragraph gets no inline exception, though — there is no
-  surrounding sentence, so it is just a 16px target.
-- **`getComputedStyle` returns a `color-mix()` result as `color(srgb r g b)` with 0–1 components**,
-  and everything else as `rgb()` with 0–255 ones. A hand-rolled contrast helper that assumes one
-  format silently reports 1.0 for every pair. Do not hand-roll it: run `color-contrast` through axe,
-  which also composites translucent backgrounds and walks for the real backdrop.
-- **`new AxeBuilder({ page })` needs a page from `browser.newContext()`**, not `browser.newPage()`.
-  The error says "Please use browser.newContext()" and only bites throwaway scripts, since the
-  Playwright `page` fixture is already contexted.
 - **`npm run x -- --flag "two words"` loses the quotes.** `new-component.mjs` joins words up to the
   next `--` to compensate. Running `node scripts/new-component.mjs …` directly is more predictable.
 - **Astro `srcDir` is `./src/site`**, so pages live at `src/site/pages/`. `src/library/` is
@@ -1022,10 +1230,6 @@ It must match `npm run preview` exactly, base path included.
 - **The demo's CSS goes in `<slot name="head">`, the JS in `<slot name="end">` with `is:inline defer`.**
   `is:inline` stops Astro bundling it, which is what keeps the served file byte-identical to the
   copy panel.
-- **`[popover]` needs a UA-style reset** — `inset: auto; margin: 0; border: 0; padding: 0` — or the
-  browser centers it in the viewport.
-- **Do not use `includeHidden: true` with `getByRole('option')`** in dropdown tests: it also matches
-  the hidden native `<select>`'s `<option>` elements and trips strict mode.
 - **npm 11 gates install scripts.** `allowScripts` in `package.json` already approves esbuild and
   sharp; re-approve with `npm approve-scripts <pkg>` if a new one appears.
 - **Header height is not a number you can reason out — measure it in a browser at ~15 widths.** The
@@ -1037,8 +1241,9 @@ It must match `npm run preview` exactly, base path included.
   each control's rect, and `scrollWidth > innerWidth` — cheap to rewrite, and it settles in one run
   what CSS reasoning gets wrong repeatedly.
 - **`[glob-loader] Duplicate id "<slug>" found in …/docs.md` is a stale `.astro` cache, not a
-  bug.** It appears on the *second* build after a `docs.md` is created or replaced wholesale — the
-  content layer has the old entry cached and re-syncs the new one under the same id. The page it
+  bug.** It appears after a `docs.md` is created or replaced — the content layer has the
+  old entry cached and re-syncs the new one under the same id. This was recorded twice with
+  contradictory ordinals, first build versus second, so do not re-add one. The page it
   names still builds correctly. `Remove-Item -Recurse -Force .astro` and rebuild; the warning is
   gone and nothing else changes. Do not go looking for a duplicate file — the glob's `base` is
   `src/library/components` and `public/library/` is not in it.
@@ -1047,182 +1252,24 @@ It must match `npm run preview` exactly, base path included.
   to the first one and the second readout never updates — caught in `status-text` before it shipped.
   Prefix the key with its example when the obvious word is already taken (`detail-good`).
 - **Git is 2.24** — no `git init -b`, no interactive flags.
-- **Playwright does not walk up to find its config.** `npm` finds `package.json` from any
-  subdirectory, so an earlier `cd` into a component folder leaves tests failing with
-  `Project(s) "chromium" not found. Available projects: ""`. Prefix the call:
-  `Set-Location D:\sources\a11y-component-examples; npx playwright test --project=chromium <slug>`.
-- **`textContent = <the same string>` still mutates the DOM.** The old text node is removed and a new
-  one inserted, so a `MutationObserver` fires even though the announced value never changed. A test
-  that counts mutations therefore cannot tell a working live region from a silent one — assert that
-  the region is **observed empty** between two identical messages instead. `live-region`'s spec is the
-  precedent.
-- **A second intermittent full-suite failure, same shape as the first.** `modal.spec.mjs` → "the close
-  button has a real name and clears 44px" read `boundingBox()` a frame after the dialog opened, so it
-  measured the button mid-entrance-animation and reported it under 44px. Now `expect.poll`. **Any
-  geometry read on something with a motion-gated entrance needs polling**, the same way any state read
-  after a dialog closes does.
-- **The first intermittent full-suite failure was found and fixed.** It was `modal.spec.mjs` → "the page is
-  scroll-locked while it is open, and released after", failing about one run in four. A test bug, not
-  a component bug: the `close` event is **queued, not dispatched synchronously**, so reading
-  `document.documentElement.overflow` immediately after Escape races the unlock. Now
-  `await expect.poll(...)`. **Any assertion about state after a dialog closes needs polling** — this
-  is the second bug that queued `close` event has caused.
-- **`innerText` includes clipped text.** It only drops `display: none` and `visibility: hidden`, so it
-  cannot prove something is off screen. Use geometry (`boundingBox`, a `getBoundingClientRect` diff)
-  for "not visible" and `toHaveAccessibleName` for "still announced".
-- **`astro preview` does not rebuild, and Playwright reuses it.** `reuseExistingServer` only checks
-  that the port answers, so a preview server left running from an earlier step will serve a stale
-  build and tests will pass or fail against the wrong bytes. Kill it before a test run.
-- **A `role="alert"` must already be in the accessibility tree** before its text is inserted. Not
-  `hidden`, not `display: none`, not created on demand — `field` keeps its error element rendered and
-  empty for exactly this reason, and pays one flex `gap` for it.
-- **An empty live region is 0px tall, so `toBeVisible()` reports it hidden.** Playwright's
-  visibility check is geometric, and a correctly built `role="status"` container is empty by
-  definition until something lands in it — so the assertion that proves the pattern is right
-  *fails*, and the obvious "fix" (a `min-height`, or moving the role onto the message) breaks the
-  component. Assert the negative instead: `display` is not `none`, `visibility` is not `hidden`,
-  no `[hidden]` attribute, and `isConnected`. `notice`'s spec is the precedent. The same trap is
-  waiting in the shared a11y gate — any sweep that asserts every element it finds is visible will
-  fail on every live region in the library.
-- **Don't make a message container `display: flex`.** Every inline element inside becomes a flex item,
-  so a `<code>` or a link in the text breaks onto its own line. Position the marker instead.
-- **`display: block` on a `<table>` no longer drops its role** — corrected while building
-  `data-table`. Chromium 151 still reports `table`, `row`, `rowheader` and `cell` for a table
-  restyled into stacked cards, so the reason usually given for not doing it is out of date and an
-  axe run on the restyle comes back clean. Two reasons survive and both are measurable: the cells of
-  a row stop sharing a top edge, so the column is gone for everyone who could see it; and the
-  `td::before { content: attr(data-label) }` that always comes with the pattern is **folded into the
-  cell's accessible name**, while the clipped `<thead>` keeps the real columnheader in the tree — so
-  the column is announced twice. Still wrap and scroll rather than restyle; just do not argue it from
-  the role.
-- **Playwright's `toBeDisabled()` treats `aria-disabled="true"` as disabled**, so it cannot be used
-  to prove a control is still focusable. Assert on the `disabled` attribute directly.
-- **A row's `textContent` includes decoration.** A dropdown option reads `"Acid Arcade✓"`, so anchored
-  `hasText` regexes fail; match on the accessible name instead.
-- **`test.use({ forcedColors: 'active' })` silently does nothing** in this setup — Playwright 1.62,
-  Chromium. It is accepted, and `matchMedia('(forced-colors: active)')` still reports `false` inside
-  the page, so every assertion in the block is made against the ordinary stylesheet and **passes for
-  the wrong reason**. Use `await page.emulateMedia({ forcedColors: 'active' })` in a `beforeEach`,
-  which is the same API the reduced-motion tests already use. `focus-ring`'s spec is the precedent.
-  **`test.use({ reducedMotion: 'reduce' })` has the identical problem** — accepted, ignored, and the
-  test passes against a page that is still animating. `page.emulateMedia` for both, always.
 - **`src/library/tokens/tokens.css` is not loaded by the site.** It is an optional layer and no page
   links it, deliberately: a component has to work from the fallback chain alone. So
   `getPropertyValue('--ac-motion')` in a test on a component page returns `""`, not `1` or `0`, and
   the value that resolved is theme-service's `--motion`. Assert on the *effect* (a computed duration,
   `getAnimations().length`) or read the theme token, never the `--ac-*` name.
-- **Headless Chromium paints overlay scrollbars.** `offsetWidth - clientWidth` is `0`, no scrollbar
-  is drawn, and a screenshot of an `fx-scroll` region shows nothing at all — so the styling looks
-  broken when it is not. A headed launch (`chromium.launch({ headless: false })`) shows the 12px
-  gutter and the gradient thumb. `getComputedStyle(el, '::-webkit-scrollbar-thumb')` resolves in both
-  modes, so assert scrollbar *colors*, never scrollbar geometry.
-- **Chromium 151 makes any scrollable box a tab stop with no `tabindex`.** It gets no role and no
-  accessible name, and its focus indicator is the UA default — `rgb(16, 16, 16) auto 1px`, a black
-  hairline that is invisible on a dark theme. So a scroll region is reachable and silent by default;
-  `tabindex="0"` + `role="region"` + a name is still required (Safari does not do this at all), and
-  the ring has to be supplied. `effects`' `[PATCH]` is the one to lift.
-- **Forced colors hands `transparent` back opaque.** `border-top-color: transparent` — the standard
-  way to cut the gap into a CSS ring spinner — computes to `rgb(0, 0, 0)` under
-  `forced-colors: active` in Chromium, so the ring closes into a full circle and the rotation stops
-  being visible at all. `border-color` is forced wholesale and `transparent` is not exempt. Repaint
-  the gap in whatever system color the element's own background became (`ButtonFace` on a button,
-  `Highlight` on hover) rather than assuming it survived. `loading-button`'s `[FORCED]` is the
-  precedent, and its spec asserts the two border colors differ.
-- **A computed *color* read right after a state flip is the transition, not the state.** Every
-  component here gates its color transitions on `--ac-motion` at 150ms, and `getComputedStyle`
-  reports the animating value — so a readout or a test that flips `aria-pressed` and reads
-  `backgroundColor` in the same tick gets a color neither state ever has, and properties listed
-  later in the `transition` shorthand can look like they never changed at all. `chip-toggle`'s
-  readout claimed the border was unchanged for exactly this reason. Two fixes, both used there: in
-  page code, set `el.style.transition = 'none'`, read, restore (`getComputedStyle` flushes the style
-  it was just handed); in a test, `page.emulateMedia({ reducedMotion: 'reduce' })` before the run,
-  or an assertion that retries (`toHaveCSS`). This is the color sibling of the geometry-polling
-  gotcha above, and it cost the best part of an hour — it looks exactly like forced colors ignoring
-  the stylesheet.
-- **A live region is not part of an ancestor's accessible name.** Naming from contents only folds in
-  a child whose *own* role takes a name from its contents, and no live-region role does — so
-  `role="status"` on a badge nested inside a button removes the count from the button. Chromium
-  computes `Inbox` where the identical-looking specimen beside it computes
-  `Inbox 98 unread messages`. The attribute added to make the change *more* audible is what makes
-  the control silent on arrival. Two consequences: any component that composes a name from real
-  text has to check what roles are inside it, and **any page-side accname walk has to model this**
-  or its readout will confidently contradict the browser — `badge`'s `[NAME]` skips
-  `status`/`alert`/`log`/`marquee`/`timer` children, and its spec asserts against
-  `toHaveAccessibleName` rather than against the walk. Found by a failing test that was written
-  expecting the opposite.
-- **`<output>` has an implicit `role="status"`, so it is a live region nobody declared.** The
-  element that sounds most correct for a computed value announces the whole value on every change —
-  a 100-character URL, every keystroke of the field feeding it. Two consequences worth keeping.
-  A live-region audit that greps for `role=` / `aria-live` **misses it**, so any selector meant to
-  find every region on a page needs `output` in it. And a test cannot detect it with `el.role`:
-  ARIA reflection returns the *attribute*, which is exactly the thing that is absent, so it reads
-  `null`. Use `locator.ariaSnapshot()` — an `<output>` snapshots as `- status: …` and a `<code>` as
-  `- code: …` — or CDP `Accessibility.getPartialAXTree`, which also reports the `live` property.
-  `result-panel`'s spec is the precedent.
-- **`overflow-wrap: break-word` does not shrink a box's min-content width.** It breaks a word that
-  has *already* overflowed, so the text wraps and the box looks fixed — but a flex or grid item's
-  automatic minimum size is its min-content width, so the panel still refuses to go under the
-  longest unbreakable run and the page cannot reflow to 320px (SC 1.4.10). `overflow-wrap: anywhere`
-  and `word-break: break-all` both do shrink it; prefer `anywhere`, which only breaks where it has
-  to. Measured on the live page: a URL with a 40-character token is **479px** minimum under
-  `break-word` and **32px** under `anywhere`, and the two are pixel-identical on screen.
-  `result-panel`'s example 2 has all three side by side and the number is what tells them apart.
-  Measure it on a clone with `width: min-content`; the real layout cannot have that width.
-- **Chromium's free tab stop is given to `overflow: auto`/`scroll` only — not to `hidden`, not to
-  `clip`.** Corrected while building `prose-surface`, which measures all three side by side; the
-  earlier note from `result-panel` had `hidden` buying a stop and it does not. The rule is
-  *user*-scrollable, so a box that only script can scroll gets nothing. Two things follow. A
-  `overflow: hidden` box of text is worse than the silent-stop version everyone worries about: the
-  content is in the DOM and fully announced, and there is **no route to it at all** — no scrollbar,
-  no wheel, no keyboard. And `clip` is still the right choice for "cut this off", just for a
-  different reason than the one recorded: it makes no scroll container, so a focused descendant
-  cannot be scrolled into view under the clamp. `result-panel`'s CSS comment and spec comment were
-  both fixed at the same time.
-- **The UA's `[hidden] { display: none }` loses to any author `display`.** A component that declares
-  `display: inline-flex` on its root has silently disabled the `hidden` attribute, so
-  `el.hidden = true` leaves the thing on screen and in the accessibility tree. Declare
-  `.thing[hidden] { display: none }` explicitly. `tooltip` hit this first and `badge`'s zero case
-  hit it again; it costs one line and there is nothing in the failing markup to suggest a cause.
 - **A `MutationObserver` callback is a microtask, so it lands after the click handler that caused
   it.** Clearing a mock-AT log in the same handler that resets the demo therefore empties the list
   *before* the reset's own mutations arrive, and they reappear in it. Clear in a
   `requestAnimationFrame` instead. Every page in the library with a "reset" button beside a mock
   screen reader has this shape.
-- **CSS generated content is part of the accessible name.** accname folds `::before` and `::after`
-  into the name of anything named from its contents, and Chromium implements it: a button reading
-  "Matinee" with `::before { content: "✓" }` announces **"✓ Matinee"** (joined with a space). So the
-  obvious non-color state cue renames the control every time the state changes — SC 1.4.1's fix
-  landing on SC 2.5.3. Draw the shape instead: `content: ""` plus borders contributes nothing to the
-  name and, on `currentColor`, survives forced colors with no rule of its own. `chip-toggle`'s
-  example 2 has both live. The same trap applies to any decorative pseudo-element on a button, an
-  `<a>` or a heading.
 - **A deliberately broken example has to opt out of the file's own `[FORCED]` block.** The good
   forced-colors rule matches the failing element too — `.ac-chip[aria-pressed="true"]` covers
   `.ac-ct-chip-flat` — so the block silently repairs the failure the example exists to show. The
   broken variant needs its own line putting it back to what a component with no forced-colors block
   gets for free. Screenshots do not catch this; only reading the computed style in both states does.
-- **Forced colors drops gradient `background-image`s and every `box-shadow`** in Chromium, which is
-  why `fx-grid`, both `fx-bar-*` and the glow tokens vanish there without anyone writing a rule.
-  `background-image` is not in the spec's forced list, so declare `none` yourself rather than relying
-  on it — and remember that whatever the decoration was distinguishing is now undistinguished.
 - **The header's motion toggle cannot be `.check()`ed.** The real input is `opacity: 0` under
   `.switch__track`, which intercepts the pointer, and Playwright retries for the full timeout. Click
   `.switch__track` the way a person clicks the label, or focus the input and press Space.
-- **A host page's own `h1`–`h6` rules cascade into anything you put a class on.** A class beats a bare
-  element selector only for the properties it actually declares; everything it stays quiet about still
-  comes from the host. `.ac-t-h2` on an `<h4>` inherited the shell's `text-transform: uppercase`, its
-  neon `text-shadow` and its `letter-spacing`, while the same class on a `<div>` got none of them — so
-  typography's example 2, whose whole argument is that the two are indistinguishable, quietly stopped
-  being true. Only visible at 320px, because that is where the two specimens stack and can be compared
-  by eye. A utility class that claims to own appearance has to declare the properties a host is likely
-  to set, not just the ones it cares about.
-- **`document.body.focus()` is a no-op, not a blur.** Chrome ignores `focus()` on an element that is
-  not focusable rather than moving focus to it, so the usual "save `document.activeElement`, focus
-  something, put it back" shape **silently fails at page load**, where `activeElement` is `<body>`.
-  `button`'s example 3 probes two buttons to find out which one the keyboard can reach, and left focus
-  parked on the second one: a keyboard reader arrived in the middle of the page and Tab continued from
-  there. Every test was green — it was the screenshot that showed the ring. Call `el.blur()` first and
-  only then restore, and assert `document.activeElement` is `<body>` after load.
 - **Screenshot the finished page before ticking the row.** It has caught a real bug three times, and all
   times every test was green. The recipe, because it fails two ways otherwise: a throwaway script that
   imports `{ chromium } from '@playwright/test'` **must sit in the repo root** — from the scratchpad it
@@ -1234,103 +1281,11 @@ It must match `npm run preview` exactly, base path included.
   **Shoot `.ac-demo-grid > .ac-demo` one at a time as well.** A single tall element screenshot stitches
   while it scrolls, so the sticky header paints across the middle of it and hides an example — that is
   an artifact, not a bug, but it is also where a real one goes unnoticed. And print
-  `document.activeElement.tagName` in the same pass; it is one line and it is what caught the focus
-  probe above. **The stitching is avoidable: open the page at `{ width, height: 3000 }`.** With a
+  `document.activeElement.tagName` in the same pass; it is one line and it is what caught
+  `document.body.focus()` leaving a keyboard reader parked mid-page — now in
+  `docs/agents/pitfalls.src.md`. **The stitching is avoidable: open the page at `{ width, height: 3000 }`.** With a
   viewport taller than the demo, an element screenshot never scrolls and the header cannot paint into
   it — the per-example shots come back clean at both widths with no second pass.
-- **`box-sizing: border-box` counts the border into a target's measured size.** An SC 2.5.8 failure
-  built by removing `min-width`/`min-height` from a 20px glyph lands at exactly 24×24 — on the floor
-  rather than under it — because the 2px border on each side is inside the box. The `border-width`
-  has to go too. `icon-button`'s `--tiny` is the precedent, and its readout is what caught it.
-- **Two single-class rules are ordered by source, not by which is more specific.** `.ac-btn--sm` and
-  `.ac-btn-icon` are both (0,1,0) and both set `padding`, so an icon button laid out before the size
-  modifier silently keeps the text button's padding and stops being square. Declaring `[BTN]` before
-  `[ICON]` is the fix and it is worth a comment, because there is nothing in either rule to suggest
-  it matters.
-- **`[WARN] [glob-loader] Duplicate id "<slug>" found` is a stale content cache, not a real
-  duplicate.** It appears on the first build after a scaffolded `docs.md` is filled in, because the
-  entry was already indexed in `.astro/`. Nothing is wrong and the page builds; `rm -rf .astro` and
-  rebuild if you want to confirm. Do not go looking for a second `docs.md`.
-- **Playwright honors `aria-disabled` in its actionability checks.** A click on a control that is only
-  *soft* disabled hangs for the full 30s timeout with "element is not enabled" — including a click on
-  a `<label>` or a decorative `<span>` inside one, because it resolves to the associated input. That
-  is correct behavior and the same reason a screen reader says "unavailable", so do not weaken the
-  markup: pass `{ force: true }` and say in a comment that the `preventDefault` in the component is
-  what the assertion is actually about. `motion-preferences` and `switch` both need this.
-- **`el.focus()` plus a read of `document.activeElement` is a focusability probe, and it is ground
-  truth.** A selector can only list the elements that are *usually* focusable, and every interesting
-  case is one that is unusually focusable or unusually not — a link inside an `opacity: 0` panel, a
-  scroll container Chromium hands a stop to, a `[hidden]` box that still has `tabindex="0"`. Asking
-  the browser answers all of them: `el.focus({ preventScroll: true })` and then
-  `document.activeElement === el`. Two rules come with it. **Focus on something that cannot take it
-  is a no-op, not a move**, so the probe has to `blur()` and restore focus itself or it parks a
-  keyboard reader wherever the last probe landed — the same trap as `document.body.focus()` above.
-  And **focusable is not tabbable**: filter on `el.tabIndex >= 0` first, which is exactly the
-  distinction roving tabindex trades on. `tabs`' `[FOCUS]` is the block to lift, and its spec proves
-  every walk again with real `page.keyboard.press('Tab')` rather than trusting the probe.
-- **A rename that misses one line can leave a silent always-false.** `panels[i].hidden = !on` was
-  left behind by a rename of `on` to `isOn`, and `on` resolved to the file's own `on(el, type, fn)`
-  listener helper — so `!on` was `false` on every iteration, every panel stayed visible, and there
-  was no error, no warning and nothing wrong-looking in the source. Every test written at that point
-  passed; the readout was the only thing that disagreed. What found it in one run: patch the
-  property on the prototype from a Playwright `addInitScript` and log `new Error().stack` on every
-  set. Worth reaching for whenever the DOM is in a state nothing in the code appears to produce.
-  The general shape — a leftover identifier that resolves to a *function* in scope — is invisible to
-  `undefined` checks, because functions are truthy and negating one is always `false`.
-- **A `[hidden]` element has no accessible name.** `toHaveAccessibleName` returns `""` for it, which
-  is correct — it is out of the accessibility tree, which is the whole reason to hide it that way —
-  and it means the assertion that proves the markup is right *fails* on the panel that is not
-  showing. Select it first, then assert. Same shape as the empty-live-region trap above: the correct
-  state is the one the obvious assertion cannot express.
-- **A tab strip that wraps must not have a rail across the whole strip.** A `border-bottom` on the
-  tablist belongs to the last row, so at 320px the first row of a wrapped strip hangs over nothing
-  and the leftover tabs read as stray text. Put the selected cue on each tab instead — a
-  `border-bottom` declared at its full width in *both* states, transparent when unselected, so the
-  row cannot reflow and shift the next tab out from under a pointer already heading for it. This is
-  the layout half of the same rule `chip-toggle` found for its tick.
-- **An unfocusable fragment target does not leave focus on the link.** Following `<a href="#x">`
-  where `#x` cannot take focus does not fail quietly by leaving the keyboard where it was — the
-  browser runs the focusing steps for the document's viewport, so `document.activeElement` comes
-  back as `<body>` and the next Tab starts at the **top of the page**. A keyboard reader who asked
-  to be moved down the page is moved to the beginning of it. Browser-confirmed in Chromium, and it
-  is strictly worse than the failure `jump-nav` was designed around; the test asserts `body` is
-  focused, which reads oddly and is the correct assertion. `tabindex="-1"` on the target is the fix
-  and it is one attribute.
-- **A settle-poll that starts in the same frame as the scroll request reports the state before the
-  scroll.** "scrollTop has not changed for three frames" is true immediately after
-  `scrollTo({ behavior: 'smooth' })` and after a fragment jump, because both begin *after* the frame
-  they were requested in — so the callback fires against the old position and the readout looks like
-  it never ran. `jump-nav`'s `whenSettled` waits for a move to have been *seen*, or twenty frames
-  without one, before it will call anything settled. Same family as the geometry-polling gotchas
-  above, arriving from the other direction: the poll was not too early to be stable, it was stable
-  too early.
-- **A base rule written `.ac-thing th, .ac-thing td` outranks every single-class modifier on a
-  cell.** The compound is (0,1,1) and `.ac-thing__num` is (0,1,0), so the modifier loses and does
-  nothing at all — no warning, no visible cause, and the base rule looks entirely innocent because it
-  is the one everybody writes first. `data-table`'s right alignment and its 2px header rule were both
-  dead until the spec caught them; every modifier there is now written `.ac-table .ac-table__num` to
-  match the base's specificity. This is the third member of the family, after `icon-button`'s two
-  single-class rules ordered by source and `jump-nav`'s two modifiers setting the same custom
-  property. The rule of thumb: **write a modifier at the same specificity as the base rule it has to
-  beat**, and never reason about it — a computed-style assertion in the spec is what finds it.
-- **Chromium demotes a `<table>` with no `<caption>`, no `<th>` and no borders to `LayoutTable`.**
-  It is not exposed as a table at all: no table navigation, no row or column announcements, and the
-  cells come back as `LayoutTableCell`. A `<caption>` on its own is enough to promote it; `<th>`
-  alone promotes it but leaves it unnamed; **`aria-label` does not promote it**, so the attribute
-  people reach for is the one that does not work. The heuristic is also defeated by ordinary cell
-  borders, which is why this is a note rather than a demo — style the table and it is a data table
-  whatever the markup says. Measured with CDP `Accessibility.getPartialAXTree`; `ariaSnapshot()`
-  computes roles from the element and does **not** report the demotion.
-- **A `<caption>` inside a `display: block` table keeps `display: table-caption`.** The parent is no
-  longer a table box, so the caption gets an anonymous one of its own and shrink-wraps — a
-  four-word caption renders as four lines of one word. Every real card restyle carries a
-  `caption { display: block }` line for this and nobody mentions why.
-- **Chromium's forced-colors emulation does not repaint author background colors.** Under
-  `page.emulateMedia({ forcedColors: 'active' })` the media query matches and the `@media` block
-  applies, but `getComputedStyle` still returns the author's own `color-mix` for anything the block
-  did not override. So a forced-colors test can assert **that the `[FORCED]` rules took effect** —
-  and cannot assert that the platform dropped a tint. Write the assertion as "the repaired element
-  differs from the one left alone", never as "the tint is gone".
 - **Astro's bundled `site.css` loads *after* every `component.css`.** Head order is theme, effects,
   dropdown, the page's component, then the `_astro/*.css` bundle. So a shell rule at **equal**
   specificity wins over a component's. This bites exactly one rule shape: `site.css` ships a global

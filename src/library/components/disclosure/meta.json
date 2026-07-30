@@ -8,5 +8,43 @@
   "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/",
   "wcag": ["1.3.1", "2.1.1", "4.1.2"],
   "status": "stable",
-  "files": ["html", "css", "js"]
+  "files": ["html", "css", "js"],
+  "contract": {
+    "useWhen": "A button that shows and hides the region right after it.",
+    "root": [".ac-disclosure"],
+    "aria": {
+      "the trigger": [
+        "type=button",
+        "aria-expanded",
+        "aria-controls"
+      ],
+      "the panel": [
+        "aria-labelledby"
+      ]
+    },
+    "keyboard": [
+      [
+        "Enter / Space",
+        "native: it is a <button>, so there is no key handler to write"
+      ]
+    ],
+    "states": [
+      "expanded",
+      "collapsed"
+    ],
+    "failureModes": [
+      "aria-expanded on the panel instead of the trigger — it is the control's state",
+      "the panel hidden with height:0 or opacity, which hides it from nobody",
+      "a div as the trigger, so there is no role and no keyboard",
+      "aria-controls naming an id nobody built"
+    ],
+    "api": [
+      "AC.createDisclosure(root, options) -> { open, close, toggle, isOpen, destroy }"
+    ],
+    "seeAlso": [
+      "drawer",
+      "modal",
+      "tabs"
+    ]
+  }
 }

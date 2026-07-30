@@ -9,5 +9,45 @@
   "wcag": ["2.4.1", "2.4.7", "2.4.11", "2.5.8", "4.1.2"],
   "status": "stable",
   "files": ["html", "css"],
-  "demoNote": "No JavaScript on this page. Click inside a frame and press Shift+Tab to reach its link. Example 5 is broken on purpose — both of its failures are live, so you can Tab through them and watch."
+  "demoNote": "No JavaScript on this page. Click inside a frame and press Shift+Tab to reach its link. Example 5 is broken on purpose — both of its failures are live, so you can Tab through them and watch.",
+  "contract": {
+    "useWhen": "The first focusable thing on the page, and a target that accepts focus.",
+    "root": [".ac-skip-link", ".ac-skip-nav", ".ac-skip-main"],
+    "aria": {
+      "the target": [
+        "tabindex=-1"
+      ],
+      "a list of destinations": [
+        "aria-label"
+      ]
+    },
+    "keyboard": [
+      [
+        "Tab",
+        "it has to be the first stop — nothing focusable may precede it"
+      ],
+      [
+        "Enter",
+        "follows it; the ring on the target is the only confirmation of the jump"
+      ]
+    ],
+    "states": [
+      "clipped",
+      "focused",
+      "always visible"
+    ],
+    "failureModes": [
+      "display:none to hide it, which makes it unfocusable — the most common broken skip link there is",
+      ":focus-visible instead of :focus, so a programmatic focus leaves it invisible",
+      "no tabindex=-1 on the target, so the page scrolls and the next Tab resumes at the top",
+      "a border in the clipped state, which border-box cannot shrink below: a 1px box becomes 4px",
+      "no white-space:nowrap, so the text wraps inside 1px and is read a letter at a time",
+      "a cookie banner focusable before it"
+    ],
+    "seeAlso": [
+      "jump-nav",
+      "focus-ring",
+      "visually-hidden"
+    ]
+  }
 }

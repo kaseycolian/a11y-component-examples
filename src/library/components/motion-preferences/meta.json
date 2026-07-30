@@ -18,5 +18,45 @@
   "wcag": ["1.4.1", "2.2.2", "2.3.1", "2.5.8", "4.1.2", "4.1.3"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "The toggle in example 2 controls every example on this page, and the readout under it names the three signals that produced the answer. Example 5 is broken on purpose and live: one extra CSS rule that beats your operating system, with a button that proves it."
+  "demoNote": "The toggle in example 2 controls every example on this page, and the readout under it names the three signals that produced the answer. Example 5 is broken on purpose and live: one extra CSS rule that beats your operating system, with a button that proves it.",
+  "contract": {
+    "useWhen": "One motion token: a page can add the restriction, never override the OS.",
+    "root": [".ac-switch", ".ac-motion-scope"],
+    "aria": {
+      "the toggle": [
+        "aria-describedby"
+      ],
+      "the drawn track": [
+        "aria-hidden=true"
+      ],
+      "the readout that reports which way it resolved": [
+        "role=status"
+      ]
+    },
+    "keyboard": [
+      [
+        "Space",
+        "toggles the checkbox behind the switch"
+      ]
+    ],
+    "states": [
+      "reducing",
+      "not reducing — the absence of the attribute"
+    ],
+    "failureModes": [
+      "[data-motion=\"on\"], which beats the media query and leaves the toggle unable to describe the page",
+      "matchMedia read for the value, which cannot see the page’s own toggle",
+      "the distance gated as well as the duration, so a state change becomes a jump cut",
+      "a loop past five seconds with no pause control (SC 2.2.2), whatever the motion setting",
+      "the two rules at different specificity, which turns source order into an accident"
+    ],
+    "api": [
+      "AC.createMotionPreferences(root, options) -> { allowed, set, refresh, input, destroy }"
+    ],
+    "seeAlso": [
+      "effects",
+      "switch",
+      "focus-ring"
+    ]
+  }
 }

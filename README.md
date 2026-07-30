@@ -48,14 +48,32 @@ const dropdown = AC.createDropdown(el);
 dropdown.destroy();
 ```
 
+## If an agent is doing the copying
+
+Start at **[AGENTS.md](AGENTS.md)**, which is written for that and nothing else: a tiered read path with
+byte budgets, a one-line index of the roster, and a per-component ARIA contract — roles, keyboard map,
+states, failure modes, JS API — generated from each `meta.json` and asserted against the shipped markup
+by the test suite. Alongside it, `agents/pitfalls.md` collects the platform behaviors that make
+correct-looking markup wrong, each one paid for by a real failure.
+
+The same files are served under the site's base path, so a fetcher needs no checkout; `llms.txt` is the
+entry point there. Claude Code picks up `.claude/skills/a11y-library/` on clone.
+
+Do not point an agent at `CLAUDE.md` or `docs/`. Those are for working *on* the library and cost tens of
+thousands of tokens to say nothing about how a component behaves. Why that side is built the way it is —
+the tiers, the budgets, the single manifest, and what each surface measured against its budget — is
+recorded for people in [docs/agent-layer.md](docs/agent-layer.md).
+
 ## Repository layout
 
 ```
 src/library/     The components themselves. Pure vanilla, zero Astro. This is the product.
 src/site/        The Astro shell that displays them. Never contains component code.
 tests/shared/    The accessibility gate every component must pass.
+AGENTS.md        The agent entry point. Generated.
+agents/          The roster index, a contract per component, and the cross-cutting traps. Generated.
 docs/            Authoring guide, AT support matrix, WCAG mapping.
-scripts/         Library sync, component scaffolder, token linter.
+scripts/         Library sync, component scaffolder, token linter, agent-surface renderer.
 ```
 
 `src/library/` never imports from `src/site/`, so the library stays portable.

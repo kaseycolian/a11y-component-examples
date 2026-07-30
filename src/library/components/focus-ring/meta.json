@@ -9,5 +9,31 @@
   "wcag": ["1.4.1", "1.4.11", "2.4.7", "2.4.11", "2.4.13"],
   "status": "stable",
   "files": ["html", "css"],
-  "demoNote": "No JavaScript on this page, and it is meant to be Tabbed through rather than read. Example 4 is broken on purpose and live: three buttons, and only one of them can be followed with a keyboard."
+  "demoNote": "No JavaScript on this page, and it is meant to be Tabbed through rather than read. Example 4 is broken on purpose and live: three buttons, and only one of them can be followed with a keyboard.",
+  "contract": {
+    "useWhen": "The visible focus indicator, and what clips or hides one by accident.",
+    "root": [".ac-focus-ring"],
+    "keyboard": [
+      [
+        "Tab",
+        ":focus-visible matches this; :focus also matches a mouse press"
+      ]
+    ],
+    "states": [
+      "focus-visible",
+      "focus"
+    ],
+    "failureModes": [
+      "outline:none with no equal-or-better replacement (SC 2.4.7)",
+      "an overflow:hidden ancestor clipping a positive outline-offset, with nothing to see",
+      "border-radius in a focus rule — an outline already follows the element’s own",
+      "a sticky bar covering the focused element, which only happens moving backwards (SC 2.4.11)",
+      "a ring built out of the border, which a ghost button does not have at rest"
+    ],
+    "seeAlso": [
+      "skip-link",
+      "button",
+      "effects"
+    ]
+  }
 }

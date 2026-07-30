@@ -9,5 +9,38 @@
   "wcag": ["1.3.1", "1.4.1", "1.4.11", "2.1.1", "2.5.8", "3.3.1", "4.1.2"],
   "status": "stable",
   "files": ["html", "css"],
-  "demoNote": "No JavaScript on this page. Open one on a phone and you get the OS picker: full height, scrollable, with the platform's own screen reader behavior. That is the thing a custom listbox gives up."
+  "demoNote": "No JavaScript on this page. Open one on a phone and you get the OS picker: full height, scrollable, with the platform's own screen reader behavior. That is the thing a custom listbox gives up.",
+  "contract": {
+    "useWhen": "The native select, which is the better default on a phone.",
+    "root": [".ac-select"],
+    "aria": {
+      "the control": [
+        "aria-describedby"
+      ],
+      "the error": [
+        "role=alert"
+      ]
+    },
+    "keyboard": [
+      [
+        "ArrowDown / Home",
+        "native: the OS picker owns all of it"
+      ]
+    ],
+    "states": [
+      "invalid — aria-invalid=true on the control, set only while the error shows",
+      "disabled"
+    ],
+    "failureModes": [
+      "appearance:none with no caret drawn back, leaving a box that does not look openable",
+      "a custom listbox reached for when this would have done",
+      "the label replaced by a first option reading \"Choose…\", which is a value, not a name",
+      "options styled beyond color, which the OS picker ignores anyway"
+    ],
+    "seeAlso": [
+      "dropdown",
+      "field",
+      "radio-group"
+    ]
+  }
 }

@@ -9,5 +9,52 @@
   "wcag": ["1.3.1", "1.4.1", "1.4.11", "2.1.1", "2.4.7", "2.5.8", "3.2.2", "4.1.2", "4.1.3"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Flip example 2 and the confirmation arrives politely, without renaming the control. Example 4's locked switch still takes focus and still says why — that is the difference between aria-disabled and disabled."
+  "demoNote": "Flip example 2 and the confirmation arrives politely, without renaming the control. Example 4's locked switch still takes focus and still says why — that is the difference between aria-disabled and disabled.",
+  "contract": {
+    "useWhen": "An on/off that applies immediately, with the thumb as the second cue.",
+    "root": [".ac-switch"],
+    "aria": {
+      "the input": [
+        "type=checkbox",
+        "aria-describedby"
+      ],
+      "the drawn track": [
+        "aria-hidden=true"
+      ]
+    },
+    "keyboard": [
+      [
+        "Space",
+        "toggles"
+      ],
+      [
+        "Tab",
+        "one stop — the drawn track is not focusable"
+      ],
+      [
+        "Enter",
+        "submits the form, as on any checkbox. It does not toggle"
+      ]
+    ],
+    "states": [
+      "on",
+      "off",
+      "disabled"
+    ],
+    "failureModes": [
+      "the track color as the only cue, so the state is carried by color alone (SC 1.4.1)",
+      "role=switch reached for by default — it announces inconsistently in older JAWS",
+      "a switch that needs a Save button, which should have been a checkbox",
+      "the real input hidden with display:none, which removes the keyboard route",
+      "disabled rather than aria-disabled when the person needs to know why"
+    ],
+    "api": [
+      "AC.createSwitch(root, options) -> { set, state, refresh, input, destroy }"
+    ],
+    "seeAlso": [
+      "checkbox",
+      "chip-toggle",
+      "motion-preferences"
+    ]
+  }
 }

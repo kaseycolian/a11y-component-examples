@@ -5,55 +5,15 @@
  * This module globs them at build time, so navigation, the index page, the
  * per-component routes, and the test matrix all derive from the same source.
  * Adding a component means adding a folder -- nothing here needs editing.
+ *
+ * The glob is why the group list lives in groups.mjs rather than here:
+ * `import.meta.glob` is a Vite feature, so this file can only be loaded by
+ * Astro, and scripts/build-agent-surfaces.mjs runs under plain Node.
  */
+import { GROUPS } from './groups.mjs';
 
-/** Display order and blurb for each group. A component's `group` must match one of these keys. */
-export const GROUPS = [
-  {
-    id: 'foundations',
-    name: 'Foundations',
-    summary:
-      'The primitives everything else is built on: focus, motion, announcements, and the utilities that make the rest possible.',
-  },
-  {
-    id: 'buttons-actions',
-    name: 'Buttons & Actions',
-    summary: 'Things a person presses, and how each one reports what it did.',
-  },
-  {
-    id: 'forms-inputs',
-    name: 'Forms & Inputs',
-    summary:
-      'Labeled, described, and error-wired controls. The field wrapper here is the backbone every other input reuses.',
-  },
-  {
-    id: 'overlays-disclosure',
-    name: 'Overlays & Disclosure',
-    summary:
-      'Content that appears on demand, where focus has to go somewhere sensible and come back again.',
-  },
-  {
-    id: 'navigation',
-    name: 'Navigation',
-    summary: 'Moving between views and sections without losing your place.',
-  },
-  {
-    id: 'feedback-status',
-    name: 'Feedback & Status',
-    summary:
-      'Telling someone what happened -- in a way that reaches a screen reader, not just an eye.',
-  },
-  {
-    id: 'data-display',
-    name: 'Data Display',
-    summary: 'Structured content that keeps its structure when it is read aloud or reflowed.',
-  },
-  {
-    id: 'compositions',
-    name: 'Compositions',
-    summary: 'Several components working together, the way they would in a real screen.',
-  },
-];
+/** Display order and blurb for each group. A component's `group` must match one of these ids. */
+export { GROUPS };
 
 const GROUP_INDEX = new Map(GROUPS.map((g, i) => [g.id, i]));
 

@@ -18,5 +18,52 @@
   "wcag": ["1.4.1", "1.4.11", "2.4.3", "2.5.8", "3.3.1", "4.1.3"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Examples 2 to 5 are live. Example 2's notices announce one identical sentence in two tones; example 3 adds the same notice three ways and logs which one a screen reader was given; example 4's alert fired before you arrived, and again on every reload; example 5's close button leaves focus on the document body."
+  "demoNote": "Examples 2 to 5 are live. Example 2's notices announce one identical sentence in two tones; example 3 adds the same notice three ways and logs which one a screen reader was given; example 4's alert fired before you arrived, and again on every reload; example 5's close button leaves focus on the document body.",
+  "contract": {
+    "useWhen": "An inline message: the word carries the tone, the icon carries nothing.",
+    "root": [".ac-notice"],
+    "aria": {
+      "the icon": [
+        "aria-hidden=true"
+      ],
+      "the container it lands in": [
+        "role=status"
+      ],
+      "an error that must interrupt": [
+        "role=alert"
+      ],
+      "the dismiss button, which has no text of its own": [
+        "aria-label"
+      ]
+    },
+    "keyboard": [
+      [
+        "Enter",
+        "the dismiss button — whose handler owes focus somewhere afterwards"
+      ]
+    ],
+    "states": [
+      "info",
+      "success",
+      "warn",
+      "error"
+    ],
+    "failureModes": [
+      "role=status on the notice rather than on the container, which was never being watched",
+      "role=alert present at page load, interrupting on every render",
+      "color as the only cue for the tone (SC 1.4.1)",
+      "two buttons both named Close, naming nothing",
+      "the focused dismiss button removed with no answer for where focus goes"
+    ],
+    "api": [
+      "AC.createNotice(root) -> { build, announce, refresh, destroy }",
+      "AC.buildNotice(tone, text)",
+      "AC.announceNotice(region, notice)"
+    ],
+    "seeAlso": [
+      "live-region",
+      "status-text",
+      "field"
+    ]
+  }
 }

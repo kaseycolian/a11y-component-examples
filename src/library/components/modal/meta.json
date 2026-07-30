@@ -9,5 +9,52 @@
   "wcag": ["1.3.1", "1.4.1", "1.4.10", "1.4.11", "2.1.1", "2.1.2", "2.4.3", "2.4.7", "2.5.8", "3.2.2", "4.1.2", "4.1.3"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Open example 1 and Tab past the last button: focus comes back around, because the browser does that for a dialog opened with showModal(). Example 3 lands focus on the safe answer, never on Delete — Enter is the key people press to make a dialog go away."
+  "demoNote": "Open example 1 and Tab past the last button: focus comes back around, because the browser does that for a dialog opened with showModal(). Example 3 lands focus on the safe answer, never on Delete — Enter is the key people press to make a dialog go away.",
+  "contract": {
+    "useWhen": "A native dialog over the page, and the ARIA you must not add to it.",
+    "root": [".ac-modal"],
+    "aria": {
+      "the dialog": [
+        "aria-labelledby"
+      ],
+      "a destructive confirmation": [
+        "role=alertdialog",
+        "aria-describedby"
+      ]
+    },
+    "keyboard": [
+      [
+        "Escape",
+        "closes through the cancel event, so unsaved work can intercept it"
+      ],
+      [
+        "Tab",
+        "cycles inside — showModal() makes the rest of the page inert"
+      ],
+      [
+        "Enter",
+        "activates the focused button"
+      ]
+    ],
+    "states": [
+      "open",
+      "closed"
+    ],
+    "failureModes": [
+      "aria-modal=true added by hand, which has made VoiceOver skip the dialog's own content",
+      "showModal() with no scroll lock — and overflow:hidden alone jumps the layout sideways",
+      "aria-expanded on the trigger, reporting on a thing the person is now inside",
+      "the outcome announced from a region inside the dialog, removed from the tree before it speaks",
+      "no visible close control, which is a trap on touch",
+      "a drag that starts inside and ends on the backdrop, closing the dialog"
+    ],
+    "api": [
+      "AC.createModal(root, options) -> { open, close, isOpen, triggers, element, destroy }"
+    ],
+    "seeAlso": [
+      "drawer",
+      "disclosure",
+      "focus-ring"
+    ]
+  }
 }

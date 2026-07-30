@@ -9,5 +9,45 @@
   "wcag": ["1.3.1", "1.3.5", "1.4.1", "2.5.8", "3.3.1", "3.3.2", "3.3.3", "4.1.3"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Tab into Work email and straight out again, then type something without an @: the error is announced, and the hint stays in aria-describedby the whole time."
+  "demoNote": "Tab into Work email and straight out again, then type something without an @: the error is announced, and the hint stays in aria-describedby the whole time.",
+  "contract": {
+    "useWhen": "A label, a hint and an error on one control, wired so both stay announced.",
+    "root": [".ac-field"],
+    "aria": {
+      "the label": [
+        "for"
+      ],
+      "the control": [
+        "aria-describedby"
+      ],
+      "the error": [
+        "role=alert"
+      ]
+    },
+    "keyboard": [
+      [
+        "Tab",
+        "leaving the control is when to validate, not on every keystroke"
+      ]
+    ],
+    "states": [
+      "invalid — aria-invalid=true only while a message shows",
+      "disabled"
+    ],
+    "failureModes": [
+      "aria-describedby overwritten with the error id, which deletes the hint",
+      "the error element created on demand, so it is not in the tree when the text lands",
+      "a placeholder used as the label, gone the moment anyone types",
+      "aria-invalid left true after the field is fixed, so the state and the styling disagree",
+      "validation on every keystroke, which announces a half-typed value as wrong"
+    ],
+    "api": [
+      "AC.createField(root, options) -> { check, setError, clearError, isInvalid, focus, destroy }"
+    ],
+    "seeAlso": [
+      "text-input",
+      "fieldset-group",
+      "live-region"
+    ]
+  }
 }

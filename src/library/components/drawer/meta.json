@@ -9,5 +9,51 @@
   "wcag": ["1.4.13", "2.1.1", "2.1.2", "2.4.3", "2.5.8", "4.1.2"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Same behavior on a phone and on a desktop — that is what separates it from the Dropdown, which anchors to its trigger at every width. Open one and press Tab repeatedly: in the first three, focus cannot leave."
+  "demoNote": "Same behavior on a phone and on a desktop — that is what separates it from the Dropdown, which anchors to its trigger at every width. Open one and press Tab repeatedly: in the first three, focus cannot leave.",
+  "contract": {
+    "useWhen": "A panel from a screen edge. The whole component is the focus management.",
+    "root": [".ac-drawer"],
+    "aria": {
+      "the trigger": [
+        "type=button",
+        "aria-expanded",
+        "aria-controls"
+      ],
+      "the panel": [
+        "role=dialog",
+        "aria-modal=true",
+        "aria-labelledby"
+      ]
+    },
+    "keyboard": [
+      [
+        "Escape",
+        "closes, and focus returns to the trigger"
+      ],
+      [
+        "Tab",
+        "cycles inside — it is trapped while the drawer is modal"
+      ]
+    ],
+    "states": [
+      "open",
+      "modal",
+      "non-modal"
+    ],
+    "failureModes": [
+      "focus left behind on the page, so the next Tab starts from the top",
+      "no visible close control, which is a trap on touch where there is no Escape key",
+      "popover=auto light dismiss fighting a custom Escape handler — use manual",
+      "overflow:hidden alone for the scroll lock, which jumps the layout sideways",
+      "role=listbox on the drawer itself, instead of leaving its contents their own semantics"
+    ],
+    "api": [
+      "AC.createDrawer(root, options) -> { open, close, isOpen, isModal, element, destroy }"
+    ],
+    "seeAlso": [
+      "modal",
+      "dropdown",
+      "disclosure"
+    ]
+  }
 }

@@ -41,6 +41,13 @@ jobs:
       - name: Check tokens
         run: npm run check:tokens
 
+      # AGENTS.md and agents/** are rendered from meta.json and
+      # docs/agents/preamble.md. This re-renders and diffs, so editing a source
+      # without regenerating -- or hand-editing a generated file -- fails here
+      # rather than shipping surfaces that disagree with each other.
+      - name: Check agent surfaces
+        run: npm run check:agents
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
