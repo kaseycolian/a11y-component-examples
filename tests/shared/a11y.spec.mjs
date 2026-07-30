@@ -76,18 +76,29 @@ const selectorOf = (node) => node.target[node.target.length - 1];
 /**
  * Split axe's violations into the ones a `data-ac-demo-broken` element claimed
  * and the ones nobody did, and report which claims went unclaimed.
+ *
+ * `undetermined` is axe's `incomplete` bucket, and it is passed in for one
+ * reason: a claim it covers has *not* been shown to be repaired. axe returns
+ * incomplete when it cannot finish a check -- for color-contrast, when it
+ * cannot resolve what is behind the text -- and "I could not tell" is not the
+ * same answer as "this element is fine". Treating it as a pass fails the build
+ * and points at the demo, when what actually happened is that the checker gave
+ * up. It only ever satisfies an existing claim; it never creates a violation.
  */
-async function partition(page, violations) {
-  const flat = violations.flatMap((violation) =>
-    violation.nodes.map((node) => ({
-      rule: violation.id,
-      impact: violation.impact,
-      selector: selectorOf(node),
-      html: node.html.slice(0, 120),
-    })),
-  );
+async function partition(page, violations, undetermined = []) {
+  const flatten = (results) =>
+    results.flatMap((result) =>
+      result.nodes.map((node) => ({
+        rule: result.id,
+        impact: result.impact,
+        selector: selectorOf(node),
+        html: node.html.slice(0, 120),
+      })),
+    );
+  const flat = flatten(violations);
+  const unresolved = flatten(undetermined);
 
-  return page.evaluate((found) => {
+  return page.evaluate(({ found, unresolved }) => {
     const key = (el) => {
       // A stable per-element id for matching claims to violations. The marker
       // elements are few, so an index into the marker list is enough.
@@ -115,6 +126,17 @@ async function partition(page, violations) {
       }
     }
 
+    // A claim axe could not finish checking stays claimed. Nothing here can
+    // add to `unexpected` -- an incomplete result on an element nobody marked
+    // is axe asking for a human, not a violation.
+    for (const item of unresolved) {
+      const marker = document.querySelector(item.selector)?.closest('[data-ac-demo-broken]');
+      if (!marker) continue;
+      if (marker.getAttribute('data-ac-demo-broken').split(/\s+/).includes(item.rule)) {
+        seen.add(`${key(marker)}:${item.rule}`);
+      }
+    }
+
     // Claims that never fired. Only axe rule ids are checkable here; the two
     // words in the vocabulary that are not axe rules are asserted elsewhere.
     const notAxe = new Set(['focus-visible', 'target-size']);
@@ -129,7 +151,7 @@ async function partition(page, violations) {
     });
 
     return { expected, unexpected, unclaimed };
-  }, flat);
+  }, { found: flat, unresolved });
 }
 
 const describeNodes = (nodes) =>
@@ -223,11 +245,31 @@ for (const { slug, name } of COMPONENTS) {
 
     test.beforeEach(async ({ page }) => {
       await page.goto(PAGE);
+
+      // Settle the colors before anything measures one. `.sidebar__link` and
+      // `.code-tab` transition color, background-color and border-color
+      // (site.css), and those transitions are on `var(--dur)` directly rather
+      // than through the motion gate, so `data-motion="off"` does not stop
+      // them. Any axe pass that starts while they are running samples whatever
+      // is on screen at that instant -- a value part-way between two themes,
+      // which reads as a contrast number that belongs to neither.
+      //
+      // It fails in both directions, and the second is the confusing one: a
+      // deliberate failure measured mid-flight can come out *above* its
+      // threshold, so axe reports nothing and the gate says the demo stopped
+      // being broken. That is what CI hit on typography's opacity paragraph,
+      // and it is why this belongs in beforeEach rather than in the one test
+      // that first needed it.
+      await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; }' });
     });
 
     test('axe finds nothing the page has not already claimed', async ({ page }) => {
       const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
-      const { expected, unexpected, unclaimed } = await partition(page, results.violations);
+      const { expected, unexpected, unclaimed } = await partition(
+        page,
+        results.violations,
+        results.incomplete,
+      );
 
       expect(unexpected, `unclaimed violations:\n${describeNodes(unexpected)}`).toEqual([]);
 
@@ -250,16 +292,9 @@ for (const { slug, name } of COMPONENTS) {
       test.setTimeout(180_000);
       const failures = [];
 
-      // Settle the colors before measuring any of them. `.sidebar__link` and
-      // `.code-tab` transition color, background-color and border-color
-      // (site.css), and those transitions are on `var(--dur)` directly rather
-      // than through the motion gate, so `data-motion="off"` does not stop them.
-      // Flipping data-theme and calling axe in the next statement samples
-      // whatever is on screen at that instant -- a value part-way between two
-      // themes that both pass, which can read under 4.5:1. It surfaced as a
-      // failure on a different element and a different theme on each run, which
-      // is the tell that a contrast result is being measured mid-flight.
-      await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; }' });
+      // Transitions are already suppressed in beforeEach, which this test needs
+      // more than any other: it flips data-theme and calls axe in the next
+      // statement, so without it every sample lands part-way between two themes.
 
       for (const theme of THEMES) {
         await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme);

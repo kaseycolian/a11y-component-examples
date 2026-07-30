@@ -156,9 +156,10 @@
 
    1. opacity for muted text. It composites against whatever is behind the
       element, so the contrast ratio is not written down anywhere: this one
-      declaration is 4.1:1 on the library's dark surface and 3.0:1 on its light
-      one. Nothing in the CSS says so, no linter can see it, and it changes
-      when a designer changes a background two levels up. Set a color.
+      declaration is 3.7:1 at best across the library's dark surfaces and 2.5:1
+      on its light ones. Nothing in the CSS says so, no linter can see it, and
+      it changes when a designer changes a background two levels up. Set a
+      color.
 
    2. A link identified by color alone. Against this theme's background it is
       13:1, which is the number people check and it passes easily. Against the
@@ -171,8 +172,14 @@
       after each paragraph. overflow: hidden means no scrollbar, no error, and
       nothing to see in a screenshot. Use min-height. */
 
+/* The value is load-bearing, and not for the look of it. A demo that ships a
+   deliberate failure has to fail decisively in *every* theme, because the a11y
+   gate asserts the failure is still firing. At 0.45 this landed at 4.36:1 in
+   acid-arcade-dark -- the library's default, so the one the gate measures --
+   against a 4.5:1 threshold, the narrowest margin of the ten themes. 0.4 puts
+   the worst theme at 3.7:1. Measure across every theme before touching it. */
 .ac-t-broken-faint {
-  opacity: 0.45;
+  opacity: 0.4;
 }
 
 .ac-t-broken-link {

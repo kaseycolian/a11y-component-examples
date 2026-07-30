@@ -73,8 +73,8 @@ drops under 4.5:1 with nothing failing anywhere.
 
 **Do not use `opacity` for this.** Example 3 has it live. `opacity` composites the text against
 whatever happens to be behind the element, so the resulting ratio is not written down anywhere —
-`opacity: 0.45` on this library's body text is 4.1:1 on the dark surface and 3.0:1 on the light one,
-from one declaration that names no color at all. No linter can see it, and it moves when someone
+`opacity: 0.4` on this library's body text lands between 3.4:1 and 3.7:1 across the dark themes and
+around 2.5:1 across the light ones, from one declaration that names no color at all. No linter can see it, and it moves when someone
 changes a background two levels up. Set a color.
 
 ## A link is not a color — SC 1.4.1

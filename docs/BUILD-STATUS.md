@@ -1166,6 +1166,20 @@ homes it belongs to, not in all of them.
   showing its failure for the wrong reason. **Measure the headroom, not just the outcome**: force the
   demo through several wide faces and check the margin in *lines*, then assert that margin in the spec
   so the drift fails where it started. The suite now asserts a spare line at rest.
+- **A deliberate failure has to fail by a margin, in the theme the gate measures.** Same lesson as the
+  line-count one, on the other axis. `typography`'s opacity paragraph is claimed as a live
+  `color-contrast` failure, and the gate asserts axe still reports it. At `opacity: 0.45` it measured
+  **4.36:1 against a 4.5:1 threshold** — and of the ten themes, the narrowest margin belonged to
+  `acid-arcade-dark`, which is the default and therefore the one the gate runs in. Every other theme
+  had three times the room. CI reported `claimed as broken but axe found nothing`, which reads like the
+  demo was repaired and is really the checker landing on the other side of a rounding boundary. When a
+  demo is *supposed* to fail a numeric threshold, measure it in **every** theme and pick a value that
+  fails all of them clearly; 0.4 puts the worst at 3.7:1.
+- **A probe that patches files must rebuild after it restores them.** The red probe for the above left
+  `dist/` built from the patched source, so the next run served a page with a stylesheet missing —
+  which produced page-wide contrast violations that looked like a real finding and cost a detour. If
+  the probe leans on Playwright's `webServer` to build, it must also stop any preview server already
+  holding port 4321, or `reuseExistingServer` hands it the stale one.
 - **`process.exit()` inside a `try` skips the `finally`.** A probe that patches files on purpose must
   restore them on every path, and exit is not a path — it terminates immediately. The first phase-7 red
   probe left a patched `component.html` behind that way. Throw instead; let `finally` run.

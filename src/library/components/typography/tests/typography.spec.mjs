@@ -247,7 +247,13 @@ test('the opacity paragraph is a live SC 1.4.3 failure', async ({ page }) => {
 
   // Under 4.5:1 -- and the ratio exists nowhere in the CSS, which is the point:
   // the declaration names no color, so nothing can lint it.
-  expect(ratio(color, background)).toBeLessThan(4.5);
+  //
+  // 4.0, not 4.5. The shared gate asserts axe still reports this node, so the
+  // example has to fail its threshold by a margin rather than sit against it.
+  // At opacity 0.45 the default theme measured 4.36:1 and the gate's verdict
+  // came down to rounding. Assert the margin here, where the cause is, rather
+  // than let it surface as axe going quiet in the gate.
+  expect(ratio(color, background)).toBeLessThan(4.0);
   expect(await faint.evaluate((el) => getComputedStyle(el).color)).toBe(
     await demo(page).locator('.ac-t-body').first().evaluate((el) => getComputedStyle(el).color),
   );
