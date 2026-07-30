@@ -131,8 +131,8 @@ The failure is always the same shape: a fixed height. Text that fit at line-heig
 visible in a screenshot.
 
 ```css
-.ac-t-box { min-height: 13.5rem; }   /* grows */
-.ac-t-box { height: 13.5rem; overflow: hidden; }   /* clips */
+.ac-t-box { min-height: 14rem; }   /* grows */
+.ac-t-box { height: 14rem; overflow: hidden; }   /* clips */
 ```
 
 Example 5 is both boxes with the same two sentences and a checkbox that applies all four values. Shipping

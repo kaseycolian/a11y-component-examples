@@ -1158,6 +1158,14 @@ homes it belongs to, not in all of them.
   inputs as scaffolding and made 60 real hits look like noise. What broke it was a question with no room
   for interpretation — *how many components have that element at all* — rather than a better bucket. Ask
   something countable.
+- **A demo tuned to an exact line count breaks on someone else's fonts.** `typography`'s example 5
+  clips a fixed-height box when the reader forces SC 1.4.12 spacing. Its box was 15rem wide, which put
+  the two paragraphs exactly on the 3-line/4-line boundary in Trebuchet — so on the Ubuntu CI runner,
+  where the stack falls through to a wider fallback, both paragraphs wrapped to 4 lines and the box was
+  already clipping before the checkbox was ticked. Green on Windows, red on CI, and the demo was
+  showing its failure for the wrong reason. **Measure the headroom, not just the outcome**: force the
+  demo through several wide faces and check the margin in *lines*, then assert that margin in the spec
+  so the drift fails where it started. The suite now asserts a spare line at rest.
 - **`process.exit()` inside a `try` skips the `finally`.** A probe that patches files on purpose must
   restore them on every path, and exit is not a path — it terminates immediately. The first phase-7 red
   probe left a patched `component.html` behind that way. Throw instead; let `finally` run.

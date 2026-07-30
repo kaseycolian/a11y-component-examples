@@ -187,7 +187,7 @@
 }
 
 .ac-t-broken-clip {
-  height: 13.5rem;
+  height: 14rem;
   overflow: hidden;
 }
 
@@ -231,10 +231,10 @@
 
 /* Example 5's boxes are a fixed width, and its columns are wide enough to hold
    them, so the only thing that differs between the two boxes is the height
-   rule. Let them reflow freely and the left one clips at some widths and not
-   others, which would make the demo an argument about column width. */
+   rule. Let them reflow freely and the clipping box clips at some widths and
+   not others, which would make the demo an argument about column width. */
 .ac-t-pair--boxes {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
   justify-items: start;
 }
 
@@ -247,12 +247,20 @@
   background: var(--ac-bg, var(--bg, #070110));
 }
 
-/* min-height, not height — the point of example 5's right-hand box is that it
-   has nowhere to clip from. */
+/* min-height, not height — the point of example 5's second box is that it has
+   nowhere to clip from.
+
+   The width is what keeps the example honest across machines. At 15rem the two
+   paragraphs landed exactly on the 3-line/4-line boundary, so a browser without
+   Trebuchet or Segoe fell through to a wider fallback, wrapped to 4 lines each,
+   and the clipping box was already clipping before the checkbox was ticked —
+   the demo showed its failure for the wrong reason, and CI failed on Linux.
+   17rem puts every face in the stack at 3 lines with a line to spare, and the
+   spacing toggle still overflows 14rem by more than a line. */
 .ac-t-box {
-  width: 15rem;
+  width: 17rem;
   max-width: 100%;
-  min-height: 13.5rem;
+  min-height: 14rem;
 }
 
 .ac-t-specimen__note,

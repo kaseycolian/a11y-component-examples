@@ -288,10 +288,34 @@ test('the color-only link fails the 3:1 test against the text beside it', async 
 const clipped = (locator) =>
   locator.evaluate((el) => el.scrollHeight > el.clientHeight + 1);
 
+/**
+ * Unused vertical space, in lines. scrollHeight floors at clientHeight, so it
+ * cannot answer this — the content has to be measured directly.
+ */
+const headroomInLines = (locator) =>
+  locator.evaluate((el) => {
+    const ps = [...el.querySelectorAll('.ac-t-prose')];
+    const line = parseFloat(getComputedStyle(ps[0]).lineHeight);
+    const content = ps.reduce(
+      (n, p) => n + p.getBoundingClientRect().height + parseFloat(getComputedStyle(p).marginBottom),
+      0,
+    );
+    return (el.clientHeight - content) / line;
+  });
+
 test('both boxes hold their text until the reader changes the spacing', async ({ page }) => {
   await expect(demo(page).locator('#t-spacing')).not.toBeChecked();
   expect(await clipped(demo(page).locator('.ac-t-broken-clip'))).toBe(false);
   expect(await clipped(demo(page).locator('.ac-t-box:not(.ac-t-broken-clip)'))).toBe(false);
+});
+
+test('the clipping box has a line to spare before the reader touches anything', async ({ page }) => {
+  // The example only proves its point if the clip is caused by the spacing.
+  // Fonts differ by machine -- a box tuned to the exact line count wraps to one
+  // more line wherever the stack falls through to a wider face, and then it
+  // clips at rest and the demo argues for nothing. Assert the margin, not just
+  // the outcome, so the drift fails here rather than on someone else's CI.
+  expect(await headroomInLines(demo(page).locator('.ac-t-broken-clip'))).toBeGreaterThan(1);
 });
 
 test('the fixed-height box loses the end of the sentence, and min-height does not', async ({ page }) => {
