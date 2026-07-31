@@ -1,0 +1,779 @@
+/* =============================================================================
+   The A11Y Way — site header.
+
+   A port of the theme-service app's own header (its assets/site-header.css), so
+   the two apps read as one brand. Both run the same theme tokens, so every value
+   here is a token and the header re-skins with the picker inside it.
+
+   Four zones, always in this DOM order:
+
+       brand ........ who this is                (identity)
+       components ... where you can go           (this site's navigation)
+       motion ....... a preference               (quiet, lowest priority)
+       theme ........ the shared instrument      (loudest, always top-right)
+
+   Where the theme-service has a two-stop Overview/Preview segmented control, this
+   app has the components picker — its real navigation, and the only navigation
+   there is below 900px where the sidebar drops out. It gets the same console
+   shell as the theme picker, keyed to --accent-blue rather than --accent-purple.
+
+   The responsive rules only ever RE-FLOW the four zones, never reorder them, so
+   tab order always matches reading order (SC 2.4.3).
+
+   Loaded after site.css by BaseLayout. Order is not relied on, though: every rule
+   that overrides a library default does it by specificity (.console
+   .ac-dropdown__toggle beats .ac-dropdown__toggle), because the Dropdown's own
+   stylesheet is a plain <link> whose position Astro does not guarantee.
+   ============================================================================= */
+
+:root {
+  /* Height of the sticky header, used for scroll-margin so that jumping to an
+     anchor never parks the target underneath it (SC 2.4.11), and for the
+     sidebar's sticky offset. Measured against the real header at each width
+     rather than guessed -- tests/site-header.spec.mjs asserts it stays within
+     2px. Too high only wastes space above an anchor; too low hides the anchor,
+     so round up. One row here; two below 1080px. */
+  --header-h: 3.75rem;
+
+  /* Console height, and with it the height of a header row. Flat 36px on every
+     device: the SC 2.5.8 floor is 24px, so this has half again as much, and a
+     single number is what lets --header-h above stay one measured value rather
+     than a matrix of them. Where a finger really needs 44px is the open list,
+     and the Dropdown already gives it that through its own --ac-target. */
+  --console-h: 36px;
+}
+
+/* Under prefers-reduced-motion the script unhides #motion-note, a strip under
+   the rail. Without this the token is a line or two short for exactly the
+   visitors who get it, and every anchor target lands under the header. */
+:root[data-motion-note] {
+  --header-h: 5.25rem;
+}
+
+/* --- The rail ---------------------------------------------------------------- */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  /* Translucent so the page's neon grid shows through as content scrolls under
+     it -- the header reads as glass over the rink, not a solid slab. */
+  background: color-mix(in srgb, var(--bg-panel) 88%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(1.15);
+  backdrop-filter: blur(10px) saturate(1.15);
+}
+
+/* The lit tube along the bottom edge, in place of a border. Deliberately the
+   same pink->purple->blue ramp the theme-service draws its diagram connectors
+   with, so the two headers match edge for edge. It re-colors with the theme,
+   which makes it a readout as well as a rule. */
+.site-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    var(--accent-pink),
+    var(--accent-purple),
+    var(--accent-blue)
+  );
+  box-shadow: 0 0 calc(10px * var(--glow-strength))
+    color-mix(in srgb, var(--accent-purple) 45%, transparent);
+}
+
+/* 90rem, not the theme-service's 1600px: this site has a sidebar and a content
+   column below the header, and the brand's left edge and the theme console's
+   right edge should line up with them. */
+.hdr-inner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  max-width: 90rem;
+  margin: 0 auto;
+  padding: 11px clamp(16px, 3vw, 32px);
+}
+
+/* --- Brand -------------------------------------------------------------------
+   The favicon's arch mark, then the wordmark. The separator dot is the only lit
+   piece of the lockup; the words stay quiet. */
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  margin-right: 4px;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.brand:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 4px;
+}
+
+/* The mark's strokes and their colors live in public/brand/brand-mark.svg, which
+   an <img> renders as an isolated document this stylesheet cannot reach --
+   brand-mark-theme.js carries the resolved tokens across. The glow below is a
+   filter on the element, so it re-themes from here with no JS. */
+.brand-mark {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(
+    0 0 calc(3px * var(--glow-strength)) color-mix(in srgb, var(--accent-pink) 55%, transparent)
+  );
+  transition: transform var(--dur) ease;
+}
+
+.brand:hover .brand-mark {
+  transform: translateY(calc(var(--motion) * -1px));
+}
+
+.brand-name {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  min-width: 0;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.brand-title {
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+/* The mixed accent, not the raw one. This is text at 13px, so SC 1.4.3 asks
+   4.5:1 of it in every theme -- and the raw pink is drawn to be vivid on a dark
+   page, which leaves it in the 2.7-4.2:1 band on a light theme surface. Mixing
+   toward --text always raises contrast against the surface, in either mode. */
+.brand-dot {
+  color: var(--accent-pink-text);
+  font-weight: 700;
+}
+
+.brand-tag {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+/* --- Console -----------------------------------------------------------------
+   The shared shell both pickers wear. It keeps the border, glow and focus ring;
+   the Dropdown trigger inside it goes flat and contributes only its text and
+   caret. One custom property is the whole difference between the two.
+
+   A <div>, not a <label>: once the Dropdown enhances the select the real control
+   is a <button>, which a wrapping label would neither name nor focus. Each
+   console's cap does that job through aria-labelledby instead. */
+
+.console {
+  /* The modifiers below both set this, and both win on source order. It is
+     declared here so a console without one degrades to a plain bordered control
+     rather than losing its border, background and glow outright -- an undefined
+     custom property makes every color-mix() referencing it invalid at once. */
+  --console-accent: var(--border-strong);
+  display: inline-flex;
+  align-items: center;
+  height: var(--console-h);
+  min-width: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  background: color-mix(in srgb, var(--console-accent) 7%, var(--bg-elevated));
+  border: 1px solid color-mix(in srgb, var(--console-accent) 50%, var(--border));
+  box-shadow: 0 0 calc(12px * var(--glow-strength))
+    color-mix(in srgb, var(--console-accent) 20%, transparent);
+  transition: border-color var(--dur) ease, box-shadow var(--dur) ease;
+}
+
+.console--theme {
+  --console-accent: var(--accent-purple);
+  /* Sized so the TRIGGER alone -- not the console -- fits the longest theme name,
+     "Midnight Arcade (No Background)". The Dropdown writes the open panel's width
+     from the trigger's own rect, so the trigger is what decides how much of a
+     name the closed control and the open list can both show. The cap and the
+     lamps are on top of this. */
+  width: 26rem;
+  max-width: 100%;
+}
+
+.console--nav {
+  --console-accent: var(--accent-blue);
+  /* Pushes motion and theme to the right edge; on the two-row layout below this
+     is replaced by grid placement. */
+  margin-right: auto;
+  width: 21rem;
+  max-width: 100%;
+}
+
+.console:hover {
+  border-color: var(--console-accent);
+  box-shadow: 0 0 calc(18px * var(--glow-strength))
+    color-mix(in srgb, var(--console-accent) 38%, transparent);
+}
+
+/* The trigger is the real control, so the ring belongs to the console it fills.
+   Both selectors are live: the first once the Dropdown has enhanced it, the
+   second on the native fallback. */
+.console:has(.ac-dropdown__toggle:focus-visible),
+.console:has(select:focus-visible) {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.console:has(select:focus-visible) select {
+  outline: none;
+}
+
+.console__cap {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  flex: none;
+  padding: 0 11px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--console-accent) 35%, var(--border));
+}
+
+/* Only used on the fallback path, where the Dropdown did not load. */
+.console__go {
+  align-self: center;
+  flex: none;
+  min-height: 24px;
+  margin: 0 6px;
+  padding: 0 0.7rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.console__go[hidden] {
+  display: none;
+}
+
+/* --- Lamps -------------------------------------------------------------------
+   A live palette readout: painted from --accent-*, so a theme change re-colors
+   them with no JS at all. The smallest possible demonstration of what the
+   control beside them does. Theme console only. */
+
+.console__lamps {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: 5px;
+  padding: 0 11px;
+}
+
+.console__lamps i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--lamp);
+  box-shadow: 0 0 calc(5px * var(--glow-strength))
+    color-mix(in srgb, var(--lamp) 65%, transparent);
+  /* Staggered so the palette rolls left to right on a theme change. Both the
+     duration and the delay are multiplied by --motion, so "Reduce motion" and
+     the OS setting collapse the whole sweep to an instant swap. */
+  transition: background-color calc(var(--motion) * 0.3s) ease,
+    box-shadow calc(var(--motion) * 0.3s) ease;
+}
+
+/* Pink, green, blue, purple -- the same order themes.mjs writes data-ac-swatch
+   in, so a swatch row and the lamps read as the same four colors. */
+.console__lamps i:nth-child(1) {
+  --lamp: var(--accent-pink);
+}
+
+.console__lamps i:nth-child(2) {
+  --lamp: var(--accent-green);
+  transition-delay: calc(var(--motion) * 50ms);
+}
+
+.console__lamps i:nth-child(3) {
+  --lamp: var(--accent-blue);
+  transition-delay: calc(var(--motion) * 100ms);
+}
+
+.console__lamps i:nth-child(4) {
+  --lamp: var(--accent-purple);
+  transition-delay: calc(var(--motion) * 150ms);
+}
+
+/* --- The enhanced control inside a console ------------------------------------
+   Nothing here reaches into the Dropdown's behavior; it is all surface. The
+   two-class selectors also mean this wins over the component's own defaults
+   whichever order the two stylesheets land in. */
+
+.console .ac-dropdown {
+  flex: 1 1 auto;
+  min-width: 0;
+  align-self: stretch;
+}
+
+/* Flat inside the console: the shell already draws the border, radius and glow.
+
+   The left padding matches the right and is load-bearing, not decoration: when
+   the trigger is expanded it tints its own background (below), and that tint
+   starts at the padding edge. At 0 the fill began exactly at the first letter,
+   so the name read as jammed against its own highlight. */
+.console .ac-dropdown__toggle {
+  height: 100%;
+  min-height: 0;
+  padding: 0 11px;
+  gap: 8px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.console .ac-dropdown__toggle:hover {
+  border-color: transparent;
+}
+
+.console .ac-dropdown__toggle[aria-expanded="true"] {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--console-accent) 14%, transparent);
+  box-shadow: none;
+}
+
+/* The ring is drawn by the console, so the trigger must not draw its own. */
+.console .ac-dropdown__toggle:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.console .ac-dropdown__caret {
+  color: var(--console-accent);
+}
+
+/* The panel matches the trigger's width, which is why the consoles above carry
+   an explicit one. Rows wrap rather than truncate: a list is where you go to
+   read the name in full, so it is the one place it should never be cut. */
+.console .ac-dropdown__primary {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+/* One palette notation in the header, not two. The component's default swatch is
+   a contiguous strip; the lamps beside it are four dots, and reading a row then
+   the trigger meant re-parsing the same four accents in a different shape. So
+   the panel adopts the lamps' notation -- same order, same circles, same 5px
+   rhythm, one size down for the row's smaller type. Scoped to the header: the
+   library keeps its strip everywhere else, which is what the Dropdown page
+   demonstrates. */
+.console--theme .ac-dropdown__swatch {
+  gap: 5px;
+  border: 0;
+  border-radius: 0;
+  /* The strip clipped its children to a rounded box. Dots need to glow past
+     their own edges, so the clip goes with the border that motivated it. */
+  overflow: visible;
+}
+
+.console--theme .ac-dropdown__swatch > span {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+/* The lamps glow with a box-shadow off var(--lamp). These dots cannot: their
+   color is an inline style from the option's data, and no shadow property can
+   read a background. A pseudo-element can -- `background: inherit` picks up that
+   same inline value -- so a blurred copy of the dot becomes its halo.
+
+   It paints ON TOP of the dot rather than behind it, which needs no z-index and
+   so cannot escape the row's stacking context: blurring a solid disc leaves the
+   center solid, so at 65% over its own color only the spill past the edge reads.
+
+   inset:0 and 65% reproduce the lamps' own glow. The halo must start at the
+   dot's own edge, like a shadow -- inflating the disc before blurring turns dots
+   into blobs. */
+.console--theme .ac-dropdown__swatch > span::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+  filter: blur(2.5px);
+  opacity: calc(0.65 * var(--glow-strength));
+}
+
+/* --- The native fallback (the Dropdown script never landed) ------------------- */
+
+.console select {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-self: stretch;
+  padding: 0 6px 0 11px;
+  border: 0;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.console select option {
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+.console select optgroup {
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+}
+
+/* Two triangles for a caret, in the console's own accent. Only for the fallback
+   -- once enhanced, the component draws its own chevron. */
+.console:not(:has(.ac-dropdown))::after {
+  content: "";
+  flex: none;
+  width: 10px;
+  height: 5px;
+  margin-right: 13px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--console-accent) 50%),
+    linear-gradient(135deg, var(--console-accent) 50%, transparent 50%);
+  background-position: 0 0, 5px 0;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+/* --- Reduce motion -----------------------------------------------------------
+   A preference, so it stays small and muted. A real checkbox drives it: the
+   visible track and thumb are decoration (aria-hidden), so screen readers
+   announce the native control and its checked state, and the label text is part
+   of the accessible name. */
+
+.motion {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  /* The track is 24px, which is exactly the SC 2.5.8 floor. The label is the
+     real target, so it gets the comfortable size instead -- and it takes the
+     console's height, because on the two-row layout the switch is what sets the
+     second row where a console is not, and a row that is not --console-h tall
+     puts --header-h out by the difference. */
+  min-height: var(--console-h);
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: color var(--dur) ease;
+}
+
+.switch:hover {
+  color: var(--text);
+}
+
+.switch input {
+  position: absolute;
+  width: 44px;
+  height: 24px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.switch__track {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 24px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text) 12%, transparent);
+  transition: background-color var(--dur) ease, border-color var(--dur) ease,
+    box-shadow var(--dur) ease;
+}
+
+.switch__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--text);
+  transition: transform var(--dur) ease, background-color var(--dur) ease;
+}
+
+.switch input:checked + .switch__track {
+  background: var(--accent-green);
+  border-color: var(--accent-green);
+  box-shadow: var(--bglow-green);
+}
+
+.switch input:checked + .switch__track .switch__thumb {
+  transform: translateX(20px);
+  background: var(--on-green);
+}
+
+.switch input:focus-visible + .switch__track {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* aria-disabled, not the disabled attribute: the control stays focusable, so a
+   keyboard user reaches it and hears the note explaining why it is stuck. */
+.switch:has(input[aria-disabled="true"]) {
+  cursor: not-allowed;
+  color: var(--text-muted);
+}
+
+.switch input[aria-disabled="true"] + .switch__track {
+  border-style: dashed;
+  opacity: 0.7;
+}
+
+/* The reduced-motion note: a strip under the rail, not a paragraph inside it.
+   Shown only when the OS asks for reduced motion, so most visitors never see it
+   and the header stays one row. */
+.hdr-note {
+  max-width: 90rem;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 3vw, 32px) 8px;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.hdr-note[hidden] {
+  display: none;
+}
+
+/* =============================================================================
+   Responsive. Two rows below 1080px, in a 2-column grid that keeps the four
+   zones in DOM order:  brand | components  /  motion | theme.
+   ============================================================================= */
+
+@media (max-width: 1080px) {
+  :root {
+    --header-h: 6.5rem;
+  }
+
+  :root[data-motion-note] {
+    --header-h: 8rem;
+  }
+
+  .hdr-inner {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 14px;
+    row-gap: 8px;
+    align-items: center;
+  }
+
+  /* Both consoles fill their column instead of reserving a fixed trigger width;
+     the panel narrows with them, and its rows wrap rather than truncate. */
+  .console--nav,
+  .console--theme {
+    justify-self: end;
+    width: 100%;
+    max-width: 30rem;
+  }
+
+  .console--nav {
+    margin-right: 0;
+  }
+
+  /* Dots one step down, matching the lamps below. Four circles at a 5px rhythm
+     are wider than the strip they replaced, and the panel narrows here too. */
+  .console--theme .ac-dropdown__swatch {
+    gap: 4px;
+  }
+
+  .console--theme .ac-dropdown__swatch > span {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+/* Below 900px the sidebar is gone and the components console is the whole of
+   this site's navigation, so it stops being width-capped and takes its row. The
+   theme console uncaps with it: two stacked controls of the same width read as
+   one block, where one short and one long reads as a mistake. */
+@media (max-width: 900px) {
+  .console--nav,
+  .console--theme {
+    max-width: none;
+  }
+}
+
+/* The tagline is the first thing to go, and it goes here rather than at the
+   theme-service's 620px: this is just under the width where the sidebar
+   disappears, and every pixel it gives back goes to the navigation. */
+@media (max-width: 760px) {
+  .brand-tag,
+  .brand-dot {
+    display: none;
+  }
+
+  .brand {
+    gap: 9px;
+  }
+}
+
+/* Phones: tighter rail, and the console's cap is the next thing to go. */
+@media (max-width: 620px) {
+  :root {
+    --header-h: 6.375rem;
+  }
+
+  :root[data-motion-note] {
+    --header-h: 7.875rem;
+  }
+
+  .hdr-inner {
+    padding: 10px 14px;
+    column-gap: 10px;
+  }
+
+  /* Stays flush with the rail above it. */
+  .hdr-note {
+    padding: 0 14px 8px;
+  }
+
+  .console__lamps {
+    padding: 0 9px;
+    gap: 4px;
+  }
+
+  .console--theme .ac-dropdown__swatch {
+    gap: 3px;
+  }
+
+  .console--theme .ac-dropdown__swatch > span {
+    width: 5px;
+    height: 5px;
+  }
+
+  /* The caps are HIDDEN, NOT REMOVED. Each is its control's accessible name via
+     aria-labelledby, and a name that points at a display:none element resolves
+     to nothing -- the trigger would announce as a bare button. Clipping keeps
+     the name intact at every width. */
+  .console__cap {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+/* The switch's own text goes before the brand does -- the track's state is
+   visible, and the toggle keeps its name from the text either way. */
+@media (max-width: 560px) {
+  .switch__text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* Narrowest phones: mark only. The link keeps its name from aria-label. */
+@media (max-width: 400px) {
+  /* Only the note changes height here -- it takes a third line at this width. */
+  :root[data-motion-note] {
+    --header-h: 8.875rem;
+  }
+
+  .brand-name {
+    display: none;
+  }
+}
+
+/* =============================================================================
+   Windows High Contrast
+   ============================================================================= */
+
+/* Both palette indicators are painted with background-color alone, and HCM
+   replaces backgrounds with system colors -- so the lamps and the panel's dots
+   would both go invisible, and the dots would take the strip's border with them.
+   They are aria-hidden decoration, so nothing is announced either way, but four
+   rings still say "a palette lives here". Outlines, not borders: they sit
+   outside the box, so the geometry the glow and the gap were tuned around is
+   untouched. */
+@media (forced-colors: active) {
+  .console__lamps i,
+  .console--theme .ac-dropdown__swatch > span {
+    outline: 1px solid CanvasText;
+    outline-offset: -1px;
+  }
+
+  /* The halo is a blurred copy of a color that no longer exists here. */
+  .console--theme .ac-dropdown__swatch > span::after {
+    display: none;
+  }
+
+  .console {
+    border-color: ButtonBorder;
+  }
+
+  .switch input:checked + .switch__track {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  .switch input:checked + .switch__track .switch__thumb {
+    background: HighlightText;
+  }
+
+  /* opacity and the muted text color are both dropped here, so the dashed
+     border becomes the only cue left that the toggle cannot be changed. */
+  .switch input[aria-disabled="true"] + .switch__track {
+    border-color: GrayText;
+    opacity: 1;
+  }
+}

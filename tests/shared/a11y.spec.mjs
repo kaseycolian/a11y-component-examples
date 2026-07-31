@@ -283,6 +283,13 @@ for (const { slug, name } of COMPONENTS) {
     });
 
     test('axe finds nothing the page has not already claimed', async ({ page }) => {
+      // One axe pass, but the heaviest pages are ~6000 nodes: data-table
+      // measures 18.5s run alone and goes past the default 30s once the suite
+      // runs at full parallelism, which showed up as a timeout on a different
+      // page each run. Not a slow component -- the header is 417 of those nodes
+      // and costs 1.1s of the 18.5s, measured with and without it.
+      test.setTimeout(90_000);
+
       const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
 
       const skipped = skippedRules(results);

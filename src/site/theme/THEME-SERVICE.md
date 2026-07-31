@@ -24,6 +24,25 @@ bootstrap is the external `theme-init.js`).
 | `themes.index.json` | Theme registry. The theme picker is generated from this at build time. |
 | `theme-init.js` | Pre-paint bootstrap: applies the saved (or `?theme=` / `?motion=`) choice before first paint so there is no flash. Loaded from `<head>` as an external script. |
 
+## Vendored brand assets
+
+`The A11Y Way` is one brand across two apps, so the header lockup and the tab icon are shared with
+the theme-service rather than redrawn here. These four are copied **verbatim** from that repo's
+`assets/` folder and live in `public/brand/`, not here — they are served to the browser, and
+`public/` is the only place Astro serves static files from. They are committed: `.gitignore` and
+`scripts/sync-library.mjs` both name the generated `public/` subfolders individually, and
+`public/brand/` is not one of them.
+
+| File | Purpose |
+|------|---------|
+| `favicon.svg` | The alley-and-arch tile. Paints from `--a11y-theme-*` with brand-color fallbacks, so it stands alone as a static icon. |
+| `favicon-theme.js` | Progressive enhancement: reads the live tokens off `<html>`, inlines them onto the SVG, and swaps in a `data:` URI. Re-runs on `data-theme` change. |
+| `brand-mark.svg` | The arch alone, lifted out of the tile so it reads at 26px beside the wordmark. Paints from `--accent-pink` / `--accent-green`. |
+| `brand-mark-theme.js` | The same trick for `img.brand-mark` in the header, which is an isolated document the page's custom properties never reach. |
+
+Re-copy all four on a theme-service update; they are not generated from `theme.css` and the update
+script will not know about them. Nothing else about them is repo-specific.
+
 ## Applied configuration (current decisions on record)
 
 - **Component styling:** `full-restyle` — this repo *is* a component library. Its components are
@@ -72,3 +91,6 @@ Preferences page rather than worked around.
   skipped `components.css` and `theme-select.js` (see "Deliberate deviations" above). Theme picker
   and motion toggle placed in the sticky site header, built from this library's own Dropdown and
   Switch components.
+- `2026-07-30` — Redesigned the site header to match the theme-service's own
+  (`assets/site-header.css`), so the two apps read as one brand. Vendored the four brand assets
+  above into `public/brand/`; no change to the theme files themselves.

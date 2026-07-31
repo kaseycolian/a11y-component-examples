@@ -226,8 +226,12 @@ test('flips above the trigger when there is no room below', async ({ page }) => 
   await page.reload();
 
   const { toggle, panel } = env(page);
-  // Push the trigger to the bottom of the viewport.
-  await toggle.evaluate((el) => el.scrollIntoView({ block: 'end' }));
+  // Push the trigger to the bottom of the viewport. behavior: 'instant' opts out
+  // of the site's `html { scroll-behavior: smooth }`, which otherwise animates
+  // this over ~300px: the click below then lands mid-scroll, the trigger still
+  // has room under it, and the panel correctly does not flip -- a race that
+  // reads exactly like a broken component.
+  await toggle.evaluate((el) => el.scrollIntoView({ block: 'end', behavior: 'instant' }));
   await toggle.click();
 
   const panelBox = await panel.boundingBox();

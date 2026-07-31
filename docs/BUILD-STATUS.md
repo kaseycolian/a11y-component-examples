@@ -11,9 +11,9 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-30 (**the agent layer is complete — all eight phases**, see item 5; suite is
-**1164/1164** in Chromium. Playwright **firefox is installed but has never been run**, webkit is not
-installed; the `summary` voice changed on 2026-07-28, see item 0a)
+Last updated: 2026-07-30 (**the agent layer is complete — all eight phases**, see item 5; the **site
+header was redesigned** to match the theme-service app — see Infrastructure. Playwright webkit is
+still not installed; the `summary` voice changed on 2026-07-28, see item 0a)
 
 ---
 
@@ -251,19 +251,37 @@ take their logic and not their layout. See item 1 under remaining work.
 - **Scripts** — `sync-library.mjs`, `check-tokens.mjs`, `new-component.mjs`. All three verified working.
 - **Site shell** — `BaseLayout` (with `head` + `end` slots), `SiteHeader`, `CodePanel`,
   `ComponentNav`, `registry.mjs`, `themes.mjs`, `content.config.ts`, `site.css`, home, index, `[slug]`.
-- **Header** — brand, a **components picker**, then the settings. The picker is the library's own
-  Dropdown over a `<select>` grouped exactly like the sidebar, with the current page preselected; it
-  navigates on `change`, which is safe because the Dropdown commits only on click or Enter and the
-  described hint says so in advance (SC 3.2.2). A `Go` button, hidden by default, appears at `load` if
-  the Dropdown never enhanced the select — a bare native select fires `change` on every arrow key.
-  Prominence is set with `--ac-*` tokens on the wrapper (accent border, wider trigger) rather than by
-  reaching into the component's internals. **Two rows at every width**: settings top-right, then the
-  picker beneath them — right-aligned above 760px, full-width below. The picker is *after* the
-  settings in the DOM as well as on screen, so Tab never runs back up the page (SC 2.4.3).
-- **Header theme picker** — is the library's own Dropdown, loaded site-wide from
+- **Header** — redesigned 2026-07-30 to match the theme-service app's own header
+  (`D:\sources\theme-service\assets\site-header.css`), so the two apps read as one brand. All of it
+  is in **`src/site/styles/site-header.css`**, one file the way theme-service keeps it;
+  `SiteHeader.astro` has no `<style>` block, and `site.css` has no header rules. Four zones, in this
+  DOM order and this reading order: **brand → components picker → reduce motion → theme picker**. One
+  flex row from 1081px up; below that a 2-column grid, `brand | components / motion | theme`, which
+  re-flows without reordering, so Tab never runs back across the screen (SC 2.4.3). The rail is
+  `90rem`, not theme-service's 1600px, so the brand and the theme console line up with the sidebar
+  and content below. Brand strings are `SITE_NAME` + `SITE_BRAND_TAG` in `src/site/lib/site.mjs`.
+- **Both pickers are the library's own Dropdown**, loaded site-wide from
   `public/library/components/dropdown/` by `BaseLayout`. The shell is a *consumer* of the library, so
-  a regression in the dropdown breaks the site, not just a test. Covered by
-  `tests/site-header.spec.mjs`.
+  a regression in the dropdown breaks the site, not just a test. Each sits in a `.console` shell —
+  a cap that names it, a flat trigger, an accent border and glow — keyed to `--accent-blue` for the
+  components picker and `--accent-purple` for the theme one, plus four **lamps** on the theme console
+  painted straight from `--accent-*`. Nothing reaches into the component's internals: the shell is
+  the consumer's own CSS, and the two-class selectors win over the library's defaults by specificity
+  rather than by stylesheet order. The components picker navigates on `change`, which is safe because
+  the Dropdown commits only on click or Enter and the described hint says so in advance (SC 3.2.2);
+  a `Go` button, hidden by default, appears at `load` if the Dropdown never enhanced the select — a
+  bare native select fires `change` on every arrow key. Covered by `tests/site-header.spec.mjs`.
+- **Each picker is named by its cap, through `aria-labelledby`** — not by a `<label for>`. Once the
+  Dropdown enhances the select the real control is a `<button>`, which a wrapping label neither names
+  nor focuses. So the caps are **clipped, never `display: none`**, at the width where they go: a name
+  pointing at a `display:none` element resolves to nothing and the trigger announces as a bare
+  button.
+- **Brand assets are vendored, in `public/brand/`** — `favicon.svg`, `brand-mark.svg` and the two
+  theme scripts that re-color them, copied verbatim from theme-service's `assets/`. Committed, not
+  generated: `.gitignore` and `sync-library.mjs` both name the generated `public/` subfolders
+  individually and `brand/` is not one. Before this the `<link rel="icon">` pointed at a
+  `favicon.svg` that **did not exist**, so every page served a 404 for its icon. Provenance is
+  recorded in `src/site/theme/THEME-SERVICE.md`; re-copy all four on a theme-service update.
 - **Home hero** — two columns from 68rem up, prose left at its own measure, a real `Field` markup
   excerpt right (`tabindex="0"` + `role="group"`, because it scrolls sideways). No component counts
   anywhere: see the **Writing style** rules in `CLAUDE.md` — never count, and demo content is 90s punk
@@ -273,10 +291,13 @@ take their logic and not their layout. See item 1 under remaining work.
   same list, grouped the same way, and it is already on screen. Nothing else navigates, so any change
   that hides the picker on mobile has to bring the sidebar back.
 - **`--header-h` is measured, not guessed.** It drives `scroll-margin-top` on every `[id]`
-  (SC 2.4.11), so it must be ≥ the header's real height at *every* width, and a two-row header's
-  height depends on what wrapped. Three values — 9.75rem, 8.5rem below 760px, 9.25rem below 340px
-  where the brand wraps to two lines. `tests/site-header.spec.mjs` asserts the token covers the real
-  height at five widths; that test is the guard, not the comment.
+  (SC 2.4.11) and the sidebar's sticky offset, so it must be ≥ the header's real height at *every*
+  width. It lives in `site-header.css` beside the breakpoints that change it. Two values for the
+  normal case — 3.75rem for the one-row layout, 6.5rem below 1080px, 6.375rem below 620px — and a
+  parallel set under `:root[data-motion-note]`, which the header script sets when it unhides the
+  reduced-motion note. `tests/site-header.spec.mjs` asserts the token covers the real height at five
+  widths in **both** cases; that test is the guard, not the comment. Keep the token a plain `rem`
+  literal: the test reads it with `parseFloat(...) * 16`, so a `calc()` would come back `NaN`.
 - **Markdown tables** — `scripts/rehype-scrollable-tables.mjs` wraps every `docs.md` table in a
   focusable `.table-scroll` region. Without it every component page overflowed sideways at 320px.
 - **Playwright** — `playwright.config.mjs`, three browser projects, `webServer` runs
@@ -1141,6 +1162,39 @@ homes it belongs to, not in all of them.
 
 - **Node is not on the inherited PATH.** Prefix PowerShell calls with
   `$env:Path = "C:\nvm4w\nodejs;$env:Path"`.
+- **A wide element inside a header zone starves the other zones.** The reduced-motion note started
+  beside the switch, and at 1080px and below that put an 18rem paragraph in an `auto` grid column:
+  `auto` sizes to max-content, so the note took 288px of a 292px content box and the components
+  picker came out **2px wide** at 320px. Nothing failed — the header still fit, the note still read.
+  It is now a full-width strip under the rail, which costs one line and cannot compete with anything.
+  Anything conditionally revealed inside the header rail is the same hazard.
+- **Shortening the header broke a modal test that was passing by accident.** `modal.spec.mjs`'s
+  inertness test force-clicked a background trigger while a dialog was open. That trigger sat *below*
+  the 720px viewport on a scroll-locked page, so the click never landed anywhere; the header losing
+  ~98px brought it on screen, where the click hit the dialog's backdrop and closed it — for the
+  documented reason, since that example carries `data-ac-backdrop-close="true"`. The test now uses
+  the example *without* backdrop-close and computes a click point that is over the trigger **and**
+  over the backdrop, asserting the two boxes make such a point possible. **Changing the header's
+  height moves every page's geometry**, so a test that depends on where something lands is a test
+  that will move with it.
+- **`html { scroll-behavior: smooth }` makes `scrollIntoView` a race in a test.** `dropdown`'s
+  "flips above the trigger" scrolled the trigger to the bottom of a 400px viewport and clicked. The
+  scroll is *animated*: measured, `scrollY` was **2 of 316** immediately after the call and only
+  reached 316 about a second later. The click landed mid-scroll with room still under the trigger,
+  the panel correctly did not flip, and the failure read exactly like a broken component. Fixed with
+  `behavior: 'instant'` in the `scrollIntoView` call. Any test that scrolls and then measures needs
+  the same opt-out.
+- **The gate's axe test needed a real timeout, and it was not the header.** `axe finds nothing…` ran
+  on the default 30s. The heaviest pages are ~6000 nodes — `data-table` measures **18.5s alone** and
+  goes past 30s at full parallelism, which surfaced as a timeout on a different page each run
+  (`badge`, `data-table`, `jump-nav`, `tabs`). Raised to 90s, matching what the contrast test in the
+  same file already does for the same reason. Measured before blaming the redesign: the header is
+  **417 of those 5901 nodes and 1.1s of the 18.5s**, with and without it.
+- **Anything the header script reveals needs a `--header-h` value of its own.** The old header had
+  ~156px of slack, so the reduced-motion note fit inside it unnoticed. The new one is 58px and does
+  not. The script sets `data-motion-note` on `<html>`, and `site-header.css` carries a taller token
+  under `:root[data-motion-note]` at every breakpoint — otherwise every anchor target lands under the
+  sticky header for exactly the visitors who get the note (SC 2.4.11).
 - **Never write a size or a count into a doc by hand.** Three of them were wrong here, each by a
   different mechanism: four rows divided bytes by 1000 while the budget beside them used 1024; one row
   quoted the number out of the generator's budget-failure message, describing a file two edits stale; and
@@ -1187,6 +1241,9 @@ homes it belongs to, not in all of them.
   three accents already had) clears it everywhere, worst case 5.25:1. Two things to carry: a clamped
   font-size means the threshold is clamped too, so measure at the smallest step; and the shared gate
   runs axe at 1280 only, so 320px contrast is checked in `tests/site-header.spec.mjs` and nowhere else.
+  (`.site-brand__mark` itself is gone — the 2026-07-30 header redesign replaced it with a plain
+  `--text` wordmark. The lesson stands, and `--accent-pink-text` is now what the brand's separator dot
+  uses for the same reason.)
 - **A deliberate failure has to fail by a margin, in the theme the gate measures.** Same lesson as the
   line-count one, on the other axis. `typography`'s opacity paragraph measured **4.36:1 against a
   4.5:1 threshold** at `opacity: 0.45`, and of the ten themes the narrowest margin belonged to

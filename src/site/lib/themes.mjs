@@ -2,7 +2,7 @@
  * Theme registry for the site header's picker.
  *
  * `themes.index.json` gives us ids, labels, families and modes. The actual
- * colors live in `theme.css`, so we parse the accent triple out of each
+ * colors live in `theme.css`, so we parse the four accents out of each
  * `[data-theme="..."]` block at build time and hand it to the picker as a
  * swatch. That keeps the swatches honest: they are the theme's real colors,
  * not a hand-maintained copy that can drift.
@@ -23,7 +23,15 @@ function parseSwatches(css) {
       const found = body.match(new RegExp(`--${name}\\s*:\\s*([^;]+);`));
       return found ? found[1].trim() : null;
     };
-    const colors = [read('accent-pink'), read('accent-green'), read('accent-blue')].filter(Boolean);
+    // Pink, green, blue, purple -- the type scale's order, and the same order the
+    // header's lamps are painted in, so a swatch row and the lamps beside it read
+    // as the same four colors rather than two different notations.
+    const colors = [
+      read('accent-pink'),
+      read('accent-green'),
+      read('accent-blue'),
+      read('accent-purple'),
+    ].filter(Boolean);
     if (colors.length) swatches.set(id, colors);
   }
 

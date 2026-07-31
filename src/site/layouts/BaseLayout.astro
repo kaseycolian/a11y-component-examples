@@ -1,6 +1,7 @@
 ---
 import SiteHeader from '../components/SiteHeader.astro';
 import '../styles/site.css';
+import '../styles/site-header.css';
 
 /**
  * The site's default theme goes on <html> below, in the markup rather than in
@@ -38,7 +39,16 @@ const fullTitle = pageTitle(title);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+    {/*
+      The static icon paints in brand colors on its own; favicon-theme.js
+      re-colors it per theme, and brand-mark-theme.js does the same for the
+      header's <img> lockup. Both are progressive enhancement -- if either fetch
+      fails, the static file simply stands. Shared verbatim with the
+      theme-service app; see src/site/theme/THEME-SERVICE.md.
+    */}
+    <link rel="icon" href={`${base}brand/favicon.svg`} type="image/svg+xml" />
+    <script is:inline defer src={`${base}brand/favicon-theme.js`}></script>
+    <script is:inline defer src={`${base}brand/brand-mark-theme.js`}></script>
 
     {/*
       Applies the saved (or ?theme= / ?motion=) choice before first paint, so

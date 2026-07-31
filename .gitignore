@@ -10,6 +10,9 @@ dist/
 # commit these -- src/library/, src/site/theme/ and agents/ are the sources of
 # truth. agents/ itself IS committed: it is what a clone reads, and public/ is
 # only how a fetcher reaches the same bytes.
+#
+# Named one by one, not as `public/`: public/brand/ is hand-vendored and IS
+# committed. See src/site/theme/THEME-SERVICE.md.
 public/library/
 public/theme/
 public/agents/

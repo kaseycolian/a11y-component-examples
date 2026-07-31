@@ -130,25 +130,88 @@ test('the Go fallback stays hidden while the Dropdown is doing its job', async (
   await expect(page.locator('[data-component-jump-go]')).toBeHidden();
 });
 
-/* --- Header layout -------------------------------------------------------- */
+/* --- Brand ---------------------------------------------------------------- */
 
-test('the picker sits below the settings, in that order in the DOM too', async ({ page }) => {
+test('the brand mark and the tab icon are real files that follow the theme', async ({ page }) => {
+  // The icon used to point at a favicon.svg that did not exist, so every page
+  // served a 404 for it. Both assets are now vendored in public/brand/.
+  const notFound = [];
+  page.on('response', (r) => {
+    if (r.status() >= 400) notFound.push(`${r.status()} ${r.url()}`);
+  });
+
   await page.goto('components/disclosure/');
 
-  const settings = await page.locator('.site-header__controls').boundingBox();
-  const picker = await page.locator('[data-jump-control]').boundingBox();
+  const mark = page.locator('img.brand-mark');
+  await expect(mark).toBeVisible();
+  expect((await mark.boundingBox()).width).toBeGreaterThan(0);
 
-  expect(picker.y).toBeGreaterThan(settings.y);
-  // Both right-aligned to the same edge, so the two rows read as one stack.
-  expect(Math.round(picker.x + picker.width)).toBe(Math.round(settings.x + settings.width));
+  // Both files paint in brand colors on their own; the two theme scripts read
+  // the live tokens off <html> and hand the browser a data: URI instead. A
+  // browser renders an <img> and a favicon in isolated documents, so this swap
+  // is the only way either can follow the picker.
+  await expect(mark).toHaveAttribute('src', /^data:image\/svg\+xml/);
+  await expect(page.locator('link[rel~="icon"]')).toHaveAttribute(
+    'href',
+    /^data:image\/svg\+xml/,
+  );
 
-  // The point of the DOM order: Tab moves down the screen, never back up it
-  // (SC 2.4.3). Anything that moves the picker visually has to move it here.
-  const order = await page.evaluate(() => {
-    const inner = document.querySelector('.site-header__inner');
-    return [...inner.children].map((el) => el.className.split(' ')[0]);
-  });
-  expect(order.indexOf('site-header__controls')).toBeLessThan(order.indexOf('control'));
+  const before = await mark.getAttribute('src');
+  await picker(page).locator('.ac-dropdown__toggle').click();
+  await picker(page).getByRole('option', { name: 'Hot Neon', exact: true }).first().click();
+  await expect(mark).not.toHaveAttribute('src', before);
+
+  expect(notFound).toEqual([]);
+});
+
+/* --- Header layout -------------------------------------------------------- */
+
+test('the four zones sit in one row, in the order you tab through them', async ({ page }) => {
+  await page.goto('components/disclosure/');
+
+  const box = async (selector) => page.locator(selector).boundingBox();
+  const brand = await box('.brand');
+  const nav = await box('[data-jump-control]');
+  const motion = await box('.motion');
+  const theme = await box('[data-theme-control]');
+
+  // Left to right: identity, where you can go, a preference, the instrument.
+  expect(brand.x).toBeLessThan(nav.x);
+  expect(nav.x).toBeLessThan(motion.x);
+  expect(motion.x).toBeLessThan(theme.x);
+
+  // The point of the DOM order: Tab moves the way the eye does, never back
+  // across the screen (SC 2.4.3). Anything that moves a zone visually has to
+  // move it here too.
+  const order = await page.evaluate(() =>
+    [...document.querySelector('.hdr-inner').children].map((el) =>
+      el.matches('[data-jump-control]')
+        ? 'nav'
+        : el.matches('[data-theme-control]')
+          ? 'theme'
+          : el.className.split(' ')[0],
+    ),
+  );
+  expect(order).toEqual(['brand', 'nav', 'motion', 'theme']);
+});
+
+test('below 1080px the zones re-flow to two rows without reordering', async ({ page }) => {
+  await page.goto('components/disclosure/');
+  await page.setViewportSize({ width: 900, height: 900 });
+
+  const box = async (selector) => page.locator(selector).boundingBox();
+  const brand = await box('.brand');
+  const nav = await box('[data-jump-control]');
+  const motion = await box('.motion');
+  const theme = await box('[data-theme-control]');
+
+  // brand | components  /  motion | theme -- read left to right, then down,
+  // which is still the DOM order above.
+  expect(nav.y).toBeLessThan(theme.y);
+  expect(motion.y).toBeGreaterThan(brand.y);
+  expect(motion.x).toBeLessThan(theme.x);
+  // The two consoles right-align, so the pair reads as one stack.
+  expect(Math.round(nav.x + nav.width)).toBe(Math.round(theme.x + theme.width));
 });
 
 test('the sidebar gives way to the header picker below 900px', async ({ page }) => {
@@ -158,40 +221,61 @@ test('the sidebar gives way to the header picker below 900px', async ({ page }) 
   // Stacked, the full roster sat between the header and the page you asked for.
   await page.setViewportSize({ width: 760, height: 900 });
   await expect(page.locator('.sidebar')).toBeHidden();
-  // Still navigable -- the picker is the same list, and now full width.
+  // Still navigable -- the picker is the same list, and now the whole row.
   await expect(jump(page).locator('.ac-dropdown__toggle')).toBeVisible();
 
-  const picker = await page.locator('[data-jump-control]').boundingBox();
-  expect(picker.width).toBeGreaterThan(600);
+  const nav = await page.locator('[data-jump-control]').boundingBox();
+  const brand = await page.locator('.brand').boundingBox();
+  // It uncaps below 900px because it is the only navigation left, so it takes
+  // everything the brand does not.
+  expect(nav.width).toBeGreaterThan(500);
+  expect(Math.round(nav.x)).toBeGreaterThanOrEqual(Math.round(brand.x + brand.width));
 });
 
-test('--header-h covers the real header at every width, so anchors clear it', async ({ page }) => {
-  await page.goto('components/chip-toggle/');
-
-  // SC 2.4.11: scroll-margin-top is calc(--header-h + 1rem), so the token going
-  // stale is an anchor target parked underneath a sticky header. Two rows make
-  // that height depend on which things wrapped, hence a check per breakpoint.
+/* SC 2.4.11: scroll-margin-top is calc(--header-h + 1rem), so the token going
+   stale is an anchor target parked underneath a sticky header. The header
+   re-flows from one row to two, hence a check per breakpoint. */
+async function assertHeaderTokenCovers(page, label) {
   for (const width of [1440, 900, 760, 375, 320]) {
     await page.setViewportSize({ width, height: 900 });
     const { real, token } = await page.evaluate(() => ({
       real: document.querySelector('.site-header').getBoundingClientRect().height,
-      token: parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) * 16,
+      token:
+        parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) * 16,
     }));
-    // The border-bottom is the 1px the token does not claim; the +1rem of
-    // scroll-margin absorbs it.
-    expect(real - token, `at ${width}px`).toBeLessThanOrEqual(2);
+    expect(real - token, `${label} at ${width}px`).toBeLessThanOrEqual(2);
   }
+}
+
+test('--header-h covers the real header at every width, so anchors clear it', async ({ page }) => {
+  await page.goto('components/chip-toggle/');
+  await assertHeaderTokenCovers(page, 'default');
+});
+
+test('--header-h still covers it once the reduced-motion note is showing', async ({ browser }) => {
+  // The note is a strip under the rail, so it grows the header by a line or two
+  // for exactly the visitors who get it. The script sets data-motion-note on
+  // <html> when it unhides the note; site-header.css has the taller value at
+  // each breakpoint.
+  const context = await browser.newContext({ reducedMotion: 'reduce' });
+  const page = await context.newPage();
+  await page.goto('components/chip-toggle/');
+
+  await expect(page.locator('#motion-note')).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('data-motion-note', 'on');
+  await assertHeaderTokenCovers(page, 'reduced motion');
+
+  await context.close();
 });
 
 test('the header holds its contrast at 320px, where the brand stops being large text', async ({
   page,
 }) => {
   // The one width the shared gate does not run axe at, and the one where SC
-  // 1.4.3 changes its mind about the header: the brand shrinks to fit beside
-  // the settings, crosses under the 18.66px bold floor, and the threshold it
-  // is measured against goes from 3:1 to 4.5:1 without the color moving. The
-  // raw accent sat at 4.44:1 there. Per theme, because a threshold this close
-  // is a per-theme question.
+  // 1.4.3 has the most to say about the header: the wordmark and both console
+  // caps are gone by here, so what is left to measure is the two trigger values
+  // and the switch -- small mono text over a translucent panel that every theme
+  // tints differently. Per theme, because that is a per-theme question.
   test.setTimeout(120_000);
   await page.goto('components/disclosure/');
   await page.setViewportSize({ width: 320, height: 640 });
@@ -215,7 +299,29 @@ test('the header holds its contrast at 320px, where the brand stops being large 
 test('swatches carry each theme real accents from theme.css', async ({ page }) => {
   await page.goto('components/disclosure/');
   const swatch = page.locator('#theme-select option[value="rink-classic-dark"]');
-  await expect(swatch).toHaveAttribute('data-ac-swatch', /^#[0-9a-f]{3,8},#[0-9a-f]{3,8},#/i);
+  // Four, in the lamps' order -- pink, green, blue, purple -- so a swatch row
+  // and the lamps beside the trigger are the same four colors.
+  await expect(swatch).toHaveAttribute(
+    'data-ac-swatch',
+    /^(#[0-9a-f]{3,8},){3}#[0-9a-f]{3,8}$/i,
+  );
+});
+
+test('the theme console lamps show the live palette', async ({ page }) => {
+  await page.goto('components/disclosure/');
+
+  const lamp = (n) => page.locator(`[data-theme-control] .console__lamps i:nth-child(${n})`);
+  const painted = async () =>
+    Promise.all([1, 2, 3, 4].map((n) => lamp(n).evaluate((el) => getComputedStyle(el).backgroundColor)));
+
+  const before = await painted();
+  // No JS paints these: they read --accent-* off the page, so a theme change
+  // re-colors them for free. That is the point of putting them there.
+  expect(new Set(before).size).toBe(4);
+
+  await picker(page).locator('.ac-dropdown__toggle').click();
+  await picker(page).getByRole('option', { name: 'Hot Neon', exact: true }).first().click();
+  await expect.poll(painted).not.toEqual(before);
 });
 
 test('the motion toggle explains an OS preference with visible, described text', async ({ browser }) => {

@@ -100,15 +100,29 @@ test('Tab cycles inside the dialog and cannot reach the page behind', async ({ p
 });
 
 test('the page behind is inert, so a trigger out there cannot be clicked', async ({ page }) => {
-  await page.getByRole('button', { name: 'Ticket details', exact: true }).click();
+  // House rules, not Ticket details: this is the example WITHOUT
+  // data-ac-backdrop-close, and every point outside an open dialog is its
+  // backdrop. Against the one that closes on backdrop click, a click aimed at
+  // the page behind closes the dialog for a documented reason, and the test
+  // could no longer tell that apart from a leak.
+  await page.getByRole('button', { name: 'House rules', exact: true }).click();
 
-  const other = page.getByRole('button', { name: 'House rules', exact: true });
+  const other = page.getByRole('button', { name: 'Ticket details', exact: true });
+  const trigger = await other.boundingBox();
+  const dialog = await page.locator('#ac-modal-rules').boundingBox();
+
+  // Aim at a point that is over the trigger AND over the backdrop, computed
+  // from the two boxes rather than guessed. The trigger's center sits under the
+  // dialog itself at this viewport, so a default click would land on the
+  // dialog's own content and prove nothing about what is behind it.
+  expect(trigger.x).toBeLessThan(dialog.x);
+
   // Inertness is the browser's, from showModal(). force: true is a real trusted
   // click, and it still does nothing.
-  await other.click({ force: true });
+  await other.click({ force: true, position: { x: 4, y: trigger.height / 2 } });
 
-  await expect(page.locator('#ac-modal-rules')).toBeHidden();
-  await expect(page.locator('#ac-modal-doors')).toBeVisible();
+  await expect(page.locator('#ac-modal-doors')).toBeHidden();
+  await expect(page.locator('#ac-modal-rules')).toBeVisible();
 });
 
 test('the page is scroll-locked while it is open, and released after', async ({ page }) => {

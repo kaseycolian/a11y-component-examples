@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <!-- COLORS ARE CUSTOM PROPERTIES, DEFAULTED TO THE BRAND. Each stroke reads
+         the same accent tokens theme.css defines, so wherever those tokens are in
+         scope the mark follows the active theme with no JS at all (an inline
+         `use` reference inherits them for free). The fallbacks are Rink Classic
+         Dark's accents, so the file also stands alone: as an `img`, an icon, or
+         opened on its own it paints in brand.
+
+         Note for `img` use: a browser renders an image in an isolated document,
+         so page-level custom properties never reach it and the fallbacks always
+         win. assets/brand-mark-theme.js closes that gap by stamping the resolved
+         values onto the root element here; see its header for why the site
+         header loads this as an `img` rather than referencing it inline.
+
+         Keep every comment in this file free of double hyphens: it is parsed as
+         strict XML, where a double hyphen inside a comment is a parse error that
+         kills the whole image. That is why token names appear unprefixed below. -->
+    <style>
+      /* accent-pink */
+      .bm-outer { fill: none; stroke: var(--accent-pink, #ff2ec4); stroke-width: 12; stroke-linecap: round; }
+      /* accent-green */
+      .bm-inner { fill: none; stroke: var(--accent-green, #5bff3a); stroke-width: 6; stroke-linecap: round; }
+      /* accent-pink */
+      .bm-bar   { fill: none; stroke: var(--accent-pink, #ff2ec4); stroke-width: 9; stroke-linecap: round; }
+    </style>
+  </defs>
+
+  <!-- The 'A' bridge from favicon.svg, lifted out of its tile so it reads at
+       26px beside the wordmark. Stroke geometry stays inside the 200x200 box once
+       round caps are counted (x 19..181, y 19..176), so nothing clips when this
+       is rasterized. Grouped under an id so it can also be referenced inline. -->
+  <g id="brand-mark">
+    <!-- Outer thick magenta track -->
+    <path class="bm-outer" d="M 25 170 C 50 170, 75 35, 100 25 C 125 35, 150 170, 175 170"/>
+    <!-- Inner crisp neon green track -->
+    <path class="bm-inner" d="M 50 170 C 70 170, 85 55, 100 45 C 115 55, 130 170, 150 170"/>
+    <!-- Sweeping crossbar -->
+    <path class="bm-bar"   d="M 35 115 Q 100 135 165 115"/>
+  </g>
+</svg>
