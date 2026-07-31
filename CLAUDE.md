@@ -46,6 +46,8 @@ of `dropdown` (thorough) or `disclosure` (small) rather than inventing a new one
 src/library/     THE PRODUCT. Zero Astro. Pure vanilla. Never imports from src/site/.
 src/site/        Astro shell (srcDir points here). Never contains component code.
 src/site/theme/  Vendored theme-service files. See THEME-SERVICE.md before touching.
+src/site/styles/ Site shell CSS. The header and footer are ports of theme-service's own —
+                 see A11Y-WAY-PAGES.md there before restyling either.
 scripts/         sync-library (src -> public), check-tokens (linter), new-component (scaffolder),
                  build-agent-surfaces (renders AGENTS.md + agents/ + the skill),
                  rehype-scrollable-tables (wraps docs.md tables so pages don't overflow at 320px)

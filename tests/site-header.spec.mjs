@@ -142,7 +142,10 @@ test('the brand mark and the tab icon are real files that follow the theme', asy
 
   await page.goto('components/disclosure/');
 
-  const mark = page.locator('img.brand-mark');
+  // Scoped to the header: the footer wears the same lockup, and brand-mark-theme.js
+  // paints every img.brand-mark on the page, so the bare selector matches two.
+  // The footer's copy is site-footer.spec.mjs's to check.
+  const mark = page.locator('.site-header img.brand-mark');
   await expect(mark).toBeVisible();
   expect((await mark.boundingBox()).width).toBeGreaterThan(0);
 

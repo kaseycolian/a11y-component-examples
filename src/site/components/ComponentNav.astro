@@ -10,27 +10,205 @@ const { current } = Astro.props;
 const base = import.meta.env.BASE_URL;
 ---
 
-<nav class="sidebar" aria-label="Components">
-  {
-    COMPONENTS_BY_GROUP.map((group) => (
-      <div class="sidebar__group">
-        <h2 class="sidebar__title" id={`nav-${group.id}`}>
-          {group.name}
-        </h2>
-        <ul class="sidebar__list" aria-labelledby={`nav-${group.id}`}>
-          {group.components.map((component) => (
-            <li>
-              <a
-                class="sidebar__link"
-                href={`${base}components/${component.slug}/`}
-                aria-current={component.slug === current ? 'page' : undefined}
-              >
-                {component.name}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    ))
-  }
+{/*
+  The roster is the whole library, so as a plain list of links it was one Tab
+  stop per component standing between the header and the page you actually came
+  to read. Tab order matched reading order the entire time -- it was never an SC
+  2.4.3 failure, it was just unusable. So the list becomes an APG menubar
+  (https://www.w3.org/WAI/ARIA/apg/patterns/menubar/): one Tab stop for the whole
+  sidebar, Tab again to leave it, arrow keys to move inside.
+
+  The roles are applied by the script below rather than shipped in the markup,
+  and that is the one place this deviates from the APG example's HTML. A menubar
+  puts tabindex="-1" on every item but one, so a menubar that ships in the markup
+  and never gets its script is a sidebar no keyboard can reach at all. Un-upgraded
+  this stays the long-but-working list it was before -- the same bet the header's
+  Go button makes about its Dropdown.
+*/}
+{/*
+  tabindex="-1" is about Firefox, and it is not a keyboard trap in reverse.
+  Firefox puts a scrollable container in the tab order on its own -- `.sidebar`
+  is `max-height` + `overflow-y: auto`, so it has always been a stop there, it
+  was just invisible among a whole roster of links. As one of two stops it is
+  half the sidebar, and it lands you on a region rather than the thing you were
+  reaching for.
+
+  The behavior exists so a scroll region with nothing focusable in it can still
+  be scrolled; here the arrow keys walk every item and focus scrolls it into
+  view, so nothing becomes unreachable by taking it out. An author tabindex wins
+  over the heuristic, and -1 keeps the element focusable to script.
+*/}
+<nav class="sidebar" aria-label="Components" tabindex="-1" data-component-nav>
+  {/*
+    Unhidden by the script, because until the script runs it is not true. Sighted
+    keyboard users are the ones who need it: a screen reader is told "menu bar"
+    and already knows what the arrows do, but nothing announces a roving tabindex
+    to an eye.
+  */}
+  <p class="sidebar__hint" hidden>Arrow keys move through this list; Tab leaves it.</p>
+
+  <div class="sidebar__groups">
+    {
+      COMPONENTS_BY_GROUP.map((group) => (
+        <div class="sidebar__group">
+          <h2 class="sidebar__title" id={`nav-${group.id}`}>
+            {group.name}
+          </h2>
+          <ul class="sidebar__list" aria-labelledby={`nav-${group.id}`}>
+            {group.components.map((component) => (
+              <li>
+                <a
+                  class="sidebar__link"
+                  href={`${base}components/${component.slug}/`}
+                  aria-current={component.slug === current ? 'page' : undefined}
+                >
+                  {component.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
 </nav>
+
+{/*
+  Compiled to an external module script, so there is no inline JS and it runs
+  after the markup above is parsed.
+*/}
+<script>
+  const nav = document.querySelector<HTMLElement>('[data-component-nav]');
+  const menubar = nav?.querySelector<HTMLElement>('.sidebar__groups');
+  const items = menubar ? [...menubar.querySelectorAll<HTMLAnchorElement>('.sidebar__link')] : [];
+
+  if (nav && menubar && items.length > 0) {
+    menubar.setAttribute('role', 'menubar');
+    // A menubar is horizontal unless it says otherwise, and the orientation is
+    // what tells a screen reader that Up and Down are the keys -- so it has to
+    // match the handler below, not just the layout.
+    menubar.setAttribute('aria-orientation', 'vertical');
+    menubar.setAttribute('aria-label', 'Components');
+
+    for (const group of menubar.querySelectorAll<HTMLElement>('.sidebar__group')) {
+      const title = group.querySelector<HTMLElement>('.sidebar__title');
+      group.setAttribute('role', 'group');
+
+      // The group takes the words that are on screen as its name, and the
+      // heading itself leaves the accessibility tree. Not a style choice: a
+      // menubar's allowed children are menuitems, groups and separators, and
+      // that constraint reaches *through* a group -- an h2 anywhere under the
+      // menubar is `aria-required-children: children which are not allowed`.
+      // aria-labelledby at the group would have kept the heading exposed and hit
+      // the same rule, so this is aria-label plus aria-hidden or nothing.
+      //
+      // What it costs is the sidebar's group headings as heading-navigation
+      // stops. On the index page they were a second copy of that page's own h2s;
+      // everywhere else, hearing "Forms & Inputs, group" on the way into it is
+      // the more useful of the two.
+      if (title) {
+        group.setAttribute('aria-label', title.textContent?.trim() ?? '');
+        title.setAttribute('aria-hidden', 'true');
+      }
+
+      // role="none" on the list and each row: menuitem's required owner is a
+      // menu or a menubar, and a list/listitem pair sitting in between is a
+      // different tree from the one the pattern describes. Dropping
+      // aria-labelledby is not tidying up -- role="none" is *ignored* on an
+      // element that carries a global ARIA attribute, so leaving it there would
+      // leave a list.
+      const list = group.querySelector<HTMLElement>('.sidebar__list');
+      if (list) {
+        list.setAttribute('role', 'none');
+        list.removeAttribute('aria-labelledby');
+        for (const row of [...list.children]) row.setAttribute('role', 'none');
+      }
+    }
+
+    for (const item of items) {
+      item.setAttribute('role', 'menuitem');
+      item.tabIndex = -1;
+    }
+
+    // The single Tab stop starts on the page you are already on, so tabbing in
+    // lands where you are instead of at the top of a roster you then have to
+    // arrow back down through.
+    const start = items.find((el) => el.getAttribute('aria-current') === 'page') ?? items[0];
+    start.tabIndex = 0;
+
+    nav.querySelector('.sidebar__hint')?.removeAttribute('hidden');
+
+    // One owner for the roving tabindex, and it is the browser's own report of
+    // where focus went -- so a mouse click leaves the Tab stop where the pointer
+    // put it, exactly as an arrow key does.
+    menubar.addEventListener('focusin', (event) => {
+      const landed = (event.target as HTMLElement).closest('.sidebar__link');
+      if (!landed) return;
+      for (const item of items) item.tabIndex = item === landed ? 0 : -1;
+    });
+
+    const focusItem = (index: number) => {
+      items[((index % items.length) + items.length) % items.length]?.focus();
+    };
+
+    /* Type-ahead. With eight groups on screen it is the fastest way to the one
+       component you want, and it is part of the pattern rather than an extra. */
+    let typed = '';
+    let typedAt = 0;
+
+    const search = (from: number) => {
+      for (let step = 0; step < items.length; step += 1) {
+        const index = (from + step) % items.length;
+        if ((items[index].textContent ?? '').trim().toLowerCase().startsWith(typed)) {
+          focusItem(index);
+          return;
+        }
+      }
+    };
+
+    menubar.addEventListener('keydown', (event) => {
+      // Chords belong to the browser -- Ctrl+Home and Alt+Left are not ours to
+      // take, and neither is any letter a user meant as a shortcut.
+      if (event.altKey || event.ctrlKey || event.metaKey) return;
+
+      const item = (event.target as HTMLElement).closest<HTMLAnchorElement>('.sidebar__link');
+      const at = item ? items.indexOf(item) : -1;
+      if (at < 0) return;
+
+      switch (event.key) {
+        // Both ends wrap, per the pattern: from the last item Down is the first.
+        case 'ArrowDown':
+          focusItem(at + 1);
+          break;
+        case 'ArrowUp':
+          focusItem(at - 1);
+          break;
+        case 'Home':
+          focusItem(0);
+          break;
+        case 'End':
+          focusItem(items.length - 1);
+          break;
+        case ' ':
+          // Enter follows a link on its own. Space does not -- its default is to
+          // scroll the page out from under the list you are reading.
+          item.click();
+          break;
+        default: {
+          if (event.key.length !== 1 || !/\S/.test(event.key)) return;
+          const now = Date.now();
+          // A second key inside the window extends the string; after it, the new
+          // key starts over. Typing the same letter repeatedly is how you cycle
+          // through the components that share it, so a single character searches
+          // from the *next* item rather than matching the one you are on.
+          typed = now - typedAt > 500 ? event.key.toLowerCase() : typed + event.key.toLowerCase();
+          typedAt = now;
+          search(typed.length === 1 ? at + 1 : at);
+          break;
+        }
+      }
+
+      event.preventDefault();
+    });
+  }
+</script>

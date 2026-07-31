@@ -1,7 +1,9 @@
 ---
 import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
 import '../styles/site.css';
 import '../styles/site-header.css';
+import '../styles/site-footer.css';
 
 /**
  * The site's default theme goes on <html> below, in the markup rather than in
@@ -83,14 +85,7 @@ const fullTitle = pageTitle(title);
       <slot />
     </main>
 
-    <footer class="site-footer">
-      <div class="site-footer__inner">
-        <p>Built to WCAG 2.2 AA. Every component here is meant to be copied.</p>
-        <p>
-          <a href="https://github.com/kaseycolian/a11y-component-examples">Source on GitHub</a>
-        </p>
-      </div>
-    </footer>
+    <SiteFooter />
 
     {/*
       Enhances the header's theme <select>. `defer` runs it after the header

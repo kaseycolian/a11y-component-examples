@@ -276,6 +276,20 @@ take their logic and not their layout. See item 1 under remaining work.
   nor focuses. So the caps are **clipped, never `display: none`**, at the width where they go: a name
   pointing at a `display:none` element resolves to nothing and the trigger announces as a bare
   button.
+- **Footer** — replaced 2026-07-31 with the shared one (theme-service `assets/site-footer.css`), the
+  header's companion: same `90rem` rail, and the header's lit tube mirrored onto the top edge so the
+  two bracket the page. Two zones — a lede (lockup, mission, source link) and a `<nav>` cross-linking
+  the two A11Y Way products, which until now pointed only one way, from theme-service to here. **No
+  boxes**: structure is the 2px tube and a 1px rule over each product, and lighting that rule is the
+  whole hover affordance. The current product is `aria-current="true"` (an item in a *set*, not a
+  page) plus the words "You are here", never the lit dot alone. It adds no heading, so a component
+  page's outline is untouched, and no new color pair — text is `--text` / `--text-muted`, accents
+  only decorate. In `src/site/styles/site-footer.css` + `SiteFooter.astro`; `site.css` has no footer
+  rules. Covered by `tests/site-footer.spec.mjs`.
+- **Header/footer provenance is `src/site/styles/A11Y-WAY-PAGES.md`** — the `a11y-way-pages` skill's
+  tracking log: version, brand decisions, and the eight deliberate deviations from upstream a re-sync
+  must not revert. Separate from `THEME-SERVICE.md`, which records the *theme* files; the two skills
+  are separate contracts and the logs must not restate each other.
 - **Brand assets are vendored, in `public/brand/`** — `favicon.svg`, `brand-mark.svg` and the two
   theme scripts that re-color them, copied verbatim from theme-service's `assets/`. Committed, not
   generated: `.gitignore` and `sync-library.mjs` both name the generated `public/` subfolders
@@ -1350,6 +1364,31 @@ homes it belongs to, not in all of them.
   `.thing:focus { outline: … }`. `focus-ring`'s `--always` variant carries a deliberately doubled
   selector for this, with the reason in the CSS; `skip-link` never hit it because its rings are only
   ever reached by keyboard, where `:focus-visible` matches and the reset does not apply.
+- **A menubar's allowed children reach *through* a `role="group"`.** The components sidebar is an APG
+  menubar now (`ComponentNav.astro`), and the obvious way to keep its group headings was
+  `role="group"` + `aria-labelledby` pointing at the `<h2>` that is already on screen. axe:
+  `aria-required-children — Element has children which are not allowed: h2`, naming every group, with
+  the *menubar* as the target. The rule walks owned descendants, so a group is not a container the
+  constraint stops at. The heading has to be `aria-hidden` and the group named with `aria-label`,
+  which is also why the sidebar's group names are no longer heading-navigation stops. **The companion
+  trap in the same commit:** `role="none"` is *ignored* on an element carrying a global ARIA
+  attribute, so the `aria-labelledby` the un-upgraded list uses has to be removed in the same
+  statement that presents the `<ul>` — leave it and every group is still a list wrapped around its
+  menuitems, silently.
+- **Firefox puts a scrollable container in the tab order by itself.** `.sidebar` is `max-height` +
+  `overflow-y: auto`, so it had always been a Firefox tab stop — invisible among a whole roster of
+  links, and then half the sidebar's stops once the menubar left one. Verified as pre-existing by tabbing the page
+  with `javaScriptEnabled: false`, which is the un-upgraded list. `tabindex="-1"` on the nav takes it
+  back, and that is only safe because the arrow keys reach every item and focus scrolls it into view;
+  the behavior exists for scroll regions with nothing focusable inside. **Two testing lessons:** an
+  assertion written as `closest('.sidebar')` passes on the container and hides exactly this, so assert
+  the element you meant; and `page.evaluate` is documented as unavailable in a `javaScriptEnabled:
+  false` context but in fact works in all three browsers — locators are still the honest way to check
+  the un-enhanced markup.
+- **Waiting for the markup is not waiting for the enhancement.** Every test in `site-nav.spec.mjs`
+  presses a key that a deferred module script is what handles, and `.sidebar` is visible from first
+  paint. Under parallelism that was a coin flip — two different tests failing per run, each passing
+  alone. `beforeEach` now waits on `.sidebar__groups[role="menubar"]`, the thing the script does.
 
 ---
 

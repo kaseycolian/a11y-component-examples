@@ -43,6 +43,10 @@ the theme-service rather than redrawn here. These four are copied **verbatim** f
 Re-copy all four on a theme-service update; they are not generated from `theme.css` and the update
 script will not know about them. Nothing else about them is repo-specific.
 
+The header and footer that *use* these assets are a separate contract with a separate skill
+(`a11y-way-pages`). Their record — what was ported, what was deliberately changed, what a re-sync
+must not revert — is `src/site/styles/A11Y-WAY-PAGES.md`.
+
 ## Applied configuration (current decisions on record)
 
 - **Component styling:** `full-restyle` — this repo *is* a component library. Its components are

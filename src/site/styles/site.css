@@ -152,12 +152,19 @@ body {
 
 /* --- Sidebar navigation ------------------------------------------------------ */
 
+/* The roster is a menubar, not a list of Tab stops -- ComponentNav.astro says
+   why and does the wiring. What that costs here is the focus ring: arrowing is
+   now the way through the list, so the ring is the only thing saying where you
+   are. `overflow-y: auto` computes overflow-x to `auto` as well, which clips a
+   3px outline sitting 2px outside a link, so the scroll box gets that much
+   padding back and the negative margin puts the links where they were. */
 .sidebar {
   position: sticky;
   top: calc(var(--header-h) + 1rem);
   max-height: calc(100vh - var(--header-h) - 2rem);
   overflow-y: auto;
-  padding-right: 0.5rem;
+  padding: 0.35rem 0.85rem 0.35rem 0.35rem;
+  margin: -0.35rem 0 -0.35rem -0.35rem;
 }
 
 /* Below 900px there is no column to be a column in, and stacked it is a full
@@ -168,6 +175,18 @@ body {
   .sidebar {
     display: none;
   }
+}
+
+/* Hidden in the markup and revealed by the script, so it never claims a
+   keyboard behavior the page does not have. --text-muted rather than --text on
+   purpose: it is chrome for the list, and .sidebar__title beside it has already
+   proven the token clears 4.5:1 on this surface in every theme. */
+.sidebar__hint {
+  margin: 0 0 1.25rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+  text-wrap: balance;
 }
 
 .sidebar__group + .sidebar__group {
@@ -725,23 +744,9 @@ code {
   overflow-x: auto;
 }
 
-/* --- Footer ---------------------------------------------------------------------- */
-
-.site-footer {
-  border-top: 1px solid var(--border);
-  padding: 2rem 1.25rem 3rem;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-}
-
-.site-footer__inner {
-  max-width: 90rem;
-  margin: 0 auto;
-  display: flex;
-  gap: 1rem 2rem;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
+/* The footer, like the header, is a design of its own ported from the
+   theme-service app -- it lives in site-footer.css, and nothing about it is
+   here. */
 
 /* --- Forced colors ----------------------------------------------------------------
    Windows High Contrast throws away color-mix fills, glows and tints. Restore
