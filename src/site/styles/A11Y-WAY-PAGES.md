@@ -1,7 +1,7 @@
 # A11Y Way — page header & footer
 
 This repo's site header, footer and brand assets come from the shared **theme-service** repo's
-`assets/` — currently on version `1.0.0`. The files here are ports of those, not byte copies (see
+`assets/` — currently on version `1.1.0`. The files here are ports of those, not byte copies (see
 Class naming below). Do not hardcode colors: everything consumes theme tokens (`var(--…)`).
 
 ## For agents working in this repo
@@ -36,10 +36,17 @@ record is `src/site/theme/THEME-SERVICE.md`. This one never edits themes.
   header carries the components picker instead — its actual navigation, and the only navigation there
   is below 900px where the sidebar drops out. It wears the same console shell as the theme picker,
   keyed to `--accent-blue` rather than `--accent-purple`.
-- **Footer family:** Component Guide (this site, current) and Themes
-  (`https://kaseycolian.github.io/theme-service/`). The names and the two descriptions mirror
-  theme-service's own footer, so the pair reads identically from either site. Source URL:
+- **Footer family:** Accessible Component Library (this site, current) and Accessible Theming
+  Service (`https://kaseycolian.github.io/theme-service/`). The names and the two descriptions
+  mirror theme-service's own footer, so the pair reads identically from either site —
+  `tests/site-footer.spec.mjs` asserts both names so one cannot move without the other. The
+  outbound link opens in a new tab, with the SC 3.2.5 warning as clipped text; it is the only
+  `target="_blank"` on the site. Source URL:
   `https://github.com/kaseycolian/a11y-component-examples`.
+- **Brand zone:** nothing in it is ever hidden for space. The descriptor is the only thing that says
+  which A11Y Way site you are on, so below 620px the lockup stacks instead of shedding it, and 320px
+  only steps type and gutters down. The `.brand` link therefore carries no `aria-label` — its
+  visible text is complete at every width, so it names itself (SC 2.5.3).
 - **Existing furniture:** header restyled in place 2026-07-30; footer **replaced** 2026-07-31 at the
   user's request (what it replaced was a placeholder: a border rule and two paragraphs).
 - **Class naming:** the source's own names, verbatim, so a future upstream diff maps 1:1 — `.hdr-inner`,
@@ -72,8 +79,28 @@ Recorded so a future update does not "fix" them.
 7. **The header carries `--header-h`, `--console-h`, `.hdr-note`, `.console__go` and the `.switch`
    rules,** none of which are upstream. The first two exist because anchors have to clear a sticky
    header here (SC 2.4.11); `.switch` exists because `components.css` is deliberately not vendored.
-8. **Extra header breakpoints at 900px and 760px.** They track where this site's sidebar disappears,
-   which the source has no equivalent of.
+8. **An extra header breakpoint at 900px.** It tracks where this site's sidebar disappears, which the
+   source has no equivalent of. (The 760px one is gone: it existed only to hide the brand descriptor,
+   and v1.1.0 reversed that policy — see History.)
+9. **No flex-wrap machinery in the ≤620px header.** Upstream wraps `.hdr-inner` with a zero-height
+   `::before` forced break, because it has no breakpoint layout and its nav is two pills whose
+   collision width depends on the rendered font. This repo already splits the four zones into two
+   rows deterministically at 1080px with a grid, so there is nothing for the wrap to discover.
+   Upstream's `.seg-label` / `.seg-tail` rules go with it — there is no segmented nav here.
+10. **`--header-h` is retuned per version, not copied.** Upstream has no such token. The values are
+    measured against the real header at 1440 / 1080 / 900 / 760 / 620 / 430 / 375 / 320 and rounded
+    up to the next 0.125rem; `tests/site-header.spec.mjs` asserts they still cover it.
+11. **No `min-width` on the components console.** This site pays more for v1.1.0's "never hide the
+    descriptor" policy than the source does — upstream's descriptor is one word, this one is
+    "WCAG 2.2 Components" (~150px of tracked mono) sharing the rail with the only navigation left
+    below 900px, so the console comes out ~102px at 320px. A floor was tried and taken back out: it
+    competes against the brand's min-content, which follows the *rendered* font (`--font-ui` falls
+    back to Verdana, which is wider), and it overflowed a 320px rail. As written the layout cannot
+    overflow at any font, and the spec asserts that at six widths. Read the note in the CSS's 430px
+    block before adding one.
+12. **The reduced-motion note has its own breakpoint at 380px,** separate from the brand ladder's
+    430px, because the two measure different things — where the lockup steps, and where that
+    sentence wraps to a third line. Re-measure it if the note's wording changes.
 
 ## History
 
@@ -87,3 +114,17 @@ Recorded so a future update does not "fix" them.
   footer already pointed here. Header re-checked against the same version and left untouched — every
   upstream change since the port was already in it, and the four brand assets are byte-identical.
   `.site-footer__inner` and its rules in `site.css` retired.
+- `2026-07-31` — Updated to v`1.1.0` ("header and footer keep site identity on small screens"), plus
+  the type step that followed it upstream. Header: the rail's vertical gutter became a clamp
+  (`13px → 22px`), the lockup gained a 17/16/15px ladder with the tag at 13.5/13/12, and the brand
+  descriptor now survives to 320px by stacking below 620px — which retires the 760px hide block, the
+  400px `.brand-name { display: none }` and the `.brand` `aria-label`. `--header-h` re-measured at
+  every breakpoint. Footer: rail padding and gaps tightened, `.ftr-wordmark` tracked the header to
+  17px, the lede lies down as a band between 621px and 1080px, and the two products took
+  theme-service's own names and descriptions. The Themes link now opens in a new tab with a clipped
+  "opens in a new tab" (`.ftr-newtab`) carrying the SC 3.2.5 warning — the site's only `_blank`, and
+  a user decision on this update, not an upstream default. Brand assets byte-identical, untouched.
+  The one thing the port could not take verbatim is a width floor for the components console — see
+  deviation 11; `tests/site-header.spec.mjs` grew an overflow sweep to hold that line, and its
+  `nav.width > 500` assertion became "starts after the brand, ends at the rail", which is the
+  invariant that pixel number was standing in for.

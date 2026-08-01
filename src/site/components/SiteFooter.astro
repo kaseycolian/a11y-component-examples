@@ -67,31 +67,58 @@ const base = import.meta.env.BASE_URL;
         <li>
           <a class="ftr-link" href={base} aria-current="true">
             <span class="ftr-name"
-              >Component Guide
+              >Accessible Component Library
               <span class="ftr-here">You are here</span>
             </span>
             <span class="ftr-desc">
-              WCAG 2.2 AA components in plain HTML, CSS and JavaScript. The live demo loads the same
-              files you copy, so the two can never drift.
+              A reference library of common UI components meeting WCAG 2.2 AA, written in plain HTML,
+              CSS, and JavaScript. Source code also available with instructions on using the library
+              with agentic development.
             </span>
           </a>
         </li>
         <li>
-          <a class="ftr-link" href="https://kaseycolian.github.io/theme-service/">
+          {/*
+            The one target="_blank" on this site, and a deliberate one: it is the
+            sibling A11Y Way site, not a page of this one. rel="noopener" stays
+            explicit for engines that do not imply it; noreferrer is deliberately
+            NOT set -- one owner runs both sites, and it would strip the only
+            signal that the traffic came from the other product.
+          */}
+          <a
+            class="ftr-link"
+            href="https://kaseycolian.github.io/theme-service/"
+            target="_blank"
+            rel="noopener"
+          >
             <span class="ftr-name"
-              >Themes
+              >Accessible Theming Service
               {/*
-                Leaves the site. Decoration only: the link text already names the
-                destination, so there is nothing extra to announce.
+                Leaves the site. Decoration only, and aria-hidden, so it announces
+                nothing -- which is exactly why the warning after it is real text.
               */}
               <svg class="ftr-ext" viewBox="0 0 12 12" aria-hidden="true">
                 <path d="M4.5 1.5h6v6"></path>
                 <path d="M10.5 1.5 1.5 10.5"></path>
               </svg>
+              {/*
+                CLIPPED, not display:none. The arrow says "new tab" to anyone who
+                can see it, but it is aria-hidden decoration -- without this a
+                screen reader user gets a new window with no warning at all, which
+                is the actual SC 3.2.5 complaint. Nothing extra on screen, the
+                whole sentence announced.
+
+                No punctuation in front of it: clipping positions this absolutely,
+                which blockifies it, and the accessible-name algorithm puts its own
+                space between block boxes. A leading comma would be announced as
+                "Service , opens in a new tab" -- letting that inserted space be
+                the word space instead makes the name read as one sentence.
+              */}
+              <span class="ftr-newtab">opens in a new tab</span>
             </span>
             <span class="ftr-desc">
-              Accessible dark and light themes an agent generates and installs into any repo, new or
-              legacy. Nothing is written until it passes AA.
+              Create WCAG 2.2 AA compliant color themes guided by an agent to use across your
+              websites.
             </span>
           </a>
         </li>

@@ -20,6 +20,14 @@
    The responsive rules only ever RE-FLOW the four zones, never reorder them, so
    tab order always matches reading order (SC 2.4.3).
 
+   Nothing in the brand zone is ever hidden for space. The A11Y Way ships more than
+   one site off this header, and they share a mark and a wordmark -- the descriptor
+   beside the wordmark ("WCAG 2.2 Components" here) is the only thing that says
+   which one you are looking at, so it has to survive the width where a visitor has
+   the least other context. Below 620px the lockup stacks instead, which costs no
+   height because the console already makes that row 36px tall. Down to 320px the
+   phone rules only step type and gutters down.
+
    Loaded after site.css by BaseLayout. Order is not relied on, though: every rule
    that overrides a library default does it by specificity (.console
    .ac-dropdown__toggle beats .ac-dropdown__toggle), because the Dropdown's own
@@ -33,7 +41,7 @@
      rather than guessed -- tests/site-header.spec.mjs asserts it stays within
      2px. Too high only wastes space above an anchor; too low hides the anchor,
      so round up. One row here; two below 1080px. */
-  --header-h: 3.75rem;
+  --header-h: 5rem;
 
   /* Console height, and with it the height of a header row. Flat 36px on every
      device: the SC 2.5.8 floor is 24px, so this has half again as much, and a
@@ -47,7 +55,7 @@
    the rail. Without this the token is a line or two short for exactly the
    visitors who get it, and every anchor target lands under the header. */
 :root[data-motion-note] {
-  --header-h: 5.25rem;
+  --header-h: 6.625rem;
 }
 
 /* --- The rail ---------------------------------------------------------------- */
@@ -87,14 +95,27 @@
 
 /* 90rem, not the theme-service's 1600px: this site has a sidebar and a content
    column below the header, and the brand's left edge and the theme console's
-   right edge should line up with them. */
+   right edge should line up with them.
+
+   Both gutters are fluid, and they are independent of each other.
+
+   VERTICAL is the rail's breathing room: 22px once there is a desktop's worth of
+   width, tapering to 13px on a phone. It has to taper -- this bar is sticky, so
+   every pixel of padding is a pixel of a small screen permanently spent, and the
+   layout below 1080px is already two rows tall. A clamp rather than a step at each
+   breakpoint so the rail grows smoothly instead of jumping; it is a gutter, which
+   is exactly what this file uses clamp() for.
+
+   HORIZONTAL is the shared rail geometry -- it lines header content up with footer
+   content and with .ftr-inner's identical clamp. The two are set together here for
+   readability only; changing one must not drag the other. */
 .hdr-inner {
   display: flex;
   align-items: center;
   gap: 18px;
   max-width: 90rem;
   margin: 0 auto;
-  padding: 11px clamp(16px, 3vw, 32px);
+  padding: clamp(13px, 2.2vw, 22px) clamp(16px, 3vw, 32px);
 }
 
 /* --- Brand -------------------------------------------------------------------
@@ -135,12 +156,31 @@
   transform: translateY(calc(var(--motion) * -1px));
 }
 
+/* The lockup's type ladder, in one place. The WORDMARK's size lives on
+   .brand-name -- .brand-title has no font-size of its own and inherits it, as does
+   .brand-dot, so the separator can never fall out of scale with the words it
+   separates. The tag carries its own size because it is a different face. Both
+   step twice, and the wordmark stays the larger of the two at every step:
+
+       wordmark   17px  ->  16px (<=620)  ->  15px (<=430)
+       tag        13.5  ->  13            ->  12
+
+   The steps are deliberately shallow. The rail's vertical gutter is fluid now
+   (clamp on .hdr-inner), so the header is markedly taller than it was and small
+   type reads as lost in it rather than compact -- and the phone end was the worst
+   of it, where a tracked 10.5px cap was at the floor of comfortable reading.
+
+   These sizes are not free: they set the brand's width, which is what the nav
+   console's column gets what is left of. Grow them and the console gets narrower
+   at every width below 1080px -- measure, don't assume. .ftr-wordmark in
+   site-footer.css copies the 17px verbatim so the header and footer lockups stay
+   the same object; move them together. */
 .brand-name {
   display: inline-flex;
   align-items: baseline;
   gap: 7px;
   min-width: 0;
-  font-size: 13px;
+  font-size: 17px;
   white-space: nowrap;
 }
 
@@ -150,10 +190,12 @@
   text-transform: uppercase;
 }
 
-/* The mixed accent, not the raw one. This is text at 13px, so SC 1.4.3 asks
-   4.5:1 of it in every theme -- and the raw pink is drawn to be vivid on a dark
-   page, which leaves it in the 2.7-4.2:1 band on a light theme surface. Mixing
-   toward --text always raises contrast against the surface, in either mode. */
+/* The mixed accent, not the raw one. This is text under 18.66px bold, so SC 1.4.3
+   asks 4.5:1 of it in every theme -- and the raw pink is drawn to be vivid on a
+   dark page, which leaves it in the 2.7-4.2:1 band on a light theme surface. Mixing
+   toward --text always raises contrast against the surface, in either mode. No
+   font-size of its own: it inherits the wordmark's, so it cannot fall out of scale
+   with the words it separates. */
 .brand-dot {
   color: var(--accent-pink-text);
   font-weight: 700;
@@ -161,7 +203,7 @@
 
 .brand-tag {
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: 13.5px;
   font-weight: 400;
   letter-spacing: 0.06em;
   color: var(--text-muted);
@@ -591,11 +633,11 @@
 
 @media (max-width: 1080px) {
   :root {
-    --header-h: 6.5rem;
+    --header-h: 7.75rem;
   }
 
   :root[data-motion-note] {
-    --header-h: 8rem;
+    --header-h: 9.375rem;
   }
 
   .hdr-inner {
@@ -642,33 +684,61 @@
   }
 }
 
-/* The tagline is the first thing to go, and it goes here rather than at the
-   theme-service's 620px: this is just under the width where the sidebar
-   disappears, and every pixel it gives back goes to the navigation. */
-@media (max-width: 760px) {
-  .brand-tag,
-  .brand-dot {
-    display: none;
+/* Phones: the lockup stacks, and the console's cap is the first thing to go. */
+@media (max-width: 620px) {
+  :root {
+    --header-h: 6.75rem;
+  }
+
+  :root[data-motion-note] {
+    --header-h: 8.25rem;
+  }
+
+  /* padding-INLINE only. The vertical gutter is the clamp on the base rule and is
+     already tapering on its own by this width; a shorthand here would silently
+     overwrite it and put a cliff back at 621px. */
+  .hdr-inner {
+    padding-inline: 14px;
+    column-gap: 10px;
   }
 
   .brand {
     gap: 9px;
   }
-}
 
-/* Phones: tighter rail, and the console's cap is the next thing to go. */
-@media (max-width: 620px) {
-  :root {
-    --header-h: 6.375rem;
+  /* The lockup goes vertical. The wordmark is the half of the identity the two
+     A11Y Way sites SHARE; the descriptor is the half that differs -- so on a phone
+     the descriptor is the last thing that should go, not the first. Stacked, the
+     brand takes the width of its longer line instead of the sum of both, which is
+     what buys the room to keep it, and the room is the nav console's. The two lines
+     total ~33px: inside the 36px the console already sets for this row, so the
+     header does not get taller. align-items must be restated -- the row lockup
+     aligns on the baseline, and in a column that property is suddenly the
+     horizontal axis, which would center the two lines on each other instead of
+     ranging them left. */
+  .brand-name {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    line-height: 1.05;
+    font-size: 16px; /* wordmark, step 2 of the ladder up top */
   }
 
-  :root[data-motion-note] {
-    --header-h: 7.875rem;
+  /* A separator between two things side by side. Stacked, the line break is the
+     separator, and a leftover dot reads as a bullet. */
+  .brand-dot {
+    display: none;
   }
 
-  .hdr-inner {
-    padding: 10px 14px;
-    column-gap: 10px;
+  /* The second line takes the console cap's voice -- mono, small, tracked out,
+     muted -- so the header has ONE treatment for small labels rather than two, and
+     the descriptor reads as a deliberate sub-line of the wordmark rather than as a
+     word that wrapped. Tracking eases as the size grows: .16em was tuned for a 10px
+     cap, and at 13px the same ratio reads loose rather than deliberate. */
+  .brand-tag {
+    font-size: 13px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
   }
 
   /* Stays flush with the rail above it. */
@@ -722,15 +792,85 @@
   }
 }
 
-/* Narrowest phones: mark only. The link keeps its name from aria-label. */
-@media (max-width: 400px) {
-  /* Only the note changes height here -- it takes a third line at this width. */
-  :root[data-motion-note] {
-    --header-h: 8.875rem;
+/* Phones in portrait. One step down in type and gutters, and that is all -- both
+   lines of the lockup stay. The mark and the wordmark are identical on the themes
+   site; the descriptor is the only thing in this header that says WHICH A11Y Way
+   site you are on, so it is worth more than the pixels it costs. Everything here is
+   a step, not a switch: nothing appears or disappears between 620px and 320px.
+
+   430px, not the 400px this used to be: it is the widest phone in portrait (the
+   iPhone Pro Max class), so the step lands above every common portrait width rather
+   than cutting through the middle of them. */
+@media (max-width: 430px) {
+  .hdr-inner {
+    padding-inline: 12px;
+    column-gap: 8px;
   }
 
+  .brand {
+    gap: 8px;
+  }
+
+  .brand-mark {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Stays flush with the rail above it. */
+  .hdr-note {
+    padding-inline: 12px;
+  }
+
+  /* Step 3 of the lockup ladder. Size on .brand-name, same carrier as the other two
+     steps, so there is one place to look for the wordmark's size. */
   .brand-name {
-    display: none;
+    font-size: 15px;
+  }
+
+  .brand-title {
+    letter-spacing: 0.09em;
+  }
+
+  .brand-tag {
+    font-size: 12px;
+    letter-spacing: 0.11em;
+  }
+
+  /* NO floor on the components console here, and that is a decision rather than an
+     omission -- it was tried and taken back out.
+
+     This site pays more for the "never hide the descriptor" policy than the source
+     does. Upstream's descriptor is one word ("Themes"); this one is "WCAG 2.2
+     Components", ~150px of tracked mono, sharing a rail with the ONLY navigation
+     left below 900px. At 320px the console comes out ~102px: a legal target, still
+     correctly named through its cap, and its open panel wraps rows rather than
+     truncating them -- but a trigger showing about eight characters.
+
+     The obvious fix is a min-width on the console's grid track, forcing the tag to
+     wrap under the wordmark. It buys ~30px and it is a trap: a rem floor competes
+     against the brand's min-content, which is a function of the RENDERED font, not
+     of the character count. --font-ui falls back Trebuchet MS -> Segoe UI ->
+     Verdana, and Verdana is wide enough to push brand + floor past a 320px rail --
+     a horizontal scrollbar (SC 1.4.10) on exactly the machines nobody tests on.
+     Widen it and the brand's wordmark overflows into the console instead, silently,
+     because .brand carries min-width: 0.
+
+     As written the layout cannot overflow at any font: the console's track is 1fr
+     with a zero base, so the brand takes what it needs and the console takes the
+     rest. A cramped trigger is the honest cost of keeping the descriptor, and it
+     is recoverable -- the panel is still readable and the sidebar returns at
+     900px. A scrollbar that only appears on someone else's font is not. */
+
+
+/* The reduced-motion note takes a third line, and only the token changes. Its own
+   breakpoint rather than a line in the block above, because the two are measuring
+   different things: 430px is where the lockup steps, ~378px is where this
+   sentence wraps. Sharing one boundary would mean re-tuning the note's value every
+   time the brand's type moves, and over-reserving 18px of scroll-margin on every
+   phone between. Measured, so re-measure if the note's wording changes. */
+@media (max-width: 380px) {
+  :root[data-motion-note] {
+    --header-h: 9.25rem;
   }
 }
 

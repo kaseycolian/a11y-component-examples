@@ -37,15 +37,24 @@ test('the family index names both sites and marks this one as the current produc
   // aria-current="true", not "page": this marks the current item in a SET -- the
   // product you are inside -- which stays true on every page of this site. A
   // "page" here would be a lie on all of them but the home page.
-  const here = links.filter({ hasText: 'Component Guide' });
+  // The two product names are the ones theme-service's own footer uses, so the
+  // pair reads identically from either site. Changing one without the other is
+  // what this assertion is here to catch.
+  const here = links.filter({ hasText: 'Accessible Component Library' });
   await expect(here).toHaveAttribute('aria-current', 'true');
   await expect(here).toHaveAttribute('href', /a11y-component-examples\/$/);
 
-  const themes = links.filter({ hasText: 'Themes' });
+  const themes = links.filter({ hasText: 'Accessible Theming Service' });
   await expect(themes).toHaveAttribute('href', 'https://kaseycolian.github.io/theme-service/');
   await expect(themes).not.toHaveAttribute('aria-current', /.*/);
-  // Nobody asked for a new tab (SC 3.2.5).
-  expect(await themes.getAttribute('target')).toBeNull();
+
+  // The one new tab on this site, and the only one allowed: the sibling product,
+  // not a page of this one. The arrow that says so is aria-hidden decoration, so
+  // the warning has to be in the accessible name or a screen reader user gets a
+  // new window with no notice (SC 3.2.5).
+  await expect(themes).toHaveAttribute('target', '_blank');
+  await expect(themes).toHaveAttribute('rel', /noopener/);
+  await expect(themes).toHaveAccessibleName(/opens in a new tab/);
 });
 
 test('"you are here" is real text, so current is never carried by the dot alone', async ({

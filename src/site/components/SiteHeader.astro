@@ -23,11 +23,19 @@ const here = Astro.url.pathname;
 <header class="site-header">
   <div class="hdr-inner">
     {/*
-      alt="" because the link's aria-label already names the whole lockup, and
-      the mark is the same glyph the name spells out. Width and height are on the
-      element so the row does not reflow when the image lands.
+      No aria-label: both halves of the lockup are on screen at every width now
+      (it stacks below 620px rather than shedding the descriptor), so the link
+      names itself from its own text -- "The A11Y Way WCAG 2.2 Components", the
+      separator being aria-hidden. Nothing left to drift out of sync with what is
+      drawn, and the accessible name matches the visible one at every breakpoint,
+      which is what voice control needs of it (SC 2.5.3).
     */}
-    <a class="brand" href={base} aria-label={`${SITE_NAME} · ${SITE_BRAND_TAG}`}>
+    <a class="brand" href={base}>
+      {/*
+        alt="" because the wordmark beside it is real text -- the mark would only
+        repeat it. Width and height are on the element so the row does not reflow
+        when the image lands.
+      */}
       <img
         class="brand-mark"
         src={`${base}brand/brand-mark.svg`}
@@ -38,6 +46,7 @@ const here = Astro.url.pathname;
       <span class="brand-name">
         <span class="brand-title">{SITE_NAME}</span>
         <span class="brand-dot" aria-hidden="true">·</span>
+        {/* Which A11Y Way site this is. Never hidden -- see site-header.css. */}
         <span class="brand-tag">{SITE_BRAND_TAG}</span>
       </span>
     </a>

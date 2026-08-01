@@ -229,10 +229,29 @@ test('the sidebar gives way to the header picker below 900px', async ({ page }) 
 
   const nav = await page.locator('[data-jump-control]').boundingBox();
   const brand = await page.locator('.brand').boundingBox();
+  const railRight = await page.evaluate(() => {
+    const el = document.querySelector('.hdr-inner');
+    return el.getBoundingClientRect().right - parseFloat(getComputedStyle(el).paddingRight);
+  });
+
   // It uncaps below 900px because it is the only navigation left, so it takes
-  // everything the brand does not.
-  expect(nav.width).toBeGreaterThan(500);
+  // everything the brand does not -- stated as "starts after the brand, ends at
+  // the rail" rather than as a width in pixels. The brand's own width is a
+  // function of the rendered font (--font-ui falls back to Verdana, which is
+  // wider), so any threshold here would pass on this machine and fail on another.
   expect(Math.round(nav.x)).toBeGreaterThanOrEqual(Math.round(brand.x + brand.width));
+  expect(Math.round(nav.x + nav.width)).toBe(Math.round(railRight));
+
+  // And the pair never forces a sideways scroll at any width (SC 1.4.10). This is
+  // the assertion the console's missing min-width depends on -- see the note in
+  // site-header.css's 430px block before adding one.
+  for (const width of [900, 760, 620, 430, 375, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow, `header overflow at ${width}px`).toBeLessThanOrEqual(0);
+  }
 });
 
 /* SC 2.4.11: scroll-margin-top is calc(--header-h + 1rem), so the token going
@@ -274,11 +293,13 @@ test('--header-h still covers it once the reduced-motion note is showing', async
 test('the header holds its contrast at 320px, where the brand stops being large text', async ({
   page,
 }) => {
-  // The one width the shared gate does not run axe at, and the one where SC
-  // 1.4.3 has the most to say about the header: the wordmark and both console
-  // caps are gone by here, so what is left to measure is the two trigger values
-  // and the switch -- small mono text over a translucent panel that every theme
-  // tints differently. Per theme, because that is a per-theme question.
+  // The one width the shared gate does not run axe at, and the one where SC 1.4.3
+  // has the most to say about the header. Both console caps are clipped by here,
+  // but the lockup is not -- it stacks rather than shedding the descriptor, so
+  // this also covers a 15px wordmark and a 12px muted mono tag that only exist at
+  // this size. The rest is the two trigger values and the switch: small text over
+  // a translucent panel that every theme tints differently. Per theme, because
+  // that is a per-theme question.
   test.setTimeout(120_000);
   await page.goto('components/disclosure/');
   await page.setViewportSize({ width: 320, height: 640 });

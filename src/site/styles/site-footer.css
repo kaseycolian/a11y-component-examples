@@ -84,9 +84,14 @@
 .ftr-inner {
   max-width: 90rem;
   margin: 0 auto;
-  padding: 42px clamp(16px, 3vw, 32px) 46px;
+  /* Bottom is 4px heavier than top, at every width. The slab ends the page, so an
+     even split reads top-heavy -- this is an optical choice, not a rounding
+     artifact, and it should survive any future retune of these numbers.
+     The horizontal clamp is the shared rail geometry and is NOT free to change:
+     it is what lines footer content up with header content. */
+  padding: 30px clamp(16px, 3vw, 32px) 34px;
   display: grid;
-  gap: 34px;
+  gap: 26px;
 }
 
 @media (min-width: 1080px) {
@@ -144,9 +149,10 @@ img.ftr-mark {
 }
 
 /* The header's wordmark, verbatim -- same size, weight and tracking, so the two
-   lockups are the same object rather than two takes on it. */
+   lockups are the same object rather than two takes on it. The 17px is
+   .brand-name's step 1 in site-header.css; move the two together. */
 .ftr-wordmark {
-  font-size: 13px;
+  font-size: 17px;
   font-weight: 800;
   letter-spacing: 0.13em;
   text-transform: uppercase;
@@ -341,7 +347,11 @@ img.ftr-mark {
 /* "You are here" -- the current item in the set, as a lit dot and a micro label
    rather than a chip: the header's lamp notation, reused because it says the same
    thing. The words carry the meaning, so the dot is free to be decoration and
-   "current" is never left to color. */
+   "current" is never left to color.
+
+   Only the current item is labelled. The other product is marked by .ftr-ext
+   alone, which is a deliberate asymmetry: the arrow says "elsewhere" without
+   spending a second line of type on it. */
 .ftr-here {
   display: inline-flex;
   align-items: center;
@@ -366,6 +376,28 @@ img.ftr-mark {
     color-mix(in srgb, var(--accent-blue) 65%, transparent);
 }
 
+/* The warning the arrow cannot give. The glyph reads as "new tab" only if you can
+   see it -- it is aria-hidden decoration -- so this suffix is what stops a screen
+   reader user getting a new window with no notice, which is the actual SC 3.2.5
+   complaint. CLIPPED, not display:none, so the visible label stays one word while
+   the accessible name keeps the whole sentence.
+
+   Written out rather than reaching for site.css's .visually-hidden: this file has
+   to stand on its own if only the footer is taken, the same reason img.ftr-mark
+   restates the mark's size. site-header.css's .console__cap writes the same six
+   declarations for the same reason. */
+.ftr-newtab {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Capped at a reading measure rather than at the column: on a wide screen the
    index track runs these past 80 characters, which is well beyond the point the
    eye reliably finds the next line. */
@@ -378,8 +410,97 @@ img.ftr-mark {
 
 /* =============================================================================
    Responsive. Both grids collapse on their own; these only tighten the rail, at
-   the same widths site-header.css uses so the two stay in step.
+   the same widths site-header.css uses so the two stay in step -- except for the
+   lede band below, which is the one rule here that changes a shape.
    ============================================================================= */
+
+/* Tablets and small laptops: the lede lies down across the full width.
+
+   Between 620px and 1080px the footer is a single column, and a lede that keeps
+   its column shape is three stacked rows down the left edge with most of the rail
+   empty beside them. The narrow measure causing that is inherited from the
+   two-column layout above 1080px, where it is doing real work; here it only makes
+   the footer tall. As a band the same three parts read left to right in the same
+   order and give back ~93px, which is the point -- this is the furniture at the
+   bottom of a page, and on a laptop it should not push what a visitor actually
+   came for further off screen.
+
+   Only the lede lies down: the index below keeps its own auto-fit grid, so the two
+   products stay side by side and this is a change of proportion, not of structure.
+   It has to live down here rather than beside the other .ftr-lede rules because it
+   overrides .ftr-mission's measure cap at equal specificity -- source order is what
+   decides it. */
+@media (min-width: 621px) and (max-width: 1079.98px) {
+  .ftr-lede {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    /* One value for the band's rhythm. It is the space on BOTH sides of the rule
+       below -- the gap puts it before, the mission's padding puts it after -- so
+       the rule sits centered in its own margin instead of being shoved against the
+       text it introduces. Inherits to .ftr-mission. */
+    --band-gap: clamp(20px, 2.6vw, 32px);
+    gap: var(--band-gap);
+  }
+
+  .ftr-brand {
+    flex: none;
+  }
+
+  /* The mission changes ROLE here, so it changes voice.
+
+     Above 1080px it is the lede's hero statement in a narrow column and earns
+     --text at 14.5px -- the loudest prose in the footer, which is correct there.
+     In the band it is a descriptor on a rail beside a 17px wordmark and a 12.5px
+     link, and that same treatment made it the loudest thing in the whole footer,
+     floating mid-rail with nothing holding it. Demoted here and only here.
+
+     Mono because this system already HAS a descriptor voice and it is mono --
+     .console__cap in the header's consoles, and the header's own .brand-tag. So
+     this is a borrow, not a new idea, and it puts maximum distance between the
+     mission and the wordmark without touching the wordmark.
+
+     NO NEW COLOR PAIR: --text-muted on this surface is already AA-validated by the
+     theme build, and .ftr-desc above runs it at this exact size. */
+  .ftr-mission {
+    flex: 1 1 auto;
+    max-width: none;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.45;
+    letter-spacing: 0.01em;
+    color: var(--text-muted);
+    /* balance evens the two lines of a paragraph, which is right in the column and
+       wrong on a rail: here the line should fill the width it was given. */
+    text-wrap: wrap;
+
+    /* The rule that anchors it. The footer's whole brief is "structure from rules
+       and space, no boxes", so a 1px divider is this file's own vocabulary rather
+       than an import.
+
+       align-self overrides the row's centering so this box spans the band's full
+       height (set by .ftr-src's 32px floor) and the rule reads as a divider between
+       two zones instead of a stub the height of one line of text; the inner flex
+       then re-centers the words inside that taller box.
+
+       A real border, not a painted pseudo-element: Windows High Contrast keeps
+       borders and replaces backgrounds, so this one needs no forced-colors patch.
+       The block at the foot of this file exists precisely because the footer's
+       OTHER rules are backgrounds. */
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    border-left: 1px solid var(--border);
+    padding-left: var(--band-gap);
+  }
+
+  /* Its optical 3px nudge was centering it under the text above it; in a row that
+     only knocks the link off the band's center line. */
+  .ftr-src {
+    flex: none;
+    margin-top: 0;
+  }
+}
 
 @media (max-width: 620px) {
   .site-footer {
@@ -387,8 +508,8 @@ img.ftr-mark {
   }
 
   .ftr-inner {
-    padding: 32px 14px 36px;
-    gap: 28px;
+    padding: 24px 14px 28px;
+    gap: 22px;
   }
 
   .ftr-mission {

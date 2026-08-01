@@ -5,9 +5,11 @@
 export const SITE_NAME = 'The A11Y Way';
 
 /**
- * The second half of the header lockup, after the dot. Short because it sits on
- * one line beside the name at 11.5px — the long version of this sentence is the
- * page description, not the brand.
+ * The second half of the header lockup, after the dot, and the only thing in the
+ * header that says which A11Y Way site you are on — so it is never hidden for
+ * space. Short because it sits beside the name on one line above 620px and under
+ * it below; the long version of this sentence is the page description, not the
+ * brand.
  */
 export const SITE_BRAND_TAG = 'WCAG 2.2 Components';
 
