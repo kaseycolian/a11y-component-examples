@@ -186,6 +186,14 @@ attribute, so `el.hidden = true` leaves the thing on screen and in the accessibi
 `.thing[hidden] { display: none }` explicitly. It costs one line, and there is nothing in the failing
 markup to suggest a cause.
 
+<!-- item: `hidden` does nothing at all on an `<svg>` -->
+
+The rule that implements it lives in the UA's HTML stylesheet and never reaches the SVG namespace, so
+`<svg hidden>` still lays out: inline in flow, and blockified to a 300x150 box inside a flex or grid
+parent. An icon sprite marked that way draws nothing, which is why it survives review — it is a silent
+hole in the layout. `dropdown`'s was 150px tall. Add `style="display: none"`; the attribute is the
+intent, the declaration is what carries it out.
+
 <!-- item: A host page's own `h1`–`h6` rules cascade into anything you put a class on -->
 
 A class beats a bare element selector only for the properties it actually declares; everything it

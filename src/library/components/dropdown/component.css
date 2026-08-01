@@ -9,7 +9,7 @@
                     component; repeated so this file stands alone.
      [CORE]         all examples. Wrapper, trigger, panel, options.
      [DECORATION]   examples 1 and 3. Icons, swatches, secondary text.
-     [GROUPS]       example 2. <optgroup> rendering.
+     [GROUPS]       example 2.
      [DISABLED]     examples 2 and 4.
      [EMPTY]        example 5.
      [TOUCH]        keep it. Bigger rows on a touch device.
@@ -21,10 +21,16 @@
    the Popover API. That is the fix for the most common way a custom dropdown
    breaks in a real layout: an absolutely-positioned panel is clipped the moment
    an ancestor has overflow:hidden or a transform, and no z-index rescues it.
+   Its width, offset and max-height are the four properties component.js writes
+   inline; everything else about it is here.
 
    It anchors to its trigger at every viewport width. For a panel that rises from
    the bottom of the screen instead, that is a different component with a
    different focus and dismissal model — see `drawer`.
+
+   Every state selects on the same attribute a screen reader reads —
+   aria-expanded, aria-selected, aria-disabled — so there is no way to draw this
+   in a state without also saying it is in that state.
 
    Every color is var(--ac-token, var(--theme-token, #literal)) so this works
    standalone, in a theme-service app, and in an app that sets --ac-*.
@@ -64,16 +70,10 @@
   min-width: 0;
 }
 
-/* Mirrors the native select's own `hidden`, so app code toggling it keeps
-   working. Without !important the display:block above would defeat it. */
+/* The UA's own [hidden] rule loses to any author `display`, so hiding the whole
+   control with the attribute would quietly do nothing without this. */
 .ac-dropdown[hidden] {
   display: none !important;
-}
-
-/* The native <select> stays in the DOM as the value store — form submission,
-   .value reads and change handlers all still work — but is never shown. */
-.ac-dropdown__native {
-  display: none;
 }
 
 /* --- [CORE] trigger ------------------------------------------------------- */
@@ -127,14 +127,10 @@
 
 .ac-dropdown__caret {
   flex: none;
-  display: inline-flex;
-  color: var(--ac-text-muted, var(--text-muted, #bcadde));
-  transition: transform calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
-}
-
-.ac-dropdown__caret svg {
   width: 1rem;
   height: 1rem;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  transition: transform calc(var(--ac-motion, var(--motion, 1)) * var(--ac-dur, var(--dur, 150ms))) ease;
 }
 
 .ac-dropdown__toggle[aria-expanded="true"] .ac-dropdown__caret {
@@ -142,13 +138,10 @@
 }
 
 /* --- [CORE] panel ---------------------------------------------------------
-   The [popover] rules undo the UA defaults, which center the popover in the
-   viewport with a border and padding. Everything else applies whether or not the
-   browser supports the Popover API.
-
-   Width, position and max-height are written inline by component.js, which
-   anchors the panel to the trigger and flips it above when there is more room
-   there. */
+   The [popover] selector repeats the rule so it also beats the UA popover
+   defaults, which center the popover in the viewport with a border and padding.
+   Everything here applies whether or not the browser supports the Popover API;
+   without it, only the top-layer promotion is lost. */
 
 .ac-dropdown__panel,
 .ac-dropdown__panel[popover] {
@@ -188,6 +181,7 @@
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  min-width: 0;
   min-height: 2.5rem;
   padding: 0.4rem 0.6rem;
   border: 2px solid transparent;
@@ -216,8 +210,29 @@
   font-weight: 700;
 }
 
+/* The row's text takes the space, whether it is a bare primary line or a
+   primary and a secondary stacked. */
+.ac-dropdown__text,
+.ac-dropdown__option > .ac-dropdown__primary {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ac-dropdown__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.ac-dropdown__primary {
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Selection shows as a tick as well as a color, so it never rests on color alone
-   (SC 1.4.1). */
+   (SC 1.4.1). A real character in the markup rather than a ::before, because
+   generated content joins the accessible name and would rename the option. */
 .ac-dropdown__check {
   flex: none;
   margin-left: auto;
@@ -236,19 +251,6 @@
 }
 
 /* --- [DECORATION] examples 1 and 3 ---------------------------------------- */
-
-.ac-dropdown__text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  line-height: 1.3;
-}
-
-.ac-dropdown__primary {
-  font-size: 0.9rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
 .ac-dropdown__secondary {
   font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", Consolas, ui-monospace, monospace));
@@ -272,6 +274,9 @@
   );
 }
 
+/* The swatch colors are inline in the markup, because they are the author's
+   data rather than a stylesheet decision. That is the one place a literal color
+   belongs, and the reason the token linter has nothing to say about them. */
 .ac-dropdown__swatch {
   flex: none;
   display: inline-flex;
@@ -305,12 +310,19 @@
 
 /* --- [DISABLED] examples 2 and 4 ------------------------------------------ */
 
-/* aria-disabled, not the disabled attribute, so the control stays focusable and a
-   keyboard user can reach it and hear why. */
-.ac-dropdown--disabled .ac-dropdown__toggle {
+/* Selecting on aria-disabled rather than a class: the attribute is the state,
+   both on screen and in the accessibility tree, so there is nothing to keep in
+   sync. It is aria-disabled and not the disabled attribute because the trigger
+   has to stay focusable — a keyboard user should be able to reach it and hear
+   why it is unavailable. */
+.ac-dropdown__toggle[aria-disabled="true"] {
   cursor: not-allowed;
   opacity: 0.6;
   border-style: dashed;
+}
+
+.ac-dropdown__toggle[aria-disabled="true"]:hover {
+  border-color: var(--ac-border-strong, var(--border-strong, #8064c0));
 }
 
 .ac-dropdown__option[aria-disabled="true"] {
@@ -324,6 +336,7 @@
 /* --- [EMPTY] example 5 ---------------------------------------------------- */
 
 .ac-dropdown__empty {
+  margin: 0;
   padding: 1.25rem 0.75rem;
   text-align: center;
   font-size: 0.85rem;
@@ -357,6 +370,13 @@
     border-color: ButtonBorder;
   }
 
+  /* A row reserves its focus border as 2px of transparent, and forced colors
+     hands transparent back opaque — so every option comes out boxed and the one
+     with focus stops standing out. Canvas puts the reservation back to nothing. */
+  .ac-dropdown__option {
+    border-color: Canvas;
+  }
+
   .ac-dropdown__option:focus {
     background: Highlight;
     color: HighlightText;
@@ -374,7 +394,8 @@
     opacity: 1;
   }
 
-  .ac-dropdown--disabled .ac-dropdown__toggle {
+  .ac-dropdown__toggle[aria-disabled="true"],
+  .ac-dropdown__toggle[aria-disabled="true"]:hover {
     color: GrayText;
     border-color: GrayText;
     opacity: 1;

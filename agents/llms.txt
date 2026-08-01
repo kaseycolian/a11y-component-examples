@@ -16,7 +16,7 @@ Tier 0 is this file. Relative paths resolve against it; a `<slug>` comes from th
 - `agents/components/<slug>.md` — tier 2, ≤ 1.8 KB. The contract: roles, attributes, keys, states, what goes wrong, the JS API.
 - `library/components/<slug>/component.{html,css,js}` — tier 3, varies. The code. Copy from here.
 - `library/components/<slug>/{docs.md,meta.json}` — tier 4, varies. Why it is built that way. Read when the code surprises you.
-- `agents/{pitfalls,conventions,verify,testing}.md` — tier 4, ≤ 14.7 KB. The traps that cost a real failure, and what a copied component assumes about your page.
+- `agents/{pitfalls,conventions,verify,testing}.md` — tier 4, ≤ 15.1 KB. The traps that cost a real failure, and what a copied component assumes about your page.
 
 ## Rules
 

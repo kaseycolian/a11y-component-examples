@@ -46,14 +46,16 @@ test.describe('components sidebar', () => {
     expect(tabbable).toBe(1);
 
     // From the last header control, forward, the way a keyboard actually
-    // arrives: onto an item, then straight past the sidebar.
+    // arrives: onto an item, then straight past the sidebar. The components
+    // picker is that control, not the theme one -- it is last in the header's
+    // DOM order, which is a layout decision SiteHeader.astro explains.
     //
     // The first assertion is the item itself and not `closest('.sidebar')`,
     // because Firefox puts a scrollable container in the tab order on its own
     // and this sidebar is one. That stop passes an "inside the sidebar" check
     // while being exactly the extra stop the pattern is here to remove -- see
     // the tabindex="-1" on the nav in ComponentNav.astro.
-    await page.locator('[data-theme-control] .ac-dropdown__toggle').focus();
+    await page.locator('[data-jump-control] .ac-dropdown__toggle').focus();
     await page.keyboard.press('Tab');
     expect(await page.evaluate(() => !!document.activeElement.matches('.sidebar__link'))).toBe(true);
 
@@ -69,7 +71,7 @@ test.describe('components sidebar', () => {
     await expect(here).toHaveCount(1);
     await expect(here).toHaveAttribute('tabindex', '0');
 
-    await page.locator('[data-theme-control] .ac-dropdown__toggle').focus();
+    await page.locator('[data-jump-control] .ac-dropdown__toggle').focus();
     await page.keyboard.press('Tab');
     await expect(here).toBeFocused();
   });

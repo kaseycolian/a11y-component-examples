@@ -2,27 +2,28 @@
    DROPDOWN / LISTBOX
 
    WHAT TO COPY
-     [CORE]        every example. The whole contract: trigger, panel, options,
-                   positioning, keyboard, open/close.
-     [DECORATION]  examples 1 and 3. Icons, swatches, secondary text. Marked
-                   inline inside decorate().
-     [GROUPS]      example 2. <optgroup> handling inside rebuild().
+     [CORE]        every example. Open and close, positioning, roving focus,
+                   committing a choice, and the one event a host app needs.
+     [IDS]         nice to have. Fills in wiring ids the markup left out.
      [TYPEAHEAD]   nice to have. Delete typeAhead() and the two single-character
                    key branches that call it.
+     [FORM]        example 6 only. Two lines that mirror the chosen value into a
+                   hidden input. Delete them and the input outside a form.
      [AUTO-INIT]   delete if you construct instances yourself.
+     [PAGE]        this page's own readout. Never copy it.
 
    Copy the file whole for the library version.
 
-   Progressive enhancement of a real <select>. The native element stays in the DOM
-   as the value store, so `.value`, `.selectedIndex`, `change` listeners and form
-   submission keep working — you can drop this onto an existing form and nothing
-   downstream needs to know.
+   This script writes no markup. The trigger, the panel, every option and every
+   piece of decoration are in component.html, which is the point: what the code
+   panel shows is what runs, and the ARIA contract is readable without running
+   anything. What is left here is the part markup cannot do.
 
    Focus model: when the panel opens, DOM focus moves onto the option itself
    (roving tabindex) rather than staying on the button with
    `aria-activedescendant`. Both are APG-legal. Real focus is used because
-   activedescendant is unreliable on VoiceOver for iOS and on TalkBack, and mobile
-   screen reader support is a requirement for this library.
+   activedescendant is unreliable on VoiceOver for iOS and on TalkBack, and
+   mobile screen reader support is a requirement for this library.
 
    The panel anchors to its trigger at every viewport width. For a panel that
    rises from the bottom of the screen instead — a different focus and dismissal
@@ -42,322 +43,188 @@
     typeof HTMLElement !== 'undefined' &&
     Object.prototype.hasOwnProperty.call(HTMLElement.prototype, 'showPopover');
 
-  /**
-   * @param {HTMLSelectElement} select
-   * @param {{ emptyText?: string }} [options]
-   */
-  function createDropdown(select, options) {
-    if (!select || select._acDropdown) return select && select._acDropdown;
+  /* Geometry, in px. GAP is the space between trigger and panel; EDGE is how
+     close to a viewport edge the panel may come; the panel flips above the
+     trigger when there is less than FLIP room below it and more room above. */
+  var GAP = 6;
+  var EDGE = 8;
+  var FLIP = 200;
+  var MIN_HEIGHT = 120;
 
-    // A multi-select is a different pattern with a different keyboard model.
-    // Enhancing it would quietly break it, so leave it as the native control.
-    if (select.multiple) {
-      if (typeof console !== 'undefined' && console.warn) {
-        console.warn('ac-dropdown: <select multiple> is not supported; leaving it native.', select);
+  /** How long the type-ahead buffer survives between keystrokes, in ms. */
+  var TYPEAHEAD_WINDOW = 800;
+
+  /**
+   * @param {HTMLElement} root  the .ac-dropdown element
+   */
+  function createDropdown(root) {
+    if (!root || root._acDropdown) return root && root._acDropdown;
+
+    var toggle = root.querySelector('.ac-dropdown__toggle');
+    var panel = root.querySelector('[role="listbox"]');
+    var valueEl = root.querySelector('.ac-dropdown__value');
+
+    if (!toggle || !panel || !valueEl) {
+      throw new Error(
+        'ac-dropdown: needs a .ac-dropdown__toggle containing a .ac-dropdown__value, and a [role="listbox"].',
+      );
+    }
+
+    /* === [FORM] delete this line and the one in paint() outside a form ===== */
+    var formInput = root.querySelector('input[data-ac-dropdown-input]');
+
+    /* === [IDS] optional — delete it if you always write the ids yourself ====
+       Only fills in what the markup left out, so authored ids survive. The one
+       thing it insists on is that the value span is among the things the
+       trigger is labelled by: a trigger named by its label alone never says
+       what is currently selected, which is the most common way this pattern is
+       got wrong.
+
+       Duplicate ids are yours to avoid. Paste the block twice and give the
+       second copy its own — nothing here can tell which label belongs to which
+       trigger once two of them claim the same id. */
+
+    var n = ++uid;
+
+    function ensureId(el, suffix) {
+      if (!el.id) el.id = 'ac-dropdown-' + n + '-' + suffix;
+      return el.id;
+    }
+
+    ensureId(toggle, 'toggle');
+    toggle.setAttribute('aria-controls', ensureId(panel, 'panel'));
+
+    var valueId = ensureId(valueEl, 'value');
+    var names = (toggle.getAttribute('aria-labelledby') || '').split(/\s+/);
+    var namedByValue = false;
+    for (var i = 0; i < names.length; i++) {
+      if (names[i] === valueId) namedByValue = true;
+    }
+    if (names[0] && !namedByValue) {
+      toggle.setAttribute('aria-labelledby', names.join(' ') + ' ' + valueId);
+    }
+
+    /* === [CORE] the option list ===========================================
+       `rows` is the options the keyboard can reach — everything with
+       role="option" that is not aria-disabled, in visual order. Disabled ones
+       stay in the DOM and in the accessibility tree, so a screen reader user
+       learns they exist and why they are out; they just have no tabindex, and
+       that is what makes the arrows skip them. */
+
+    /** @type {HTMLElement[]} */
+    var rows = [];
+
+    function options() {
+      return panel.querySelectorAll('[role="option"]');
+    }
+
+    function refresh() {
+      rows = [];
+      var all = options();
+      for (var i = 0; i < all.length; i++) {
+        if (all[i].getAttribute('aria-disabled') === 'true') {
+          all[i].removeAttribute('tabindex');
+        } else {
+          all[i].tabIndex = -1;
+          rows.push(all[i]);
+        }
+      }
+    }
+
+    function selected() {
+      return panel.querySelector('[role="option"][aria-selected="true"]');
+    }
+
+    function optionFor(value) {
+      var all = options();
+      for (var i = 0; i < all.length; i++) {
+        if (all[i].dataset.value === value) return all[i];
       }
       return null;
     }
 
-    var settings = options || {};
-    var id = select.id || 'ac-dropdown-' + ++uid;
-    var emptyText =
-      settings.emptyText || select.getAttribute('data-ac-empty-text') || 'No options available';
-
-    /* === [CORE] Build the shell =========================================== */
-
-    var wrap = document.createElement('div');
-    wrap.className = 'ac-dropdown';
-
-    var toggle = document.createElement('button');
-    toggle.type = 'button';
-    toggle.className = 'ac-dropdown__toggle';
-    toggle.id = id + '-toggle';
-    toggle.setAttribute('aria-haspopup', 'listbox');
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.setAttribute('aria-controls', id + '-panel');
-
-    var valueEl = document.createElement('span');
-    valueEl.className = 'ac-dropdown__value';
-
-    var caret = document.createElement('span');
-    caret.className = 'ac-dropdown__caret';
-    caret.setAttribute('aria-hidden', 'true');
-    caret.innerHTML =
-      '<svg viewBox="0 0 16 16" focusable="false"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-
-    toggle.appendChild(valueEl);
-    toggle.appendChild(caret);
-
-    var panel = document.createElement('div');
-    panel.className = 'ac-dropdown__panel';
-    panel.id = id + '-panel';
-    panel.setAttribute('role', 'listbox');
-    panel.hidden = true;
-    if (SUPPORTS_POPOVER) {
-      // "manual" rather than "auto": we handle Escape and outside-click
-      // ourselves, and auto's light-dismiss races with the toggle's own click.
-      panel.setAttribute('popover', 'manual');
+    /** The text the trigger shows. Not the option's textContent, which also
+        carries the tick and any secondary line. */
+    function labelOf(option) {
+      var primary = option.querySelector('.ac-dropdown__primary');
+      return (primary || option).textContent.trim();
     }
 
-    var list = document.createElement('div');
-    list.className = 'ac-dropdown__list';
-    panel.appendChild(list);
-
-    /* === [CORE] Accessible name ===========================================
-       Carry over whatever labeled the <select>. A <label for> is the common case
-       and the one this pattern usually drops. */
-
-    function resolveLabel() {
-      var labelledBy = select.getAttribute('aria-labelledby');
-      if (labelledBy) return { ids: labelledBy, text: null };
-
-      var ariaLabel = select.getAttribute('aria-label');
-      if (ariaLabel) return { ids: null, text: ariaLabel };
-
-      var labels = select.labels;
-      if (labels && labels.length) {
-        var ids = [];
-        for (var i = 0; i < labels.length; i++) {
-          if (!labels[i].id) labels[i].id = id + '-label-' + i;
-          ids.push(labels[i].id);
-        }
-        return { ids: ids.join(' '), text: labels[0].textContent.trim() };
+    /* Paint a selection without announcing it. aria-selected is written on
+       every option rather than only the chosen one, because it is also what the
+       CSS selects on — there is no way to draw a row as chosen without saying
+       so. */
+    function paint(option) {
+      var all = options();
+      for (var i = 0; i < all.length; i++) {
+        all[i].setAttribute('aria-selected', all[i] === option ? 'true' : 'false');
       }
 
-      return { ids: null, text: null };
-    }
-
-    // The trigger's name is "<label>, <current value>", which is how a native
-    // <select> announces. Referencing the value element rather than copying its
-    // text means the name updates itself whenever the selection changes.
-    valueEl.id = id + '-value';
-
-    var label = resolveLabel();
-    if (label.ids) {
-      toggle.setAttribute('aria-labelledby', label.ids + ' ' + valueEl.id);
-      panel.setAttribute('aria-labelledby', label.ids);
-    } else if (label.text) {
-      toggle.setAttribute('aria-label', label.text);
-      panel.setAttribute('aria-label', label.text);
-    }
-
-    // Descriptions (hints, error text) apply to the visible control too.
-    var describedBy = select.getAttribute('aria-describedby');
-    if (describedBy) toggle.setAttribute('aria-describedby', describedBy);
-
-    /* === [CORE] Insert, and demote the native select to a value store ===== */
-
-    select.parentNode.insertBefore(wrap, select);
-    wrap.appendChild(toggle);
-    wrap.appendChild(panel);
-    wrap.appendChild(select);
-
-    select.classList.add('ac-dropdown__native');
-    select.tabIndex = -1;
-    // display:none already removes it from the accessibility tree; this makes the
-    // intent explicit for anyone reading the DOM.
-    select.setAttribute('aria-hidden', 'true');
-
-    /* === [CORE] Options =================================================== */
-
-    /** @type {HTMLElement[]} rows in visual order, index-aligned to enabled options */
-    var rows = [];
-    /** @type {number[]} select.options index for each row */
-    var rowIndexes = [];
-
-    function decorate(row, option) {
-      /* [DECORATION] an icon or a color strip. Delete this block if you use
-         neither. Both render aria-hidden, so no symbol name reaches the option's
-         accessible name. */
-      var swatch = option.getAttribute('data-ac-swatch');
-      var icon = option.getAttribute('data-ac-icon');
-
-      if (icon) {
-        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('class', 'ac-dropdown__icon');
-        svg.setAttribute('aria-hidden', 'true');
-        svg.setAttribute('focusable', 'false');
-        var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-        use.setAttribute('href', '#' + icon);
-        svg.appendChild(use);
-        row.appendChild(svg);
-      } else if (swatch) {
-        var colors = swatch.split(',');
-        var strip = document.createElement('span');
-        strip.className = 'ac-dropdown__swatch';
-        strip.setAttribute('aria-hidden', 'true');
-        for (var i = 0; i < colors.length; i++) {
-          var dot = document.createElement('span');
-          // The one place a literal color is legitimate: it comes from the
-          // author's data, not from the stylesheet.
-          dot.style.background = colors[i].trim();
-          strip.appendChild(dot);
-        }
-        row.appendChild(strip);
-      }
-
-      /* [CORE] the option's own text */
-      var text = document.createElement('span');
-      text.className = 'ac-dropdown__text';
-
-      var primary = document.createElement('span');
-      primary.className = 'ac-dropdown__primary';
-      primary.textContent = option.textContent.trim();
-      text.appendChild(primary);
-
-      /* [DECORATION] a muted second line. NOT aria-hidden: it is real
-         information, so it belongs in the accessible name. */
-      var secondary = option.getAttribute('data-ac-secondary');
-      if (secondary) {
-        var sub = document.createElement('span');
-        sub.className = 'ac-dropdown__secondary';
-        sub.textContent = secondary;
-        text.appendChild(sub);
-      }
-
-      row.appendChild(text);
-
-      /* [CORE] the tick, so selection is never shown by color alone */
-      var check = document.createElement('span');
-      check.className = 'ac-dropdown__check';
-      check.setAttribute('aria-hidden', 'true');
-      check.textContent = '✓';
-      row.appendChild(check);
-    }
-
-    function buildRow(option, optionIndex) {
-      var row = document.createElement('div');
-      row.className = 'ac-dropdown__option';
-      row.id = id + '-option-' + optionIndex;
-      row.setAttribute('role', 'option');
-      row.setAttribute('aria-selected', String(optionIndex === select.selectedIndex));
-      row.dataset.index = String(optionIndex);
-
-      if (option.disabled) {
-        // aria-disabled rather than removing it: the option stays discoverable, so
-        // a screen reader user learns it exists and why it is unavailable.
-        row.setAttribute('aria-disabled', 'true');
+      if (option) {
+        valueEl.textContent = labelOf(option);
+        valueEl.classList.remove('ac-dropdown__value--empty');
+        root.dataset.value = option.dataset.value || '';
       } else {
-        row.tabIndex = -1;
-        rows.push(row);
-        rowIndexes.push(optionIndex);
+        // Nothing selected: the markup's own empty text is already in the value
+        // span, so leave it alone.
+        root.removeAttribute('data-value');
       }
 
-      decorate(row, option);
-      return row;
+      /* [FORM] */
+      if (formInput) formInput.value = option ? option.dataset.value || '' : '';
     }
 
-    function rebuild() {
-      list.textContent = '';
-      rows = [];
-      rowIndexes = [];
-
-      var optionIndex = 0;
-      var children = select.children;
-
-      for (var i = 0; i < children.length; i++) {
-        var child = children[i];
-
-        /* [GROUPS] <optgroup> becomes role="group". Delete this branch if you
-           never group options. */
-        if (child.tagName === 'OPTGROUP') {
-          var group = document.createElement('div');
-          group.setAttribute('role', 'group');
-          group.className = 'ac-dropdown__group';
-          var groupLabel = document.createElement('div');
-          groupLabel.className = 'ac-dropdown__group-label';
-          groupLabel.id = id + '-group-' + i;
-          groupLabel.textContent = child.label;
-          // aria-hidden on the visible text plus aria-label on the group stops the
-          // label being announced twice, once as text and once as the name.
-          groupLabel.setAttribute('aria-hidden', 'true');
-          group.setAttribute('aria-label', child.label);
-          group.appendChild(groupLabel);
-
-          for (var j = 0; j < child.children.length; j++) {
-            group.appendChild(buildRow(child.children[j], optionIndex++));
-          }
-          list.appendChild(group);
-        } else if (child.tagName === 'OPTION') {
-          list.appendChild(buildRow(child, optionIndex++));
-        }
-      }
-
-      if (!select.options.length) {
-        var empty = document.createElement('div');
-        empty.className = 'ac-dropdown__empty';
-        empty.textContent = emptyText;
-        list.appendChild(empty);
-      }
-
-      syncValue();
-      syncDisabled();
-    }
-
-    function syncValue() {
-      var option = select.options[select.selectedIndex];
-      valueEl.textContent = option ? option.textContent.trim() : emptyText;
-      valueEl.classList.toggle('ac-dropdown__value--empty', !option);
-
-      var allRows = list.querySelectorAll('[role="option"]');
-      for (var i = 0; i < allRows.length; i++) {
-        allRows[i].setAttribute(
-          'aria-selected',
-          String(Number(allRows[i].dataset.index) === select.selectedIndex),
-        );
-      }
-    }
-
-    function syncDisabled() {
-      // aria-disabled, not the disabled attribute: the control stays focusable, so
-      // a keyboard user can still reach it and hear why it is unavailable.
-      toggle.setAttribute('aria-disabled', String(select.disabled));
-      wrap.classList.toggle('ac-dropdown--disabled', select.disabled);
-    }
-
-    /* === [CORE] Positioning ===============================================
-       The panel is position:fixed and, where supported, in the top layer. That is
-       what stops an ancestor with overflow:hidden or a transform from clipping it.
-       Recomputed on scroll and resize rather than once at open time, so it cannot
-       drift away from its trigger. */
+    /* === [CORE] positioning ===============================================
+       The panel is position:fixed and, where supported, in the top layer. That
+       is what stops an ancestor with overflow:hidden or a transform from
+       clipping it. Recomputed on scroll and resize rather than once at open
+       time, so it cannot drift away from its trigger. */
 
     function position() {
       var rect = toggle.getBoundingClientRect();
-      var gap = 6;
-      var margin = 8;
-      var spaceBelow = window.innerHeight - rect.bottom - gap - margin;
-      var spaceAbove = rect.top - gap - margin;
+      var below = window.innerHeight - rect.bottom - GAP - EDGE;
+      var above = rect.top - GAP - EDGE;
       // Flip up only when below is genuinely cramped AND above has more room.
-      var flipUp = spaceBelow < 200 && spaceAbove > spaceBelow;
+      var flipUp = below < FLIP && above > below;
 
-      // Match the trigger's width, the way a native select does, but never let the
-      // panel hang off either edge of a narrow viewport.
+      // Match the trigger's width, the way a native select does, but never let
+      // the panel hang off either edge of a narrow viewport.
       panel.style.width = rect.width + 'px';
       panel.style.left =
-        Math.max(margin, Math.min(rect.left, window.innerWidth - rect.width - margin)) + 'px';
-      panel.style.maxHeight = Math.max(120, flipUp ? spaceAbove : spaceBelow) + 'px';
+        Math.max(EDGE, Math.min(rect.left, window.innerWidth - rect.width - EDGE)) + 'px';
+      panel.style.maxHeight = Math.max(MIN_HEIGHT, flipUp ? above : below) + 'px';
 
       if (flipUp) {
         panel.style.top = '';
-        panel.style.bottom = window.innerHeight - rect.top + gap + 'px';
+        panel.style.bottom = window.innerHeight - rect.top + GAP + 'px';
       } else {
         panel.style.bottom = '';
-        panel.style.top = rect.bottom + gap + 'px';
+        panel.style.top = rect.bottom + GAP + 'px';
       }
 
-      // A styling hook for consumers who want to square off the adjoining corners.
-      wrap.classList.toggle('ac-dropdown--up', flipUp);
+      // A styling hook for consumers who want to square off the adjoining
+      // corners.
+      root.classList.toggle('ac-dropdown--up', flipUp);
     }
 
-    /* === [CORE] Open and close ============================================ */
+    /* === [CORE] open and close ============================================ */
 
     function isOpen() {
       return toggle.getAttribute('aria-expanded') === 'true';
     }
 
+    /* aria-disabled, not the disabled attribute: the trigger stays focusable,
+       so a keyboard user can reach it and hear why it is unavailable. The
+       attribute is the whole state — there is no class to keep in sync. */
+    function isDisabled() {
+      return toggle.getAttribute('aria-disabled') === 'true';
+    }
+
     function open() {
-      if (isOpen() || select.disabled) return;
+      if (isOpen() || isDisabled()) return;
       if (openInstance && openInstance !== api) openInstance.close(false);
+
+      refresh();
 
       panel.hidden = false;
       if (SUPPORTS_POPOVER) {
@@ -375,16 +242,20 @@
       document.addEventListener('pointerdown', onDocumentPointerDown, true);
       window.addEventListener('resize', position);
       // `true` for capture so we reposition even when a nested element scrolls.
-      window.addEventListener('scroll', onScroll, true);
+      window.addEventListener('scroll', position, true);
 
       // Focus the selected option so a screen reader announces the listbox and
-      // where you are in it. Falling back to the first option when nothing is
+      // where you are in it. Falling back to the first row when nothing is
       // selected keeps the arrow keys predictable.
-      var target = rows[indexOfSelected()] || rows[0];
+      var target = selected();
+      if (!target || rows.indexOf(target) === -1) target = rows[0];
+
       if (target) {
         target.focus();
         scrollRowIntoView(target);
       } else {
+        // An empty listbox still has to take focus, or the message in it is
+        // never read.
         panel.tabIndex = -1;
         panel.focus();
       }
@@ -402,30 +273,23 @@
       }
       panel.hidden = true;
       toggle.setAttribute('aria-expanded', 'false');
-      wrap.classList.remove('ac-dropdown--up');
+      root.classList.remove('ac-dropdown--up');
       if (openInstance === api) openInstance = null;
 
       document.removeEventListener('pointerdown', onDocumentPointerDown, true);
       window.removeEventListener('resize', position);
-      window.removeEventListener('scroll', onScroll, true);
+      window.removeEventListener('scroll', position, true);
 
-      // Focus has to go somewhere. Hiding the element that holds it without moving
-      // it first drops focus to <body>, and the user loses their place entirely.
+      // Focus has to go somewhere. Hiding the element that holds it without
+      // moving it first drops focus to <body>, and the user loses their place.
       if (restoreFocus !== false) toggle.focus();
     }
 
-    function onScroll() {
-      position();
-    }
-
     function onDocumentPointerDown(event) {
-      if (!wrap.contains(event.target) && !panel.contains(event.target)) close(false);
+      if (!root.contains(event.target)) close(false);
     }
 
-    function indexOfSelected() {
-      var found = rowIndexes.indexOf(select.selectedIndex);
-      return found === -1 ? 0 : found;
-    }
+    /* === [CORE] moving and choosing ======================================= */
 
     function scrollRowIntoView(row) {
       if (row.scrollIntoView) row.scrollIntoView({ block: 'nearest' });
@@ -442,20 +306,24 @@
       return rows.indexOf(document.activeElement);
     }
 
-    function choose(rowIndex) {
-      var optionIndex = rowIndexes[rowIndex];
-      if (typeof optionIndex !== 'number') return;
+    function choose(option) {
+      if (!option || option.getAttribute('aria-disabled') === 'true') return;
+      var changed = option !== selected();
 
-      if (select.selectedIndex !== optionIndex) {
-        select.selectedIndex = optionIndex;
-        // Dispatched on the native element, so handlers already bound to the
-        // <select> fire exactly as they did before this was enhanced.
-        select.dispatchEvent(new Event('input', { bubbles: true }));
-        select.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-
-      syncValue();
+      paint(option);
       close();
+
+      // How a consumer hears about it, since there is no native control here to
+      // fire a change of its own. Dispatched after the panel closes and focus is
+      // back on the trigger, so a handler that navigates is not racing us.
+      if (changed) {
+        root.dispatchEvent(
+          new CustomEvent('ac:dropdown:change', {
+            bubbles: true,
+            detail: { value: option.dataset.value, option: option },
+          }),
+        );
+      }
     }
 
     /* === [TYPEAHEAD] optional — delete this and the two key branches below == */
@@ -465,31 +333,30 @@
 
     function typeAhead(char) {
       var now = Date.now();
-      // An 800ms window, so "st" lands on Staging rather than jumping to the first
-      // "s" and then the first "t".
-      buffer = (now - bufferTime > 800 ? '' : buffer) + char.toLowerCase();
+      // A window between keystrokes, so "st" lands on Staging rather than
+      // jumping to the first "s" and then the first "t".
+      buffer = (now - bufferTime > TYPEAHEAD_WINDOW ? '' : buffer) + char.toLowerCase();
       bufferTime = now;
 
       for (var i = 0; i < rows.length; i++) {
-        var text = select.options[rowIndexes[i]].textContent.trim().toLowerCase();
-        if (text.indexOf(buffer) === 0) {
+        if (labelOf(rows[i]).toLowerCase().indexOf(buffer) === 0) {
           if (isOpen()) focusRow(i);
-          else choose(i);
+          else choose(rows[i]);
           return;
         }
       }
     }
 
-    /* === [CORE] Events ==================================================== */
+    /* === [CORE] events ==================================================== */
 
     function onToggleClick() {
-      if (select.disabled) return;
+      if (isDisabled()) return;
       if (isOpen()) close();
       else open();
     }
 
     function onToggleKeydown(event) {
-      if (select.disabled) return;
+      if (isDisabled()) return;
       var key = event.key;
 
       if (key === 'ArrowDown' || key === 'ArrowUp' || key === 'Enter' || key === ' ') {
@@ -505,9 +372,11 @@
         return;
       }
 
-      /* [TYPEAHEAD] */
+      /* [TYPEAHEAD] closed, a letter commits straight away — the same as a
+         native select. */
       if (key.length === 1 && /\S/.test(key)) {
         event.preventDefault();
+        refresh();
         typeAhead(key);
       }
     }
@@ -530,14 +399,14 @@
         focusRow(rows.length - 1);
       } else if (key === 'Enter' || key === ' ') {
         event.preventDefault();
-        if (index > -1) choose(index);
+        if (index > -1) choose(rows[index]);
       } else if (key === 'Escape') {
         event.preventDefault();
         // Stop it here, or a surrounding dialog closes at the same time.
         event.stopPropagation();
         close();
       } else if (key === 'Tab') {
-        // Move focus back to the toggle first, then let the browser carry on
+        // Move focus back to the trigger first, then let the browser carry on
         // tabbing from there — otherwise focus sits on an element we are hiding.
         close();
       } else if (key.length === 1 && /\S/.test(key)) {
@@ -547,78 +416,66 @@
       }
     }
 
-    function onListClick(event) {
+    function onPanelClick(event) {
       var row = event.target.closest('[role="option"]');
-      if (!row) return;
-      if (row.getAttribute('aria-disabled') === 'true') return;
-      var index = rows.indexOf(row);
-      if (index > -1) choose(index);
+      if (row && panel.contains(row)) choose(row);
     }
 
-    function onListPointerMove(event) {
+    function onPanelPointerMove(event) {
       // Only follow a real mouse. On touch this fires during a scroll drag and
       // would yank focus to whatever passed under the finger.
       if (event.pointerType !== 'mouse') return;
       var row = event.target.closest('[role="option"]');
-      if (!row || row.getAttribute('aria-disabled') === 'true') return;
-      var index = rows.indexOf(row);
-      if (index > -1 && document.activeElement !== rows[index]) rows[index].focus();
-    }
-
-    function onNativeChange() {
-      syncValue();
+      if (!row || rows.indexOf(row) === -1) return;
+      if (document.activeElement !== row) row.focus();
     }
 
     toggle.addEventListener('click', onToggleClick);
     toggle.addEventListener('keydown', onToggleKeydown);
     panel.addEventListener('keydown', onPanelKeydown);
-    list.addEventListener('click', onListClick);
-    list.addEventListener('pointermove', onListPointerMove);
-    select.addEventListener('change', onNativeChange);
-
-    // Mirror the native element's own `hidden` and `disabled` so app code that
-    // toggles them keeps working without knowing this wrapper exists.
-    var observer = new MutationObserver(function () {
-      wrap.hidden = select.hidden;
-      syncDisabled();
-      if (select.disabled && isOpen()) close(false);
-    });
-    observer.observe(select, { attributes: true, attributeFilter: ['hidden', 'disabled'] });
-    wrap.hidden = select.hidden;
+    panel.addEventListener('click', onPanelClick);
+    panel.addEventListener('pointermove', onPanelPointerMove);
 
     /* === [CORE] API ======================================================= */
 
     var api = {
-      /** Re-read the <select> after its options changed. */
-      rebuild: rebuild,
-      /** Re-read the current value after setting select.value programmatically. */
-      sync: syncValue,
+      /** Re-read the option list after you changed it. */
+      refresh: refresh,
+      /** The selected option's data-value, or null. */
+      value: function () {
+        var option = selected();
+        return option ? option.dataset.value || '' : null;
+      },
+      /** Select by value and repaint. Fires nothing — it is not a user choice. */
+      setValue: function (value) {
+        var option = optionFor(value);
+        if (option) paint(option);
+        return !!option;
+      },
       open: open,
       close: close,
       isOpen: isOpen,
-      /** The enhanced wrapper, if you need to position something relative to it. */
-      element: wrap,
+      /** The root element, if you need to position something relative to it. */
+      element: root,
       destroy: function () {
         close(false);
-        observer.disconnect();
         toggle.removeEventListener('click', onToggleClick);
         toggle.removeEventListener('keydown', onToggleKeydown);
         panel.removeEventListener('keydown', onPanelKeydown);
-        list.removeEventListener('click', onListClick);
-        list.removeEventListener('pointermove', onListPointerMove);
-        select.removeEventListener('change', onNativeChange);
-
-        select.classList.remove('ac-dropdown__native');
-        select.removeAttribute('aria-hidden');
-        select.tabIndex = 0;
-        wrap.parentNode.insertBefore(select, wrap);
-        wrap.remove();
-        delete select._acDropdown;
+        panel.removeEventListener('click', onPanelClick);
+        panel.removeEventListener('pointermove', onPanelPointerMove);
+        delete root._acDropdown;
       },
     };
 
-    select._acDropdown = api;
-    rebuild();
+    root._acDropdown = api;
+
+    refresh();
+    // data-value on the root wins over the markup's aria-selected, so a host app
+    // can write the value before this script has run and not have to care which
+    // of the two lands first.
+    paint(root.hasAttribute('data-value') ? optionFor(root.dataset.value) : selected());
+
     return api;
   }
 
@@ -627,16 +484,48 @@
 
   /* === [AUTO-INIT] delete this block if you construct instances yourself === */
   function initAll(scope) {
-    (scope || document).querySelectorAll('select[data-ac-dropdown]').forEach(function (el) {
+    (scope || document).querySelectorAll('[data-ac-dropdown]').forEach(function (el) {
       createDropdown(el);
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () {
-      initAll();
-    });
-  } else {
+  /* === [PAGE] this page's own readout — never copy this ====================
+     Example 6, printing what the form would send. The hidden input is the whole
+     mechanism: FormData reads it like any other field. */
+  function createDropdownPage(root) {
+    if (!root || root._acDropdownPage) return root && root._acDropdownPage;
+    root._acDropdownPage = true;
+
+    var form = root.querySelector('[data-ac-dd-form]');
+    var out = root.querySelector('[data-ac-dd-out="form"]');
+    if (!form || !out) return null;
+
+    function report() {
+      var entries = [];
+      new FormData(form).forEach(function (value, key) {
+        entries.push(key + '=' + value);
+      });
+      out.textContent = entries.length ? entries.join(' & ') : 'nothing';
+    }
+
+    form.addEventListener('ac:dropdown:change', report);
+    report();
+
+    return { destroy: function () { form.removeEventListener('ac:dropdown:change', report); } };
+  }
+
+  global.AC.createDropdownPage = createDropdownPage;
+
+  function boot() {
     initAll();
+    document.querySelectorAll('[data-ac-dropdown-page]').forEach(function (el) {
+      createDropdownPage(el);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
   }
 })(window);

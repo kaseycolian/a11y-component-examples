@@ -3,16 +3,16 @@
   "name": "Dropdown / Listbox",
   "group": "overlays-disclosure",
   "order": 20,
-  "summary": "A styled select that keeps a real <select> underneath as its value store, so forms and existing change handlers keep working.",
-  "tags": ["listbox", "select", "combobox", "popover", "progressive-enhancement", "top-layer"],
-  "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/",
-  "wcag": ["1.4.11", "1.4.13", "2.1.1", "2.4.3", "2.5.8", "4.1.2"],
+  "summary": "A styled select is the pattern people reach for and then get wrong — the current value stops being announced, or the arrow keys land on nothing. Here the button, the listbox and every option are real markup you can read and copy, and the script only opens it, moves focus, and remembers what you chose.",
+  "tags": ["listbox", "select", "combobox", "popover", "top-layer", "roving-tabindex"],
+  "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/listbox/",
+  "wcag": ["1.4.1", "1.4.11", "1.4.13", "2.1.1", "2.4.3", "2.5.8", "4.1.2"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "The panel anchors to its trigger at every width, and flips above it when there is no room below. For a panel that rises from the bottom of the screen, see the Drawer component.",
+  "demoNote": "The panel anchors to its trigger at every width, and flips above it when there is no room below. For a panel that rises from the bottom of the screen, see the Drawer component. This one needs JavaScript; Native Select is the answer when that is not on offer.",
   "contract": {
-    "useWhen": "A custom select, for when the native one cannot be styled the way you need.",
-    "root": ["[data-ac-dropdown]", ".ac-dropdown"],
+    "useWhen": "A custom select, for when the native one cannot be styled the way you need. Needs JavaScript.",
+    "root": [".ac-dropdown"],
     "aria": {
       "the trigger": [
         "aria-haspopup=listbox",
@@ -28,12 +28,13 @@
       "an option": [
         "role=option",
         "aria-selected",
-        "tabindex=-1"
+        "tabindex=-1",
+        "data-value"
       ],
       "a disabled option": [
         "aria-disabled=true"
       ],
-      "an optgroup": [
+      "a group": [
         "role=group",
         "aria-label"
       ]
@@ -41,7 +42,7 @@
     "keyboard": [
       [
         "ArrowDown / ArrowUp",
-        "move between options"
+        "move between options, wrapping"
       ],
       [
         "Home / End",
@@ -49,7 +50,7 @@
       ],
       [
         "Enter / Space",
-        "open from the trigger, or choose the focused option"
+        "open it, or choose the focused option"
       ],
       [
         "Escape",
@@ -57,23 +58,29 @@
       ],
       [
         "Tab",
-        "close and carry on tabbing, from the trigger rather than the hidden panel"
+        "close, then tab on from the trigger"
+      ],
+      [
+        "Any letter",
+        "jump to the first option starting with it"
       ]
     ],
     "states": [
       "open",
       "selected",
-      "disabled option"
+      "disabled option",
+      "disabled — aria-disabled on the trigger",
+      "empty"
     ],
     "failureModes": [
-      "aria-activedescendant rather than real DOM focus, which is unreliable on iOS VoiceOver and TalkBack",
+      "aria-activedescendant rather than real DOM focus, unreliable on iOS VoiceOver and TalkBack",
       "the trigger named by its label alone, so the current value is never announced",
-      "an optgroup's visible label read twice — it needs aria-hidden once role=group carries the name",
+      "a hidden <select> behind it, so one value lives in two places and they drift",
       "a disabled option left with a tabindex, so the keyboard lands on something inert",
       "a div as the trigger, so aria-expanded sits on something with no role"
     ],
     "api": [
-      "AC.createDropdown(select, options) -> { open, close, isOpen, sync, rebuild, element, destroy }"
+      "AC.createDropdown(root) -> { open, close, isOpen, value, setValue, refresh, element, destroy }"
     ],
     "seeAlso": [
       "native-select",

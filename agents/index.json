@@ -322,14 +322,14 @@
       "slug": "dropdown",
       "name": "Dropdown / Listbox",
       "group": "overlays-disclosure",
-      "useWhen": "A custom select, for when the native one cannot be styled the way you need.",
-      "tags": ["listbox", "select", "combobox", "popover", "progressive-enhancement", "top-layer"],
-      "wcag": ["1.4.11", "1.4.13", "2.1.1", "2.4.3", "2.5.8", "4.1.2"],
-      "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/combobox/",
+      "useWhen": "A custom select, for when the native one cannot be styled the way you need. Needs JavaScript.",
+      "tags": ["listbox", "select", "combobox", "popover", "top-layer", "roving-tabindex"],
+      "wcag": ["1.4.1", "1.4.11", "1.4.13", "2.1.1", "2.4.3", "2.5.8", "4.1.2"],
+      "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/listbox/",
       "files": ["html", "css", "js"],
       "status": "stable",
       "hasContract": true,
-      "_summaryRev": "1e56c7cd"
+      "_summaryRev": "0f0a6941"
     },
     {
       "slug": "modal",

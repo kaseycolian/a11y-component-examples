@@ -827,9 +827,10 @@ fix now and pre-empted nothing.
 **1 · The convention the whole design rested on was not real, and one query said so.** The plan scoped
 the ARIA check to `.ac-<slug>`, which reads like a rule this repo enforces. It holds for 15 of 33
 components. The other 18 anchor on an abbreviation — `checkbox` is `.ac-choice`, `text-input` is
-`.ac-input`, `icon-button` is `.ac-btn-icon`, `status-text` is `.ac-status` — and `dropdown` has no
-`ac-dropdown` class in its markup at all: the root is an `.ac-field` carrying `[data-ac-dropdown]`, and
-the factory builds the rest at runtime. A check scoped that way would have swept nothing for more than
+`.ac-input`, `icon-button` is `.ac-btn-icon`, `status-text` is `.ac-status` — and `dropdown` had no
+`ac-dropdown` class in its markup at all: it was a `<select>` carrying `[data-ac-dropdown]`, and the
+factory built the rest at runtime. (It is authored markup now, and `.ac-dropdown` is real — but the
+point stands for the other 17.) A check scoped that way would have swept nothing for more than
 half the library **and reported it as a pass**. It cost one query to find and reshaped the phase, adding
 `contract.root` and 33 declarations. The lesson is not "check your assumptions" but something narrower:
 **a convention stated in `CLAUDE.md` is a rule for new code, not a description of old code.** The

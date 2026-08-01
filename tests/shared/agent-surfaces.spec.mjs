@@ -104,13 +104,13 @@ const EXEMPT_ARIA = ['aria-hidden'];
 /**
  * Which elements on a demo page are the component itself, per its contract.
  *
- * This cannot be derived from the slug. `.ac-<slug>` holds for fifteen
- * components and fails for eighteen: `checkbox` is `.ac-choice`, `text-input` is
- * `.ac-input`, `icon-button` is `.ac-btn-icon`, and `dropdown` is a `<select>`
- * carrying `[data-ac-dropdown]` that the factory wraps at runtime. A scope
- * guessed from the slug would sweep nothing for more than half the library and
- * report that as a pass, which is the failure mode this whole suite is built to
- * avoid -- so the contract declares it and check 12 holds it to it.
+ * This cannot be derived from the slug. `.ac-<slug>` holds for about half the
+ * library and fails for the rest: `checkbox` is `.ac-choice`, `text-input` is
+ * `.ac-input`, `icon-button` is `.ac-btn-icon`, `switch` is `.ac-switch` but
+ * `fieldset-group` is `.ac-group`. A scope guessed from the slug would sweep
+ * nothing for those and report it as a pass, which is the failure mode this
+ * whole suite is built to avoid -- so the contract declares it and check 12
+ * holds it to it.
  */
 const OWN_ROOTS = Object.fromEntries(
   COMPONENTS.filter((c) => c.contract?.root).map((c) => [c.slug, c.contract.root.join(', ')]),
@@ -600,17 +600,29 @@ for (const { slug, name, contract } of COMPONENTS) {
       // to be in the markup you copy, and the broken variants are the markup you
       // must not -- so finding the attribute only inside one is a miss, which is
       // exactly the confusion this check exists to prevent.
-      const missing = await page.evaluate(
-        ({ demo, selectors }) => {
-          const scope = document.querySelector(demo);
-          if (!scope) return selectors.map((s) => `${s} (no ${demo} on the page)`);
-          return selectors.filter((selector) => {
-            const found = [...scope.querySelectorAll(selector)];
-            return !found.some((el) => !el.closest('[data-ac-demo-broken]'));
-          });
-        },
-        { demo: DEMO, selectors: tokens.map((t) => t.selector) },
-      );
+      const probe = () =>
+        page.evaluate(
+          ({ demo, selectors }) => {
+            const scope = document.querySelector(demo);
+            if (!scope) return selectors.map((s) => `${s} (no ${demo} on the page)`);
+            return selectors.filter((selector) => {
+              const found = [...scope.querySelectorAll(selector)];
+              return !found.some((el) => !el.closest('[data-ac-demo-broken]'));
+            });
+          },
+          { demo: DEMO, selectors: tokens.map((t) => t.selector) },
+        );
+
+      // Not all of a contract is in the authored markup: some of it arrives when
+      // the component runs. jump-nav's aria-current is written by the first
+      // IntersectionObserver callback, so one read in the same frame as the load
+      // reports it absent -- and does so only under enough parallel load to lose
+      // that race, which is the worst kind of red. Retry before believing it.
+      let missing = await probe();
+      for (let i = 0; missing.length && i < 20; i++) {
+        await page.waitForTimeout(100);
+        missing = await probe();
+      }
 
       const named = missing.map(
         (selector) => `${tokens.find((t) => t.selector === selector).part}: ${selector}`,

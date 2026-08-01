@@ -264,12 +264,9 @@
      rather than losing its border, background and glow outright -- an undefined
      custom property makes every color-mix() referencing it invalid at once. */
   --console-accent: var(--border-strong);
-  /* The trigger's type size, as a property rather than a declaration, because it
-     has to reach two selectors that sit in different sections of this file -- the
-     enhanced .ac-dropdown__toggle and the native <select> fallback. Overriding it
-     per console from here means the step is stated once and neither path can be
-     changed without the other, where two font-size rules would have depended on
-     the order they happen to appear in. */
+  /* The trigger's type size, as a property rather than a declaration, so a
+     console can step it up from here -- .console--nav does -- without a second
+     font-size rule further down whose effect would depend on source order. */
   --console-type: 12.5px;
   display: inline-flex;
   align-items: center;
@@ -348,16 +345,10 @@
 }
 
 /* The trigger is the real control, so the ring belongs to the console it fills.
-   Both selectors are live: the first once the Dropdown has enhanced it, the
-   second on the native fallback. */
-.console:has(.ac-dropdown__toggle:focus-visible),
-.console:has(select:focus-visible) {
+   The trigger's own ring is suppressed further down, or there would be two. */
+.console:has(.ac-dropdown__toggle:focus-visible) {
   outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
-}
-
-.console:has(select:focus-visible) select {
-  outline: none;
 }
 
 .console__cap {
@@ -376,28 +367,7 @@
   border-right: 1px solid color-mix(in srgb, var(--console-accent) 35%, var(--border));
 }
 
-/* Only used on the fallback path, where the Dropdown did not load. */
-.console__go {
-  align-self: center;
-  flex: none;
-  min-height: 24px;
-  margin: 0 6px;
-  padding: 0 0.7rem;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sm);
-  background: var(--bg-elevated);
-  color: var(--text);
-  font: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.console__go[hidden] {
-  display: none;
-}
-
-/* --- The enhanced control inside a console ------------------------------------
+/* --- The Dropdown inside a console --------------------------------------------
    Nothing here reaches into the Dropdown's behavior; it is all surface. The
    two-class selectors also mean this wins over the component's own defaults
    whichever order the two stylesheets land in. */
@@ -499,53 +469,6 @@
   background: inherit;
   filter: blur(2.5px);
   opacity: calc(0.65 * var(--glow-strength));
-}
-
-/* --- The native fallback (the Dropdown script never landed) ------------------- */
-
-.console select {
-  -webkit-appearance: none;
-  appearance: none;
-  flex: 1 1 auto;
-  min-width: 0;
-  align-self: stretch;
-  padding: 0 6px 0 11px;
-  border: 0;
-  background: transparent;
-  outline: none;
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: var(--console-type);
-  font-weight: 600;
-  color: var(--text);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.console select option {
-  background: var(--bg-elevated);
-  color: var(--text);
-}
-
-.console select optgroup {
-  background: var(--bg-elevated);
-  color: var(--text-muted);
-}
-
-/* Two triangles for a caret, in the console's own accent. Only for the fallback
-   -- once enhanced, the component draws its own chevron. */
-.console:not(:has(.ac-dropdown))::after {
-  content: "";
-  flex: none;
-  width: 10px;
-  height: 5px;
-  margin-right: 13px;
-  background-image: linear-gradient(45deg, transparent 50%, var(--console-accent) 50%),
-    linear-gradient(135deg, var(--console-accent) 50%, transparent 50%);
-  background-position: 0 0, 5px 0;
-  background-size: 5px 5px, 5px 5px;
-  background-repeat: no-repeat;
 }
 
 /* --- Reduce motion -----------------------------------------------------------

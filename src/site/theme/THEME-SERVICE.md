@@ -74,9 +74,11 @@ a future update session does not "fix" their absence:
    same semantics, so a repo that later adds `components.css` stays compatible.
 
 2. **`theme-select.js` is not vendored.** The theme picker is the library's own Dropdown component,
-   which supports SVG swatches per option — a better showcase than a bare `<select>`, and it keeps
-   the site built from the components it documents. `theme-init.js` (the anti-flash bootstrap) *is*
-   vendored and used as shipped.
+   which supports a swatch per option — a better showcase than a bare `<select>`, and it keeps the
+   site built from the components it documents. Since the Dropdown became authored markup there is no
+   `<select>` behind it at all: `SiteHeader.astro` writes the trigger, the panel and every option, and
+   the header script talks to it through `ac:dropdown:change` and `setValue()`. `theme-init.js` (the
+   anti-flash bootstrap) *is* vendored and used as shipped.
 
 ### Motion behavior worth knowing
 

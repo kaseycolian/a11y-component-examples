@@ -65,7 +65,9 @@ Recorded so a future update does not "fix" them.
    since been removed outright — see deviation 18.
 2. **`.theme-console .dropdown-*` became `.console .ac-dropdown__*`.** The picker is this library's
    own Dropdown, not theme-service's `dropdown.js` — `theme-select.js` is deliberately not vendored
-   (see `THEME-SERVICE.md`). The rules are the same rules; only the class names differ.
+   (see `THEME-SERVICE.md`). The rules are the same rules; only the class names differ. Since the
+   Dropdown became authored markup the picker is written out in `SiteHeader.astro` rather than grown
+   from a `<select>`, so what these rules style is in the template beside them.
 3. **The rail is `90rem`, not the source's `1600px`,** in both `.hdr-inner` and `.ftr-inner`. This
    site has a sidebar and a content column between them, and all three should share an edge.
 4. **`.brand-dot` uses `--accent-pink-text`, not raw `--accent-pink`.** CLAUDE.md's rule: an accent
@@ -77,9 +79,13 @@ Recorded so a future update does not "fix" them.
 6. **`text-shadow: none` on `.ftr-link:hover` and `.ftr-src:hover`.** `site.css` lights every
    `a:hover` with a glow. The footer's hover signature is the rule and the underline, and a glow on
    12.5px text over glass costs more legibility than it buys.
-7. **The header carries `--header-h`, `--console-h`, `.hdr-note`, `.console__go` and the `.switch`
-   rules,** none of which are upstream. The first two exist because anchors have to clear a sticky
-   header here (SC 2.4.11); `.switch` exists because `components.css` is deliberately not vendored.
+7. **The header carries `--header-h`, `--console-h`, `.hdr-note` and the `.switch` rules,** none of
+   which are upstream. The first two exist because anchors have to clear a sticky header here
+   (SC 2.4.11); `.switch` exists because `components.css` is deliberately not vendored. A `.console__go`
+   button lived here too, for the case where the Dropdown script never landed and a native `<select>`
+   would have navigated on every arrow key. Both it and the fallback `.console select` rules went when
+   the Dropdown became authored markup: there is no `<select>` in the header any more, so there is
+   nothing to fall back to.
 8. **An extra header breakpoint at 900px.** It tracks where this site's sidebar disappears, which the
    source has no equivalent of. (The 760px one is gone: it existed only to hide the brand descriptor,
    and v1.1.0 reversed that policy — see History.)
@@ -174,9 +180,9 @@ Recorded so a future update does not "fix" them.
     reason. This is what sets the three-row breakpoint at 560px, and the spec asserts the label has
     real width at every one of them.
 
-    Beside it, `--console-type` (12.5px, 13.5px on the picker) carries the trigger size to both the
-    enhanced `.ac-dropdown__toggle` and the native `<select>` fallback from one declaration, so the
-    two paths cannot drift.
+    Beside it, `--console-type` (12.5px, 13.5px on the picker) carries the trigger size as a property
+    rather than a declaration, so `.console--nav` steps it up without a second `font-size` rule whose
+    effect would depend on source order.
 17. **`@media (forced-colors: active)` was never being applied above 430px.** The 430px block was
     missing its closing brace, so every rule after it — the note's own breakpoint and the whole High
     Contrast block — parsed as nested inside it. Fixed while restyling; the HCM treatment for the

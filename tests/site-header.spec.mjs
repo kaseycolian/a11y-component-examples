@@ -42,7 +42,9 @@ test('the header theme picker is the library Dropdown and applies a theme', asyn
 
   const toggle = picker(page).locator('.ac-dropdown__toggle');
   await expect(toggle).toBeVisible();
-  await expect(page.locator('#theme-select')).toBeHidden();
+  // No hidden <select> behind it any more: the markup below is the component,
+  // and the root's data-value is where the choice lives.
+  await expect(page.locator('[data-theme-control] select')).toHaveCount(0);
   // The site's default is set on <html> in the markup (SITE_THEME), so the picker
   // opens on it rather than on Auto.
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'acid-arcade-dark');
@@ -63,7 +65,7 @@ test('the header theme picker is the library Dropdown and applies a theme', asyn
   await picker(page).getByRole('option', { name: 'Hot Neon · Dark', exact: true }).click();
 
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'hot-neon-dark');
-  await expect(page.locator('#theme-select')).toHaveValue('hot-neon-dark');
+  await expect(picker(page)).toHaveAttribute('data-value', 'hot-neon-dark');
   await expect(toggle).toBeFocused();
 
   const stored = await page.evaluate(() => localStorage.getItem('theme'));
@@ -88,11 +90,14 @@ test('the choice survives a reload and the trigger shows it', async ({ page }) =
   await picker(page).getByRole('option', { name: 'Midnight Arcade · Dark', exact: true }).click();
 
   await page.reload();
-  // The ordering hazard: theme-init sets data-theme, the header script mirrors it
-  // into the select, the dropdown builds from it. The trigger must not lag.
+  // The ordering hazard: the server rendered SITE_THEME as selected, theme-init
+  // sets data-theme from localStorage, and the header script has to push that
+  // into the Dropdown whichever of the two scripts ran first. The trigger must
+  // not lag.
   await expect(picker(page).locator('.ac-dropdown__toggle')).toHaveAccessibleName(
     /Theme.*Midnight Arcade/s,
   );
+  await expect(picker(page)).toHaveAttribute('data-value', 'midnight-arcade-dark');
 });
 
 /* --- Components picker ---------------------------------------------------- */
@@ -124,11 +129,22 @@ test('choosing a component navigates, and the picker shows where you landed', as
   );
 });
 
-test('the Go fallback stays hidden while the Dropdown is doing its job', async ({ page }) => {
+test('arrowing through the components picker does not navigate', async ({ page }) => {
   await page.goto('components/disclosure/');
-  // It exists for the case where the Dropdown script never lands, and a native
-  // select would otherwise navigate on every arrow key.
-  await expect(page.locator('[data-component-jump-go]')).toBeHidden();
+
+  // SC 3.2.2, and the whole reason navigating on the change event is allowed
+  // here: the Dropdown commits only on a click or Enter. A bare native select
+  // fires on every arrow key on Windows, which is what this used to guard with a
+  // Go button instead.
+  const toggle = jump(page).locator('.ac-dropdown__toggle');
+  await toggle.press('Enter');
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('ArrowUp');
+
+  await expect(page).toHaveURL(/components\/disclosure\/$/);
+  await page.keyboard.press('Escape');
+  await expect(toggle).toBeFocused();
 });
 
 /* --- Brand ---------------------------------------------------------------- */
@@ -447,13 +463,16 @@ test('the header holds its contrast at 320px, where the brand stops being large 
 
 test('swatches carry each theme real accents from theme.css', async ({ page }) => {
   await page.goto('components/disclosure/');
-  const swatch = page.locator('#theme-select option[value="rink-classic-dark"]');
+  // Authored in the markup, one span per accent, with the color inline because
+  // it is the theme's own data rather than a stylesheet decision.
+  const dots = page.locator(
+    '[data-theme-control] [role="option"][data-value="rink-classic-dark"] .ac-dropdown__swatch > span',
+  );
   // Four, in themes.mjs's order -- pink, green, blue, purple -- the same order
   // the type scale reads them in.
-  await expect(swatch).toHaveAttribute(
-    'data-ac-swatch',
-    /^(#[0-9a-f]{3,8},){3}#[0-9a-f]{3,8}$/i,
-  );
+  await expect(dots).toHaveCount(4);
+  const styles = await dots.evaluateAll((els) => els.map((el) => el.getAttribute('style')));
+  for (const style of styles) expect(style).toMatch(/background:\s*#[0-9a-f]{3,8}/i);
 });
 
 /* The open panel is the header's only palette readout since the lamps came out,

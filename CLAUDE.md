@@ -98,8 +98,8 @@ src/library/components/<slug>/
 **asserted against the component**, so four of its fields carry an obligation:
 
 - `root` is the selector(s) that *are* this component on its demo page. It cannot be guessed from the
-  slug — `checkbox` is `.ac-choice`, `text-input` is `.ac-input`, `dropdown` is a `<select>` carrying
-  `[data-ac-dropdown]` — and every ARIA check scopes itself to it, so a wrong one checks nothing.
+  slug — `checkbox` is `.ac-choice`, `text-input` is `.ac-input`, `fieldset-group` is `.ac-group` —
+  and every ARIA check scopes itself to it, so a wrong one checks nothing.
 - `aria` is what must be in the markup you copy. An attribute that exists only in a transient state
   (`aria-busy` while pending, `aria-invalid` after a failed validation) goes in `states`, named there:
   `"invalid — aria-invalid=true on the control, set only while the error shows"`.

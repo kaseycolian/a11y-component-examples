@@ -2,38 +2,39 @@
 
 # Dropdown / Listbox
 
-A custom select, for when the native one cannot be styled the way you need.
+A custom select, for when the native one cannot be styled the way you need. Needs JavaScript.
 
 In `library/components/dropdown/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
-**Root:** `[data-ac-dropdown]`, `.ac-dropdown`
+**Root:** `.ac-dropdown`
 
 ## ARIA
 
 - **the trigger** — `aria-haspopup=listbox` `aria-expanded` `aria-controls` `aria-labelledby` `aria-describedby`
 - **the panel** — `role=listbox` `aria-labelledby`
-- **an option** — `role=option` `aria-selected` `tabindex=-1`
+- **an option** — `role=option` `aria-selected` `tabindex=-1` `data-value`
 - **a disabled option** — `aria-disabled=true`
-- **an optgroup** — `role=group` `aria-label`
+- **a group** — `role=group` `aria-label`
 
 ## Keyboard
 
-- `ArrowDown / ArrowUp` — move between options
+- `ArrowDown / ArrowUp` — move between options, wrapping
 - `Home / End` — first / last option
-- `Enter / Space` — open from the trigger, or choose the focused option
+- `Enter / Space` — open it, or choose the focused option
 - `Escape` — close, keeping the current value
-- `Tab` — close and carry on tabbing, from the trigger rather than the hidden panel
+- `Tab` — close, then tab on from the trigger
+- `Any letter` — jump to the first option starting with it
 
-**States:** open, selected, disabled option
+**States:** open, selected, disabled option, disabled — aria-disabled on the trigger, empty
 
 ## Goes wrong when
 
-- aria-activedescendant rather than real DOM focus, which is unreliable on iOS VoiceOver and TalkBack
+- aria-activedescendant rather than real DOM focus, unreliable on iOS VoiceOver and TalkBack
 - the trigger named by its label alone, so the current value is never announced
-- an optgroup's visible label read twice — it needs aria-hidden once role=group carries the name
+- a hidden <select> behind it, so one value lives in two places and they drift
 - a disabled option left with a tabindex, so the keyboard lands on something inert
 - a div as the trigger, so aria-expanded sits on something with no role
 
-**API:** `AC.createDropdown(select, options) -> { open, close, isOpen, sync, rebuild, element, destroy }`
+**API:** `AC.createDropdown(root) -> { open, close, isOpen, value, setValue, refresh, element, destroy }`
 
-WCAG 1.4.11 1.4.13 2.1.1 2.4.3 2.5.8 4.1.2 · [APG](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/) · see also `native-select`, `drawer`, `field`
+WCAG 1.4.1 1.4.11 1.4.13 2.1.1 2.4.3 2.5.8 4.1.2 · [APG](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/) · see also `native-select`, `drawer`, `field`

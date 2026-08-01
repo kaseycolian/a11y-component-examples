@@ -26,7 +26,7 @@ Repo-relative in a checkout of this library. Anywhere else the same paths resolv
 | 2 | `agents/components/<slug>.md` | ≤ 1.8 KB | The contract: roles, attributes, keys, states, what goes wrong, the JS API. |
 | 3 | `library/components/<slug>/component.{html,css,js}` | varies | The code. Copy from here. |
 | 4 | `library/components/<slug>/{docs.md,meta.json}` | varies | Why it is built that way. Read when the code surprises you. |
-| 4 | `agents/{pitfalls,conventions,verify,testing}.md` | ≤ 14.7 KB | The traps that cost a real failure, and what a copied component assumes about your page. |
+| 4 | `agents/{pitfalls,conventions,verify,testing}.md` | ≤ 15.1 KB | The traps that cost a real failure, and what a copied component assumes about your page. |
 
 ## Rules
 

@@ -11,8 +11,9 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-07-30 (**the agent layer is complete — all eight phases**, see item 5; the **site
-header was redesigned** to match the theme-service app — see Infrastructure. Playwright webkit is
+Last updated: 2026-08-01 (**`dropdown` was rebuilt as authored markup** — no hidden `<select>`, the
+ARIA contract is in `component.html`, and both header pickers moved with it; see its roster row and
+Infrastructure. **The agent layer is complete — all eight phases**, see item 5. Playwright webkit is
 still not installed; the `summary` voice changed on 2026-07-28, see item 0a)
 
 ---
@@ -230,9 +231,10 @@ copyability and writing-style conventions in `CLAUDE.md` — numbered example se
 a copy map in each header, the framework caveat in `docs.md`. Copy the shape of `field` for a form
 component, `tooltip` for a hard-behavior one, `skip-link` or `typography` for a **CSS-only** one.
 
-`dropdown` is still the best reference for *hard behavior* (popover positioning, roving focus,
-type-ahead, 14 tests) and `disclosure` for a minimal factory — but both predate the conventions, so
-take their logic and not their layout. See item 1 under remaining work.
+`dropdown` is the best reference for *hard behavior* (popover positioning, roving focus, type-ahead)
+and, since its 2026-08-01 rebuild, for **a component whose ARIA contract is authored rather than
+built** — the shape to copy when a widget needs a lot of markup. `disclosure` is the minimal factory
+but predates the conventions, so take its logic and not its layout. See item 1 under remaining work.
 
 ---
 
@@ -269,13 +271,19 @@ take their logic and not their layout. See item 1 under remaining work.
   trigger was removed 2026-08-01 so the width goes to the theme name instead (deviation 18 in
   `src/site/styles/A11Y-WAY-PAGES.md`). Nothing reaches into the component's internals: the shell is
   the consumer's own CSS, and the two-class selectors win over the library's defaults by specificity
-  rather than by stylesheet order. The components picker navigates on `change`, which is safe because
-  the Dropdown commits only on click or Enter and the described hint says so in advance (SC 3.2.2);
-  a `Go` button, hidden by default, appears at `load` if the Dropdown never enhanced the select — a
-  bare native select fires `change` on every arrow key. Covered by `tests/site-header.spec.mjs`.
-- **Each picker is named by its cap, through `aria-labelledby`** — not by a `<label for>`. Once the
-  Dropdown enhances the select the real control is a `<button>`, which a wrapping label neither names
-  nor focuses. So the caps are **clipped, never `display: none`**, at the width where they go: a name
+  rather than by stylesheet order. The components picker navigates on `ac:dropdown:change`, which is
+  safe because the Dropdown commits only on click or Enter and the described hint says so in advance
+  (SC 3.2.2). Covered by `tests/site-header.spec.mjs`.
+- **Both pickers are written out in `SiteHeader.astro`**, since the 2026-08-01 rebuild made the
+  Dropdown authored markup. There is no `<select>` in the header at all, so the `Go` button and the
+  `.console select` fallback rules are gone with it: **without JavaScript the header pickers do
+  nothing.** That is deliberate and it is the cost of a custom listbox — the sidebar nav still lists
+  every component, and the site's default theme still renders. The theme script hands the stored theme
+  over as `data-value` *and* through `setValue()`, so whichever of the two scripts runs first, the
+  trigger is right.
+- **Each picker is named by its cap, through `aria-labelledby`** — not by a `<label for>`. The real
+  control is a `<button>`, which a wrapping label neither names nor focuses. So the caps are
+  **clipped, never `display: none`**, at the width where they go: a name
   pointing at a `display:none` element resolves to nothing and the trigger announces as a bare
   button.
 - **Footer** — replaced 2026-07-31 with the shared one (theme-service `assets/site-footer.css`), the
@@ -622,10 +630,17 @@ take their logic and not their layout. See item 1 under remaining work.
 ### overlays-disclosure
 - [x] `disclosure` — works, but **predates the copyability + style conventions — retrofit (item 1)**.
   Also still has **no spec** — backfill one.
-- [x] `dropdown` — complete and retrofitted. 17/17 tests in Chromium. **The bottom sheet was removed:**
-  it anchors to its trigger at every viewport width, flips above when there is no room below, and
-  sizes rows by `@media (pointer: coarse)` rather than a width breakpoint. The sheet behavior moved to
-  `drawer`.
+- [x] `dropdown` — **rebuilt 2026-08-01 as authored markup.** 24/24 tests in Chromium. The hidden
+  `<select>` is gone and so is the 250-odd lines of JS that built the trigger, the panel, every row and
+  every swatch at runtime: `component.html` now carries the whole ARIA contract, and `component.js`
+  only opens, positions, moves focus and commits. The factory takes the root
+  (`AC.createDropdown(rootEl)`), the selection lives on `aria-selected` with `data-value` mirroring it
+  on the root, and choosing fires `ac:dropdown:change`. Form participation is one optional hidden
+  input (`[FORM]`, example 6). **It needs JavaScript** — `native-select` is the answer when that is not
+  acceptable. Two earlier decisions carry over unchanged: real DOM focus rather than
+  `aria-activedescendant`, and **no bottom sheet** — it anchors to its trigger at every viewport width,
+  flips above when there is no room below, and sizes rows by `@media (pointer: coarse)` rather than a
+  width breakpoint. The sheet behavior lives in `drawer`.
 - [x] `drawer` — done. 18/18 tests in Chromium. Carved out of `dropdown`, where it was a second
   personality with a second keyboard story. Same behavior at every viewport width. Modal and non-modal
   are separate behaviors driven by one flag: modal gets `role="dialog"` + `aria-modal` + backdrop +
@@ -1193,6 +1208,20 @@ homes it belongs to, not in all of them.
   over the backdrop, asserting the two boxes make such a point possible. **Changing the header's
   height moves every page's geometry**, so a test that depends on where something lands is a test
   that will move with it.
+- **"The last header control" was two tests' premise, and it silently stopped being true.**
+  `site-nav.spec.mjs` tabbed from `[data-theme-control] .ac-dropdown__toggle` and expected the sidebar
+  next. Adding the components picker *after* the theme one put a stop in between, so both tests had
+  been failing before the dropdown rebuild touched anything — confirmed by stashing the work and
+  re-running at `HEAD`. Worth two lessons. **A test that names a position rather than a thing** ("the
+  last control", "the second row") is a test the next layout change breaks silently. And when a change
+  turns the suite red in a place it had no business reaching, **stash and re-run before debugging** —
+  it costs a minute and it is the difference between fixing a bug and inventing one.
+- **The Tier 2 budget bites on the first `npm run agents`, not at review.** `dropdown`'s rebuilt
+  contract came out 286 bytes over 1800 and the generator refused to write. The fix is what it says:
+  cut prose. Every phrase in `contract` renders, so a keyboard effect written as a sentence and a
+  state written as a clause both cost — "close, then tab on from the trigger" says what "close and
+  carry on tabbing, from the trigger rather than the panel" said, for 31 bytes less. Budget for it
+  when a contract grows a row.
 - **`html { scroll-behavior: smooth }` makes `scrollIntoView` a race in a test.** `dropdown`'s
   "flips above the trigger" scrolled the trigger to the bottom of a 400px viewport and clicked. The
   scroll is *animated*: measured, `scrollY` was **2 of 316** immediately after the call and only
@@ -1219,10 +1248,10 @@ homes it belongs to, not in all of them.
   and paste the output.
 - **A convention in `CLAUDE.md` describes new code, not old code.** `.ac-<slug>` reads like a rule this
   repo enforces; it is true for 15 of 33 components. The rest anchor on an abbreviation — `checkbox` is
-  `.ac-choice`, `text-input` is `.ac-input` — and `dropdown` has no `ac-dropdown` class in its markup at
-  all. A phase-7 check scoped that way would have swept nothing for over half the library and reported a
-  pass. Before building anything that assumes a naming convention holds, **count how many components
-  actually satisfy it.** One query, and it reshaped the phase.
+  `.ac-choice`, `text-input` is `.ac-input`, `fieldset-group` is `.ac-group`. A phase-7 check scoped
+  that way would have swept nothing for over half the library and reported a pass. Before building
+  anything that assumes a naming convention holds, **count how many components actually satisfy it.**
+  One query, and it reshaped the phase.
 - **A probe whose buckets come from your hypothesis can only agree with you.** Sorting unclaimed ARIA
   into "component" and "demo scaffolding" by whether it sat inside `.ac-<slug>` filed `checkbox`'s real
   inputs as scaffolding and made 60 real hits look like noise. What broke it was a question with no room
@@ -1430,8 +1459,12 @@ homes it belongs to, not in all of them.
   DRY, because a copy-paste library is better served by each file standing alone.
 - **Dropdown ships one focus model** (real DOM focus on options), not two. `aria-activedescendant`
   is unreliable on iOS VoiceOver and TalkBack; the tradeoff is documented in its `docs.md`.
-- **`data-ac-secondary` text IS part of an option's accessible name.** Correct — it is real
-  information, not decoration. Only `data-ac-icon` and `data-ac-swatch` are `aria-hidden`.
+- **A dropdown option's secondary line IS part of its accessible name.** Correct — it is real
+  information, not decoration. Only the icon, the swatch and the tick are `aria-hidden`.
+- **Dropdown needs JavaScript, and does not apologize past one sentence.** The 2026-08-01 rebuild
+  traded the hidden `<select>` — and with it the no-JS fallback — for markup that carries its own
+  contract. `native-select` is the component that needs no script, and it was always the better
+  default on a phone.
 - **`components.css` and `theme-select.js` are not vendored** from theme-service. See
   `src/site/theme/THEME-SERVICE.md`.
 - **The motion toggle can only add the restriction**, never override an OS reduced-motion

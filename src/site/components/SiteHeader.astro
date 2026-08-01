@@ -1,5 +1,5 @@
 ---
-import { THEME_GROUPS } from '../lib/themes.mjs';
+import { THEME_GROUPS, THEMES, SITE_THEME } from '../lib/themes.mjs';
 import { COMPONENTS_BY_GROUP } from '../lib/registry.mjs';
 import { SITE_NAME, SITE_BRAND_TAG } from '../lib/site.mjs';
 
@@ -8,6 +8,27 @@ const indexHref = `${base}components/`;
 
 /** So the picker opens showing the page you are already on. */
 const here = Astro.url.pathname;
+
+/*
+  Both pickers are the library's own Dropdown, which is authored markup: the
+  trigger, the panel and every option are written out below rather than built by
+  a script. So the server has to render the current selection too -- which
+  option wears aria-selected, and what the trigger reads. The script at the foot
+  of this file corrects the theme one from localStorage, since only the browser
+  knows that.
+*/
+const siteTheme = THEMES.find((theme) => theme.id === SITE_THEME);
+const themeLabel = siteTheme ? siteTheme.label : 'Auto';
+
+const hereComponent = COMPONENTS_BY_GROUP.flatMap((group) => group.components).find(
+  (component) => here === `${base}components/${component.slug}/`,
+);
+const jumpHere = here === indexHref ? indexHref : hereComponent ? here : '';
+const jumpLabel = here === indexHref
+  ? 'All Components'
+  : hereComponent
+    ? hereComponent.name
+    : 'Jump to a component';
 ---
 
 {/*
@@ -88,49 +109,102 @@ const here = Astro.url.pathname;
       chosen: the swatch dots on each option in the open panel.
     */}
     <div class="console console--theme" data-theme-control>
+      {/*
+        A <span> cap rather than a <label for>: the cap names the trigger through
+        aria-labelledby, together with the value span, so it announces "Theme,
+        Acid Arcade · Dark" the way a native select does.
+      */}
       <span class="console__cap" id="theme-cap">Theme</span>
       {/*
-        The picker is the library's own Dropdown (data-ac-dropdown), which is
-        why theme-service's theme-select.js is not vendored -- see
-        src/site/theme/THEME-SERVICE.md. The native <select> stays in the DOM
-        as the value store, so the change listener below is unchanged from
-        when this was a plain select.
+        The picker is the library's own Dropdown, which is why theme-service's
+        theme-select.js is not vendored -- see src/site/theme/THEME-SERVICE.md.
+        There is no <select> here at all: the markup below IS the component, the
+        same shape the library ships on its own page.
 
-        data-ac-swatch is each theme's real four accents, parsed out of
-        theme.css at build time by themes.mjs. The swatch is decoration and
-        the Dropdown marks it aria-hidden, so an option's accessible name is
-        always just the theme name.
+        The swatch on each option is that theme's four real accents, parsed out
+        of theme.css at build time by themes.mjs. It is aria-hidden, so an
+        option's accessible name is always just the theme name.
 
         One group per palette family, and the mode is inside each label --
         theme-service's own arrangement, and the reason both are built in
         themes.mjs rather than here.
       */}
-      <select id="theme-select" data-ac-dropdown data-theme-select aria-labelledby="theme-cap">
-        {/*
-          Auto is its own group so that having no swatch reads as deliberate
-          rather than as a missing one -- and, now that every other group is a
-          palette family, so that the one option belonging to no family is not
-          sitting under a family's name.
-        */}
-        <optgroup label="System">
-          {/* Short on purpose: the trigger has to show its value without
-              truncating it, and the "System" group above says what it means.
-              It carries no mode either, unlike every option below it: which
-              one you get is the OS's call, which is the whole point. */}
-          <option value="">Auto</option>
-        </optgroup>
-        {
-          THEME_GROUPS.map((group) => (
-            <optgroup label={group.label}>
-              {group.themes.map((theme) => (
-                <option value={theme.id} data-ac-swatch={theme.swatch.join(',')}>
-                  {theme.label}
-                </option>
-              ))}
-            </optgroup>
-          ))
-        }
-      </select>
+      <div class="ac-dropdown" data-ac-dropdown data-theme-select data-value={SITE_THEME}>
+        <button
+          type="button"
+          class="ac-dropdown__toggle"
+          id="theme-toggle"
+          aria-haspopup="listbox"
+          aria-expanded="false"
+          aria-controls="theme-panel"
+          aria-labelledby="theme-cap theme-value"
+        >
+          <span class="ac-dropdown__value" id="theme-value">{themeLabel}</span>
+          <svg class="ac-dropdown__caret" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            <path
+              d="M4 6l4 4 4-4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+
+        <div
+          class="ac-dropdown__panel"
+          id="theme-panel"
+          role="listbox"
+          aria-labelledby="theme-cap"
+          hidden
+          popover="manual"
+        >
+          <div class="ac-dropdown__list">
+            {/*
+              Auto is its own group so that having no swatch reads as deliberate
+              rather than as a missing one -- and, now that every other group is
+              a palette family, so that the one option belonging to no family is
+              not sitting under a family's name.
+            */}
+            <div class="ac-dropdown__group" role="group" aria-label="System">
+              <div class="ac-dropdown__group-label" aria-hidden="true">System</div>
+              {/* Short on purpose: the trigger has to show its value without
+                  truncating it, and the "System" group above says what it means.
+                  It carries no mode either, unlike every option below it: which
+                  one you get is the OS's call, which is the whole point. */}
+              <div class="ac-dropdown__option" role="option" tabindex="-1" data-value="" aria-selected="false">
+                <span class="ac-dropdown__primary">Auto</span>
+                <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+              </div>
+            </div>
+            {
+              THEME_GROUPS.map((group) => (
+                <div class="ac-dropdown__group" role="group" aria-label={group.label}>
+                  <div class="ac-dropdown__group-label" aria-hidden="true">{group.label}</div>
+                  {group.themes.map((theme) => (
+                    <div
+                      class="ac-dropdown__option"
+                      role="option"
+                      tabindex="-1"
+                      data-value={theme.id}
+                      aria-selected={theme.id === SITE_THEME ? 'true' : 'false'}
+                    >
+                      <span class="ac-dropdown__swatch" aria-hidden="true">
+                        {theme.swatch.map((color) => (
+                          <span style={`background: ${color}`} />
+                        ))}
+                      </span>
+                      <span class="ac-dropdown__primary">{theme.label}</span>
+                      <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                    </div>
+                  ))}
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
     </div>
 
     {
@@ -140,10 +214,10 @@ const here = Astro.url.pathname;
           end of the rail and stacks under the theme console below 1200px, and the
           two orders have to agree (SC 2.4.3).
 
-          A <div>, not a <label>: once the Dropdown enhances the select the real
-          control is a <button>, which a wrapping label would neither name nor
-          focus. The cap names it through aria-labelledby instead, so the trigger
-          announces "Components, Disclosure" the way a native select does.
+          A <div>, not a <label>: the real control is a <button>, which a
+          wrapping label would neither name nor focus. The cap names it through
+          aria-labelledby instead, so the trigger announces "Components,
+          Disclosure" the way a native select does.
         */
         <div class="console console--nav" data-jump-control>
           <span class="console__cap" id="jump-cap">
@@ -151,45 +225,103 @@ const here = Astro.url.pathname;
           </span>
           {/*
             The same Dropdown the library ships, grouped exactly like the sidebar.
-            Navigating on `change` is safe here because the Dropdown commits a
-            choice only on click or Enter -- it does not fire while you arrow
-            through the list -- and the hint says what choosing does before you
-            choose (SC 3.2.2). If the Dropdown never enhances this select, the
-            script shows the Go button instead rather than leaving a native
-            select that navigates on every arrow key.
+            Navigating on the change event is safe here because the Dropdown
+            commits a choice only on click or Enter -- it does not fire while you
+            arrow through the list -- and the hint says what choosing does before
+            you choose (SC 3.2.2). That was never true of a bare native select,
+            which fires on every arrow key on Windows.
           */}
-          <select
-            id="component-jump"
+          <div
+            class="ac-dropdown"
             data-ac-dropdown
             data-component-jump
-            aria-labelledby="jump-cap"
-            aria-describedby="component-jump-hint"
+            data-value={jumpHere}
           >
-            <option value="">Jump to a component</option>
-            <optgroup label="Overview">
-              <option value={indexHref} selected={here === indexHref}>
-                All Components
-              </option>
-            </optgroup>
-            {COMPONENTS_BY_GROUP.map((group) => (
-              <optgroup label={group.name}>
-                {group.components.map((component) => (
-                  <option
-                    value={`${base}components/${component.slug}/`}
-                    selected={here === `${base}components/${component.slug}/`}
+            <button
+              type="button"
+              class="ac-dropdown__toggle"
+              id="jump-toggle"
+              aria-haspopup="listbox"
+              aria-expanded="false"
+              aria-controls="jump-panel"
+              aria-labelledby="jump-cap jump-value"
+              aria-describedby="component-jump-hint"
+            >
+              <span class="ac-dropdown__value" id="jump-value">{jumpLabel}</span>
+              <svg class="ac-dropdown__caret" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path
+                  d="M4 6l4 4 4-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+
+            <div
+              class="ac-dropdown__panel"
+              id="jump-panel"
+              role="listbox"
+              aria-labelledby="jump-cap"
+              hidden
+              popover="manual"
+            >
+              <div class="ac-dropdown__list">
+                {/* Ungrouped, and first: it is the "you have not chosen yet"
+                    state rather than a place you can go. Its empty value is what
+                    the change handler checks before navigating. */}
+                <div
+                  class="ac-dropdown__option"
+                  role="option"
+                  tabindex="-1"
+                  data-value=""
+                  aria-selected={jumpHere === '' ? 'true' : 'false'}
+                >
+                  <span class="ac-dropdown__primary">Jump to a component</span>
+                  <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                </div>
+
+                <div class="ac-dropdown__group" role="group" aria-label="Overview">
+                  <div class="ac-dropdown__group-label" aria-hidden="true">Overview</div>
+                  <div
+                    class="ac-dropdown__option"
+                    role="option"
+                    tabindex="-1"
+                    data-value={indexHref}
+                    aria-selected={jumpHere === indexHref ? 'true' : 'false'}
                   >
-                    {component.name}
-                  </option>
+                    <span class="ac-dropdown__primary">All Components</span>
+                    <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                  </div>
+                </div>
+
+                {COMPONENTS_BY_GROUP.map((group) => (
+                  <div class="ac-dropdown__group" role="group" aria-label={group.name}>
+                    <div class="ac-dropdown__group-label" aria-hidden="true">{group.name}</div>
+                    {group.components.map((component) => (
+                      <div
+                        class="ac-dropdown__option"
+                        role="option"
+                        tabindex="-1"
+                        data-value={`${base}components/${component.slug}/`}
+                        aria-selected={
+                          jumpHere === `${base}components/${component.slug}/` ? 'true' : 'false'
+                        }
+                      >
+                        <span class="ac-dropdown__primary">{component.name}</span>
+                        <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                      </div>
+                    ))}
+                  </div>
                 ))}
-              </optgroup>
-            ))}
-          </select>
+              </div>
+            </div>
+          </div>
           <p class="visually-hidden" id="component-jump-hint">
             Choosing a component opens its page.
           </p>
-          <button class="console__go" type="button" data-component-jump-go hidden>
-            Go
-          </button>
         </div>
       )
     }
@@ -221,59 +353,43 @@ const here = Astro.url.pathname;
 <script>
   const root = document.documentElement;
 
+  /** The Dropdown's own event, which carries the chosen option's data-value. */
+  type DropdownChange = CustomEvent<{ value: string }>;
+
   /* --- Components picker ---------------------------------------------------
-     Two paths, decided by whether the Dropdown enhanced the select.
-
-     Enhanced: choosing an option is an explicit commit (click or Enter), so
-     navigating on `change` is a user action, not a side effect of arrowing
-     through a list (SC 3.2.2).
-
-     Not enhanced: a bare native select fires `change` on every arrow key on
-     Windows, which would navigate away mid-browse. So the Go button appears and
-     the change handler stays off. */
-  const jump = document.querySelector<HTMLSelectElement>('[data-component-jump]');
-  const jumpGo = document.querySelector<HTMLButtonElement>('[data-component-jump-go]');
+     Choosing an option is an explicit commit -- the Dropdown fires only on a
+     click or Enter, never while you arrow through the list -- so navigating
+     here is a user action rather than a side effect of browsing (SC 3.2.2).
+     The empty value is the "Jump to a component" placeholder, which goes
+     nowhere. */
+  const jump = document.querySelector<HTMLElement>('[data-component-jump]');
 
   if (jump) {
-    const enhanced = () => !!(jump as HTMLSelectElement & { _acDropdown?: unknown })._acDropdown;
-
-    const goTo = () => {
-      if (jump.value) window.location.href = jump.value;
-    };
-
-    // Checked when the event fires rather than at startup: the Dropdown's own
-    // script may initialize before or after this one, and an ordering assumption
-    // here would decide the wrong path half the time.
-    jump.addEventListener('change', () => {
-      if (enhanced()) goTo();
-    });
-
-    // By `load` the Dropdown has definitely had its chance, so a still-native
-    // select means it is not coming.
-    window.addEventListener('load', () => {
-      if (!enhanced() && jumpGo) {
-        jumpGo.hidden = false;
-        jumpGo.addEventListener('click', goTo);
-      }
+    jump.addEventListener('ac:dropdown:change', (event) => {
+      const href = (event as DropdownChange).detail.value;
+      if (href) window.location.href = href;
     });
   }
 
   /* --- Theme --------------------------------------------------------------- */
-  const select = document.querySelector<HTMLSelectElement>('[data-theme-select]');
+  const picker = document.querySelector<HTMLElement>('[data-theme-select]');
 
-  if (select) {
-    // theme-init.js already set data-theme before paint; mirror it into the
-    // control so the two never disagree.
-    select.value = root.getAttribute('data-theme') ?? '';
+  if (picker) {
+    // The server rendered the site's default theme as selected. theme-init.js
+    // has already applied the stored one to <html> before paint, so mirror that
+    // into the control or the trigger shows a theme nobody is looking at.
+    const current = root.getAttribute('data-theme') ?? '';
 
-    // Setting .value programmatically fires no change event, so if the Dropdown
-    // has already enhanced this select its trigger is still showing the old
-    // option. Guarded rather than ordered: if the dropdown script has not run
-    // yet it reads the corrected selectedIndex when it does.
-    (select as HTMLSelectElement & { _acDropdown?: { sync(): void } })._acDropdown?.sync();
+    // Both, because the two scripts have no fixed order: data-value is what the
+    // Dropdown reads when it initializes, and setValue corrects it when it
+    // already has.
+    picker.dataset.value = current;
+    (
+      picker as HTMLElement & { _acDropdown?: { setValue(value: string): boolean } }
+    )._acDropdown?.setValue(current);
 
-    select.addEventListener('change', () => {
-      const id = select.value;
+    picker.addEventListener('ac:dropdown:change', (event) => {
+      const id = (event as DropdownChange).detail.value;
       if (id) {
         root.setAttribute('data-theme', id);
         localStorage.setItem('theme', id);

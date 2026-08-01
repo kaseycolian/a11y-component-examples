@@ -129,6 +129,13 @@ live region on the page.
 
 <!-- group: Timing -->
 
+<!-- item: An attribute a component writes at runtime is not there when `goto` resolves -->
+
+`page.goto` settles on load, and an IntersectionObserver or rAF callback that writes the attribute may
+not have run. One read reports it absent — and only under enough parallel load to lose the race, so it
+looks like flake and passes when rerun alone. Retry before believing it. `jump-nav`'s `aria-current` is
+the precedent: it is in no markup, only in an observer callback.
+
 <!-- item: Any geometry read on something with a motion-gated entrance needs polling -->
 
 `boundingBox()` a frame after a dialog opens measures the control mid-entrance and reports it under
