@@ -52,14 +52,15 @@ test('the header theme picker is the library Dropdown and applies a theme', asyn
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
 
   const options = picker(page).getByRole('option');
-  // Swatches are decoration, so the name stays the plain theme name.
+  // Swatches are decoration, so the name stays the plain theme name. The mode is
+  // part of it because the groups are families, and a family holds both modes.
   await expect(options.filter({ hasText: 'Hot Neon (No Background)' }).first()).toHaveAccessibleName(
-    'Hot Neon (No Background)',
+    'Hot Neon (No Background) · Dark',
   );
   expect(await options.count()).toBe(17);
 
   // By accessible name, not text: the row's textContent also carries the tick.
-  await picker(page).getByRole('option', { name: 'Hot Neon', exact: true }).first().click();
+  await picker(page).getByRole('option', { name: 'Hot Neon · Dark', exact: true }).click();
 
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'hot-neon-dark');
   await expect(page.locator('#theme-select')).toHaveValue('hot-neon-dark');
@@ -84,7 +85,7 @@ test('Auto hands the page back to the OS light/dark preference', async ({ page }
 test('the choice survives a reload and the trigger shows it', async ({ page }) => {
   await page.goto('components/disclosure/');
   await picker(page).locator('.ac-dropdown__toggle').click();
-  await picker(page).getByRole('option', { name: 'Midnight Arcade', exact: true }).first().click();
+  await picker(page).getByRole('option', { name: 'Midnight Arcade · Dark', exact: true }).click();
 
   await page.reload();
   // The ordering hazard: theme-init sets data-theme, the header script mirrors it
@@ -161,7 +162,7 @@ test('the brand mark and the tab icon are real files that follow the theme', asy
 
   const before = await mark.getAttribute('src');
   await picker(page).locator('.ac-dropdown__toggle').click();
-  await picker(page).getByRole('option', { name: 'Hot Neon', exact: true }).first().click();
+  await picker(page).getByRole('option', { name: 'Hot Neon · Dark', exact: true }).click();
   await expect(mark).not.toHaveAttribute('src', before);
 
   expect(notFound).toEqual([]);
@@ -447,29 +448,32 @@ test('the header holds its contrast at 320px, where the brand stops being large 
 test('swatches carry each theme real accents from theme.css', async ({ page }) => {
   await page.goto('components/disclosure/');
   const swatch = page.locator('#theme-select option[value="rink-classic-dark"]');
-  // Four, in the lamps' order -- pink, green, blue, purple -- so a swatch row
-  // and the lamps beside the trigger are the same four colors.
+  // Four, in themes.mjs's order -- pink, green, blue, purple -- the same order
+  // the type scale reads them in.
   await expect(swatch).toHaveAttribute(
     'data-ac-swatch',
     /^(#[0-9a-f]{3,8},){3}#[0-9a-f]{3,8}$/i,
   );
 });
 
-test('the theme console lamps show the live palette', async ({ page }) => {
+/* The open panel is the header's only palette readout since the lamps came out,
+   so the dots have to be really painted, and the trigger has to stay clean --
+   the swatch is what the theme console spends its width on now. */
+test('swatch dots are in the panel and never on the trigger', async ({ page }) => {
   await page.goto('components/disclosure/');
 
-  const lamp = (n) => page.locator(`[data-theme-control] .console__lamps i:nth-child(${n})`);
-  const painted = async () =>
-    Promise.all([1, 2, 3, 4].map((n) => lamp(n).evaluate((el) => getComputedStyle(el).backgroundColor)));
+  const theme = picker(page);
+  await expect(theme.locator('.ac-dropdown__toggle .ac-dropdown__swatch')).toHaveCount(0);
+  await expect(page.locator('[data-theme-control] .console__lamps')).toHaveCount(0);
 
-  const before = await painted();
-  // No JS paints these: they read --accent-* off the page, so a theme change
-  // re-colors them for free. That is the point of putting them there.
-  expect(new Set(before).size).toBe(4);
+  await theme.locator('.ac-dropdown__toggle').click();
+  const dots = theme.locator('.ac-dropdown__panel [role="option"] .ac-dropdown__swatch').first();
+  await expect(dots.locator('span')).toHaveCount(4);
 
-  await picker(page).locator('.ac-dropdown__toggle').click();
-  await picker(page).getByRole('option', { name: 'Hot Neon', exact: true }).first().click();
-  await expect.poll(painted).not.toEqual(before);
+  const painted = await dots
+    .locator('span')
+    .evaluateAll((els) => els.map((el) => getComputedStyle(el).backgroundColor));
+  expect(new Set(painted).size).toBe(4);
 });
 
 test('the motion toggle explains an OS preference with visible, described text', async ({ browser }) => {

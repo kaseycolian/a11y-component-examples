@@ -79,14 +79,37 @@ const promises = [
       </figure>
     </div>
 
-    <section aria-labelledby="promises-title">
+    {/*
+      Deliberately NOT .card-grid, and that is the whole point of this block.
+      The rule-and-lit-lead shape these used to wear is this site's notation for
+      an entry you can go to -- the cards below, the footer's .ftr-link, the
+      section tube. These four are claims, not destinations, and a dimmer lead
+      said so only in degree: you had to point at one to find out.
+
+      So they wear none of it. Three signals separate them from the group cards
+      below, none of which needs a pointer: no rule and no lead, a tick, and a
+      title in h3's own green rather than the flat --text a card title takes.
+    */}
+    <section class="page-section" aria-labelledby="promises-title">
       <h2 id="promises-title">What every component here does</h2>
-      <ul class="card-grid">
+      <ul class="promises">
         {
           promises.map((promise) => (
-            <li class="card card--static">
-              <h3 class="card__heading">{promise.title}</h3>
-              <p class="card__summary">{promise.body}</p>
+            <li class="promise">
+              {/*
+                Decoration -- the heading beside it carries the meaning. An
+                aria-hidden SVG rather than ::before { content: "✓" } because
+                generated *text* is announced by VoiceOver, which would put
+                "check mark" ahead of every claim. Same reason .ftr-ext is an
+                SVG, and currentColor is why this needs no forced-colors patch.
+              */}
+              <svg class="promise__mark" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M3 8.5 6.5 12 13 4.5" />
+              </svg>
+              <div class="promise__text">
+                <h3 class="promise__title">{promise.title}</h3>
+                <p class="promise__body">{promise.body}</p>
+              </div>
             </li>
           ))
         }
@@ -95,7 +118,7 @@ const promises = [
 
     {
       COMPONENTS_BY_GROUP.length > 0 && (
-        <section aria-labelledby="groups-title">
+        <section class="page-section" aria-labelledby="groups-title">
           <h2 id="groups-title">Browse by group</h2>
           <ul class="card-grid">
             {COMPONENTS_BY_GROUP.map((group) => (
@@ -172,6 +195,80 @@ const promises = [
     margin-top: 2rem;
   }
 
+  /* --- The promises -----------------------------------------------------------
+     Home page only, so it lives here rather than in site.css. Nothing in this
+     block is shared with .card, and that is the requirement rather than an
+     accident -- see the note on the markup above.
+
+     28rem against .card-grid's 17rem, so four claims land as a 2x2 block on a
+     desktop where the cards below run four across. These are paragraphs to read
+     and the wider column suits a 38ch body; that the two grids visibly disagree
+     about column count is the second reason, and it costs nothing.
+
+     The margin is .card-grid's, verbatim, so both sections sit on one left edge
+     under the section rule that spans past them. */
+  .promises {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 28rem), 1fr));
+    gap: 2.25rem clamp(1.75rem, 3vw, 3rem);
+    list-style: none;
+    margin: 2.25rem 0 0 clamp(0.75rem, 1.5vw, 1.75rem);
+    padding: 0;
+  }
+
+  /* The body aligns under the title, not under the tick -- so the mark reads as
+     marking the whole claim rather than as a bullet the text hangs off.
+
+     The measure is capped HERE rather than on the body, which is the difference
+     between a wide column and a wide line: 28rem of grid cell would run the text
+     to ~80ch, and .card__summary's 38ch -- right for a 272px card -- leaves it
+     stranded halfway across this one. 32rem lands the body near 65ch and keeps
+     the claim reading as one block that happens to be narrower than its cell. */
+  .promise {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0 0.7rem;
+    max-width: 32rem;
+  }
+
+  .promise__mark {
+    width: 1.1rem;
+    height: 1.1rem;
+    /* Optical, not metric: 1.1rem of box against a 1.02rem cap height sits high
+       by about this much. */
+    margin-top: 0.2rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    /* The title's own color, so an item carries one accent rather than two. */
+    color: var(--accent-green-text);
+  }
+
+  /* No color and no text-shadow on purpose: this inherits h3's green and its
+     glow, which is exactly the difference being drawn. A card title is told to
+     be flat --text because an accent there would read as a link; a heading over
+     prose has no such problem, and site.css already picked --accent-green-text
+     over the raw accent so 17.6px bold clears 4.5:1 (SC 1.4.3).
+
+     Sized to the card title it sits above so the two sections keep one type
+     rhythm; only the color and the mark diverge. */
+  .promise__title {
+    margin: 0 0 0.35rem;
+    font-size: 1.02rem;
+  }
+
+  /* .card__summary's values, matched rather than shared -- the two are one
+     rhythm now and free to diverge later. No max-width of its own: the item
+     above carries the measure, for the reason stated there. */
+  .promise__body {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--text-muted);
+  }
+
   .button-primary,
   .button-secondary {
     display: inline-flex;
@@ -208,19 +305,6 @@ const promises = [
   .button-secondary:hover {
     background: color-mix(in srgb, var(--accent-blue) 16%, transparent);
     box-shadow: var(--bglow-blue-hi);
-  }
-
-  .card--static:hover {
-    transform: none;
-    border-color: var(--border);
-    box-shadow: none;
-  }
-
-  .card__heading {
-    margin: 0;
-    font-size: 1rem;
-    color: var(--text);
-    text-shadow: none;
   }
 
   @media (forced-colors: active) {

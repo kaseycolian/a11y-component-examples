@@ -23,9 +23,8 @@ function parseSwatches(css) {
       const found = body.match(new RegExp(`--${name}\\s*:\\s*([^;]+);`));
       return found ? found[1].trim() : null;
     };
-    // Pink, green, blue, purple -- the type scale's order, and the same order the
-    // header's lamps are painted in, so a swatch row and the lamps beside it read
-    // as the same four colors rather than two different notations.
+    // Pink, green, blue, purple -- the type scale's order, so every palette
+    // readout on the site names the four accents in the same sequence.
     const colors = [
       read('accent-pink'),
       read('accent-green'),
@@ -40,17 +39,38 @@ function parseSwatches(css) {
 
 const SWATCHES = parseSwatches(themeCss);
 
-/** All themes, each with the swatch colors the picker renders. */
+/**
+ * All themes, each with the swatch colors the picker renders and the label it
+ * shows.
+ *
+ * The mode goes INTO the label, because the groups below are families and a
+ * family holds both modes -- two options reading "Rink Classic" in one group is
+ * a coin toss. theme-service's own `theme-select.js` writes exactly this string,
+ * separator included, so the same theme is called the same thing on both sites.
+ */
 export const THEMES = index.themes.map((theme) => ({
   ...theme,
+  label: `${theme.label} · ${theme.mode === 'light' ? 'Light' : 'Dark'}`,
   swatch: SWATCHES.get(theme.id) ?? [],
 }));
 
-/** Themes split into the two option groups the picker shows. */
-export const THEME_GROUPS = [
-  { label: 'Dark', themes: THEMES.filter((t) => t.mode === 'dark') },
-  { label: 'Light', themes: THEMES.filter((t) => t.mode === 'light') },
-];
+/**
+ * One group per family, in the order themes.index.json lists them, and within a
+ * group in the order it lists the themes -- dark before light.
+ *
+ * By family rather than by mode, which is how theme-service groups it. Dark/Light
+ * put the two halves of one palette on opposite ends of a 17-item list, so
+ * comparing a theme against its own counterpart meant scrolling past everything
+ * else; a family group puts them next to each other. It also means the group
+ * header answers "which palette", which is the question the swatch dots are
+ * already answering visually.
+ */
+export const THEME_GROUPS = index.families
+  .map((family) => ({
+    label: family.label,
+    themes: THEMES.filter((theme) => theme.family === family.family),
+  }))
+  .filter((group) => group.themes.length > 0);
 
 export const THEME_VERSION = index.version;
 

@@ -139,15 +139,26 @@ body {
   align-items: start;
 }
 
-.layout--full {
-  grid-template-columns: minmax(0, 1fr);
-}
-
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
   }
+}
+
+/* After the breakpoint above on purpose. A media query adds no specificity, so
+   `.layout { gap: 1.5rem }` and `.layout--full { row-gap: 0 }` tie and source
+   order decides -- written above it, the row gap came back below 900px and the
+   home page's section spacing went to 80px while the overview stayed at 56. */
+.layout--full {
+  grid-template-columns: minmax(0, 1fr);
+  /* .layout's gap is there to separate the sidebar from the content -- a column
+     gap. With one column it survives as a row gap between stacked blocks, and
+     grid gaps do not collapse with margins, so the home page's sections were
+     getting it *on top of* their own margin-top, against the plain block flow
+     the overview's sections sit in. Zero it and section spacing has one source
+     on both pages. */
+  row-gap: 0;
 }
 
 /* --- Sidebar navigation ------------------------------------------------------ */
@@ -380,43 +391,206 @@ code {
   background: color-mix(in srgb, var(--accent-purple) 12%, transparent);
 }
 
-/* --- Group / component cards -------------------------------------------------- */
+/* --- Page sections ------------------------------------------------------------
+   The cards below carry no box, so a section boundary has to be visible before
+   its heading is read. This is the header's lit edge one step down: a hairline
+   the width of the column with the first 3.5rem of it running accent and lit.
+   Same vocabulary as the footer -- rules and space, never a container. */
+.page-section {
+  position: relative;
+  /* Applies whole, rather than collapsing: the padding-top below blocks
+     collapsing through the top edge, and the grid above carries no bottom
+     margin. So this is the real gap between one section and the next. */
+  margin-top: 3.5rem;
+  padding-top: 1.15rem;
+}
+
+.page-section::before {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  /* A step above the card rule below it, so the hierarchy holds before the lit
+     segment is noticed. Mixing toward --text raises contrast against the
+     surface in either mode -- the same fact --accent-*-text is built on.
+     Measured across all ten themes: 3.95:1 worst (synthwave-sunset-light). */
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--border-strong) 85%, var(--text)) 78%,
+    transparent
+  );
+}
+
+/* The lit part runs a quarter of the rule, in full accent blue. The card leads
+   below share the 2px height and nothing else -- 15% of a narrower line, in a
+   purple sunk into the page -- so rank is carried by color and by length
+   together, ~235px of lit blue against ~41px of dim purple. Length alone was
+   doing it before, and 25% against 22% is not a difference anyone reads.
+
+   The glow spans the full 25%, tail included, because a box-shadow is drawn from
+   the border box rather than from the painted gradient; that is what the header's
+   own tube does too. */
+.page-section::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 25%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-blue) 62%, transparent);
+  box-shadow: 0 0 calc(9px * var(--glow-strength))
+    color-mix(in srgb, var(--accent-blue) 55%, transparent);
+}
+
+.page-section > h2 {
+  margin-top: 0;
+  /* The jump target is the heading, but the rule above it is what says a new
+     section began -- clear the sticky header by enough to keep it on screen.
+     Overrides the global [id] rule. */
+  scroll-margin-top: calc(var(--header-h) + 2.5rem);
+}
+
+/* --- Group / component cards --------------------------------------------------
+   Entries under a rule, not tiles -- the footer's .ftr-link shape, and the two
+   are meant to read as one system: a hairline at the top of the cell fading out
+   over the last third. Two things diverge from the footer and both are
+   deliberate. The rule's color, because these sit on the page canvas and the
+   footer's sit on --bg-panel (see below). And the hover, because a wall of 33
+   entries needs a lit lead marking where each one starts, so hover extends that
+   lead rather than recoloring the whole rule the way .ftr-link does.
+
+   The title's underline is the half of the hover cue that survives forced
+   colors and a color deficiency; the lead and the glow are decoration. */
 
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
-  gap: 1rem;
+  /* The row gap has to beat the rule-to-title gap by enough that a title groups
+     with its own summary rather than with the rule below it -- 2.5 against
+     1.15. At 1.5 against 0.85 the two were close enough that the grid read as
+     one dense block. Column gap stays well over the row gap so wrapped columns
+     read as columns without a divider -- the footer's .ftr-links ratio. */
+  gap: 2.5rem clamp(1.75rem, 3vw, 3rem);
   list-style: none;
-  margin: 0 0 2rem;
+  /* Top: clear of the heading block above it. This collapses with whatever sits
+     there -- the h2's 0.5em on the home page, the lede's 1rem on the overview
+     -- so both pages get the same air, and it stays just under the row gap so
+     the section header reads as further off than one row is from the next.
+
+     Left: the grid is indented against its own heading, so the entries read as
+     nested inside the section rather than as a second list beside it. The
+     section rule stays full width, which is what the indent is measured
+     against. It clamps rather than sitting fixed because at 320px the layout
+     gutter has already taken 1.25rem off each side. */
+  margin: 2.25rem 0 0 clamp(0.75rem, 1.5vw, 1.75rem);
   padding: 0;
 }
 
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.3rem;
   height: 100%;
-  padding: 1rem 1.1rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--bg-panel);
+  /* Top only: the rule sits at top: 0 and the grid gap does everything else. */
+  padding: 1.15rem 0 0;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  /* The footer mixes this down toward --border because it sits on --bg-panel;
+     here it sits on the page canvas, where that mix measured 1.79:1 in
+     acid-arcade-light and all but vanished. Raw --border-strong is the first
+     value clearing 3:1 in all ten themes (worst 3.15, synthwave-sunset-light).
+     This rule is the only thing dividing one entry from the next, so it is a
+     boundary rather than decoration and 3:1 is the bar it has to clear. */
+  background: linear-gradient(90deg, var(--border-strong) 62%, transparent);
+}
+
+/* Where this entry starts: the section tube's shape at card scale, and two steps
+   down from it rather than one. It was the same blue at nearly the same fraction,
+   which made a card rule and a section rule read as the same rank at a glance.
+
+   Now it is purple, and sunk 45% into the page it sits on. Mixing toward --bg is
+   the mirror of what --accent-*-text does: -text raises contrast because --text
+   is the one color a theme guarantees against its own background, so mixing the
+   other way lowers it just as reliably, in either mode. In the dark themes that
+   is literally a darker purple; in the light ones it is a paler one, which is the
+   same thing said correctly -- "darker" in a light theme would mean *louder*.
+   Free to be quiet because the lead is decoration: .card::before is the boundary
+   that has a 3:1 bar to clear, and it is untouched.
+
+   The gradient is what makes it work -- a solid block butting into the rule reads
+   as a broken line, so the accent has to fade out into the dark rule the way the
+   section tube fades into its own hairline. It sits 1px proud of the 1px rule,
+   which makes it the thick part. */
+.card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* 15%: ~41px on a 272px column against the section's ~235px, so the two are
+     an order apart rather than a few percent. Short enough that the gradient's
+     fade needs most of it -- hence 70% here where the section runs 62%. */
+  width: 15%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--accent-purple) 55%, var(--bg)) 70%,
+    transparent
+  );
+  box-shadow: 0 0 calc(6px * var(--glow-strength))
+    color-mix(in srgb, var(--accent-purple) 30%, transparent);
   transition:
-    border-color var(--dur) ease,
-    box-shadow var(--dur) ease,
-    transform var(--dur) ease;
+    width var(--dur) ease,
+    box-shadow var(--dur) ease;
 }
 
-.card:hover {
-  border-color: var(--accent-blue);
-  box-shadow: var(--bglow-blue);
-  transform: translateY(calc(var(--motion, 1) * -2px));
+/* Hover and focus run the lit part further down the line rather than lighting
+   the whole rule: the rule has to stay dark past the fade or there is nothing
+   for the accent to flow into, which was the point of the gradient. Width is
+   the animated property and --dur is motion-gated, so under reduced motion the
+   longer lead simply appears.
+
+   :has(:focus-visible) rather than :focus-within, so a mouse click does not
+   light it -- the same split site-header.css makes on .console. */
+.card:hover::after,
+.card:has(.card__link:focus-visible)::after {
+  width: 66%;
+  /* Hover is the one place the lead comes back up to full accent: at rest it is
+     ranked below the section rule, but under the pointer it is the thing being
+     pointed at. Same hue, the 45% of --bg dropped. */
+  background: linear-gradient(90deg, var(--accent-purple) 70%, transparent);
+  box-shadow: 0 0 calc(9px * var(--glow-strength))
+    color-mix(in srgb, var(--accent-purple) 55%, transparent);
 }
 
-/* The whole card is clickable, but only the title is a real link -- so the
+/* EVERY .card IS A LINK. There was a .card--static for the home page's four
+   promises, wearing the same rule and a lead dimmed to gray, and it was the wrong
+   shape for the job: a card here means "an entry you can go to", and dimming the
+   accent argues that in degree when the question is one of kind. You had to
+   point at one to learn whether it went anywhere. The promises are their own
+   thing now, in index.astro, wearing no part of this. Anything else that is not
+   navigable gets the same treatment -- do not add the variant back.
+
+   The title is --text rather than an accent precisely because an accent on this
+   page means "you can follow this somewhere", and the whole cell already says
+   that. It is also why a heading over prose is free to keep h3's green.
+
+   The whole cell is clickable, but only the title is a real link -- so the
    accessible name stays "Dropdown", not the entire card's text. */
 .card__link {
-  color: var(--text);
+  font-size: 1.02rem;
   font-weight: 700;
+  line-height: 1.35;
+  color: var(--text);
   text-decoration: none;
 }
 
@@ -424,20 +598,25 @@ code {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: inherit;
 }
 
-.card {
-  position: relative;
-}
-
-.card:focus-within {
-  border-color: var(--focus-ring);
+/* site.css lights every a:hover with a blue glow, which on a --text title is a
+   smudge rather than a cue. Same reason the footer kills it on .ftr-link:hover
+   (deviation 6 in A11Y-WAY-PAGES.md). */
+.card:hover .card__link,
+.card:has(.card__link:focus-visible) .card__link {
+  text-shadow: none;
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 .card__summary {
   margin: 0;
-  font-size: 0.88rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  /* Shorter than the track on purpose. A summary that fills its column is what
+     turns three columns into a wall of text; a ragged right reads as prose. */
+  max-width: 38ch;
   color: var(--text-muted);
 }
 
@@ -740,10 +919,27 @@ code {
    Windows High Contrast throws away color-mix fills, glows and tints. Restore
    the state cues with borders and system colors so nothing becomes invisible. */
 @media (forced-colors: active) {
-  .card,
   .panel,
   .code-block {
     border: 1px solid ButtonBorder;
+  }
+
+  /* The section and card rules are gradients, so they go. Borders come back in
+     their place, 2px for a section and 1px for an entry, keeping the hierarchy
+     the color carried. Same patch site-footer.css makes for .ftr-link. */
+  .page-section::before,
+  .page-section::after,
+  .card::before,
+  .card::after {
+    display: none;
+  }
+
+  .page-section {
+    border-top: 2px solid CanvasText;
+  }
+
+  .card {
+    border-top: 1px solid CanvasText;
   }
 
   .sidebar__link[aria-current="page"],

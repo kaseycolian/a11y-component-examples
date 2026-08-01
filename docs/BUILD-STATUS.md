@@ -264,8 +264,10 @@ take their logic and not their layout. See item 1 under remaining work.
   `public/library/components/dropdown/` by `BaseLayout`. The shell is a *consumer* of the library, so
   a regression in the dropdown breaks the site, not just a test. Each sits in a `.console` shell —
   a cap that names it, a flat trigger, an accent border and glow — keyed to `--accent-blue` for the
-  components picker and `--accent-purple` for the theme one, plus four **lamps** on the theme console
-  painted straight from `--accent-*`. Nothing reaches into the component's internals: the shell is
+  components picker and `--accent-purple` for the theme one. The theme console's palette readout is
+  the **swatch dots on each option in the open panel**, and only there: a row of lamps beside the
+  trigger was removed 2026-08-01 so the width goes to the theme name instead (deviation 18 in
+  `src/site/styles/A11Y-WAY-PAGES.md`). Nothing reaches into the component's internals: the shell is
   the consumer's own CSS, and the two-class selectors win over the library's defaults by specificity
   rather than by stylesheet order. The components picker navigates on `change`, which is safe because
   the Dropdown commits only on click or Enter and the described hint says so in advance (SC 3.2.2);
@@ -1389,6 +1391,36 @@ homes it belongs to, not in all of them.
   presses a key that a deferred module script is what handles, and `.sidebar` is visible from first
   paint. Under parallelism that was a coin flip — two different tests failing per run, each passing
   alone. `beforeEach` now waits on `.sidebar__groups[role="menubar"]`, the thing the script does.
+- **`.card` and the footer's `.ftr-link` are one shape written twice, and the copy is not exact.**
+  The fading hairline and the `--glow-strength` shadow are duplicated on purpose — the cards are site
+  chrome in `site.css`, the footer is a port in `site-footer.css`, and restyling either means looking
+  at the other. Two things must **not** be copied across. The rule's color: the footer mixes toward
+  `--border` because it sits on `--bg-panel`, and that same mix on the page canvas measured
+  **1.79:1** in `acid-arcade-light` — an invisible divider. The cards use raw `--border-strong` (worst
+  3.15:1, `synthwave-sunset-light`), and the section rule above them needed its own value again, mixed
+  toward `--text`. **A token that passes on one surface is not measured for the other** — measure a
+  divider against the surface it actually lands on. And the hover: the footer recolors its whole rule,
+  but a wall of 33 entries needs a lit lead saying where each one starts, so the cards keep the rule
+  dark and extend the lead across it instead. A solid lead butting into the rule reads as a broken
+  line; it has to fade out, like the section tube does into its own hairline.
+- **Every `.card` is a link, and `.card--static` is not coming back.** The home page's four promises
+  used to be cards with the lead dimmed to gray — the same rule, the same geometry, sitting directly
+  above four cards that *are* links and whose whole cell is clickable. That argues affordance in
+  **degree** when the question is one of **kind**: you had to hover to find out which was which, and
+  hovering is not available to everyone. They are `.promise` in `index.astro` now, wearing no part of
+  the card system: no rule, no lead, a tick, and `h3`'s own green title where a card title is
+  deliberately flat `--text`. Three differences, none needing a pointer. Anything else on this site
+  that is not navigable gets the same treatment rather than a quieter card.
+- **A card's lead and a section's tube are two ranks, and length alone never said so.** They were the
+  same `--accent-blue` at 22% and 25%, which reads as one rank at a glance. The card lead is now
+  purple **mixed 45% into `--bg`**, at 15%. Mixing toward the *background* is the mirror of what
+  `--accent-*-text` does and it is mode-correct for the same reason: `--text` is the one color a theme
+  guarantees against its own background, so mixing the other way lowers contrast just as reliably in
+  either mode. That is why "darker" is not written as a mix toward black — in a light theme a darker
+  purple is a **louder** one, and the rank would invert. Safe to sink because the lead is decoration:
+  `.card::before` is the divider carrying the 3:1 bar, and it keeps raw `--border-strong`. Hover
+  drops the `--bg` and comes back to full accent, which is the one moment the entry outranks its own
+  section.
 
 ---
 

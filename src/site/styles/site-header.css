@@ -303,12 +303,20 @@
      below 1200px, and 26rem of it was what starved the brand and the picker at the
      same time.
 
-     The cost is that most theme names ellipsize on the closed trigger. Recoverable,
-     and deliberately so: the panel takes its width from the trigger's rect
-     (dropdown/component.js) and .ac-dropdown__primary below wraps rather than
-     truncates, so the full name is always readable in the open list. The lamps say
-     which palette is live without needing to be read at all. */
-  flex: 0 1 15rem;
+     19rem, up from 15rem, and the lamps' ~69px on top of it went to the trigger
+     rather than back to the row. It is sized for the PANEL, not for the trigger:
+     the panel takes its width from the trigger's rect (dropdown/component.js), so
+     the trigger is the only lever there is on it, and at 15rem a name like
+     "Midnight Arcade · Dark" broke over three lines in the open list.
+
+     Still under the picker's 20rem, which is the ordering that says which control
+     this site is for -- but only just, so the size is no longer carrying that on
+     its own. --console-type is: 13.5px there against 12.5px here.
+
+     The longest names still ellipsize on the closed trigger and that stays
+     deliberate: .ac-dropdown__primary below wraps rather than truncates, so the
+     full name is always readable in the open list. */
+  flex: 0 1 19rem;
   max-width: 100%;
 }
 
@@ -389,54 +397,6 @@
   display: none;
 }
 
-/* --- Lamps -------------------------------------------------------------------
-   A live palette readout: painted from --accent-*, so a theme change re-colors
-   them with no JS at all. The smallest possible demonstration of what the
-   control beside them does. Theme console only. */
-
-.console__lamps {
-  display: inline-flex;
-  align-items: center;
-  flex: none;
-  gap: 5px;
-  padding: 0 11px;
-}
-
-.console__lamps i {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--lamp);
-  box-shadow: 0 0 calc(5px * var(--glow-strength))
-    color-mix(in srgb, var(--lamp) 65%, transparent);
-  /* Staggered so the palette rolls left to right on a theme change. Both the
-     duration and the delay are multiplied by --motion, so "Reduce motion" and
-     the OS setting collapse the whole sweep to an instant swap. */
-  transition: background-color calc(var(--motion) * 0.3s) ease,
-    box-shadow calc(var(--motion) * 0.3s) ease;
-}
-
-/* Pink, green, blue, purple -- the same order themes.mjs writes data-ac-swatch
-   in, so a swatch row and the lamps read as the same four colors. */
-.console__lamps i:nth-child(1) {
-  --lamp: var(--accent-pink);
-}
-
-.console__lamps i:nth-child(2) {
-  --lamp: var(--accent-green);
-  transition-delay: calc(var(--motion) * 50ms);
-}
-
-.console__lamps i:nth-child(3) {
-  --lamp: var(--accent-blue);
-  transition-delay: calc(var(--motion) * 100ms);
-}
-
-.console__lamps i:nth-child(4) {
-  --lamp: var(--accent-purple);
-  transition-delay: calc(var(--motion) * 150ms);
-}
-
 /* --- The enhanced control inside a console ------------------------------------
    Nothing here reaches into the Dropdown's behavior; it is all surface. The
    two-class selectors also mean this wins over the component's own defaults
@@ -498,13 +458,12 @@
   white-space: normal;
 }
 
-/* One palette notation in the header, not two. The component's default swatch is
-   a contiguous strip; the lamps beside it are four dots, and reading a row then
-   the trigger meant re-parsing the same four accents in a different shape. So
-   the panel adopts the lamps' notation -- same order, same circles, same 5px
-   rhythm, one size down for the row's smaller type. Scoped to the header: the
-   library keeps its strip everywhere else, which is what the Dropdown page
-   demonstrates. */
+/* Four separate discs rather than the component's default contiguous strip.
+   The shape was adopted to match a row of lamps beside the trigger; it stayed
+   after those went, because this is now the only palette readout in the header
+   and at 7px a strip reads as one smudge of color where four dots read as four
+   accents. Scoped to the header: the library keeps its strip everywhere else,
+   which is what the Dropdown page demonstrates. */
 .console--theme .ac-dropdown__swatch {
   gap: 5px;
   border: 0;
@@ -521,18 +480,17 @@
   border-radius: 50%;
 }
 
-/* The lamps glow with a box-shadow off var(--lamp). These dots cannot: their
-   color is an inline style from the option's data, and no shadow property can
-   read a background. A pseudo-element can -- `background: inherit` picks up that
-   same inline value -- so a blurred copy of the dot becomes its halo.
+/* A box-shadow cannot glow these: the dot's color is an inline style from the
+   option's data, and no shadow property can read a background. A pseudo-element
+   can -- `background: inherit` picks up that same inline value -- so a blurred
+   copy of the dot becomes its halo.
 
    It paints ON TOP of the dot rather than behind it, which needs no z-index and
    so cannot escape the row's stacking context: blurring a solid disc leaves the
    center solid, so at 65% over its own color only the spill past the edge reads.
 
-   inset:0 and 65% reproduce the lamps' own glow. The halo must start at the
-   dot's own edge, like a shadow -- inflating the disc before blurring turns dots
-   into blobs. */
+   The halo must start at the dot's own edge, like a shadow -- inflating the disc
+   before blurring turns dots into blobs. */
 .console--theme .ac-dropdown__swatch > span::after {
   content: "";
   position: absolute;
@@ -790,13 +748,21 @@
 
   /* Capped rather than fluid: on row 1 it is competing with the brand, and a theme
      console that swelled to fill a wide row would be the loudest thing in a header
-     whose primary control is on the row below. */
+     whose primary control is on the row below.
+
+     Held below the base 19rem, and the gap between the two is the point. This is a
+     GRID item here, in an `auto` track that sizes to the console's max-content --
+     so the cap is the only thing stopping the longest option name from setting the
+     track's width and pushing the brand out of its own box. The brand cannot
+     reflow (nowrap, min-width: 0), so it overflows silently rather than shrinking;
+     site-header.spec.mjs asserts it is never overrun. 17rem is measured against
+     that test, which sweeps this band down to 561px, its tightest. */
   .console--theme {
-    max-width: 15rem;
+    max-width: 17rem;
   }
 
-  /* Dots one step down, matching the lamps below. Four circles at a 5px rhythm
-     are wider than the strip they replaced, and the panel narrows here too. */
+  /* Dots one step down: four circles at a 5px rhythm are wider than the strip
+     they replaced, and the panel narrows here too. */
   .console--theme .ac-dropdown__swatch {
     gap: 4px;
   }
@@ -893,11 +859,6 @@
   /* Stays flush with the rail above it. */
   .hdr-note {
     padding: 0 14px 8px;
-  }
-
-  .console__lamps {
-    padding: 0 9px;
-    gap: 4px;
   }
 
   .console--theme .ac-dropdown__swatch {
@@ -1025,17 +986,6 @@
     letter-spacing: 0.11em;
   }
 
-  /* The lamps go, and only here. They are a live readout of the palette and they
-     earn their ~69px everywhere else, but they are aria-hidden decoration --
-     display: none costs nothing in the accessibility tree -- and on row 2 of a
-     320px phone that 69px is the difference between a trigger showing a theme name
-     and one showing four characters. The purple caret still says which console this
-     is, and the swatch dots in the open panel are untouched: those sit in a list
-     that has the room, and they become the only palette cue once these are gone. */
-  .console__lamps {
-    display: none;
-  }
-
   /* STILL NO floor on the components console, and it is still a decision rather
      than an omission -- it was tried and taken back out.
 
@@ -1072,15 +1022,13 @@
    Windows High Contrast
    ============================================================================= */
 
-/* Both palette indicators are painted with background-color alone, and HCM
-   replaces backgrounds with system colors -- so the lamps and the panel's dots
-   would both go invisible, and the dots would take the strip's border with them.
-   They are aria-hidden decoration, so nothing is announced either way, but four
-   rings still say "a palette lives here". Outlines, not borders: they sit
-   outside the box, so the geometry the glow and the gap were tuned around is
-   untouched. */
+/* The panel's dots are painted with background-color alone, and HCM replaces
+   backgrounds with system colors -- so they would go invisible, taking the
+   strip's border with them. They are aria-hidden decoration, so nothing is
+   announced either way, but four rings still say "a palette lives here".
+   Outlines, not borders: they sit outside the box, so the geometry the glow and
+   the gap were tuned around is untouched. */
 @media (forced-colors: active) {
-  .console__lamps i,
   .console--theme .ac-dropdown__swatch > span {
     outline: 1px solid CanvasText;
     outline-offset: -1px;

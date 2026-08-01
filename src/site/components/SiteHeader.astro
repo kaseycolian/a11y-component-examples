@@ -76,14 +76,19 @@ const here = Astro.url.pathname;
     </div>
 
     {/*
-      A labelled instrument rather than a bare dropdown: a cap that names it,
-      four lamps showing the palette you are currently on, and the control
-      filling the rest. The lamps are plain elements painted with --accent-*, so
-      switching the theme re-colors them with no JS at all.
+      A labelled instrument rather than a bare dropdown: a cap that names it and
+      the control filling the rest.
+
+      A row of four lamps sat between the two until 2026-08-01, painted from
+      --accent-* so a theme change re-colored them for free. They went because
+      this site is a components library and its own theme picker should not be
+      the most decorated thing in the header -- and because the ~69px they cost
+      is the difference between a trigger showing a theme name and one showing
+      "Midnight...". The palette readout survives where it is actually being
+      chosen: the swatch dots on each option in the open panel.
     */}
     <div class="console console--theme" data-theme-control>
       <span class="console__cap" id="theme-cap">Theme</span>
-      <span class="console__lamps" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
       {/*
         The picker is the library's own Dropdown (data-ac-dropdown), which is
         why theme-service's theme-select.js is not vendored -- see
@@ -95,15 +100,23 @@ const here = Astro.url.pathname;
         theme.css at build time by themes.mjs. The swatch is decoration and
         the Dropdown marks it aria-hidden, so an option's accessible name is
         always just the theme name.
+
+        One group per palette family, and the mode is inside each label --
+        theme-service's own arrangement, and the reason both are built in
+        themes.mjs rather than here.
       */}
       <select id="theme-select" data-ac-dropdown data-theme-select aria-labelledby="theme-cap">
         {/*
           Auto is its own group so that having no swatch reads as deliberate
-          rather than as a missing one.
+          rather than as a missing one -- and, now that every other group is a
+          palette family, so that the one option belonging to no family is not
+          sitting under a family's name.
         */}
         <optgroup label="System">
           {/* Short on purpose: the trigger has to show its value without
-              truncating it, and the "System" group above says what it means. */}
+              truncating it, and the "System" group above says what it means.
+              It carries no mode either, unlike every option below it: which
+              one you get is the OS's call, which is the whole point. */}
           <option value="">Auto</option>
         </optgroup>
         {

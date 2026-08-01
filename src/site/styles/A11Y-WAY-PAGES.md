@@ -59,9 +59,10 @@ record is `src/site/theme/THEME-SERVICE.md`. This one never edits themes.
 Recorded so a future update does not "fix" them.
 
 1. **`.theme-console` / `.tc-*` became `.console` / `.console--theme` / `.console--nav` /
-   `.console__cap` / `.console__lamps`.** There are two pickers in this header, not one, so the
-   console had to become a shared shell with a `--console-accent` modifier. The upstream single-use
-   names would have been a lie on the components picker.
+   `.console__cap`.** There are two pickers in this header, not one, so the console had to become a
+   shared shell with a `--console-accent` modifier. The upstream single-use names would have been a
+   lie on the components picker. Upstream's lamp row was ported too, as `.console__lamps`, and has
+   since been removed outright — see deviation 18.
 2. **`.theme-console .dropdown-*` became `.console .ac-dropdown__*`.** The picker is this library's
    own Dropdown, not theme-service's `dropdown.js` — `theme-select.js` is deliberately not vendored
    (see `THEME-SERVICE.md`). The rules are the same rules; only the class names differ.
@@ -148,21 +149,22 @@ Recorded so a future update does not "fix" them.
     brand and the picker both spanning, the only row needing columns is the pair's.
 
     Above 1200px the picker does not grow — a 600px trigger is no more usable than a 320px one, so
-    the slack goes into the channel after the brand. `.console--theme` is `15rem`, well under the
-    picker's `20rem`; most theme names ellipsize on the closed trigger, which is recoverable because
-    the panel takes its width from the trigger's rect and `.ac-dropdown__primary` wraps rather than
-    truncates.
+    the slack goes into the channel after the brand. `.console--theme` is `19rem` (`17rem` in the
+    two-row band, where the brand is on the same row), under the picker's `20rem` but no longer by
+    enough for size alone to carry the hierarchy — `--console-type` does, 13.5px against 12.5px. It
+    is sized for the **panel**, which is the part that has to be read: the panel takes its width from
+    the trigger's rect, so the trigger is the only lever there is on it. The longest names still
+    ellipsize on the closed trigger, which is recoverable because `.ac-dropdown__primary` wraps
+    rather than truncates in the open list.
 
-    Two supporting rules, both sized by measurement:
+    One supporting rule, sized by measurement:
 
     - **The lockup stacks from 800px, not 620px.** A fit decision, not a legibility one: the brand
       now shares row 1 with the whole preference pair, and one line of it (~360px) left the theme
       console nothing between 620 and 800. Stacked it is ~207px. The wordmark/tag *type* ladder stays
       keyed to 620px and 430px — those steps measure legibility, per deviation 12's argument.
-    - **`.console__lamps` are hidden below 430px.** `aria-hidden` decoration, so `display: none` costs
-      nothing in the accessibility tree, and on row 2 of a 320px phone that ~69px is the difference
-      between a trigger showing a theme name and one showing four characters. The panel's swatch dots
-      stay — they become the only palette cue.
+
+    A second one, hiding `.console__lamps` below 430px, is gone with the lamps themselves (18).
 16. **The motion toggle's label is never clipped, at any width.** It used to be, below 560px.
     `.switch__text` is part of the toggle's accessible name, so clipping was the only way to hide it
     at all — and a bare 44×24 track beside an unlabelled console is a guess rather than a control. It
@@ -178,8 +180,27 @@ Recorded so a future update does not "fix" them.
 17. **`@media (forced-colors: active)` was never being applied above 430px.** The 430px block was
     missing its closing brace, so every rule after it — the note's own breakpoint and the whole High
     Contrast block — parsed as nested inside it. Fixed while restyling; the HCM treatment for the
-    lamps, the panel's swatch dots, the console borders and the switch now applies at every width, as
-    it always read as doing.
+    panel's swatch dots, the console borders and the switch now applies at every width, as it always
+    read as doing.
+18. **Upstream's lamp row is gone, at every width.** Four `--accent-*` dots sat between the theme
+    console's cap and its trigger, a live palette readout that re-colored itself on a theme change
+    with no JS. Removed 2026-08-01 for two reasons, and the second is the one that generalizes: it
+    cost ~69px inside a `15rem` console, which is what pushed "Midnight Arcade" down to
+    "Midnight…" on the closed trigger; and this site is a components library, so its own theme
+    picker should not be the most decorated control in the header. The reclaimed width went to the
+    trigger rather than back to the row, since `.console .ac-dropdown` is `flex: 1 1 auto`.
+
+    The readout survives where the choice is actually made: the swatch dots on each option in the
+    open panel, which keep the lamps' circular notation (deviation 1's port is the only thing that
+    left). A re-sync will offer the lamps back. It should decline.
+19. **The theme options are grouped by family, and each option's label carries its mode** — "Rink
+    Classic · Dark" under a "Rink Classic" group. This is upstream's own arrangement, separator
+    included, arrived at from the other direction: the port had grouped by mode, which put the two
+    halves of one palette at opposite ends of a 17-item list. Recorded because the labels are built
+    in `src/site/lib/themes.mjs` rather than by upstream's `theme-select.js` (deviation 2), so
+    nothing keeps the two in step automatically — if upstream restyles its option text, this is the
+    file to change. **Auto** stays in a "System" group of its own: it belongs to no family, and it
+    is the one option with no mode to name, which is the point of it.
 
 ## History
 
@@ -230,3 +251,16 @@ Recorded so a future update does not "fix" them.
   widths including the one-row band, where the failure actually lived. Found and fixed in passing:
   the 430px media block was missing its closing brace, so the entire forced-colors block had been
   scoped to phones (17).
+- `2026-08-01` — The theme console's lamp row removed at every width; no re-sync. A user decision, on
+  the grounds that the header's job is to get out of the way of the components (18). The ~69px went
+  to the trigger, which now shows a theme name instead of the first word of one, and the entry above
+  hiding the lamps below 430px is moot. The panel's swatch dots — same circles, same order — are the
+  header's only palette readout now, so the spec's lamp test became one asserting the dots are
+  painted in the panel and absent from the trigger.
+
+  Two follow-ons in the same pass, both from the same user. The console went `15rem → 19rem`
+  (`17rem` in the two-row band), sized against the open panel rather than the trigger since the panel
+  can only be widened through it (15); measured at every breakpoint against the brand-overrun sweep,
+  which is what the two numbers differ for. And the options are grouped by family with the mode in
+  the label, matching upstream (19) — which is also what made the extra width worth spending, the
+  labels being longer than the ones the old `15rem` was cut for.

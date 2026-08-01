@@ -24,7 +24,7 @@ const base = import.meta.env.BASE_URL;
 
       {
         COMPONENTS_BY_GROUP.map((group) => (
-          <section aria-labelledby={`group-${group.id}`}>
+          <section class="page-section" aria-labelledby={`group-${group.id}`}>
             <h2 id={`group-${group.id}`}>{group.name}</h2>
             <p class="lede">{group.summary}</p>
 

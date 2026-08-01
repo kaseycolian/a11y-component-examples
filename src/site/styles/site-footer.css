@@ -345,9 +345,9 @@ img.ftr-mark {
 }
 
 /* "You are here" -- the current item in the set, as a lit dot and a micro label
-   rather than a chip: the header's lamp notation, reused because it says the same
-   thing. The words carry the meaning, so the dot is free to be decoration and
-   "current" is never left to color.
+   rather than a chip: the same lit-dot notation the theme panel's swatches use,
+   reused because it says the same thing. The words carry the meaning, so the dot
+   is free to be decoration and "current" is never left to color.
 
    Only the current item is labelled. The other product is marked by .ftr-ext
    alone, which is a deliberate asymmetry: the arrow says "elsewhere" without
