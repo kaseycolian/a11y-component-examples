@@ -812,11 +812,25 @@ code {
 }
 
 /* Shiki output. The `.code-block` wrapper already supplies the surface,
-   padding and scrolling, so flatten Shiki's own <pre>. */
+   padding and scrolling, so flatten Shiki's own <pre>.
+
+   `overflow` is `!important` for the same reason `background` is: Shiki writes
+   `overflow-x: auto` as an inline style, and an inline style beats a rule. It
+   has to go, because it puts the scrolling on the <pre> -- and the <pre> is not
+   the element that carries the accessible name. `.code-block` is the one with
+   tabindex and aria-labelledby, so it has to be the one that scrolls, or the
+   region is reachable but not scrollable from the keyboard (SC 2.1.1).
+
+   The visible tell is a fixed-height block: the <pre> is only as tall as its
+   code, so its scrollbar sits part-way up the box with dead space beneath. */
 .code-block .astro-code {
   margin: 0;
   padding: 0;
   background: none !important;
+  overflow: visible !important;
+  /* Fill a `.code-block` that was given a height, so a selection or a future
+     background covers the box. A no-op where the height is auto. */
+  min-height: 100%;
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;

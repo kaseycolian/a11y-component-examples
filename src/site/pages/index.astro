@@ -1,8 +1,94 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import CodePanel from '../components/CodePanel.astro';
 import { COMPONENTS_BY_GROUP } from '../lib/registry.mjs';
 
 const base = import.meta.env.BASE_URL;
+
+/*
+  Not decoration: three excerpts of what the Field component actually serves, so
+  "three files, no build step" is visible before anyone clicks. CodePanel rather
+  than a hand-rolled tablist -- the tabs pattern is already built and tested, and
+  a second copy of it on the one page that promises copyable components would be
+  the wrong thing to ship.
+
+  Excerpts, so `note={false}` and no `href`: naming a file, or offering it for
+  download, would promise the whole of something the panel is showing a slice of.
+  The component page is where the whole file lives. `filename` stays because it
+  is what says, in this file, which source each slice came from.
+*/
+const PEEK_FILES = [
+  {
+    label: 'HTML',
+    lang: 'html',
+    filename: 'field/component.html (excerpt)',
+    code: `<div class="ac-field" data-ac-field>
+  <label class="ac-field__label" for="email">Work email</label>
+  <input class="ac-input" id="email" type="email"
+         autocomplete="email" aria-invalid="true"
+         aria-describedby="email-hint email-error" />
+  <p class="ac-field__hint" id="email-hint">Used only for your sign-in link.</p>
+
+  <!-- Always present, never hidden: an alert added at the same
+       moment as its text is not announced. -->
+  <p class="ac-field__error" id="email-error" role="alert">
+    Enter an address in the form ruby.soho@example.com.
+  </p>
+</div>`,
+  },
+  {
+    label: 'CSS',
+    lang: 'css',
+    filename: 'field/component.css (excerpt)',
+    code: `/* Every color is ours -> the theme's -> a standalone default. */
+.ac-field__error {
+  color: color-mix(in srgb,
+    var(--ac-danger, var(--accent-pink, #ff2ec4)) 80%,
+    var(--ac-text, var(--text, #f3ecff)));
+}
+
+/* Driven by aria-invalid, so the styling cannot disagree with what
+   is announced. Two cues, never color alone (SC 1.4.1). */
+[aria-invalid="true"].ac-input {
+  border-width: 2px;
+  border-color: var(--ac-danger, var(--accent-pink, #ff2ec4));
+}
+
+/* High Contrast drops color-mix and tinted fills, so width has to
+   carry what hue no longer can. */
+@media (forced-colors: active) {
+  [aria-invalid="true"].ac-input {
+    border-width: 3px;
+    border-color: CanvasText;
+  }
+}`,
+  },
+  {
+    label: 'JS',
+    lang: 'js',
+    filename: 'field/component.js (excerpt)',
+    code: `// aria-describedby is a space-separated LIST, and the usual bug is
+// one line: setAttribute('aria-describedby', errorId) drops the hint.
+// So write it ONCE, at init, naming both. Showing an error then only
+// sets that element's text, and there is nothing to clobber.
+var described = (control.getAttribute('aria-describedby') || '')
+  .split(/\\s+/)
+  .filter(Boolean);
+
+[hint, error].forEach(function (el) {
+  if (el && described.indexOf(el.id) === -1) described.push(el.id);
+});
+
+control.setAttribute('aria-describedby', described.join(' '));
+
+function write(message) {
+  error.textContent = message;
+  root.classList.toggle('ac-field--invalid', Boolean(message));
+  if (message) control.setAttribute('aria-invalid', 'true');
+  else control.removeAttribute('aria-invalid');
+}`,
+  },
+];
 
 const promises = [
   {
@@ -51,31 +137,9 @@ const promises = [
         </p>
       </div>
 
-      {/*
-        Not decoration: this is a real excerpt of what the Field component serves,
-        so the promise on the left is visible on the right before anyone clicks.
-      */}
-      <figure class="hero__peek panel">
-        <figcaption class="hero__peek-head panel__head">What you copy</figcaption>
-        {/*
-          tabindex + a group name because the block scrolls sideways: a scrollable
-          region that only a mouse can reach is a keyboard trap in reverse
-          (SC 2.1.1). Same treatment the docs tables get.
-        */}
-        <pre class="code-block" tabindex="0" role="group" aria-label="Field markup excerpt"><code>{`<div class="ac-field">
-  <label class="ac-field__label" for="email">Email</label>
-  <input class="ac-input" id="email" type="email"
-         autocomplete="email" aria-invalid="true"
-         aria-describedby="email-hint email-error" />
-  <p class="ac-field__hint" id="email-hint">Work address.</p>
-  <p class="ac-field__error" id="email-error" role="alert">
-    Add the @ — try ruby.soho@example.com
-  </p>
-</div>`}</code></pre>
-        <p class="hero__peek-foot">
-          Three files per component, no build step, no dependency to track.
-        </p>
-      </figure>
+      <div class="hero__peek">
+        <CodePanel id="hero-peek" title="What you copy" files={PEEK_FILES} note={false} />
+      </div>
     </div>
 
     {/*
@@ -158,33 +222,25 @@ const promises = [
     max-width: 60ch;
   }
 
+  /* Sticky-free and self-contained: it is an excerpt, not a control. */
   .hero__peek {
-    margin: 0;
-    /* Sticky-free and self-contained: it is an excerpt, not a control. */
     min-width: 0;
   }
 
-  .hero__peek-head {
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-
-  .hero__peek .code-block {
-    max-height: none;
-    /* Long lines scroll inside the card rather than pushing the page sideways. */
-    overflow-x: auto;
-    white-space: pre;
-  }
-
-  .hero__peek-foot {
+  /* .code-panel's own top margin is for the gap under a component demo; here it
+     is the first thing in its column. */
+  .hero__peek :global(.code-panel) {
     margin: 0;
-    padding: 0.7rem 1rem;
-    border-top: 1px solid var(--border);
-    font-size: 0.8rem;
-    color: var(--text-muted);
+  }
+
+  /* One height for all three tabs, so switching them never shoves the page.
+     Whichever excerpt is longer scrolls inside the block instead -- it is
+     focusable and labeled already, so the overflow stays keyboard reachable
+     (SC 2.1.1). In rem rather than px so text zoom grows the box with the
+     type instead of squeezing more lines into a fixed one (SC 1.4.4). */
+  .hero__peek :global(.code-block) {
+    height: 24rem;
+    max-height: none;
   }
 
   .hero__actions {

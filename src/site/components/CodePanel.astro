@@ -33,9 +33,15 @@ interface Props {
   /** Unique-per-page id prefix, so multiple panels can coexist. */
   id?: string;
   title?: string;
+  /**
+   * The filename-and-download line under the code. Off for a panel showing
+   * excerpts, where naming a file it does not hold in full is a claim it cannot
+   * make: `filename` then only labels the source in this file.
+   */
+  note?: boolean;
 }
 
-const { files, id = 'source', title = 'Source' } = Astro.props;
+const { files, id = 'source', title = 'Source', note = true } = Astro.props;
 const titleId = `${id}-title`;
 ---
 
@@ -92,17 +98,21 @@ const titleId = `${id}-title`;
     ))
   }
 
-  <p class="code-note" data-code-note>
-    <span data-filename>{files[0]?.filename}</span>
-    {files[0]?.href && (
-      <>
-        {' · '}
-        <a href={files[0].href} download data-download>
-          download the raw file
-        </a>
-      </>
-    )}
-  </p>
+  {
+    note && (
+      <p class="code-note" data-code-note>
+        <span data-filename>{files[0]?.filename}</span>
+        {files[0]?.href && (
+          <>
+            {' · '}
+            <a href={files[0].href} download data-download>
+              download the raw file
+            </a>
+          </>
+        )}
+      </p>
+    )
+  }
 
   {/* Copy confirmations are announced here rather than only shown on the button. */}
   <p class="visually-hidden" role="status" aria-live="polite" data-copy-status></p>
@@ -122,10 +132,22 @@ const titleId = `${id}-title`;
     const copyButton = panel.querySelector<HTMLButtonElement>('[data-copy-button]');
     const copyLabel = panel.querySelector<HTMLElement>('[data-copy-label]');
     const status = panel.querySelector<HTMLElement>('[data-copy-status]');
-    const filenameEl = panel.querySelector<HTMLElement>('[data-filename]');
-    const downloadEl = panel.querySelector<HTMLAnchorElement>('[data-download]');
+
+    // Scoped to the note, and it has to be: every tabpanel also carries a
+    // `data-filename`, and they come first in the DOM. Searching the whole panel
+    // returns tabpanel 0, so `select()` would write the filename into the first
+    // tab as textContent and wipe out the code it was rendering.
+    const note = panel.querySelector<HTMLElement>('[data-code-note]');
+    const filenameEl = note?.querySelector<HTMLElement>('[data-filename]') ?? null;
+    const downloadEl = note?.querySelector<HTMLAnchorElement>('[data-download]') ?? null;
 
     if (!tabs.length) return;
+
+    // Shiki writes its own tabindex="0" onto the <pre>, for the scrolling it
+    // also assigns there inline. site.css takes that scrolling back for the
+    // labeled wrapper, which leaves the <pre> a second tab stop that neither
+    // scrolls nor carries a name.
+    panels.forEach((p) => p.querySelector('.astro-code')?.removeAttribute('tabindex'));
 
     // Captured once so the note can follow the selected tab.
     const state: PanelState = {
