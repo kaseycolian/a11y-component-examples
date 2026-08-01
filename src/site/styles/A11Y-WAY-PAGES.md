@@ -88,19 +88,98 @@ Recorded so a future update does not "fix" them.
    rows deterministically at 1080px with a grid, so there is nothing for the wrap to discover.
    Upstream's `.seg-label` / `.seg-tail` rules go with it — there is no segmented nav here.
 10. **`--header-h` is retuned per version, not copied.** Upstream has no such token. The values are
-    measured against the real header at 1440 / 1080 / 900 / 760 / 620 / 430 / 375 / 320 and rounded
-    up to the next 0.125rem; `tests/site-header.spec.mjs` asserts they still cover it.
-11. **No `min-width` on the components console.** This site pays more for v1.1.0's "never hide the
-    descriptor" policy than the source does — upstream's descriptor is one word, this one is
-    "WCAG 2.2 Components" (~150px of tracked mono) sharing the rail with the only navigation left
-    below 900px, so the console comes out ~102px at 320px. A floor was tried and taken back out: it
-    competes against the brand's min-content, which follows the *rendered* font (`--font-ui` falls
-    back to Verdana, which is wider), and it overflowed a 320px rail. As written the layout cannot
-    overflow at any font, and the spec asserts that at six widths. Read the note in the CSS's 430px
-    block before adding one.
+    measured against the real header at every breakpoint and both sides of each row-count switch —
+    1440 / 1201 / 1200 / 1000 / 801 / 800 / 621 / 620 / 561 / 560 / 430 / 375 / 320 — and rounded up
+    to the next 0.125rem; `tests/site-header.spec.mjs` asserts they still cover it, within 2px. Note
+    the step at 800px: nothing re-flows there, but the rail's vertical gutter is a clamp, so a
+    two-row header keeps shrinking across the band and one value for all of it over-reserves ~17px of
+    scroll-margin at the bottom of it.
+11. **No `min-width` on the components picker.** A floor was tried and taken back out: it competes
+    against the brand's min-content, which follows the *rendered* font (`--font-ui` falls back to
+    Verdana, which is wider), and it overflowed a 320px rail. As written the layout cannot overflow
+    at any font, and the spec asserts that at seventeen widths. Read the note in the CSS's 430px
+    block before adding one. The ~102px trigger this used to cost at 320px is gone — deviation 15
+    fixed it with a row of its own rather than with a width promise the font can break.
 12. **The reduced-motion note has its own breakpoint at 380px,** separate from the brand ladder's
-    430px, because the two measure different things — where the lockup steps, and where that
-    sentence wraps to a third line. Re-measure it if the note's wording changes.
+    430px and the three-row switch at 560px, because all three measure different things — where the
+    lockup's type steps, where the header needs a third row, and where that sentence wraps to another
+    line. Re-measure it if the note's wording changes.
+13. **The zones are in a different order from upstream, and the order reaches into the markup.**
+    `SiteHeader.astro` emits **brand, motion, theme, components** — the picker last, where upstream's
+    equivalent is second. It is not a CSS-only reflow because it cannot be: the picker sits at the
+    right-hand end of the rail and stacks under the theme console, and visual order has to equal DOM
+    order or tab order stops matching reading order (SC 2.4.3).
+
+    **What it costs:** this site's navigation is the last stop in the header rather than the first. A
+    keyboard user reaches the brand, the motion toggle and the theme picker before it. The skip link
+    ahead of all of it is what keeps that from mattering to someone going straight for the content.
+    Judged worth it because the picker's *visual* prominence — right-hand end, widest control, full
+    rail below 1200px — is what most visitors navigate by.
+
+    A future upstream re-sync will want to undo this. It should not.
+14. **Motion and theme are one pair and are adjacent at every width, without exception.** They are
+    the same kind of thing — a preference about how the page behaves — and the picker is not. What
+    says so is spacing alone: `.hdr-inner`'s gap is the *tight* intra-pair value (10px, against
+    upstream's uniform 18px) and every other join is opened wider — `auto` before `.motion`, which
+    also pins the cluster to the rail's right edge, and 26px before the picker. No wrapper element and
+    no bordered box: the skill's "structure with rules and space" rule, and a box would need its own
+    hover, focus and forced-colors treatment for no gain.
+
+    An earlier pass drew a 1px hairline in the wider channel. It went when the picker moved right —
+    a vertical rule immediately beside a bordered console is noise, not structure.
+
+    `tests/site-header.spec.mjs` asserts the adjacency directly, as geometry, at seventeen widths:
+    same row, theme after motion, and nothing sharing their row in the channel between them.
+15. **Three layouts, and the picker only ever moves down and right.**
+
+    | Band | Rows |
+    | --- | --- |
+    | ≥1200px | one — `brand · · · · motion theme picker` |
+    | 560–1200px | two — `brand \| motion theme` / `picker`, spanning the pair's columns |
+    | <560px | three — `brand` / `motion theme` / `picker` (full rail) |
+
+    The two-row grid is `1fr auto auto` — **three** columns where upstream has two, and that is the
+    reason it is a grid at all: motion and theme have to share row 1 while the picker sits under both
+    of them, which two columns cannot do without a wrapper element. The picker takes
+    `grid-column: 2 / -1`, so its width is exactly motion + gap + theme and its edges line up with
+    theirs on both sides — the three controls read as one right-hand block over two lines. A
+    rail-wide trigger under a short pair read as two unrelated things instead. It only goes full-rail
+    below 560px, where the block *is* the rail. The three-row grid drops back to `auto 1fr`: with the
+    brand and the picker both spanning, the only row needing columns is the pair's.
+
+    Above 1200px the picker does not grow — a 600px trigger is no more usable than a 320px one, so
+    the slack goes into the channel after the brand. `.console--theme` is `15rem`, well under the
+    picker's `20rem`; most theme names ellipsize on the closed trigger, which is recoverable because
+    the panel takes its width from the trigger's rect and `.ac-dropdown__primary` wraps rather than
+    truncates.
+
+    Two supporting rules, both sized by measurement:
+
+    - **The lockup stacks from 800px, not 620px.** A fit decision, not a legibility one: the brand
+      now shares row 1 with the whole preference pair, and one line of it (~360px) left the theme
+      console nothing between 620 and 800. Stacked it is ~207px. The wordmark/tag *type* ladder stays
+      keyed to 620px and 430px — those steps measure legibility, per deviation 12's argument.
+    - **`.console__lamps` are hidden below 430px.** `aria-hidden` decoration, so `display: none` costs
+      nothing in the accessibility tree, and on row 2 of a 320px phone that ~69px is the difference
+      between a trigger showing a theme name and one showing four characters. The panel's swatch dots
+      stay — they become the only palette cue.
+16. **The motion toggle's label is never clipped, at any width.** It used to be, below 560px.
+    `.switch__text` is part of the toggle's accessible name, so clipping was the only way to hide it
+    at all — and a bare 44×24 track beside an unlabelled console is a guess rather than a control. It
+    takes the console cap's voice (mono, 10px, uppercase, tracked) so the header has one treatment
+    for a small label naming a control rather than two, which also makes it the widest fixed thing on
+    the phone layout's second row; the tracking is eased right back from the cap's `0.16em` for that
+    reason. This is what sets the three-row breakpoint at 560px, and the spec asserts the label has
+    real width at every one of them.
+
+    Beside it, `--console-type` (12.5px, 13.5px on the picker) carries the trigger size to both the
+    enhanced `.ac-dropdown__toggle` and the native `<select>` fallback from one declaration, so the
+    two paths cannot drift.
+17. **`@media (forced-colors: active)` was never being applied above 430px.** The 430px block was
+    missing its closing brace, so every rule after it — the note's own breakpoint and the whole High
+    Contrast block — parsed as nested inside it. Fixed while restyling; the HCM treatment for the
+    lamps, the panel's swatch dots, the console borders and the switch now applies at every width, as
+    it always read as doing.
 
 ## History
 
@@ -128,3 +207,26 @@ Recorded so a future update does not "fix" them.
   deviation 11; `tests/site-header.spec.mjs` grew an overflow sweep to hold that line, and its
   `nav.width > 500` assertion became "starts after the brand, ends at the rail", which is the
   invariant that pixel number was standing in for.
+- `2026-08-01` — Header controls re-arranged for this repo at v`1.1.0`; no re-sync. The port had left
+  the four zones as peers in upstream's order, which showed up two ways: the brand was painted
+  underneath the components picker between ~1081px and ~1400px (`.brand` was allowed to shrink and
+  nothing in the lockup can reflow), and the *secondary* control reserved more width than the
+  *primary* one — theme 26rem against components 21rem — with the picker sitting between motion and
+  theme and splitting them.
+
+  The picker now sits at the right-hand end of the rail and stacks under the theme console, which
+  moved it last in `SiteHeader.astro`'s DOM (deviation 13 — the one thing here that is not CSS, and
+  the one a re-sync will want to undo). Motion and theme are one pair, adjacent at every width, held
+  together by spacing alone (14). Three layouts at 1200px and 560px, with the picker spanning the
+  pair's own columns in the middle band rather than the whole rail, the lockup stacking from 800px
+  and the lamps dropping below 430px (15). The motion label is never clipped, which is what sets the
+  560px boundary (16). `--header-h` re-measured at every breakpoint, plus a new step at 800px for the
+  clamped gutter.
+
+  `tests/site-header.spec.mjs` grew the assertions that would have caught the original bug and that
+  pin the new arrangement: the brand is never overrun, the pair is never split, the picker is the
+  widest control, and each of the three layouts holds — all as geometry rather than pixel thresholds,
+  since the brand's width follows the rendered font. The overflow sweep now covers all seventeen
+  widths including the one-row band, where the failure actually lived. Found and fixed in passing:
+  the 430px media block was missing its closing brace, so the entire forced-colors block had been
+  scoped to phones (17).

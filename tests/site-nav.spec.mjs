@@ -210,9 +210,6 @@ test.describe('components sidebar', () => {
     await expect(page.locator('.sidebar__link[tabindex]')).toHaveCount(0);
     await expect(page.locator('.sidebar [role="menuitem"]')).toHaveCount(0);
 
-    // And the hint does not claim a keyboard behavior this page does not have.
-    await expect(page.locator('.sidebar__hint')).toBeHidden();
-
     await context.close();
   });
 });

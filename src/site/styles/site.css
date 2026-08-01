@@ -177,18 +177,6 @@ body {
   }
 }
 
-/* Hidden in the markup and revealed by the script, so it never claims a
-   keyboard behavior the page does not have. --text-muted rather than --text on
-   purpose: it is chrome for the list, and .sidebar__title beside it has already
-   proven the token clears 4.5:1 on this surface in every theme. */
-.sidebar__hint {
-  margin: 0 0 1.25rem;
-  font-size: 0.75rem;
-  line-height: 1.4;
-  color: var(--text-muted);
-  text-wrap: balance;
-}
-
 .sidebar__group + .sidebar__group {
   margin-top: 1.5rem;
 }

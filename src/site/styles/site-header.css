@@ -7,18 +7,45 @@
 
    Four zones, always in this DOM order:
 
-       brand ........ who this is                (identity)
-       components ... where you can go           (this site's navigation)
-       motion ....... a preference               (quiet, lowest priority)
-       theme ........ the shared instrument      (loudest, always top-right)
+       brand ........ who this is                (identity, always far left)
+       motion ....... a preference               \ one pair, never separated
+       theme ........ a preference                /
+       components ... where you can go           (this site's navigation, far right)
 
    Where the theme-service has a two-stop Overview/Preview segmented control, this
    app has the components picker — its real navigation, and the only navigation
    there is below 900px where the sidebar drops out. It gets the same console
    shell as the theme picker, keyed to --accent-blue rather than --accent-purple.
 
+   THAT IS FOUR ZONES WHERE THE SOURCE HAS THREE, and one of them is navigation, so
+   the rail cannot lay them out as peers the way upstream does:
+
+     - motion and theme are ONE PAIR and are adjacent at every single width. They
+       are the same kind of thing — a preference about how the page behaves — and
+       nothing is ever allowed between them. Proximity is what says so: the gap
+       inside the pair is 10px, the gap to anything else is 26px or a row break.
+     - the components picker is the PRIMARY control and sits at the RIGHT END of the
+       rail, alone. It is the widest control at every width and carries one step
+       more type than the theme console.
+     - the brand never shrinks. Nothing inside it can reflow, so being asked to is
+       how it ends up painted underneath a console.
+
+   Both consoles keep their lit treatment; the hierarchy is carried by width, type
+   and position alone, which is what keeps this a re-arrangement of the source
+   rather than a second visual language on top of it.
+
+   Three layouts, and the picker only ever moves DOWN and RIGHT:
+
+       >=1200   one row     brand · · · · motion theme picker
+       560-1200 two rows    brand | motion theme  /  picker (under the pair,
+                                                           the pair's own width)
+       <560     three rows  brand  /  motion theme  /  picker (full rail)
+
    The responsive rules only ever RE-FLOW the four zones, never reorder them, so
-   tab order always matches reading order (SC 2.4.3).
+   tab order always matches reading order (SC 2.4.3). The picker being last in the
+   DOM is what buys that here, and it is a real cost — this site's navigation is the
+   last stop in the header rather than the first. The skip link ahead of all of it
+   is what keeps that from mattering to someone going straight for the content.
 
    Nothing in the brand zone is ever hidden for space. The A11Y Way ships more than
    one site off this header, and they share a mark and a wordmark -- the descriptor
@@ -108,11 +135,16 @@
 
    HORIZONTAL is the shared rail geometry -- it lines header content up with footer
    content and with .ftr-inner's identical clamp. The two are set together here for
-   readability only; changing one must not drag the other. */
+   readability only; changing one must not drag the other.
+
+   The gap is the TIGHT one, and it applies to exactly one join: motion to theme.
+   Everywhere else a margin opens a wider channel -- auto before .motion, 26px before
+   the picker -- so spacing alone says which two controls are a pair. Upstream has a
+   single uniform 18px because it has one picker and nothing to group. */
 .hdr-inner {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 10px;
   max-width: 90rem;
   margin: 0 auto;
   padding: clamp(13px, 2.2vw, 22px) clamp(16px, 3vw, 32px);
@@ -122,9 +154,17 @@
    The favicon's arch mark, then the wordmark. The separator dot is the only lit
    piece of the lockup; the words stay quiet. */
 
+/* flex: none, and it is load-bearing rather than tidying. .brand-name is
+   white-space: nowrap and the lockup has nothing in it that can reflow, so a
+   flex item that is allowed to shrink does not get smaller -- it overflows its
+   own box, silently, because .brand carries min-width: 0. The console next to it
+   paints a background and comes later in paint order, so what that looks like is
+   the descriptor disappearing UNDERNEATH the components picker somewhere between
+   1081px and ~1400px. Whatever is short of room in this row, it is never this. */
 .brand {
   display: inline-flex;
   align-items: center;
+  flex: none;
   gap: 11px;
   min-width: 0;
   margin-right: 4px;
@@ -224,6 +264,13 @@
      rather than losing its border, background and glow outright -- an undefined
      custom property makes every color-mix() referencing it invalid at once. */
   --console-accent: var(--border-strong);
+  /* The trigger's type size, as a property rather than a declaration, because it
+     has to reach two selectors that sit in different sections of this file -- the
+     enhanced .ac-dropdown__toggle and the native <select> fallback. Overriding it
+     per console from here means the step is stated once and neither path can be
+     changed without the other, where two font-size rules would have depended on
+     the order they happen to appear in. */
+  --console-type: 12.5px;
   display: inline-flex;
   align-items: center;
   height: var(--console-h);
@@ -238,23 +285,51 @@
   transition: border-color var(--dur) ease, box-shadow var(--dur) ease;
 }
 
+/* The two consoles are sized against each other, not independently, and the model
+   has one hard requirement: THE ROW CANNOT OVERFLOW AT ANY RENDERED FONT. The
+   brand above is flex: none and its width follows the font --font-ui actually
+   resolves to (it falls back Trebuchet MS -> Segoe UI -> Verdana, and Verdana is
+   markedly wider), so the consoles are the only items left that can absorb a
+   short row. Both do, all the way to zero: .console already carries min-width: 0
+   and neither modifier adds a floor. That is the same invariant deviation 11 in
+   A11Y-WAY-PAGES.md turns on -- a rem floor anywhere in this row is a horizontal
+   scrollbar (SC 1.4.10) on somebody else's font. */
+
 .console--theme {
   --console-accent: var(--accent-purple);
-  /* Sized so the TRIGGER alone -- not the console -- fits the longest theme name,
-     "Midnight Arcade (No Background)". The Dropdown writes the open panel's width
-     from the trigger's own rect, so the trigger is what decides how much of a
-     name the closed control and the open list can both show. The cap and the
-     lamps are on top of this. */
-  width: 26rem;
+  /* Was a flat 26rem, sized so the TRIGGER alone fits the longest theme name,
+     "Midnight Arcade (No Background)". It is the narrower control now, by a wide
+     margin: it is one half of a preference pair, it shares row 1 with the brand
+     below 1200px, and 26rem of it was what starved the brand and the picker at the
+     same time.
+
+     The cost is that most theme names ellipsize on the closed trigger. Recoverable,
+     and deliberately so: the panel takes its width from the trigger's rect
+     (dropdown/component.js) and .ac-dropdown__primary below wraps rather than
+     truncates, so the full name is always readable in the open list. The lamps say
+     which palette is live without needing to be read at all. */
+  flex: 0 1 15rem;
   max-width: 100%;
 }
 
 .console--nav {
   --console-accent: var(--accent-blue);
-  /* Pushes motion and theme to the right edge; on the two-row layout below this
-     is replaced by grid placement. */
-  margin-right: auto;
-  width: 21rem;
+  /* The primary control, and the right-hand end of the rail. It does not grow: a
+     600px trigger is not more usable than a 320px one, so the slack goes into the
+     channel between the brand and the cluster instead, where it reads as
+     deliberate space.
+
+     margin-inline-start is the wider channel that separates the preference pair
+     from this. It is the only thing doing that job -- an earlier pass drew a
+     hairline rule there, which was right when this console sat in the middle of the
+     row and wrong now that it has its own bordered edge immediately beside it.
+
+     One step of type over the theme console, and that step plus the width is the
+     whole of the hierarchy -- both consoles keep their lit border and glow, so the
+     primary control is bigger rather than louder. */
+  --console-type: 13.5px;
+  flex: 0 1 20rem;
+  margin-inline-start: 26px;
   max-width: 100%;
 }
 
@@ -389,7 +464,7 @@
   background: transparent;
   box-shadow: none;
   font-family: var(--font-mono);
-  font-size: 12.5px;
+  font-size: var(--console-type);
   font-weight: 600;
   color: var(--text);
 }
@@ -482,7 +557,7 @@
   outline: none;
   cursor: pointer;
   font-family: var(--font-mono);
-  font-size: 12.5px;
+  font-size: var(--console-type);
   font-weight: 600;
   color: var(--text);
   text-overflow: ellipsis;
@@ -521,11 +596,26 @@
    announce the native control and its checked state, and the label text is part
    of the accessible name. */
 
+/* The first half of the preference pair, and the start of the right-hand cluster:
+   the auto margin absorbs every spare pixel in the row, so motion, theme and the
+   picker are pinned to the rail's right edge and the slack opens up after the
+   brand.
+
+   No wrapper element and no bordered box around the pair -- a tray of boxed groups
+   is the generic default this brand is drawn against, and a box here would need its
+   own hover, focus and forced-colors treatment for no gain. What says "these two
+   belong together" is only spacing: 10px between motion and theme against 26px
+   before the picker, and a shared row at every width below.
+
+   On the grid layouts the auto margin is inert (grid ignores it for placement, and
+   justify-self does the work instead), so it does not need resetting. */
 .motion {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  flex: none;
   min-width: 0;
+  margin-inline-start: auto;
 }
 
 .switch {
@@ -548,6 +638,27 @@
 
 .switch:hover {
   color: var(--text);
+}
+
+/* The console cap's voice -- mono, small, tracked out, uppercase, muted. The header
+   already has one treatment for a small label naming a control, and this is the
+   third thing that is one (the brand descriptor takes it below 800px for the same
+   reason), so it uses that rather than adding a second. What it buys is the pair
+   reading as one object: the switch's label and the THEME cap beside it are the
+   same species of text.
+
+   IT IS NEVER CLIPPED, at any width. It used to be, below 560px, and the track is
+   not a control without it -- a bare 44x24 toggle beside an unlabelled console is a
+   guess. That is what makes it the widest fixed thing on the phone layout's second
+   row, so the tracking is the cap's 0.16em eased right back: at 10px it is ~88px of
+   rail, and every one of those pixels comes out of the theme trigger beside it.
+   Re-measure the 560px and 430px bands if these numbers move. */
+.switch__text {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .switch input {
@@ -627,11 +738,24 @@
 }
 
 /* =============================================================================
-   Responsive. Two rows below 1080px, in a 2-column grid that keeps the four
-   zones in DOM order:  brand | components  /  motion | theme.
+   Responsive. The picker only ever moves down and right; the pair never splits.
+
+     >=1200   one row     brand · · · · motion theme picker
+     560-1200 two rows    brand | motion theme  /  picker (full rail)
+     <560     three rows  brand  /  motion theme  /  picker (full rail)
    ============================================================================= */
 
-@media (max-width: 1080px) {
+/* Two rows. THREE columns rather than the two the source uses, and that is the
+   whole reason this is a grid at all: motion and theme have to sit side by side in
+   row 1 while the picker takes row 2 whole, and a two-column grid cannot place two
+   zones in one cell without a wrapper element.
+
+       brand | motion | theme
+       picker ----------------
+
+   Row 1 is `1fr auto auto`, so the brand takes the slack and the pair sits hard
+   against the right edge, exactly as it does in one row. */
+@media (max-width: 1200px) {
   :root {
     --header-h: 7.75rem;
   }
@@ -642,23 +766,33 @@
 
   .hdr-inner {
     display: grid;
-    grid-template-columns: auto 1fr;
-    column-gap: 14px;
+    grid-template-columns: 1fr auto auto;
+    column-gap: 10px;
     row-gap: 8px;
     align-items: center;
   }
 
-  /* Both consoles fill their column instead of reserving a fixed trigger width;
-     the panel narrows with them, and its rows wrap rather than truncate. */
-  .console--nav,
-  .console--theme {
-    justify-self: end;
+  /* The picker drops to a row of its own and lands directly under the pair, taking
+     columns 2 and 3 -- so its width is exactly motion + gap + theme, and its edges
+     line up with theirs on both sides. Not the full rail: the three controls read
+     as one right-hand block that happens to need two lines, where a rail-wide
+     trigger under a short pair reads as two unrelated things.
+
+     It is still the widest control by a distance (the pair is ~383px at 1200px
+     against the theme console's 240px), and it goes full-rail below 560px, where
+     the block is the whole rail anyway. */
+  .console--nav {
+    grid-column: 2 / -1;
+    margin-inline-start: 0;
     width: 100%;
-    max-width: 30rem;
+    max-width: none;
   }
 
-  .console--nav {
-    margin-right: 0;
+  /* Capped rather than fluid: on row 1 it is competing with the brand, and a theme
+     console that swelled to fill a wide row would be the loudest thing in a header
+     whose primary control is on the row below. */
+  .console--theme {
+    max-width: 15rem;
   }
 
   /* Dots one step down, matching the lamps below. Four circles at a 5px rhythm
@@ -673,14 +807,49 @@
   }
 }
 
-/* Below 900px the sidebar is gone and the components console is the whole of
-   this site's navigation, so it stops being width-capped and takes its row. The
-   theme console uncaps with it: two stacked controls of the same width read as
-   one block, where one short and one long reads as a mistake. */
-@media (max-width: 900px) {
-  .console--nav,
-  .console--theme {
-    max-width: none;
+/* The lockup stacks HERE rather than at 620px, and it is a fit decision rather than
+   a legibility one. On row 1 the brand now shares with the whole preference pair,
+   and one line of it is ~360px -- which between 620px and 800px left the theme
+   console with nothing. Stacked it is ~207px, and that is what keeps the header at
+   two rows all the way down to 560px instead of needing a third at 800px.
+
+   Nothing is hidden by this: the descriptor is the only thing that says which A11Y
+   Way site you are on, and it survives to 320px. The wordmark/tag TYPE ladder stays
+   keyed to 620px and 430px below, because those steps measure legibility, not fit --
+   the same argument deviation 12 makes for the note's own breakpoint. */
+@media (max-width: 800px) {
+  /* The rail's vertical gutter is a clamp, so the two-row header keeps shrinking
+     between here and 620px even though nothing re-flows. Measured 115.2px / 139.3px;
+     without this step the 1200px value over-reserves ~17px of scroll-margin on
+     every anchor at the bottom of the band. */
+  :root {
+    --header-h: 7.25rem;
+  }
+
+  :root[data-motion-note] {
+    --header-h: 8.75rem;
+  }
+
+  .brand-name {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    line-height: 1.05;
+  }
+
+  /* A separator between two things side by side. Stacked, the line break is the
+     separator, and a leftover dot reads as a bullet. */
+  .brand-dot {
+    display: none;
+  }
+
+  /* The second line takes the console cap's voice -- mono, small, tracked out,
+     muted -- so the header has ONE treatment for small labels rather than two, and
+     the descriptor reads as a deliberate sub-line of the wordmark rather than as a
+     word that wrapped. */
+  .brand-tag {
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
   }
 }
 
@@ -706,39 +875,19 @@
     gap: 9px;
   }
 
-  /* The lockup goes vertical. The wordmark is the half of the identity the two
-     A11Y Way sites SHARE; the descriptor is the half that differs -- so on a phone
-     the descriptor is the last thing that should go, not the first. Stacked, the
-     brand takes the width of its longer line instead of the sum of both, which is
-     what buys the room to keep it, and the room is the nav console's. The two lines
-     total ~33px: inside the 36px the console already sets for this row, so the
-     header does not get taller. align-items must be restated -- the row lockup
-     aligns on the baseline, and in a column that property is suddenly the
-     horizontal axis, which would center the two lines on each other instead of
-     ranging them left. */
+  /* Step 2 of the wordmark ladder. The lockup is ALREADY stacked by here -- that
+     moved to the 800px block, where fit demanded it -- so what is left at this
+     breakpoint is legibility: type and gutters stepping down, nothing appearing or
+     disappearing. Size on .brand-name, the same carrier as the other two steps, so
+     there is one place to look for the wordmark's size. */
   .brand-name {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-    line-height: 1.05;
-    font-size: 16px; /* wordmark, step 2 of the ladder up top */
+    font-size: 16px;
   }
 
-  /* A separator between two things side by side. Stacked, the line break is the
-     separator, and a leftover dot reads as a bullet. */
-  .brand-dot {
-    display: none;
-  }
-
-  /* The second line takes the console cap's voice -- mono, small, tracked out,
-     muted -- so the header has ONE treatment for small labels rather than two, and
-     the descriptor reads as a deliberate sub-line of the wordmark rather than as a
-     word that wrapped. Tracking eases as the size grows: .16em was tuned for a 10px
-     cap, and at 13px the same ratio reads loose rather than deliberate. */
+  /* Tracking eases as the size grows: .16em was tuned for a 10px cap, and at 13px
+     the same ratio reads loose rather than deliberate. */
   .brand-tag {
     font-size: 13px;
-    letter-spacing: 0.13em;
-    text-transform: uppercase;
   }
 
   /* Stays flush with the rail above it. */
@@ -777,18 +926,58 @@
   }
 }
 
-/* The switch's own text goes before the brand does -- the track's state is
-   visible, and the toggle keeps its name from the text either way. */
+/* Three rows: the brand takes one of its own, the pair keeps theirs, the picker
+   keeps the rail.
+
+       brand -----------------
+       motion | theme
+       picker -----------------
+
+   Still DOM order read top to bottom, so tab order still matches reading order
+   (SC 2.4.3) -- the grid places, it does not reorder.
+
+   560px is where row 1 stops holding brand + motion + theme. The switch's label is
+   never clipped now, which costs that row ~100px it used to get for free, and the
+   label is the one thing on this rail that says what the toggle does -- a bare
+   44x24 track beside an unlabelled console is a guess, not a control.
+
+   The picker keeps the whole rail here exactly as it does at 1200px, which is the
+   point of the arrangement: on the smallest screens the only navigation there is
+   gets ~292px at 320px instead of the ~92px it got sharing a row with the brand. */
 @media (max-width: 560px) {
-  .switch__text {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
+  /* The third row, measured -- 146.4px and 170.5px, rounded up per deviation 10.
+     Both cover the slightly shorter 430px band below, where the lockup's type steps
+     down; a few px of over-reserve above an anchor costs nothing, and a token that
+     is short of the real header parks the anchor underneath it (SC 2.4.11). */
+  :root {
+    --header-h: 9.25rem;
+  }
+
+  :root[data-motion-note] {
+    --header-h: 10.75rem;
+  }
+
+  /* Two columns here, not the three above: with the brand and the picker both
+     spanning, the only row that needs columns is the pair's, and it wants the
+     switch at its content width with the theme console taking everything left. */
+  .hdr-inner {
+    grid-template-columns: auto 1fr;
+  }
+
+  .brand,
+  .console--nav {
+    grid-column: 1 / -1;
+  }
+
+  .motion {
+    grid-column: 1;
+  }
+
+  .console--theme {
+    grid-column: 2;
+    /* Uncapped: row 2 is the pair's alone, so whatever the switch does not need is
+       the trigger's, and this is the width where it is scarcest. */
+    max-width: none;
   }
 }
 
@@ -836,41 +1025,46 @@
     letter-spacing: 0.11em;
   }
 
-  /* NO floor on the components console here, and that is a decision rather than an
-     omission -- it was tried and taken back out.
+  /* The lamps go, and only here. They are a live readout of the palette and they
+     earn their ~69px everywhere else, but they are aria-hidden decoration --
+     display: none costs nothing in the accessibility tree -- and on row 2 of a
+     320px phone that 69px is the difference between a trigger showing a theme name
+     and one showing four characters. The purple caret still says which console this
+     is, and the swatch dots in the open panel are untouched: those sit in a list
+     that has the room, and they become the only palette cue once these are gone. */
+  .console__lamps {
+    display: none;
+  }
 
-     This site pays more for the "never hide the descriptor" policy than the source
-     does. Upstream's descriptor is one word ("Themes"); this one is "WCAG 2.2
-     Components", ~150px of tracked mono, sharing a rail with the ONLY navigation
-     left below 900px. At 320px the console comes out ~102px: a legal target, still
-     correctly named through its cap, and its open panel wraps rows rather than
-     truncating them -- but a trigger showing about eight characters.
+  /* STILL NO floor on the components console, and it is still a decision rather
+     than an omission -- it was tried and taken back out.
 
-     The obvious fix is a min-width on the console's grid track, forcing the tag to
-     wrap under the wordmark. It buys ~30px and it is a trap: a rem floor competes
-     against the brand's min-content, which is a function of the RENDERED font, not
-     of the character count. --font-ui falls back Trebuchet MS -> Segoe UI ->
-     Verdana, and Verdana is wide enough to push brand + floor past a 320px rail --
-     a horizontal scrollbar (SC 1.4.10) on exactly the machines nobody tests on.
-     Widen it and the brand's wordmark overflows into the console instead, silently,
-     because .brand carries min-width: 0.
+     A rem floor competes against the brand's min-content, which is a function of
+     the RENDERED font, not of the character count. --font-ui falls back Trebuchet
+     MS -> Segoe UI -> Verdana, and Verdana is wide enough to push brand + floor
+     past a 320px rail -- a horizontal scrollbar (SC 1.4.10) on exactly the
+     machines nobody tests on. Widen the floor instead and the brand's wordmark
+     overflows into the console, silently, because .brand carries min-width: 0.
 
-     As written the layout cannot overflow at any font: the console's track is 1fr
-     with a zero base, so the brand takes what it needs and the console takes the
-     rest. A cramped trigger is the honest cost of keeping the descriptor, and it
-     is recoverable -- the panel is still readable and the sidebar returns at
-     900px. A scrollbar that only appears on someone else's font is not. */
+     What has changed is that it no longer costs anything worth paying for. The
+     reason a floor ever looked necessary was the picker coming out ~102px at 320px,
+     and the picker does not share a row with the brand any more -- it has the whole
+     rail from 1200px down. So the invariant holds unchanged and buys more than it
+     used to: nothing in this rail has a width floor, and the layout therefore
+     cannot overflow at any font. site-header.spec.mjs sweeps for that at every
+     breakpoint. */
+}
 
-
-/* The reduced-motion note takes a third line, and only the token changes. Its own
-   breakpoint rather than a line in the block above, because the two are measuring
-   different things: 430px is where the lockup steps, ~378px is where this
-   sentence wraps. Sharing one boundary would mean re-tuning the note's value every
-   time the brand's type moves, and over-reserving 18px of scroll-margin on every
-   phone between. Measured, so re-measure if the note's wording changes. */
+/* The reduced-motion note takes another line, and only the token changes. Its own
+   breakpoint rather than a line in a block above, because these are all measuring
+   different things: 560px is where the header goes to three rows, 430px is where
+   the lockup's type steps, ~378px is where this sentence wraps. Sharing one
+   boundary would mean re-tuning the note's value every time the brand's type moves,
+   and over-reserving scroll-margin on every phone between. Measured, so re-measure
+   if the note's wording changes. */
 @media (max-width: 380px) {
   :root[data-motion-note] {
-    --header-h: 9.25rem;
+    --header-h: 11.625rem;
   }
 }
 

@@ -39,14 +39,6 @@ const base = import.meta.env.BASE_URL;
   over the heuristic, and -1 keeps the element focusable to script.
 */}
 <nav class="sidebar" aria-label="Components" tabindex="-1" data-component-nav>
-  {/*
-    Unhidden by the script, because until the script runs it is not true. Sighted
-    keyboard users are the ones who need it: a screen reader is told "menu bar"
-    and already knows what the arrows do, but nothing announces a roving tabindex
-    to an eye.
-  */}
-  <p class="sidebar__hint" hidden>Arrow keys move through this list; Tab leaves it.</p>
-
   <div class="sidebar__groups">
     {
       COMPONENTS_BY_GROUP.map((group) => (
@@ -135,8 +127,6 @@ const base = import.meta.env.BASE_URL;
     // arrow back down through.
     const start = items.find((el) => el.getAttribute('aria-current') === 'page') ?? items[0];
     start.tabIndex = 0;
-
-    nav.querySelector('.sidebar__hint')?.removeAttribute('hidden');
 
     // One owner for the roving tabindex, and it is the browser's own report of
     // where focus went -- so a mouse click leaves the Tab stop where the pointer

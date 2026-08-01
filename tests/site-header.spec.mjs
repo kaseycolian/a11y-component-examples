@@ -169,23 +169,52 @@ test('the brand mark and the tab icon are real files that follow the theme', asy
 
 /* --- Header layout -------------------------------------------------------- */
 
+/* One representative width per layout, plus both sides of each switch. The whole
+   ladder, for the sweeps that have to hold everywhere. Nothing above 1440px is a
+   separate case: .hdr-inner is capped at 90rem, so a wider viewport only adds
+   gutter. */
+const ONE_ROW_WIDTHS = [1440, 1366, 1280, 1201];
+const TWO_ROW_WIDTHS = [1200, 1000, 900, 801, 800, 620, 561];
+const THREE_ROW_WIDTHS = [560, 500, 431, 430, 375, 320];
+const ALL_WIDTHS = [...ONE_ROW_WIDTHS, ...TWO_ROW_WIDTHS, ...THREE_ROW_WIDTHS];
+
+/** The four zones' boxes, plus the rail's own content box. */
+async function zones(page) {
+  return page.evaluate(() => {
+    const box = (s) => {
+      const b = document.querySelector(s).getBoundingClientRect();
+      return { x: b.x, y: b.y, width: b.width, right: b.right };
+    };
+    const rail = document.querySelector('.hdr-inner');
+    const cs = getComputedStyle(rail);
+    const r = rail.getBoundingClientRect();
+    return {
+      brand: box('.brand'),
+      motion: box('.motion'),
+      theme: box('[data-theme-control]'),
+      nav: box('[data-jump-control]'),
+      railLeft: r.left + parseFloat(cs.paddingLeft),
+      railWidth: r.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight),
+    };
+  });
+}
+
 test('the four zones sit in one row, in the order you tab through them', async ({ page }) => {
   await page.goto('components/disclosure/');
+  await page.setViewportSize({ width: 1440, height: 900 });
 
-  const box = async (selector) => page.locator(selector).boundingBox();
-  const brand = await box('.brand');
-  const nav = await box('[data-jump-control]');
-  const motion = await box('.motion');
-  const theme = await box('[data-theme-control]');
+  const { brand, motion, theme, nav } = await zones(page);
 
-  // Left to right: identity, where you can go, a preference, the instrument.
-  expect(brand.x).toBeLessThan(nav.x);
-  expect(nav.x).toBeLessThan(motion.x);
+  // Left to right: identity, then the two preferences, then where you can go.
+  // The picker is at the right-hand end of the rail, which is why it is last.
+  expect(brand.x).toBeLessThan(motion.x);
   expect(motion.x).toBeLessThan(theme.x);
+  expect(theme.x).toBeLessThan(nav.x);
 
   // The point of the DOM order: Tab moves the way the eye does, never back
   // across the screen (SC 2.4.3). Anything that moves a zone visually has to
-  // move it here too.
+  // move it here too -- which is why putting the picker on the right meant
+  // moving it in SiteHeader.astro, not just in CSS.
   const order = await page.evaluate(() =>
     [...document.querySelector('.hdr-inner').children].map((el) =>
       el.matches('[data-jump-control]')
@@ -195,26 +224,92 @@ test('the four zones sit in one row, in the order you tab through them', async (
           : el.className.split(' ')[0],
     ),
   );
-  expect(order).toEqual(['brand', 'nav', 'motion', 'theme']);
+  expect(order).toEqual(['brand', 'motion', 'theme', 'nav']);
 });
 
-test('below 1080px the zones re-flow to two rows without reordering', async ({ page }) => {
+test('motion and theme are side by side at every width, with nothing between', async ({ page }) => {
+  // The rule the whole arrangement is built around: they are the same kind of
+  // thing -- a preference about how the page behaves -- so they are one pair and
+  // no layout is allowed to split them. Asserted as geometry rather than as a
+  // class name, so it holds however the rows are put together.
   await page.goto('components/disclosure/');
-  await page.setViewportSize({ width: 900, height: 900 });
 
-  const box = async (selector) => page.locator(selector).boundingBox();
-  const brand = await box('.brand');
-  const nav = await box('[data-jump-control]');
-  const motion = await box('.motion');
-  const theme = await box('[data-theme-control]');
+  for (const width of ALL_WIDTHS) {
+    await page.setViewportSize({ width, height: 900 });
+    const { brand, motion, theme, nav } = await zones(page);
 
-  // brand | components  /  motion | theme -- read left to right, then down,
-  // which is still the DOM order above.
-  expect(nav.y).toBeLessThan(theme.y);
-  expect(motion.y).toBeGreaterThan(brand.y);
-  expect(motion.x).toBeLessThan(theme.x);
-  // The two consoles right-align, so the pair reads as one stack.
-  expect(Math.round(nav.x + nav.width)).toBe(Math.round(theme.x + theme.width));
+    expect(Math.round(motion.y), `pair split across rows at ${width}px`).toBe(Math.round(theme.y));
+    expect(motion.x, `theme is not after motion at ${width}px`).toBeLessThan(theme.x);
+
+    // Nothing else sits in the channel between them. Row-aware on purpose: below
+    // 1200px the picker spans the whole rail on the row underneath, so it overlaps
+    // the pair's x-range while being nowhere near it. Only a zone sharing their row
+    // can come between them.
+    const gap = theme.x - motion.right;
+    expect(gap, `gap inside the pair went negative at ${width}px`).toBeGreaterThanOrEqual(0);
+    for (const [name, other] of [['brand', brand], ['picker', nav]]) {
+      const sameRow = Math.abs(other.y - motion.y) < 8;
+      const between = sameRow && other.right > motion.right && other.x < theme.x;
+      expect(between, `${name} sits between motion and theme at ${width}px`).toBe(false);
+    }
+  }
+});
+
+test('the brand is never painted underneath the zone beside it', async ({ page }) => {
+  // The regression this file did not have. .brand-name is white-space: nowrap and
+  // nothing in the lockup can reflow, so a brand that is allowed to shrink does
+  // not get smaller -- it overflows its own box, and whatever is next to it draws
+  // a background over the top. It was invisible to every assertion here because
+  // the overflow sweep only ran at 900px and under, where the layout is a grid;
+  // the failure lived entirely in the flex row above it.
+  await page.goto('components/disclosure/');
+
+  for (const width of [...ONE_ROW_WIDTHS, ...TWO_ROW_WIDTHS]) {
+    await page.setViewportSize({ width, height: 900 });
+    const { brand, motion } = await zones(page);
+
+    // Geometry only, never a pixel threshold: the brand's width follows the font
+    // --font-ui actually resolves to (it falls back to Verdana, which is wider),
+    // so any number here would pass on this machine and fail on another.
+    expect(Math.round(motion.x), `brand is overrun at ${width}px`).toBeGreaterThanOrEqual(
+      Math.round(brand.right),
+    );
+  }
+});
+
+test('the components picker is the widest control at every width', async ({ page }) => {
+  // Which control this site is *for*, said in geometry. The picker is this site's
+  // navigation and the only navigation there is below 900px; the theme console is
+  // a preference. Before this the sizes said the opposite -- 21rem against 26rem.
+  await page.goto('components/disclosure/');
+
+  for (const width of ALL_WIDTHS) {
+    await page.setViewportSize({ width, height: 900 });
+    const { theme, nav } = await zones(page);
+
+    expect(nav.width, `picker is not the widest control at ${width}px`).toBeGreaterThan(theme.width);
+  }
+});
+
+test('below 1200px the picker drops under the pair, at the pair’s own width', async ({ page }) => {
+  await page.goto('components/disclosure/');
+
+  for (const width of TWO_ROW_WIDTHS) {
+    await page.setViewportSize({ width, height: 900 });
+    const { brand, motion, theme, nav } = await zones(page);
+
+    // brand | motion theme  /  picker -- read left to right, then down, which is
+    // still the DOM order above. The picker is UNDER the theme console, which is
+    // the arrangement stated: it only ever moves down and right.
+    expect(nav.y, `picker is not below the pair at ${width}px`).toBeGreaterThan(theme.y);
+    expect(brand.x).toBeLessThan(motion.x);
+
+    // It spans the pair's columns exactly, so the three controls read as one
+    // right-hand block over two lines rather than as a rail-wide bar under a
+    // short pair. Both edges, because either one alone would pass on a fluke.
+    expect(Math.round(nav.x), `picker left edge at ${width}px`).toBe(Math.round(motion.x));
+    expect(Math.round(nav.right), `picker right edge at ${width}px`).toBe(Math.round(theme.right));
+  }
 });
 
 test('the sidebar gives way to the header picker below 900px', async ({ page }) => {
@@ -224,28 +319,20 @@ test('the sidebar gives way to the header picker below 900px', async ({ page }) 
   // Stacked, the full roster sat between the header and the page you asked for.
   await page.setViewportSize({ width: 760, height: 900 });
   await expect(page.locator('.sidebar')).toBeHidden();
-  // Still navigable -- the picker is the same list, and now the whole row.
+  // Still navigable -- the picker is the same list, on a row of its own.
   await expect(jump(page).locator('.ac-dropdown__toggle')).toBeVisible();
 
-  const nav = await page.locator('[data-jump-control]').boundingBox();
-  const brand = await page.locator('.brand').boundingBox();
-  const railRight = await page.evaluate(() => {
-    const el = document.querySelector('.hdr-inner');
-    return el.getBoundingClientRect().right - parseFloat(getComputedStyle(el).paddingRight);
-  });
+  const { motion, theme, nav } = await zones(page);
+  expect(nav.y).toBeGreaterThan(theme.y);
+  expect(Math.round(nav.x)).toBe(Math.round(motion.x));
+  expect(Math.round(nav.right)).toBe(Math.round(theme.right));
 
-  // It uncaps below 900px because it is the only navigation left, so it takes
-  // everything the brand does not -- stated as "starts after the brand, ends at
-  // the rail" rather than as a width in pixels. The brand's own width is a
-  // function of the rendered font (--font-ui falls back to Verdana, which is
-  // wider), so any threshold here would pass on this machine and fail on another.
-  expect(Math.round(nav.x)).toBeGreaterThanOrEqual(Math.round(brand.x + brand.width));
-  expect(Math.round(nav.x + nav.width)).toBe(Math.round(railRight));
-
-  // And the pair never forces a sideways scroll at any width (SC 1.4.10). This is
-  // the assertion the console's missing min-width depends on -- see the note in
-  // site-header.css's 430px block before adding one.
-  for (const width of [900, 760, 620, 430, 375, 320]) {
+  // And the header never forces a sideways scroll at any width (SC 1.4.10). This
+  // is the assertion the console's missing min-width depends on -- see the note in
+  // site-header.css's 430px block before adding one. The one-row widths are in the
+  // sweep too: the rail up there is a flex row with no floor on either console,
+  // which is the same invariant stated in a different layout.
+  for (const width of ALL_WIDTHS) {
     await page.setViewportSize({ width, height: 900 });
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -254,11 +341,48 @@ test('the sidebar gives way to the header picker below 900px', async ({ page }) 
   }
 });
 
+test('below 560px the brand takes its own row and the pair keeps theirs', async ({ page }) => {
+  // Three rows: brand / motion theme / picker. 560px is where row 1 stops holding
+  // brand + motion + theme, and it is where it stops because the switch's label is
+  // never clipped any more -- see the test below. The grid places the zones, it
+  // does not reorder them, so reading order still matches tab order (SC 2.4.3).
+  await page.goto('components/disclosure/');
+  await page.setViewportSize({ width: 320, height: 640 });
+
+  const { brand, motion, theme, nav, railLeft, railWidth } = await zones(page);
+
+  expect(brand.y).toBeLessThan(motion.y);
+  expect(Math.round(motion.y)).toBe(Math.round(theme.y));
+  expect(motion.y).toBeLessThan(nav.y);
+  expect(motion.x).toBeLessThan(theme.x);
+
+  // The picker still has the whole rail, exactly as it does at 1200px.
+  expect(Math.round(nav.x)).toBe(Math.round(railLeft));
+  expect(Math.round(nav.width)).toBe(Math.round(railWidth));
+});
+
+test('the motion toggle keeps its visible label at every width', async ({ page }) => {
+  // It used to be clipped below 560px. A bare 44x24 track beside an unlabelled
+  // console is a guess rather than a control -- and the label is part of the
+  // toggle's accessible name, so clipping it was the only way to hide it at all.
+  await page.goto('components/disclosure/');
+
+  const label = page.locator('.switch__text');
+  for (const width of ALL_WIDTHS) {
+    await page.setViewportSize({ width, height: 900 });
+    const box = await label.boundingBox();
+    // Clipped text still reports a box, so the check is that it has real size.
+    expect(box.width, `motion label is clipped at ${width}px`).toBeGreaterThan(20);
+  }
+});
+
 /* SC 2.4.11: scroll-margin-top is calc(--header-h + 1rem), so the token going
    stale is an anchor target parked underneath a sticky header. The header
-   re-flows from one row to two, hence a check per breakpoint. */
+   re-flows from one row to two to three, so every breakpoint gets a check and both
+   sides of the two row-count switches are in the list -- those are where the real
+   header changes height by a whole row. */
 async function assertHeaderTokenCovers(page, label) {
-  for (const width of [1440, 900, 760, 375, 320]) {
+  for (const width of [1440, 1201, 1200, 1000, 801, 800, 621, 620, 561, 560, 430, 375, 320]) {
     await page.setViewportSize({ width, height: 900 });
     const { real, token } = await page.evaluate(() => ({
       real: document.querySelector('.site-header').getBoundingClientRect().height,
