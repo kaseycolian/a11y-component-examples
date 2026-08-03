@@ -15,6 +15,7 @@ In `library/components/button/` — copy `component.{html,css,js}`, read `docs.m
 
 ## Keyboard
 
+- `Tab` — native: moves to and from the button. disabled removes the stop, aria-disabled keeps it
 - `Enter / Space` — activates. Native to <button>; a div owes both by hand
 
 **States:** hover, active, focus-visible, disabled

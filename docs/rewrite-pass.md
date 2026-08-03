@@ -324,9 +324,14 @@ COMPONENT: <slug>
 33 components. Order is a default, not a constraint — `button` is first because it is the most-referenced
 component and becomes the reference every later one copies.
 
+**Read `button`'s four files before starting any other component.** It is the worked example of every
+rule above: the two demo sections, the renumbering and how it ripples into the CSS and JS section
+headers, the `Required markup` table, the mandatory `Keyboard` table with its "Keys deliberately not
+bound" note, and a `summary` in the new voice.
+
 | # | slug | done | notes |
 | --- | --- | --- | --- |
-| 1 | `button` | [ ] | pilot. 4-column contract table to normalize. 1 broken marker. |
+| 1 | `button` | [x] | **The reference. Copy its shape.** Examples renumbered: old 3 (unavailable) became 2 and moved into *Correct examples*; old 2 (no `type`) became 3. That rippled into the `[DISABLED]`/`[SIZE]` order in the CSS and the `[LOCK]`/`[FORM]` order in the JS — both files now read in example order, which is the rule. `data-ac-button` moved off the grid onto a new wrapper `<div>`, because the grid is now two grids. Spec renamed 12 demo strings and was reordered to match. |
 | 2 | `icon-button` | [ ] | 3 broken markers, side-by-side comparison rail. |
 | 3 | `loading-button` | [ ] | reference for on-page text length. |
 | 4 | `chip-toggle` | [ ] | rename → Filter Chip. |

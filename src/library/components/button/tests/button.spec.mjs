@@ -11,9 +11,12 @@ test.beforeEach(async ({ page }) => {
    really is unreachable while the soft-disabled one is reachable and blocked,
    the div really has no button role, and the undersized target really is under
    the floor. Each of those is a sentence in docs.md that would otherwise be a
-   promise. */
+   promise.
 
-/* --- example 1 · the weights and accents ---------------------------------- */
+   Ordered to match component.html: examples 1 and 2 are the correct markup,
+   3 to 5 are the mistakes. */
+
+/* --- example 1 · weights and accents -------------------------------------- */
 
 test('every specimen is a real button with a name from its own text', async ({ page }) => {
   for (const name of ['Solid', 'Outline', 'Ghost', 'Pink', 'Green', 'Blue', 'Purple']) {
@@ -69,45 +72,7 @@ test('the ring is the same on all three weights and owes nothing to the border',
   expect(ghostBorder).toBe('rgba(0, 0, 0, 0)');
 });
 
-/* --- example 2 · type is not optional ------------------------------------- */
-
-test('the bare button has no type attribute, and submitting is what it does', async ({ page }) => {
-  const bare = page.getByRole('button', { name: 'Add to queue' });
-  await expect(bare).not.toHaveAttribute('type', /.*/);
-
-  const log = page.locator('[data-ac-btn-form-log]');
-  await expect(log).toHaveAttribute('role', 'status');
-  await expect(log).toBeEmpty();
-
-  await bare.click();
-  await expect(log).toContainText('The form submitted');
-  await expect(log).toContainText('No type attribute means type="submit"');
-  await expect(log).toHaveAttribute('data-ac-btn-bad', 'true');
-});
-
-test('type="button" runs its own handler and does not submit', async ({ page }) => {
-  await page.getByRole('button', { name: 'Clear the queue' }).click();
-
-  const log = page.locator('[data-ac-btn-form-log]');
-  await expect(log).toContainText('The form did not submit');
-  await expect(log).not.toHaveAttribute('data-ac-btn-bad', /.*/);
-});
-
-test('Enter in the field submits through the default button, not the green one', async ({
-  page,
-}) => {
-  await page.getByLabel('Track').press('Enter');
-
-  // event.submitter is NOT null here — the browser nominates the form's default
-  // button, the first submit button in DOM order, and on this form that is the
-  // bare one. Nobody pressed it. That is the reason implicit submission is
-  // worth knowing about at all.
-  const log = page.locator('[data-ac-btn-form-log]');
-  await expect(log).toContainText('"Add to queue" is what submitted it');
-  await expect(log).not.toContainText('Save the set list');
-});
-
-/* --- example 3 · disabled versus aria-disabled ---------------------------- */
+/* --- example 2 · disabled versus aria-disabled ---------------------------- */
 
 test('the hard-disabled button is out of the tab order; the soft one is not', async ({ page }) => {
   await expect(page.locator('[data-ac-btn-out="hard"]')).toHaveText('not in the tab order');
@@ -115,10 +80,10 @@ test('the hard-disabled button is out of the tab order; the soft one is not', as
 
   // The readout is measured, so assert the underlying fact separately rather
   // than trusting the component's own report of it.
-  const hard = page.getByRole('button', { name: 'Print the flyer' });
+  const hard = page.getByRole('button', { name: 'Download PDF' });
   await expect(hard).toBeDisabled();
 
-  const soft = page.getByRole('button', { name: 'Publish the set' });
+  const soft = page.getByRole('button', { name: 'Publish project' });
   // Not toBeEnabled(): Playwright treats aria-disabled="true" as disabled, so
   // it cannot be used to prove the control is still focusable. Ask the DOM.
   expect(await soft.evaluate((el) => el.disabled)).toBe(false);
@@ -141,18 +106,18 @@ test('measuring focusability does not leave focus behind', async ({ page }) => {
 });
 
 test('the reason is described only on the button that can be reached', async ({ page }) => {
-  const soft = page.getByRole('button', { name: 'Publish the set' });
+  const soft = page.getByRole('button', { name: 'Publish project' });
   await expect(soft).toHaveAttribute('aria-describedby', 'ac-btn-lock-why');
-  await expect(soft).toHaveAccessibleDescription('Add at least one track before publishing.');
+  await expect(soft).toHaveAccessibleDescription('Add at least one task before publishing.');
 
-  await expect(page.getByRole('button', { name: 'Print the flyer' })).not.toHaveAttribute(
+  await expect(page.getByRole('button', { name: 'Download PDF' })).not.toHaveAttribute(
     'aria-describedby',
     /.*/,
   );
 });
 
 test('the guard blocks the soft-disabled click, including from Space', async ({ page }) => {
-  const soft = page.getByRole('button', { name: 'Publish the set' });
+  const soft = page.getByRole('button', { name: 'Publish project' });
   const log = page.locator('[data-ac-btn-lock-log]');
 
   await expect(log).toBeEmpty();
@@ -176,17 +141,55 @@ test('the guard blocks the soft-disabled click, including from Space', async ({ 
 
 test('the hard-disabled button dispatches nothing at all', async ({ page }) => {
   const log = page.locator('[data-ac-btn-lock-log]');
-  await page.getByRole('button', { name: 'Print the flyer' }).click({ force: true });
+  await page.getByRole('button', { name: 'Download PDF' }).click({ force: true });
   await expect(log).toBeEmpty();
 });
 
-/* --- example 4 · not everything that looks like a button is one ------------ */
+/* --- example 3 · a button with no type attribute -------------------------- */
+
+test('the bare button has no type attribute, and submitting is what it does', async ({ page }) => {
+  const bare = page.getByRole('button', { name: 'Add task' });
+  await expect(bare).not.toHaveAttribute('type', /.*/);
+
+  const log = page.locator('[data-ac-btn-form-log]');
+  await expect(log).toHaveAttribute('role', 'status');
+  await expect(log).toBeEmpty();
+
+  await bare.click();
+  await expect(log).toContainText('The form submitted');
+  await expect(log).toContainText('No type attribute means type="submit"');
+  await expect(log).toHaveAttribute('data-ac-btn-bad', 'true');
+});
+
+test('type="button" runs its own handler and does not submit', async ({ page }) => {
+  await page.getByRole('button', { name: 'Clear form' }).click();
+
+  const log = page.locator('[data-ac-btn-form-log]');
+  await expect(log).toContainText('The form did not submit');
+  await expect(log).not.toHaveAttribute('data-ac-btn-bad', /.*/);
+});
+
+test('Enter in the field submits through the default button, not the green one', async ({
+  page,
+}) => {
+  await page.getByLabel('Task name').press('Enter');
+
+  // event.submitter is NOT null here — the browser nominates the form's default
+  // button, the first submit button in DOM order, and on this form that is the
+  // bare one. Nobody pressed it. That is the reason implicit submission is
+  // worth knowing about at all.
+  const log = page.locator('[data-ac-btn-form-log]');
+  await expect(log).toContainText('"Add task" is what submitted it');
+  await expect(log).not.toContainText('Save project');
+});
+
+/* --- example 4 · a div styled as a button --------------------------------- */
 
 test('the div is not a button, and the real one is', async ({ page }) => {
   // Both carry the same label text. Exactly one is in the accessibility tree
   // as a button, and that is the whole example.
-  await expect(page.getByRole('button', { name: 'Buy tickets' })).toHaveCount(1);
-  await expect(page.getByRole('button', { name: 'Buy tickets' })).toHaveJSProperty(
+  await expect(page.getByRole('button', { name: 'Start trial' })).toHaveCount(1);
+  await expect(page.getByRole('button', { name: 'Start trial' })).toHaveJSProperty(
     'tagName',
     'BUTTON',
   );
@@ -212,18 +215,18 @@ test('the div runs from a pointer and from nothing else', async ({ page }) => {
 });
 
 test('the link is a link, and Space does not activate it', async ({ page }) => {
-  const link = page.getByRole('link', { name: 'Tour dates' });
-  await expect(link).toHaveAttribute('href', '#ac-btn-dates');
+  const link = page.getByRole('link', { name: 'View pricing' });
+  await expect(link).toHaveAttribute('href', '#ac-btn-pricing');
   await expect(link).not.toHaveAttribute('role', /.*/);
 
   // Enter follows it and moves focus to the target, which is why the target
   // carries tabindex="-1" (SC 2.4.3).
   await link.focus();
   await page.keyboard.press('Enter');
-  await expect(page.locator('#ac-btn-dates')).toBeFocused();
+  await expect(page.locator('#ac-btn-pricing')).toBeFocused();
 });
 
-/* --- example 5 · target size and the press -------------------------------- */
+/* --- example 5 · a target under the 24px floor ---------------------------- */
 
 test('the default and the compact size both clear 24x24; the third does not', async ({ page }) => {
   const box = async (name) =>
@@ -232,7 +235,7 @@ test('the default and the compact size both clear 24x24; the third does not', as
       return { w: Math.round(r.width), h: Math.round(r.height) };
     });
 
-  const big = await box('Doors at 8');
+  const big = await box('Save changes');
   expect(big.h).toBeGreaterThanOrEqual(44);
 
   const small = await box('Small');
@@ -356,6 +359,6 @@ test('the factory is idempotent and destroy() removes the guard', async ({ page 
   // reports it either, which is the point: the attribute never did the work.
   const log = page.locator('[data-ac-btn-lock-log]');
   await expect(log).toBeEmpty();
-  await page.getByRole('button', { name: 'Publish the set' }).click({ force: true });
+  await page.getByRole('button', { name: 'Publish project' }).click({ force: true });
   await expect(log).toBeEmpty();
 });

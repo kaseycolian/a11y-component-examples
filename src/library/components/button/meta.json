@@ -3,7 +3,7 @@
   "name": "Button",
   "group": "buttons-actions",
   "order": 10,
-  "summary": "A native button, three weights and four accents — and the four things that go wrong around it: the missing type attribute, disabled versus aria-disabled, the div that only works with a mouse, and a target under the size floor.",
+  "summary": "A button is a control that does something on the current page. The native <button> element already carries the role, the tab stop, Enter and Space, and its accessible name, so there is no ARIA to add. The hard part is everything around it: the missing type attribute, and choosing between disabled and aria-disabled.",
   "tags": [
     "button",
     "type",
@@ -18,7 +18,7 @@
   "wcag": ["1.4.1", "1.4.11", "2.1.1", "2.4.7", "2.5.8", "4.1.2"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Every example after the first is live and half wrong on purpose. Example 2's first button has no type attribute and submits the form; example 4's middle control is a div and cannot be reached from the keyboard at all; example 5's third button is under the 24px floor and the readout measures it.",
+  "demoNote": "Every example under Common mistakes is live, so you can press each one and watch it fail. Tab through example 4 and you get two stops for three controls.",
   "contract": {
     "useWhen": "A real button, plus why a div with a click handler is not one.",
     "root": [".ac-btn"],
@@ -32,6 +32,10 @@
       ]
     },
     "keyboard": [
+      [
+        "Tab",
+        "native: moves to and from the button. disabled removes the stop, aria-disabled keeps it"
+      ],
       [
         "Enter / Space",
         "activates. Native to <button>; a div owes both by hand"

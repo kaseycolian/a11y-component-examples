@@ -8,8 +8,8 @@
      [CORE]      every example. The box, the ring, the press. Required.
      [WEIGHTS]   every example. solid / outline / ghost. Needs [CORE].
      [ACCENTS]   example 1. Four one-line rules. Delete the ones you don't use.
+     [DISABLED]  example 2. Both kinds of unavailable.
      [SIZE]      example 5. The compact modifier.
-     [DISABLED]  example 3. Both kinds of unavailable.
      [PANEL]     the frame around each example on this page. Not component code
                  in the sense the rest of the file is — delete it.
      [BROKEN]    examples 4 and 5. Delete them — they are the failures.
@@ -154,22 +154,10 @@
   --ac-btn-on-accent: var(--ac-on-purple, var(--on-purple, #1a0838));
 }
 
-/* --- [SIZE] example 5 -----------------------------------------------------
-   The compact one. It is still over the 24px floor with room to spare, and the
-   readout on that example measures it rather than taking this comment's word
-   for it. There is no size below this one. */
-
-.ac-btn--sm {
-  min-height: var(--ac-target-min, 24px);
-  min-width: var(--ac-target-min, 24px);
-  padding: 0.25rem 0.7rem;
-  font-size: 0.8rem;
-}
-
-/* --- [DISABLED] example 3 ------------------------------------------------
+/* --- [DISABLED] example 2 ------------------------------------------------
    Both kinds get the same paint, because to a sighted reader they are the same
    thing. The difference is entirely in the accessibility tree and the tab
-   order, and it is the whole of example 3.
+   order, and it is the whole of example 2.
 
    Drawn rather than dimmed. opacity reads as "ignore this" instead of "you
    cannot use this", and it costs contrast on the way — SC 1.4.3 exempts a
@@ -193,6 +181,18 @@
 .ac-btn[aria-disabled="true"]:active {
   translate: none;
   scale: none;
+}
+
+/* --- [SIZE] example 5 -----------------------------------------------------
+   The compact one. It is still over the 24px floor with room to spare, and the
+   readout on that example measures it rather than taking this comment's word
+   for it. There is no size below this one. */
+
+.ac-btn--sm {
+  min-height: var(--ac-target-min, 24px);
+  min-width: var(--ac-target-min, 24px);
+  padding: 0.25rem 0.7rem;
+  font-size: 0.8rem;
 }
 
 /* --- [PANEL] the frame around each example -------------------------------

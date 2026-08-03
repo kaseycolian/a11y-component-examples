@@ -3,9 +3,9 @@
 
    WHAT TO COPY
      [CORE]       the aria-disabled guard. It is the only part of this file a
-                  real app needs, and example 3 is what it is for.
-     [FORM]       example 2. Reporting which button submitted.
-     [LOCK]       example 3. Measuring which of the two the keyboard reaches.
+                  real app needs, and example 2 is what it is for.
+     [LOCK]       example 2. Measuring which of the two the keyboard reaches.
+     [FORM]       example 3. Reporting which button submitted.
      [FAKE]       example 4. The div's mouse-only handler, live.
      [SIZES]      example 5. Measuring the three targets.
      [AUTO-INIT]  delete if you construct instances yourself.
@@ -73,52 +73,7 @@
       else node.removeAttribute('data-ac-btn-bad');
     }
 
-    /* === [FORM] example 2 ================================================ */
-
-    var form = root.querySelector('[data-ac-btn-form]');
-    var formLog = form && form.querySelector('[data-ac-btn-form-log]');
-
-    function onFormSubmit(event) {
-      // Only so the demo page stays put. In your app this is where the work is.
-      event.preventDefault();
-
-      // Enter in the text field lands here too, and event.submitter is NOT null
-      // for it: the browser nominates the form's default button — the first
-      // submit button in DOM order — as the submitter, even though nobody
-      // pressed it. On this form that is the bare one. submitter is null only
-      // when the form has no submit button to nominate.
-      var by = event.submitter;
-      var label = by ? by.textContent.trim() : 'nothing — this form has no default button';
-      var bare = !!by && !by.hasAttribute('type');
-
-      say(
-        formLog,
-        bare
-          ? 'The form submitted, and "' +
-              label +
-              '" is what submitted it. No type attribute means type="submit", whatever the ' +
-              'label says.'
-          : 'The form submitted, from ' + (by ? '"' + label + '"' : label) + '.',
-        bare,
-      );
-    }
-
-    function onFormClick(event) {
-      var target = event.target;
-      if (!target || typeof target.closest !== 'function') return;
-
-      var btn = target.closest('button[type="button"]');
-      if (!btn || !form.contains(btn)) return;
-
-      say(formLog, '"' + btn.textContent.trim() + '" ran its own handler. The form did not submit.');
-    }
-
-    if (form) {
-      form.addEventListener('submit', onFormSubmit);
-      form.addEventListener('click', onFormClick);
-    }
-
-    /* === [LOCK] example 3 ================================================ */
+    /* === [LOCK] example 2 ================================================ */
 
     var lock = root.querySelector('[data-ac-btn-lock]');
     var lockLog = lock && lock.querySelector('[data-ac-btn-lock-log]');
@@ -179,6 +134,51 @@
     }
 
     if (lock) measureLock();
+
+    /* === [FORM] example 3 ================================================ */
+
+    var form = root.querySelector('[data-ac-btn-form]');
+    var formLog = form && form.querySelector('[data-ac-btn-form-log]');
+
+    function onFormSubmit(event) {
+      // Only so the demo page stays put. In your app this is where the work is.
+      event.preventDefault();
+
+      // Enter in the text field lands here too, and event.submitter is NOT null
+      // for it: the browser nominates the form's default button — the first
+      // submit button in DOM order — as the submitter, even though nobody
+      // pressed it. On this form that is the bare one. submitter is null only
+      // when the form has no submit button to nominate.
+      var by = event.submitter;
+      var label = by ? by.textContent.trim() : 'nothing — this form has no default button';
+      var bare = !!by && !by.hasAttribute('type');
+
+      say(
+        formLog,
+        bare
+          ? 'The form submitted, and "' +
+              label +
+              '" is what submitted it. No type attribute means type="submit", whatever the ' +
+              'label says.'
+          : 'The form submitted, from ' + (by ? '"' + label + '"' : label) + '.',
+        bare,
+      );
+    }
+
+    function onFormClick(event) {
+      var target = event.target;
+      if (!target || typeof target.closest !== 'function') return;
+
+      var btn = target.closest('button[type="button"]');
+      if (!btn || !form.contains(btn)) return;
+
+      say(formLog, '"' + btn.textContent.trim() + '" ran its own handler. The form did not submit.');
+    }
+
+    if (form) {
+      form.addEventListener('submit', onFormSubmit);
+      form.addEventListener('click', onFormClick);
+    }
 
     /* === [FAKE] example 4 ================================================ */
 
