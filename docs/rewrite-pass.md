@@ -181,8 +181,13 @@ One shared domain so a reader never context-switches between components.
 
 Fake credentials keep a **valid shape** — right prefix, roughly the right length — so the example still
 teaches the format. The body has to read as obviously fabricated at a glance: repeat `462`, `99` and
-`abcdefg` rather than typing plausible hex, or a secret scanner flags the file and a reader has to stop
-and check whether it is real.
+`abcdefg` rather than typing plausible hex.
+
+**This is not a style rule.** `sk_test_` followed by 24 hex characters is exactly what GitHub's push
+protection matches as a Stripe test key, and it blocked a push over a value that was invented on the
+spot. Push protection scans **every commit in the push**, not the tip, so fixing the working tree does
+not clear it — the four commits carrying it had to be rewritten with `git filter-branch` before the
+push would go through. Get the shape right the first time.
 
 **Sweep these out:** `setlist`, `merch`, `zine`, `distro`, `matinee`, `Salad Days`, `Ruby Soho`, `Gilman`,
 `Bakesale`, `Cat's Cradle`, `Cold Water Flat`, `Ten Second Anthem`, `Basement Tapes`, `Storm Windows`,
