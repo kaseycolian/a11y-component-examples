@@ -212,7 +212,7 @@
       "files": ["html", "css"],
       "status": "stable",
       "hasContract": true,
-      "_summaryRev": "ab81d96f"
+      "_summaryRev": "d65c8c55"
     },
     {
       "slug": "input-group",
