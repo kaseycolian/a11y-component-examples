@@ -1,14 +1,14 @@
 /* ===========================================================================
-   CHIP TOGGLE
+   FILTER CHIP
 
    WHAT TO COPY
      [CORE]       toggle() and the click delegation. The whole component, and
                   about fifteen lines.
      [FILTER]     example 1. The result count this page puts in a live region.
-     [CUES]       example 2. What actually changes when a chip goes down.
-     [NAMES]      example 3. The accessible name in both states.
-     [SUBMITS]    example 4. Which of the three chips has a value to send.
-     [ROVING]     example 5. The toolbar's one tab stop and its arrow keys.
+     [CUES]       example 4. What actually changes when a chip goes down.
+     [NAMES]      example 5. The accessible name in both states.
+     [SUBMITS]    example 2. Which of the three chips has a value to send.
+     [ROVING]     example 3. The toolbar's one tab stop and its arrow keys.
      [AUTO-INIT]  delete if you construct instances yourself.
 
    Copy the file whole for the library version.
@@ -24,7 +24,7 @@
 
    A toggle button is not a checkbox: nothing is submitted, and the press takes
    effect immediately. When the value has to travel with a form, use a real
-   checkbox — example 4 has both.
+   checkbox — example 2 has both.
 
    No dependencies. Plain IIFE, so a paste into a <script> tag works.
    =========================================================================== */
@@ -154,11 +154,105 @@
       });
 
       result.textContent = names.length
-        ? count + ' records · ' + names.join(', ')
-        : TOTAL + ' records · no filters';
+        ? count + ' orders · ' + names.join(', ')
+        : TOTAL + ' orders · no filters';
     }
 
-    /* === [CUES] example 2 ================================================
+    /* === [SUBMITS] example 2 ============================================= */
+
+    var submitsPanel = root.querySelector('[data-ac-ct-submits]');
+    var form = submitsPanel && submitsPanel.querySelector('[data-ac-ct-form]');
+    var ask = submitsPanel && submitsPanel.querySelector('[data-ac-ct-ask]');
+    var switchChip = submitsPanel && submitsPanel.querySelector('[data-ac-chip-switch]');
+    var checkChip = form && form.querySelector('.ac-chip__input');
+    var pressChip = form && form.querySelector('[data-ac-chip]');
+
+    /* role="switch" carries aria-checked, never aria-pressed. Both are legal on
+       a button and they are not interchangeable: pressed is "this control is
+       held down", checked is "this setting is on". Older JAWS announces the
+       role inconsistently — switch has that argument in full. */
+    function onSwitchClick() {
+      var next = switchChip.getAttribute('aria-checked') !== 'true';
+      switchChip.setAttribute('aria-checked', next ? 'true' : 'false');
+      sampleSubmits();
+    }
+
+    function sampleSubmits() {
+      if (!form) return;
+      say(out('what-split'), 'aria-pressed=' + pressChip.getAttribute('aria-pressed'));
+      say(out('what-check'), 'checked=' + checkChip.checked);
+      say(out('what-switch'), 'aria-checked=' + switchChip.getAttribute('aria-checked'));
+    }
+
+    function onAsk() {
+      var entries = [];
+      new FormData(form).forEach(function (value, key) {
+        entries.push(key + '=' + value);
+      });
+      // Not marked as a failure: the two buttons having nothing to send is
+      // correct, and it is the reason to reach for the checkbox instead.
+      say(out('what-data'), entries.length ? entries.join(' & ') : 'nothing');
+    }
+
+    if (switchChip) switchChip.addEventListener('click', onSwitchClick);
+    if (checkChip) checkChip.addEventListener('change', sampleSubmits);
+    if (ask) ask.addEventListener('click', onAsk);
+
+    /* === [ROVING] example 3 ==============================================
+       APG's toolbar: one tab stop for the row, arrows between the chips. Worth
+       it when a row is long enough to bury whatever follows it, and not before
+       — it is a keyboard map a reader has to discover.
+
+       tabindex is managed here rather than in the markup, because the element
+       that holds the 0 has to be the one focus left from. */
+
+    var toolbar = root.querySelector('[data-ac-chip-toolbar]');
+    var bars = toolbar ? [].slice.call(toolbar.querySelectorAll('[data-ac-chip]')) : [];
+
+    function focusAt(index) {
+      var next = (index + bars.length) % bars.length;
+      bars.forEach(function (chip, i) {
+        chip.tabIndex = i === next ? 0 : -1;
+      });
+      bars[next].focus();
+    }
+
+    function onToolbarKey(event) {
+      var here = bars.indexOf(event.target);
+      if (here === -1) return;
+
+      if (event.key === 'ArrowRight') focusAt(here + 1);
+      else if (event.key === 'ArrowLeft') focusAt(here - 1);
+      else if (event.key === 'Home') focusAt(0);
+      else if (event.key === 'End') focusAt(bars.length - 1);
+      else return;
+
+      // Home and End scroll the page otherwise, and the arrows scroll it
+      // sideways inside a wrapped row.
+      event.preventDefault();
+    }
+
+    function sampleStops() {
+      [
+        ['plain-stops', root.querySelector('[data-ac-ct-plain]')],
+        ['bar-stops', toolbar],
+      ].forEach(function (pair) {
+        if (!pair[1]) return;
+        var stops = [].slice.call(pair[1].querySelectorAll('[data-ac-chip]')).filter(function (c) {
+          return c.tabIndex >= 0;
+        });
+        say(out(pair[0]), String(stops.length));
+      });
+    }
+
+    if (toolbar) {
+      bars.forEach(function (chip, i) {
+        chip.tabIndex = i === 0 ? 0 : -1;
+      });
+      toolbar.addEventListener('keydown', onToolbarKey);
+    }
+
+    /* === [CUES] example 4 ================================================
        Sampled from the live chip in each state rather than described, because
        the claim is about what a stylesheet actually computed. */
 
@@ -214,14 +308,14 @@
       if (cuesSeen.flat.on && cuesSeen.tick.on) {
         say(
           cuesVerdict,
-          'Sold out changes color and nothing else, so it has no state at all in High Contrast. ' +
-            'Matinee has a real cue and pays for it in the name.',
+          'Overdue changes color and nothing else, so it has no state at all in High Contrast. ' +
+            'Refunded has a real cue and pays for it in the name.',
           true,
         );
       }
     }
 
-    /* === [NAMES] example 3 =============================================== */
+    /* === [NAMES] example 5 =============================================== */
 
     var namesPanel = root.querySelector('[data-ac-ct-names]');
     var namesVerdict = namesPanel && namesPanel.querySelector('[data-ac-ct-names-verdict]');
@@ -249,100 +343,6 @@
           true,
         );
       }
-    }
-
-    /* === [SUBMITS] example 4 ============================================= */
-
-    var submitsPanel = root.querySelector('[data-ac-ct-submits]');
-    var form = submitsPanel && submitsPanel.querySelector('[data-ac-ct-form]');
-    var ask = submitsPanel && submitsPanel.querySelector('[data-ac-ct-ask]');
-    var switchChip = submitsPanel && submitsPanel.querySelector('[data-ac-chip-switch]');
-    var checkChip = form && form.querySelector('.ac-chip__input');
-    var pressChip = form && form.querySelector('[data-ac-chip]');
-
-    /* role="switch" carries aria-checked, never aria-pressed. Both are legal on
-       a button and they are not interchangeable: pressed is "this control is
-       held down", checked is "this setting is on". Older JAWS announces the
-       role inconsistently — switch has that argument in full. */
-    function onSwitchClick() {
-      var next = switchChip.getAttribute('aria-checked') !== 'true';
-      switchChip.setAttribute('aria-checked', next ? 'true' : 'false');
-      sampleSubmits();
-    }
-
-    function sampleSubmits() {
-      if (!form) return;
-      say(out('what-split'), 'aria-pressed=' + pressChip.getAttribute('aria-pressed'));
-      say(out('what-check'), 'checked=' + checkChip.checked);
-      say(out('what-switch'), 'aria-checked=' + switchChip.getAttribute('aria-checked'));
-    }
-
-    function onAsk() {
-      var entries = [];
-      new FormData(form).forEach(function (value, key) {
-        entries.push(key + '=' + value);
-      });
-      // Not marked as a failure: the two buttons having nothing to send is
-      // correct, and it is the reason to reach for the checkbox instead.
-      say(out('what-data'), entries.length ? entries.join(' & ') : 'nothing');
-    }
-
-    if (switchChip) switchChip.addEventListener('click', onSwitchClick);
-    if (checkChip) checkChip.addEventListener('change', sampleSubmits);
-    if (ask) ask.addEventListener('click', onAsk);
-
-    /* === [ROVING] example 5 ==============================================
-       APG's toolbar: one tab stop for the row, arrows between the chips. Worth
-       it when a row is long enough to bury whatever follows it, and not before
-       — it is a keyboard map a reader has to discover.
-
-       tabindex is managed here rather than in the markup, because the element
-       that holds the 0 has to be the one focus left from. */
-
-    var toolbar = root.querySelector('[data-ac-chip-toolbar]');
-    var bars = toolbar ? [].slice.call(toolbar.querySelectorAll('[data-ac-chip]')) : [];
-
-    function focusAt(index) {
-      var next = (index + bars.length) % bars.length;
-      bars.forEach(function (chip, i) {
-        chip.tabIndex = i === next ? 0 : -1;
-      });
-      bars[next].focus();
-    }
-
-    function onToolbarKey(event) {
-      var here = bars.indexOf(event.target);
-      if (here === -1) return;
-
-      if (event.key === 'ArrowRight') focusAt(here + 1);
-      else if (event.key === 'ArrowLeft') focusAt(here - 1);
-      else if (event.key === 'Home') focusAt(0);
-      else if (event.key === 'End') focusAt(bars.length - 1);
-      else return;
-
-      // Home and End scroll the page otherwise, and the arrows scroll it
-      // sideways inside a wrapped row.
-      event.preventDefault();
-    }
-
-    function sampleStops() {
-      [
-        ['plain-stops', root.querySelector('[data-ac-ct-plain]')],
-        ['bar-stops', toolbar],
-      ].forEach(function (pair) {
-        if (!pair[1]) return;
-        var stops = [].slice.call(pair[1].querySelectorAll('[data-ac-chip]')).filter(function (c) {
-          return c.tabIndex >= 0;
-        });
-        say(out(pair[0]), String(stops.length));
-      });
-    }
-
-    if (toolbar) {
-      bars.forEach(function (chip, i) {
-        chip.tabIndex = i === 0 ? 0 : -1;
-      });
-      toolbar.addEventListener('keydown', onToolbarKey);
     }
 
     /* === wiring ========================================================== */

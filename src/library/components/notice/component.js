@@ -181,7 +181,7 @@
 
     /**
      * What a screen reader is given: the text with every aria-hidden subtree
-     * removed. Chip Toggle's nameOf() is the same walk plus generated content,
+     * removed. Filter Chip's nameOf() is the same walk plus generated content,
      * which a notice has none of.
      *
      * @param {Element} el

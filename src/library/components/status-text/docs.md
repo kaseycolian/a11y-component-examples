@@ -48,7 +48,7 @@ Example 2 has four labels that all mean "this worked", with the announced text p
 | `✅` typed into the markup | the emoji's Unicode name, in English, whatever the page language is |
 | the specimen | `Shipped` |
 
-The second one is the surprising one and it is [Chip Toggle](../chip-toggle/)'s finding at label
+The second one is the surprising one and it is [Filter Chip](../chip-toggle/)'s finding at label
 scale: **CSS generated content is folded into the accessible name.** So the well-meant non-color cue
 does not fail silently — it succeeds at putting a punctuation mark where the word should be. The
 specimen's glyph is `content: ""` plus two borders, which contributes nothing to the text and,

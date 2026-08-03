@@ -177,7 +177,7 @@
     },
     {
       "slug": "chip-toggle",
-      "name": "Chip Toggle",
+      "name": "Filter Chip",
       "group": "buttons-actions",
       "useWhen": "A filter you switch on and off: a button that remembers, not a checkbox.",
       "tags": ["button", "aria-pressed", "toggle", "filter", "toolbar", "roving-tabindex", "accessible-name", "forced-colors"],
@@ -186,7 +186,7 @@
       "files": ["html", "css", "js"],
       "status": "stable",
       "hasContract": true,
-      "_summaryRev": "1e18b511"
+      "_summaryRev": "b2b9d6b2"
     },
     {
       "slug": "field",

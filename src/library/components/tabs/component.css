@@ -18,7 +18,7 @@
 
    The selected look is selected by [aria-selected="true"], which is the same
    attribute a screen reader reads — so there is no way to draw a tab down
-   without saying so. Chip Toggle has the argument.
+   without saying so. Filter Chip has the argument.
 
    Every color is var(--ac-token, var(--theme-token, #literal)) so this works
    standalone, in a theme-service app, and in an app that sets --ac-*.
@@ -94,7 +94,7 @@
    thicker accent edge along the bottom.
 
    None of the three is generated content. `content: "▾"` would be folded into
-   the tab's accessible name and rename it on every selection — Chip Toggle
+   the tab's accessible name and rename it on every selection — Filter Chip
    found that one. */
 .ac-tabs__tab[aria-selected="true"] {
   border-color: var(--ac-border, var(--border, #34205a));

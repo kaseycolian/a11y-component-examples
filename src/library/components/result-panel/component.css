@@ -238,7 +238,7 @@
 
 /* Drawn from borders, never typed: CSS generated content is folded into the
    accessible name, so `content: "✓"` would rename whatever it sits in. Status
-   Text and Chip Toggle both have the finding. */
+   Text and Filter Chip both have the finding. */
 .ac-status__glyph {
   position: relative;
   flex: none;

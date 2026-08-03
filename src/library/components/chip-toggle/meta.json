@@ -1,9 +1,9 @@
 {
   "slug": "chip-toggle",
-  "name": "Chip Toggle",
+  "name": "Filter Chip",
   "group": "buttons-actions",
   "order": 40,
-  "summary": "A filter chip that is a toggle button, not a checkbox — aria-pressed carries the state, and a tick carries it where color cannot. Four live failures: the color-only chip, the tick that renames its own control, the chip that renames itself on purpose, and a row that swallows the tab order.",
+  "summary": "A filter chip is a button that stays pressed. Use it to switch a filter on and off without submitting a form. It is not a checkbox, so `aria-pressed` carries the state, and the pressed state needs a second cue besides color.",
   "tags": [
     "button",
     "aria-pressed",
@@ -18,7 +18,7 @@
   "wcag": ["1.4.1", "1.4.11", "2.1.1", "2.4.3", "2.5.3", "2.5.8", "4.1.2"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Examples 2 to 5 are live. Example 2's fill-only chip has no state left under Windows High Contrast, and the chip beside it puts a tick into its own accessible name; example 3's chip renames itself, so the word and the state disagree; example 5 puts five tab stops next to the toolbar's one.",
+  "demoNote": "Press any chip here and the readouts record what changed and what the chip is called afterwards. Every example on this page is live.",
   "contract": {
     "useWhen": "A filter you switch on and off: a button that remembers, not a checkbox.",
     "root": [".ac-chip"],
@@ -38,20 +38,20 @@
     },
     "keyboard": [
       [
+        "Tab",
+        "one stop per chip in a role=group row; one stop for the whole row in a role=toolbar"
+      ],
+      [
         "Enter / Space",
-        "toggles"
+        "toggles the chip"
       ],
       [
         "ArrowLeft / ArrowRight",
-        "move within the row"
+        "move between chips, wrapping. role=toolbar only"
       ],
       [
         "Home / End",
-        "first / last chip"
-      ],
-      [
-        "Tab",
-        "one stop for the whole set"
+        "first / last chip. role=toolbar only"
       ]
     ],
     "states": [

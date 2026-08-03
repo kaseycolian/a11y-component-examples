@@ -20,7 +20,7 @@
      Roving tabindex. Only the selected tab is tabindex="0", so the whole
      strip is one Tab stop and one more Tab reaches the panel. The arrows are
      what move inside it — which is a keyboard map a person has to discover,
-     and the tradeoff is Chip Toggle's example 5 seen from the other side.
+     and the tradeoff is Filter Chip's example 3 seen from the other side.
 
      The factory never touches the panel's tabindex. It is in the markup
      because a widget whose tab order changes the moment a script loads has

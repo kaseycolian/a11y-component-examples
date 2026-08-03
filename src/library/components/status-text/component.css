@@ -66,7 +66,7 @@
    Drawn from borders, on currentColor. Two reasons, and the first is the one
    that gets missed: CSS generated content is folded into the accessible name,
    so `content: "✓"` renames whatever it is on — the tick becomes part of the
-   status. `content: ""` plus a border contributes nothing. Chip Toggle found
+   status. `content: ""` plus a border contributes nothing. Filter Chip found
    this on a control; example 2 is the same finding on a label.
 
    The second is forced colors, where currentColor is recolored along with the

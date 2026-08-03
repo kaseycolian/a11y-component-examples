@@ -1,5 +1,5 @@
 /* ===========================================================================
-   CHIP TOGGLE
+   FILTER CHIP
 
    WHAT TO COPY — sections are marked with the examples that need them.
    Everything here is real component code; the demo frame (ac-demo-*) lives in
@@ -9,10 +9,10 @@
                  Already have .ac-btn in your app? Delete this section.
      [CHIP]      every example. The pill, the pressed state and the tick.
      [ROW]       every example. The group, its label and the status line.
-     [CHECK]     example 4. The checkbox spelling of the same chip.
      [ACCENTS]   example 1. Four one-line rules. Delete the ones you don't use.
+     [CHECK]     example 2. The checkbox spelling of the same chip.
      [PANEL]     the frame around each example on this page. Delete it.
-     [BROKEN]    example 2. Delete it — those are the failures.
+     [BROKEN]    example 4. Delete it — those are the failures.
      [FORCED]    always ship this. Pressed is a fill, and fills are replaced.
 
    Copy the file whole for the library version.
@@ -130,7 +130,7 @@
    The tick is a ::before with content: "" and a shape drawn from two borders.
    Deliberately not a character: CSS generated content is folded into the
    accessible name, so content: "✓" renames the chip every time it goes down.
-   Example 2 has that live.
+   Example 4 has that live.
 
    Declared after [BTN] on purpose. .ac-chip and .ac-btn--sm are both one class
    deep, so which padding wins is decided by source order and nothing else. */
@@ -167,7 +167,7 @@
 }
 
 /* aria-checked rides along because a chip spelled role="switch" is the same
-   look with a different state attribute (example 4). One state, two spellings
+   look with a different state attribute (example 2). One state, two spellings
    — never both on one element. */
 .ac-chip[aria-pressed="true"],
 .ac-chip[aria-checked="true"] {
@@ -230,7 +230,31 @@
   overflow-wrap: break-word;
 }
 
-/* --- [CHECK] example 4 ----------------------------------------------------
+/* --- [ACCENTS] example 1 --------------------------------------------------
+   Copied from button, and identical there. Decoration, never the thing
+   carrying the meaning (SC 1.4.1). */
+
+.ac-btn--pink {
+  --ac-btn-accent: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
+  --ac-btn-on-accent: var(--ac-on-pink, var(--on-pink, #22001a));
+}
+
+.ac-btn--green {
+  --ac-btn-accent: var(--ac-accent-green, var(--accent-green, #5bff3a));
+  --ac-btn-on-accent: var(--ac-on-green, var(--on-green, #062600));
+}
+
+.ac-btn--blue {
+  --ac-btn-accent: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
+  --ac-btn-on-accent: var(--ac-on-blue, var(--on-blue, #00212b));
+}
+
+.ac-btn--purple {
+  --ac-btn-accent: var(--ac-accent-purple, var(--accent-purple, #b57fff));
+  --ac-btn-on-accent: var(--ac-on-purple, var(--on-purple, #1a0838));
+}
+
+/* --- [CHECK] example 2 ----------------------------------------------------
    The same chip built on a real checkbox, for when the value has to submit
    with a form. The input is the control and keeps every keyboard behavior; it
    is transparent and stretched over the chip rather than hidden, because
@@ -261,30 +285,6 @@
 .ac-chip--check:has(.ac-chip__input:focus-visible) {
   outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
   outline-offset: 2px;
-}
-
-/* --- [ACCENTS] example 1 --------------------------------------------------
-   Copied from button, and identical there. Decoration, never the thing
-   carrying the meaning (SC 1.4.1). */
-
-.ac-btn--pink {
-  --ac-btn-accent: var(--ac-accent-pink, var(--accent-pink, #ff2ec4));
-  --ac-btn-on-accent: var(--ac-on-pink, var(--on-pink, #22001a));
-}
-
-.ac-btn--green {
-  --ac-btn-accent: var(--ac-accent-green, var(--accent-green, #5bff3a));
-  --ac-btn-on-accent: var(--ac-on-green, var(--on-green, #062600));
-}
-
-.ac-btn--blue {
-  --ac-btn-accent: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
-  --ac-btn-on-accent: var(--ac-on-blue, var(--on-blue, #00212b));
-}
-
-.ac-btn--purple {
-  --ac-btn-accent: var(--ac-accent-purple, var(--accent-purple, #b57fff));
-  --ac-btn-on-accent: var(--ac-on-purple, var(--on-purple, #1a0838));
 }
 
 /* --- [PANEL] the frame around each example --------------------------------
@@ -425,7 +425,7 @@
   );
 }
 
-/* --- [BROKEN] example 2 — delete this -------------------------------------
+/* --- [BROKEN] example 4 — delete this -------------------------------------
    Both are declared after [CHIP] because they are the same one class deep.
    Source order is the only thing deciding which one paints.
 

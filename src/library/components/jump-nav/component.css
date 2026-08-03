@@ -18,7 +18,7 @@
 
    The current look is selected by [aria-current], which is the same attribute
    a screen reader reads — so there is no way to mark a link without saying so.
-   Chip Toggle has the argument in full.
+   Filter Chip has the argument in full.
 
    Every color is var(--ac-token, var(--theme-token, #literal)) so this works
    standalone, in a theme-service app, and in an app that sets --ac-*.
@@ -85,7 +85,7 @@
 
    None of the three is generated content. `content: "▸"` would be folded into
    the link's accessible name and rename it every time the reader scrolled
-   past a heading — Chip Toggle found that one. */
+   past a heading — Filter Chip found that one. */
 .ac-jump-nav__link[aria-current] {
   border-left-color: var(--ac-accent, var(--accent-blue, #3ceaff));
   background: color-mix(in srgb, var(--ac-accent, var(--accent-blue, #3ceaff)) 16%, transparent);

@@ -11,37 +11,37 @@ test.beforeEach(async ({ page }) => {
    asserted here — the role, the state, the accessible name, and the computed
    styles in both color modes. */
 
-/* --- example 1 · the specimen --------------------------------------------- */
+/* --- example 1 · a row of filter chips ---------------------------------- */
 
 test('the row is a named group of toggle buttons', async ({ page }) => {
-  const group = page.getByRole('group', { name: 'Filter the crate' });
+  const group = page.getByRole('group', { name: 'Filter orders' });
   await expect(group).toBeVisible();
 
   // Not checkboxes: a toggle button carries aria-pressed and submits nothing.
   await expect(group.getByRole('button')).toHaveCount(4);
-  await expect(group.getByRole('button', { name: 'Live', pressed: false })).toBeVisible();
+  await expect(group.getByRole('button', { name: 'Shipped', pressed: false })).toBeVisible();
 });
 
 test('pressing a chip flips aria-pressed, keeps the name, and reports the result', async ({
   page,
 }) => {
-  const live = page.getByRole('button', { name: 'Live', exact: true });
+  const shipped = page.getByRole('button', { name: 'Shipped', exact: true });
   const status = page.locator('[data-ac-ct-result]');
 
-  await expect(status).toHaveText('462 records · no filters');
+  await expect(status).toHaveText('462 orders · no filters');
 
-  await live.click();
-  await expect(live).toHaveAttribute('aria-pressed', 'true');
+  await shipped.click();
+  await expect(shipped).toHaveAttribute('aria-pressed', 'true');
   // Announcing the state does not entitle you to rename the control.
-  await expect(live).toHaveAccessibleName('Live');
-  await expect(status).toHaveText('99 records · Live');
+  await expect(shipped).toHaveAccessibleName('Shipped');
+  await expect(status).toHaveText('99 orders · Shipped');
 
-  await page.getByRole('button', { name: 'B-side', exact: true }).click();
-  await expect(status).toHaveText('240 records · Live, B-side');
+  await page.getByRole('button', { name: 'Failed', exact: true }).click();
+  await expect(status).toHaveText('240 orders · Shipped, Failed');
 
-  await live.click();
-  await expect(live).toHaveAttribute('aria-pressed', 'false');
-  await expect(status).toHaveText('141 records · B-side');
+  await shipped.click();
+  await expect(shipped).toHaveAttribute('aria-pressed', 'false');
+  await expect(status).toHaveText('141 orders · Failed');
 });
 
 test('aria-pressed is on every chip before anything is pressed', async ({ page }) => {
@@ -56,17 +56,119 @@ test('aria-pressed is on every chip before anything is pressed', async ({ page }
 });
 
 test('Enter and Space toggle it, with no key handler in the component', async ({ page }) => {
-  const live = page.getByRole('button', { name: 'Live', exact: true });
+  const shipped = page.getByRole('button', { name: 'Shipped', exact: true });
 
-  await live.focus();
+  await shipped.focus();
   await page.keyboard.press('Space');
-  await expect(live).toHaveAttribute('aria-pressed', 'true');
+  await expect(shipped).toHaveAttribute('aria-pressed', 'true');
 
   await page.keyboard.press('Enter');
-  await expect(live).toHaveAttribute('aria-pressed', 'false');
+  await expect(shipped).toHaveAttribute('aria-pressed', 'false');
 });
 
-/* --- example 2 · pressed is not a color ----------------------------------- */
+/* --- example 2 · toggle button, checkbox, or switch --------------------- */
+
+test('the three chips expose three different roles and states', async ({ page }) => {
+  const form = page.locator('[data-ac-ct-form]');
+
+  await expect(form.getByRole('button', { name: 'Archived', pressed: false })).toBeVisible();
+  await expect(form.getByRole('checkbox', { name: 'Priority', checked: false })).toBeVisible();
+  await expect(form.getByRole('switch', { name: 'Auto-refresh', checked: false })).toBeVisible();
+
+  // Never both spellings on one control.
+  await expect(form.getByRole('switch')).not.toHaveAttribute('aria-pressed', /.*/);
+  await expect(form.getByRole('button', { name: 'Archived' })).not.toHaveAttribute(
+    'aria-checked',
+    /.*/,
+  );
+});
+
+test('all three chips look on when they are on', async ({ page }) => {
+  const tick = (locator) =>
+    locator.evaluate((el) => getComputedStyle(el, '::before').visibility);
+
+  const split = page.locator('[data-ac-ct-form] [data-ac-chip]');
+  const box = page.locator('.ac-chip--check');
+  const sw = page.locator('[data-ac-chip-switch]');
+
+  for (const el of [split, box, sw]) expect(await tick(el)).toBe('hidden');
+
+  await split.click();
+  await page.getByRole('checkbox', { name: 'Priority' }).check();
+  await sw.click();
+
+  // aria-pressed and aria-checked are two spellings of one look, or the switch
+  // is on and does not say so.
+  for (const el of [split, box, sw]) expect(await tick(el)).toBe('visible');
+});
+
+test('only the checkbox has a value to submit', async ({ page }) => {
+  const data = page.locator('[data-ac-ct-out="what-data"]');
+
+  await page.locator('[data-ac-ct-form] [data-ac-chip]').click();
+  await page.locator('[data-ac-chip-switch]').click();
+  await page.locator('[data-ac-ct-ask]').click();
+  await expect(data).toHaveText('nothing');
+
+  await page.getByRole('checkbox', { name: 'Priority' }).check();
+  await page.locator('[data-ac-ct-ask]').click();
+  await expect(data).toHaveText('priority=high');
+});
+
+test('the checkbox chip keeps a real tab stop and shows the ring on the chip', async ({ page }) => {
+  const input = page.locator('.ac-chip__input');
+  // Transparent, never hidden: display: none or visibility: hidden takes the
+  // tab stop with it.
+  await expect(input).toHaveCSS('opacity', '0');
+
+  await page.locator('[data-ac-ct-form] [data-ac-chip]').focus();
+  await page.keyboard.press('Tab');
+  await expect(input).toBeFocused();
+  await expect(page.locator('.ac-chip--check')).toHaveCSS('outline-width', '3px');
+
+  await page.keyboard.press('Space');
+  await expect(input).toBeChecked();
+});
+
+/* --- example 3 · one tab stop, or one per chip ------------------------- */
+
+test('the plain row is five tab stops and the toolbar is one', async ({ page }) => {
+  await expect(page.locator('[data-ac-ct-out="plain-stops"]')).toHaveText('5');
+  await expect(page.locator('[data-ac-ct-out="bar-stops"]')).toHaveText('1');
+
+  const toolbar = page.getByRole('toolbar', { name: 'Region — toolbar' });
+  await expect(toolbar).toBeVisible();
+  expect(
+    await toolbar.locator('[data-ac-chip]').evaluateAll((els) => els.map((el) => el.tabIndex)),
+  ).toEqual([0, -1, -1, -1, -1]);
+});
+
+test('the toolbar moves on the arrows, wraps, and still toggles on Space', async ({ page }) => {
+  const toolbar = page.getByRole('toolbar', { name: 'Region — toolbar' });
+  const chips = toolbar.locator('[data-ac-chip]');
+
+  await chips.first().focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(chips.nth(1)).toBeFocused();
+
+  await page.keyboard.press('ArrowLeft');
+  await page.keyboard.press('ArrowLeft');
+  await expect(chips.nth(4)).toBeFocused();
+
+  await page.keyboard.press('Home');
+  await expect(chips.first()).toBeFocused();
+  await page.keyboard.press('End');
+  await expect(chips.nth(4)).toBeFocused();
+
+  // Roving tabindex follows focus, or Tab would return to a chip nobody left.
+  await expect(chips.nth(4)).toHaveAttribute('tabindex', '0');
+  await expect(chips.first()).toHaveAttribute('tabindex', '-1');
+
+  await page.keyboard.press('Space');
+  await expect(chips.nth(4)).toHaveAttribute('aria-pressed', 'true');
+});
+
+/* --- example 4 · a pressed state carried by color --------------------- */
 
 const cue = (key) => `[data-ac-ct-cue="${key}"]`;
 
@@ -89,18 +191,18 @@ test('the fill-only chip changes one thing and the specimen changes three', asyn
 
 test('a tick written as a character lands in the accessible name', async ({ page }) => {
   const glyph = page.locator(cue('glyph'));
-  await expect(glyph).toHaveAccessibleName('Matinee');
+  await expect(glyph).toHaveAccessibleName('Refunded');
 
   await glyph.click();
   // accname folds ::before and ::after into the name of anything named from
   // its contents, so the well-meaning fix for SC 1.4.1 renames the control.
-  await expect(glyph).toHaveAccessibleName('✓ Matinee');
-  await expect(page.locator('[data-ac-ct-out="glyph-name"]')).toHaveText('✓ Matinee');
+  await expect(glyph).toHaveAccessibleName('✓ Refunded');
+  await expect(page.locator('[data-ac-ct-out="glyph-name"]')).toHaveText('✓ Refunded');
 
   const drawn = page.locator(cue('tick'));
   await drawn.click();
   // The drawn tick contributes an empty string and is invisible to the name.
-  await expect(drawn).toHaveAccessibleName('All ages');
+  await expect(drawn).toHaveAccessibleName('Paid');
 });
 
 test('the tick reserves its box, so a chip is the same width up and down', async ({ page }) => {
@@ -165,7 +267,7 @@ test.describe('under forced colors', () => {
   });
 });
 
-/* --- example 3 · the name has to stay still -------------------------------- */
+/* --- example 5 · a chip that renames itself --------------------------- */
 
 test('the renaming chip says its state twice and the other says it once', async ({ page }) => {
   const swap = page.locator('[data-ac-ct-name="swap"]');
@@ -185,108 +287,6 @@ test('the renaming chip says its state twice and the other says it once', async 
   await keep.click();
   await expect(keep).toHaveAccessibleName('Follow');
   await expect(keep).toHaveAttribute('aria-pressed', 'true');
-});
-
-/* --- example 4 · toggle button, checkbox, or switch ----------------------- */
-
-test('the three chips expose three different roles and states', async ({ page }) => {
-  const form = page.locator('[data-ac-ct-form]');
-
-  await expect(form.getByRole('button', { name: 'Split', pressed: false })).toBeVisible();
-  await expect(form.getByRole('checkbox', { name: '7-inch', checked: false })).toBeVisible();
-  await expect(form.getByRole('switch', { name: 'In stock', checked: false })).toBeVisible();
-
-  // Never both spellings on one control.
-  await expect(form.getByRole('switch')).not.toHaveAttribute('aria-pressed', /.*/);
-  await expect(form.getByRole('button', { name: 'Split' })).not.toHaveAttribute(
-    'aria-checked',
-    /.*/,
-  );
-});
-
-test('all three chips look on when they are on', async ({ page }) => {
-  const tick = (locator) =>
-    locator.evaluate((el) => getComputedStyle(el, '::before').visibility);
-
-  const split = page.locator('[data-ac-ct-form] [data-ac-chip]');
-  const box = page.locator('.ac-chip--check');
-  const sw = page.locator('[data-ac-chip-switch]');
-
-  for (const el of [split, box, sw]) expect(await tick(el)).toBe('hidden');
-
-  await split.click();
-  await page.getByRole('checkbox', { name: '7-inch' }).check();
-  await sw.click();
-
-  // aria-pressed and aria-checked are two spellings of one look, or the switch
-  // is on and does not say so.
-  for (const el of [split, box, sw]) expect(await tick(el)).toBe('visible');
-});
-
-test('only the checkbox has a value to submit', async ({ page }) => {
-  const data = page.locator('[data-ac-ct-out="what-data"]');
-
-  await page.locator('[data-ac-ct-form] [data-ac-chip]').click();
-  await page.locator('[data-ac-chip-switch]').click();
-  await page.locator('[data-ac-ct-ask]').click();
-  await expect(data).toHaveText('nothing');
-
-  await page.getByRole('checkbox', { name: '7-inch' }).check();
-  await page.locator('[data-ac-ct-ask]').click();
-  await expect(data).toHaveText('format=7-inch');
-});
-
-test('the checkbox chip keeps a real tab stop and shows the ring on the chip', async ({ page }) => {
-  const input = page.locator('.ac-chip__input');
-  // Transparent, never hidden: display: none or visibility: hidden takes the
-  // tab stop with it.
-  await expect(input).toHaveCSS('opacity', '0');
-
-  await page.locator('[data-ac-ct-form] [data-ac-chip]').focus();
-  await page.keyboard.press('Tab');
-  await expect(input).toBeFocused();
-  await expect(page.locator('.ac-chip--check')).toHaveCSS('outline-width', '3px');
-
-  await page.keyboard.press('Space');
-  await expect(input).toBeChecked();
-});
-
-/* --- example 5 · a row of chips is a row of tab stops ---------------------- */
-
-test('the plain row is five tab stops and the toolbar is one', async ({ page }) => {
-  await expect(page.locator('[data-ac-ct-out="plain-stops"]')).toHaveText('5');
-  await expect(page.locator('[data-ac-ct-out="bar-stops"]')).toHaveText('1');
-
-  const toolbar = page.getByRole('toolbar', { name: 'Format — toolbar' });
-  await expect(toolbar).toBeVisible();
-  expect(
-    await toolbar.locator('[data-ac-chip]').evaluateAll((els) => els.map((el) => el.tabIndex)),
-  ).toEqual([0, -1, -1, -1, -1]);
-});
-
-test('the toolbar moves on the arrows, wraps, and still toggles on Space', async ({ page }) => {
-  const toolbar = page.getByRole('toolbar', { name: 'Format — toolbar' });
-  const chips = toolbar.locator('[data-ac-chip]');
-
-  await chips.first().focus();
-  await page.keyboard.press('ArrowRight');
-  await expect(chips.nth(1)).toBeFocused();
-
-  await page.keyboard.press('ArrowLeft');
-  await page.keyboard.press('ArrowLeft');
-  await expect(chips.nth(4)).toBeFocused();
-
-  await page.keyboard.press('Home');
-  await expect(chips.first()).toBeFocused();
-  await page.keyboard.press('End');
-  await expect(chips.nth(4)).toBeFocused();
-
-  // Roving tabindex follows focus, or Tab would return to a chip nobody left.
-  await expect(chips.nth(4)).toHaveAttribute('tabindex', '0');
-  await expect(chips.first()).toHaveAttribute('tabindex', '-1');
-
-  await page.keyboard.press('Space');
-  await expect(chips.nth(4)).toHaveAttribute('aria-pressed', 'true');
 });
 
 /* --- the shared obligations ----------------------------------------------- */
@@ -345,9 +345,9 @@ test('the factory is idempotent and destroy clears what it wrote', async ({ page
 
   await expect(page.locator('[data-ac-ct-cue="flat"]')).toHaveAttribute('aria-pressed', 'false');
   await expect(page.locator('[data-ac-ct-out="flat-cues"]')).toHaveText('—');
-  await expect(page.locator('[data-ac-ct-result]')).toHaveText('462 records · no filters');
+  await expect(page.locator('[data-ac-ct-result]')).toHaveText('462 orders · no filters');
   // The roving tabindex is the factory's, so it goes back too.
   await expect(
-    page.getByRole('toolbar', { name: 'Format — toolbar' }).locator('[data-ac-chip]').nth(2),
+    page.getByRole('toolbar', { name: 'Region — toolbar' }).locator('[data-ac-chip]').nth(2),
   ).not.toHaveAttribute('tabindex', /.*/);
 });

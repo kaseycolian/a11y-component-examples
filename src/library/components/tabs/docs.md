@@ -35,7 +35,7 @@ Tab  →  the panel
 ```
 
 Six tabs would otherwise be six stops between whatever is above them and whatever is below.
-[Chip Toggle](../chip-toggle/)'s example 5 argues the other side of this — a row of chips keeps its
+[Filter Chip](../chip-toggle/)'s example 3 argues the other side of this — a row of chips keeps its
 stops, because a chip row has no arrow-key map anyone would guess at. Tabs are the case where the
 convention is old enough to be worth the trade.
 
@@ -122,7 +122,7 @@ what an in-page anchor is. [Jump Nav](../jump-nav/) is that pattern in full.
 
 None of the three cues is generated content. `content: "▾"` or a tick is folded into the accessible
 name and renames the tab every time the selection moves, which is
-[Chip Toggle](../chip-toggle/)'s finding. The accent edge is a `border-bottom` declared at its full
+[Filter Chip](../chip-toggle/)'s finding. The accent edge is a `border-bottom` declared at its full
 3px in both states — transparent when the tab is not the selected one — so the row cannot reflow and
 shift the next tab out from under a pointer already heading for it.
 

@@ -179,8 +179,10 @@ One shared domain so a reader never context-switches between components.
 | Fake ids | UUID v4 shape, obviously fake: `00000000-0000-4000-8000-000000000462` |
 | URLs | `https://app.example.com/…` |
 
-Fake credentials keep a **valid shape** — right prefix, right length, right character set — so the example
-still teaches the format.
+Fake credentials keep a **valid shape** — right prefix, roughly the right length — so the example still
+teaches the format. The body has to read as obviously fabricated at a glance: repeat `462`, `99` and
+`abcdefg` rather than typing plausible hex, or a secret scanner flags the file and a reader has to stop
+and check whether it is real.
 
 **Sweep these out:** `setlist`, `merch`, `zine`, `distro`, `matinee`, `Salad Days`, `Ruby Soho`, `Gilman`,
 `Bakesale`, `Cat's Cradle`, `Cold Water Flat`, `Ten Second Anthem`, `Basement Tapes`, `Storm Windows`,
@@ -219,7 +221,16 @@ skip-link, switch, tabs, text-input, textarea, tooltip, typography, visually-hid
 `role="alert"`, which the component is built on.
 
 **Cross-links.** `docs.md` files link each other as `[Notice](../notice/)`. The path is the slug and does
-not move; the link *text* follows the rename. Grep for the old display name after each one.
+not move; the link *text* follows the rename. **Source comments name components too** — `chip-toggle`
+was mentioned by eleven other components, mostly in `component.css` and `component.js` prose. After
+every rename:
+
+```sh
+grep -rn "<Old Display Name>" src/ docs/
+```
+
+Two of those eleven also named an example *number*, which the renumber had moved. A prose reference to
+"X's example 5" has to be re-checked against X's new numbering, not just renamed.
 
 Group names, in `src/site/lib/groups.mjs`:
 
@@ -334,7 +345,7 @@ bound" note, and a `summary` in the new voice.
 | 1 | `button` | [x] | **The reference. Copy its shape.** Examples renumbered: old 3 (unavailable) became 2 and moved into *Correct examples*; old 2 (no `type`) became 3. That rippled into the `[DISABLED]`/`[SIZE]` order in the CSS and the `[LOCK]`/`[FORM]` order in the JS — both files now read in example order, which is the rule. `data-ac-button` moved off the grid onto a new wrapper `<div>`, because the grid is now two grids. Spec renamed 12 demo strings and was reordered to match. |
 | 2 | `icon-button` | [x] | No renumbering — 1 and 2 were already correct, 3 to 5 already the mistakes. `data-ac-icon-button` moved onto a wrapper `<div>`. Labels: Play / Add task / Search projects / Bookmark project / Share project / View options / Close panel, `Add teammate` ×3, `Delete project`, `Archive project` vs `Send this project to a teammate`, Mute notifications / Next page / Stop export. |
 | 3 | `loading-button` | [x] | No renumbering. `data-ac-loading-button` moved onto a wrapper `<div>`. Only one correct example, so its section heading is singular: **Correct example**. `Save set list` → `Save changes`, `Set list saved.` → `Changes saved.`, hint → `Project 462 · 12 tasks`. |
-| 4 | `chip-toggle` | [ ] | rename → Filter Chip. |
+| 4 | `chip-toggle` | [x] | **Renamed → Filter Chip**, and the first rename done, so it is the worked example: 11 other components mentioned it in prose and all were updated, including two that named an example number. Heavy renumber — old 4 and 5 were choice demos, not failures, so they moved into *Correct examples*: 1→1, 4→2, 5→3, 2→4, 3→5. That reordered `[ACCENTS]`/`[CHECK]` in the CSS and all four demo blocks in the JS, plus the spec's five sections. |
 | 5 | `field` | [ ] | rename → Form Field. Mirrored by the home page `PEEK_FILES` excerpt. |
 | 6 | `text-input` | [ ] | 6 examples. |
 | 7 | `input-group` | [ ] | |

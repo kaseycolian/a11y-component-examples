@@ -112,7 +112,7 @@
          CSS generated content is INCLUDED — example 2's tick is a stylesheet
            declaration that ends up in the text.
 
-       Chip Toggle's nameOf() is the same walk. A clipped element is still in
+       Filter Chip's nameOf() is the same walk. A clipped element is still in
        the accessibility tree, which is the whole reason .ac-status__detail
        works and a title attribute does not. */
 

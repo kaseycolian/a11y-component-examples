@@ -146,7 +146,7 @@
 /* Example 2. display: block on every part, the header row clipped, and the
    column name put back per cell as generated content — which accname folds
    into the cell's name, so the column is announced from the cell *and* from
-   the header it is still associated with. Chip Toggle found the same trap on
+   the header it is still associated with. Filter Chip found the same trap on
    a button's tick. */
 .ac-dt-cards,
 .ac-dt-cards thead,

@@ -104,7 +104,7 @@ Two things are wrong with it, and neither is the one usually given.
 **The generated content is part of the cell's accessible name.** accname folds `::before` and
 `::after` into anything named from its contents, so the cell is named `Left: 37` — and it is still
 associated with the `Left` column header, which is still in the tree because clipping does not remove
-it. The column is announced twice. [Chip Toggle](../chip-toggle/) found the same trap on a button.
+it. The column is announced twice. [Filter Chip](../chip-toggle/) found the same trap on a button.
 
 **The column is gone for everyone who could see it.** Stacked, the cells of a row no longer share a
 top edge, so there is no column to compare down. Example 2 measures it.
