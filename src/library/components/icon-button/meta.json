@@ -3,7 +3,7 @@
   "name": "Icon Button",
   "group": "buttons-actions",
   "order": 20,
-  "summary": "A button with a glyph and no words, where the accessible name is the only name — the four ways it goes missing, the case for clipped real text over aria-label, the word voice control has to be able to say, and the target that is the padding rather than the icon.",
+  "summary": "An icon button is a button drawn as a glyph with no words on it. Use it where a label would not fit: a toolbar, a table row, the corner of a panel. Because there is no visible text, the accessible name is the only name the button has, and it is the thing most often left out.",
   "tags": [
     "button",
     "icon",
@@ -18,7 +18,7 @@
   "wcag": ["1.1.1", "2.5.3", "2.5.8", "4.1.2"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Examples 3 to 5 are live and half wrong on purpose. Two of example 3's four buttons have no accessible name at all, and the readout under each one says where its name came from; example 4's second button cannot be reached by saying the word printed under it; example 5's third button is shrink-wrapped to its glyph and lands under the 24px floor.",
+  "demoNote": "Every example under Common mistakes is live. The readout under each button says where its name came from, or that it has none.",
   "contract": {
     "useWhen": "A button whose only label is an attribute, at a size a finger can hit.",
     "root": [".ac-btn-icon"],
@@ -33,6 +33,10 @@
       ]
     },
     "keyboard": [
+      [
+        "Tab",
+        "native: one stop, the same as any button. The glyph is aria-hidden and takes none"
+      ],
       [
         "Enter / Space",
         "native: it is a <button>"

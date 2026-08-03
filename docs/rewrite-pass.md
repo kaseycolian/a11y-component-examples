@@ -332,7 +332,7 @@ bound" note, and a `summary` in the new voice.
 | # | slug | done | notes |
 | --- | --- | --- | --- |
 | 1 | `button` | [x] | **The reference. Copy its shape.** Examples renumbered: old 3 (unavailable) became 2 and moved into *Correct examples*; old 2 (no `type`) became 3. That rippled into the `[DISABLED]`/`[SIZE]` order in the CSS and the `[LOCK]`/`[FORM]` order in the JS — both files now read in example order, which is the rule. `data-ac-button` moved off the grid onto a new wrapper `<div>`, because the grid is now two grids. Spec renamed 12 demo strings and was reordered to match. |
-| 2 | `icon-button` | [ ] | 3 broken markers, side-by-side comparison rail. |
+| 2 | `icon-button` | [x] | No renumbering — 1 and 2 were already correct, 3 to 5 already the mistakes. `data-ac-icon-button` moved onto a wrapper `<div>`. Labels: Play / Add task / Search projects / Bookmark project / Share project / View options / Close panel, `Add teammate` ×3, `Delete project`, `Archive project` vs `Send this project to a teammate`, Mute notifications / Next page / Stop export. |
 | 3 | `loading-button` | [ ] | reference for on-page text length. |
 | 4 | `chip-toggle` | [ ] | rename → Filter Chip. |
 | 5 | `field` | [ ] | rename → Form Field. Mirrored by the home page `PEEK_FILES` excerpt. |

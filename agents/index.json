@@ -160,7 +160,7 @@
       "files": ["html", "css", "js"],
       "status": "stable",
       "hasContract": true,
-      "_summaryRev": "45e3712d"
+      "_summaryRev": "028fa31e"
     },
     {
       "slug": "loading-button",

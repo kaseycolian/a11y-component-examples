@@ -15,6 +15,7 @@ In `library/components/icon-button/` — copy `component.{html,css,js}`, read `d
 
 ## Keyboard
 
+- `Tab` — native: one stop, the same as any button. The glyph is aria-hidden and takes none
 - `Enter / Space` — native: it is a <button>
 
 **States:** hover, focus-visible, disabled

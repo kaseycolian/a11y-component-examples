@@ -1,13 +1,12 @@
 <!-- ===========================================================================
-     ICON BUTTON — the accessible name is the only name
+     ICON BUTTON
 
      WHAT TO COPY
-       Example 1 is the component. Every example after it is about the name:
-       where it comes from, what it has to agree with, and the four ways it
-       goes missing while the button still looks finished.
-       Each example names the component.css and component.js sections it needs.
+       Examples 1 and 2 are the component. Examples 3 to 5 are mistakes, live,
+       and are not to be copied. Each example names the component.css and
+       component.js sections it needs.
 
-     THE CONTRACT
+     REQUIRED MARKUP
        .ac-btn .ac-btn-icon         both classes. The base is button's, copied.
        --solid --outline --ghost    weight, and the four accents, unchanged.
        --sm                         24×24. There is nothing below it.
@@ -16,275 +15,68 @@
        focusable="false"            on the glyph, for IE-era Edge and some AT.
        type="button"                the default is submit.
 
-     A text button gets its name for free from the word on it, and gets its
-     width for free from the same word. An icon button has neither. Everything
-     on this page follows from that one sentence.
+     A text button gets its accessible name for free from the word on it, and
+     gets its width for free from the same word. An icon button has neither.
+     Everything on this page follows from that.
 
-     ac-demo-* / ac-demo__* is scaffolding for this page only — the grid and the
-     per-example headings. Never copy it into your app.
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the two section
+     headings, the grid, and the per-example headings. Never copy it into your app.
      =========================================================================== -->
 
-<div class="ac-demo-grid" data-ac-icon-button>
-  <!-- ======================================================================
-       EXAMPLE 1 · The specimen
-       CSS [BTN] + [ICON] + [ACCENTS]. No JavaScript.
-
-       .ac-btn-icon is three declarations on top of button's base: no gap, no
-       padding, and a square box. The weights and the accents are the same
-       custom property they always were, so an icon button that wants the green
-       outline needs no new rule — only the two classes it already has.
-
-       Every glyph is an inline <svg> stroked with currentColor. That is not a
-       style preference: an <img> or a background-image cannot follow the
-       button's text color, so it cannot follow it into a hover state, a
-       disabled state, or Windows High Contrast either.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">1 &middot; The specimen</h3>
-
-    <p class="ac-ib-caption">Weight</p>
-    <div class="ac-ib-row">
-      <button class="ac-btn ac-btn-icon ac-btn--solid" type="button" aria-label="Play">
-        <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M8 5 19 12 8 19Z" />
-        </svg>
-      </button>
-      <button class="ac-btn ac-btn-icon ac-btn--outline" type="button" aria-label="Add to the queue">
-        <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M12 5v14M5 12h14" />
-        </svg>
-      </button>
-      <button class="ac-btn ac-btn-icon ac-btn--ghost" type="button" aria-label="Search the set list">
-        <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <circle cx="11" cy="11" r="6" />
-          <path d="m15.5 15.5 4 4" />
-        </svg>
-      </button>
-    </div>
-
-    <p class="ac-ib-caption">Accent, and the compact size</p>
-    <div class="ac-ib-row">
-      <button class="ac-btn ac-btn-icon ac-btn--solid ac-btn--green" type="button" aria-label="Bookmark Ruby Soho">
-        <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M7 4h10v16l-5-4-5 4Z" />
-        </svg>
-      </button>
-      <button class="ac-btn ac-btn-icon ac-btn--outline ac-btn--blue" type="button" aria-label="Share Ruby Soho">
-        <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <circle cx="6" cy="12" r="2" />
-          <circle cx="17" cy="6" r="2" />
-          <circle cx="17" cy="18" r="2" />
-          <path d="m8 11 7-3.5M8 13l7 3.5" />
-        </svg>
-      </button>
-      <button class="ac-btn ac-btn-icon ac-btn--ghost ac-btn--purple" type="button" aria-label="Set list options">
-        <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M4 6h6M14 6h6M4 12h10M18 12h2M4 18h4M12 18h8" />
-          <circle cx="12" cy="6" r="2" />
-          <circle cx="16" cy="12" r="2" />
-          <circle cx="10" cy="18" r="2" />
-        </svg>
-      </button>
-      <button class="ac-btn ac-btn-icon ac-btn--solid ac-btn--sm" type="button" aria-label="Close the set list">
-        <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="m6 6 12 12M18 6 6 18" />
-        </svg>
-      </button>
-    </div>
-
-    <p class="ac-ib__note">
-      Tab through them and the ring is the one every other button here has. The
-      glyph is <code>aria-hidden</code> in all six, so what a screen reader reads
-      is the <code>aria-label</code> and nothing else &mdash; there is no second
-      copy of the name for it to say twice.
+<div data-ac-icon-button>
+  <div class="ac-demo-section">
+    <h3 class="ac-demo-section__title">Correct examples</h3>
+    <p class="ac-demo-section__note">
+      This is the markup to copy. An icon button shows no words, so the accessible name is the only
+      name it has, and where that name comes from is the whole component.
     </p>
-  </div>
 
-  <!-- ======================================================================
-       EXAMPLE 2 · When the label can be real text, make it real text
-       CSS [BTN] + [ICON] + [CLIP] + [PANEL]. No JavaScript.
+    <div class="ac-demo-grid">
+      <!-- ==================================================================
+           EXAMPLE 1 · Weights, accents and sizes
+           CSS [BTN] + [ICON] + [ACCENTS]. No JavaScript.
 
-       All three of these announce "Add to the queue, button". Only two of them
-       contain the words.
+           .ac-btn-icon is three declarations on top of button's base: no gap,
+           no padding, and a square box. The weights and the accents are the
+           same custom property they always were, so an icon button that wants
+           the green outline needs no new rule — only the two classes it has.
 
-       aria-label is a different tool rather than a shorter spelling of a label:
-       it replaces the whole accessible name, needs a role that supports naming,
-       and is invisible to translation tools and to find-in-page. The
-       visually-hidden page makes that argument in full — this is the case where
-       the alternative costs nothing, because a <span> of clipped text inside the
-       button is the same one line of markup.
+           Every glyph is an inline <svg> stroked with currentColor. That is not
+           a style preference: an <img> or a background-image cannot follow the
+           button's text color, so it cannot follow it into a hover state, a
+           disabled state, or Windows High Contrast either.
+           ================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">1 &middot; Weights, accents and sizes</h4>
 
-       The third button is the second one with a class added. That is the
-       payoff: text that can be un-clipped at a wider viewport, or in a settings
-       panel, or by a user stylesheet, was never available as an attribute.
-
-       Press Ctrl+F and search this page for "queue". The clipped text is found
-       and the aria-label is not.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">2 &middot; When the label can be real text</h3>
-
-    <div class="ac-ib-panel">
-      <div class="ac-ib-cases">
-        <div class="ac-ib-case">
-          <button class="ac-btn ac-btn-icon ac-btn--outline" type="button" aria-label="Add to the queue"
-                  data-ac-ib-find="label">
+        <p class="ac-ib-caption">Weight</p>
+        <div class="ac-ib-row">
+          <button class="ac-btn ac-btn-icon ac-btn--solid" type="button" aria-label="Play">
+            <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M8 5 19 12 8 19Z" />
+            </svg>
+          </button>
+          <button class="ac-btn ac-btn-icon ac-btn--outline" type="button" aria-label="Add task">
             <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d="M12 5v14M5 12h14" />
             </svg>
           </button>
-          <p class="ac-ib-case__label"><code>aria-label</code> &mdash; announced, never written</p>
-        </div>
-
-        <div class="ac-ib-case">
-          <button class="ac-btn ac-btn-icon ac-btn--outline" type="button" data-ac-ib-find="clipped">
+          <button class="ac-btn ac-btn-icon ac-btn--ghost" type="button" aria-label="Search projects">
             <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            <span class="ac-btn-icon__label">Add to the queue</span>
-          </button>
-          <p class="ac-ib-case__label">clipped text &mdash; announced <em>and</em> written</p>
-        </div>
-
-        <div class="ac-ib-case">
-          <button class="ac-btn ac-btn-icon ac-btn-icon--labeled ac-btn--outline" type="button"
-                  data-ac-ib-find="labeled">
-            <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            <span class="ac-btn-icon__label">Add to the queue</span>
-          </button>
-          <p class="ac-ib-case__label">the same markup, <code>--labeled</code></p>
-        </div>
-      </div>
-
-      <p class="ac-ib__note">
-        Try to select the words on the middle button by dragging across it. They
-        are there, in a box one pixel wide. The first button has nothing to
-        select, nothing to translate and nothing to find.
-      </p>
-    </div>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 3 · The accessible name is the only name
-       CSS [BTN] + [ICON] + [PANEL]. JS [CORE] + [NAMES].
-
-       Four buttons, one stylesheet, and two of them announce as "button" and
-       nothing else. Nothing here is invalid, no tool reports it, and the page
-       looks finished.
-
-       The readout under each one is live: it walks the accessible name
-       computation in order — aria-labelledby, then aria-label, then the
-       element's own text with the aria-hidden parts removed, then title — and
-       prints which source won.
-
-       The second case is the one people are surprised by. The label is right
-       there in the markup, on the element wrapping the button, and it is
-       discarded: a <span> is generic, ARIA prohibits naming it, and a name on a
-       parent is never inherited by a child.
-
-       The third has a name and is still wrong, which is why it is here rather
-       than in the working column. A title shows on hover, unreliably or not at
-       all on keyboard focus, and never on touch.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">3 &middot; The accessible name is the only name</h3>
-
-    <div class="ac-ib-panel" data-ac-ib-names>
-      <div class="ac-ib-cases">
-        <div class="ac-ib-case">
-          <!-- BROKEN ON PURPOSE — no name at all. -->
-          <button class="ac-btn ac-btn-icon ac-btn--outline" type="button" data-ac-ib-name="bare"
-                  data-ac-demo-broken="button-name">
-            <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" />
+              <circle cx="11" cy="11" r="6" />
+              <path d="m15.5 15.5 4 4" />
             </svg>
           </button>
-          <p class="ac-ib-case__label">nothing</p>
-          <p class="ac-ib-case__out"><code data-ac-ib-out="bare">&mdash;</code></p>
         </div>
 
-        <div class="ac-ib-case">
-          <!-- BROKEN ON PURPOSE — the label is on the wrapper, not the button. -->
-          <span aria-label="Delete the take" data-ac-demo-broken="aria-prohibited-attr button-name">
-            <button class="ac-btn ac-btn-icon ac-btn--outline" type="button" data-ac-ib-name="wrapped">
-              <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" />
-              </svg>
-            </button>
-          </span>
-          <p class="ac-ib-case__label"><code>aria-label</code> on the <code>&lt;span&gt;</code></p>
-          <p class="ac-ib-case__out"><code data-ac-ib-out="wrapped">&mdash;</code></p>
-        </div>
-
-        <div class="ac-ib-case">
-          <!-- HALF WRONG ON PURPOSE — a name, from the last resort. -->
-          <button class="ac-btn ac-btn-icon ac-btn--outline" type="button" title="Delete the take"
-                  data-ac-ib-name="title">
+        <p class="ac-ib-caption">Accent, and the compact size</p>
+        <div class="ac-ib-row">
+          <button class="ac-btn ac-btn-icon ac-btn--solid ac-btn--green" type="button" aria-label="Bookmark project">
             <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" />
+              <path d="M7 4h10v16l-5-4-5 4Z" />
             </svg>
           </button>
-          <p class="ac-ib-case__label"><code>title</code> only</p>
-          <p class="ac-ib-case__out"><code data-ac-ib-out="title">&mdash;</code></p>
-        </div>
-
-        <div class="ac-ib-case">
-          <button class="ac-btn ac-btn-icon ac-btn--solid" type="button" aria-label="Delete the take"
-                  data-ac-ib-name="fixed">
-            <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" />
-            </svg>
-          </button>
-          <p class="ac-ib-case__label"><code>aria-label</code> &mdash; the fix</p>
-          <p class="ac-ib-case__out"><code data-ac-ib-out="fixed">&mdash;</code></p>
-        </div>
-      </div>
-
-      <!-- Rendered empty and already in the accessibility tree. A live region
-           created at the moment it has something to say announces nothing. -->
-      <p class="ac-ib__verdict" role="status" data-ac-ib-names-verdict></p>
-    </div>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 4 · The name has to contain the word you can see
-       CSS [BTN] + [ICON] + [PANEL]. JS [CORE] + [VOICE].
-
-       SC 2.5.3, and it is the criterion an icon rail fails most often. Both
-       buttons below have a visible word under them. Voice control does not read
-       the word — it matches what you say against the accessible name, so a
-       button captioned "Share" and named "Send this track to a friend" cannot be
-       operated by saying "click Share", by the person looking straight at it.
-
-       The command box is a mock of that lookup, not a screen reader and not a
-       real speech engine: it matches your text against each button's accessible
-       name, the way Voice Control and Voice Access do.
-
-       Type share and nothing matches. Type queue and one does. The fix is not
-       to shorten the name — it is to start it with the visible text and keep
-       whatever else it needs after that.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">4 &middot; The name has to contain the word you can see</h3>
-
-    <div class="ac-ib-panel" data-ac-ib-voice>
-      <div class="ac-ib-rail">
-        <div class="ac-ib-rail__item">
-          <button class="ac-btn ac-btn-icon ac-btn--outline" type="button" aria-label="Queue this track"
-                  data-ac-ib-voice-btn>
-            <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-          </button>
-          <span class="ac-ib-rail__word" aria-hidden="true">Queue</span>
-        </div>
-
-        <div class="ac-ib-rail__item">
-          <!-- BROKEN ON PURPOSE — the visible word is not in the name. -->
-          <button class="ac-btn ac-btn-icon ac-btn--outline" type="button"
-                  aria-label="Send this track to a friend" data-ac-ib-voice-btn>
+          <button class="ac-btn ac-btn-icon ac-btn--outline ac-btn--blue" type="button" aria-label="Share project">
             <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <circle cx="6" cy="12" r="2" />
               <circle cx="17" cy="6" r="2" />
@@ -292,96 +84,323 @@
               <path d="m8 11 7-3.5M8 13l7 3.5" />
             </svg>
           </button>
-          <span class="ac-ib-rail__word" aria-hidden="true">Share</span>
+          <button class="ac-btn ac-btn-icon ac-btn--ghost ac-btn--purple" type="button" aria-label="View options">
+            <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4 6h6M14 6h6M4 12h10M18 12h2M4 18h4M12 18h8" />
+              <circle cx="12" cy="6" r="2" />
+              <circle cx="16" cy="12" r="2" />
+              <circle cx="10" cy="18" r="2" />
+            </svg>
+          </button>
+          <button class="ac-btn ac-btn-icon ac-btn--solid ac-btn--sm" type="button" aria-label="Close panel">
+            <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="m6 6 12 12M18 6 6 18" />
+            </svg>
+          </button>
         </div>
+
+        <p class="ac-ib__note">
+          Tab through them. The focus ring is the one every other button here has.
+          The glyph is <code>aria-hidden</code> in all seven, so a screen reader
+          reads the <code>aria-label</code> and nothing else.
+        </p>
       </div>
 
-      <p class="ac-ib__note">
-        The words are <code>aria-hidden</code>, so each button announces once.
-        They are still visible text, and SC 2.5.3 is about what you can see.
-      </p>
+      <!-- ==================================================================
+           EXAMPLE 2 · aria-label, or clipped real text
+           CSS [BTN] + [ICON] + [CLIP] + [PANEL]. No JavaScript.
 
-      <form class="ac-ib-command" data-ac-ib-voice-form>
-        <div class="ac-ib-command__field">
-          <label class="ac-ib-command__label" for="ac-ib-command">Say a command</label>
-          <input class="ac-ib-command__input" type="text" id="ac-ib-command" name="command"
-                 value="click Share" autocomplete="off" />
+           All three of these announce "Add teammate, button". Only two of them
+           contain the words.
+
+           aria-label is a different tool rather than a shorter spelling of a
+           label: it replaces the whole accessible name, needs a role that
+           supports naming, and is invisible to translation tools and to
+           find-in-page. Prefer clipped real text where it costs nothing, and it
+           costs nothing here — a <span> inside the button is the same one line
+           of markup.
+
+           The third button is the second one with a class added. That is the
+           payoff: text that can be un-clipped at a wider viewport, in a
+           settings panel, or by a user stylesheet was never available as an
+           attribute.
+
+           Press Ctrl+F and search this page for "teammate". The clipped text is
+           found and the aria-label is not.
+           ================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">2 &middot; aria-label, or clipped real text</h4>
+
+        <div class="ac-ib-panel">
+          <div class="ac-ib-cases">
+            <div class="ac-ib-case">
+              <button class="ac-btn ac-btn-icon ac-btn--outline" type="button" aria-label="Add teammate"
+                      data-ac-ib-find="label">
+                <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </button>
+              <p class="ac-ib-case__label"><code>aria-label</code> &mdash; announced, never written</p>
+            </div>
+
+            <div class="ac-ib-case">
+              <button class="ac-btn ac-btn-icon ac-btn--outline" type="button" data-ac-ib-find="clipped">
+                <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                <span class="ac-btn-icon__label">Add teammate</span>
+              </button>
+              <p class="ac-ib-case__label">clipped text &mdash; announced <em>and</em> written</p>
+            </div>
+
+            <div class="ac-ib-case">
+              <button class="ac-btn ac-btn-icon ac-btn-icon--labeled ac-btn--outline" type="button"
+                      data-ac-ib-find="labeled">
+                <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                <span class="ac-btn-icon__label">Add teammate</span>
+              </button>
+              <p class="ac-ib-case__label">the same markup, <code>--labeled</code></p>
+            </div>
+          </div>
+
+          <p class="ac-ib__note">
+            Drag across the middle button to select the words. They are there, in
+            a box one pixel wide. The first button has nothing to select, nothing
+            to translate and nothing to find.
+          </p>
         </div>
-        <button class="ac-btn ac-btn--solid ac-btn--sm" type="submit">Match it</button>
-      </form>
-
-      <p class="ac-ib__verdict" role="status" data-ac-ib-voice-log></p>
+      </div>
     </div>
   </div>
 
-  <!-- ======================================================================
-       EXAMPLE 5 · The icon is not the target
-       CSS [BTN] + [ICON] + [PANEL] + [BROKEN]. JS [CORE] + [SIZES].
+  <div class="ac-demo-section ac-demo-section--mistakes">
+    <h3 class="ac-demo-section__title">Common mistakes</h3>
+    <p class="ac-demo-section__note">
+      These three are live and wrong on purpose. Every failure here is invisible: the buttons look
+      finished, nothing in the markup is invalid, and most automated checks report nothing.
+    </p>
 
-       SC 2.5.8 asks for 24×24 CSS pixels, and an icon button is the control
-       that fails it, because a 20px glyph in a box shrink-wrapped to a 20px
-       glyph looks completely finished.
+    <div class="ac-demo-grid">
+      <!-- ==================================================================
+           EXAMPLE 3 · Buttons with no accessible name
+           CSS [BTN] + [ICON] + [PANEL]. JS [CORE] + [NAMES].
 
-       Both dimensions matter here in a way they do not for a text button, which
-       gets its width from its label whatever you do. Take the label away and
-       min-width is the only thing holding the box open.
+           Four buttons, one stylesheet, and two of them announce as "button"
+           and nothing else.
 
-       The readout measures the button and the glyph inside it separately, live.
-       Watch the glyph stay nearly the same size while the target doubles: the
-       padding is the target, and it costs nothing to draw.
+           The readout under each one is live: it walks the accessible name
+           computation in order — aria-labelledby, then aria-label, then the
+           element's own text with the aria-hidden parts removed, then title —
+           and prints which source won.
 
-       The third is under the floor on purpose. The row is spaced far enough
-       apart to pass SC 2.5.8's spacing exception, so the size is the only thing
-       wrong with it.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">5 &middot; The icon is not the target</h3>
+           The second case is the one people are surprised by. The label is
+           right there in the markup, on the element wrapping the button, and it
+           is discarded: a <span> is generic, ARIA prohibits naming it, and a
+           name on a parent is never inherited by a child.
 
-    <div class="ac-ib-panel" data-ac-ib-sizes>
-      <div class="ac-ib-row ac-ib-row--spaced">
-        <button class="ac-btn ac-btn-icon ac-btn--solid" type="button" aria-label="Mute the monitor">
-          <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M4 9h4l5-4v14l-5-4H4Z" />
-            <path d="M17 9a4 4 0 0 1 0 6" />
-          </svg>
-        </button>
-        <button class="ac-btn ac-btn-icon ac-btn--sm ac-btn--solid" type="button" aria-label="Skip to the next take">
-          <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M6 5 15 12 6 19Z" />
-            <path d="M18 5v14" />
-          </svg>
-        </button>
-        <!-- BROKEN ON PURPOSE — shrink-wrapped to its glyph, under the floor. -->
-        <button class="ac-btn ac-btn-icon ac-btn-icon--tiny ac-btn--solid" type="button"
-                data-ac-demo-broken="target-size"
-                aria-label="Stop the take">
-          <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M6 6h12v12H6Z" />
-          </svg>
-        </button>
+           The third has a name and is still wrong. A title shows on hover,
+           unreliably or not at all on keyboard focus, and never on touch.
+           ================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">3 &middot; Buttons with no accessible name</h4>
+
+        <div class="ac-ib-panel" data-ac-ib-names>
+          <div class="ac-ib-cases">
+            <div class="ac-ib-case">
+              <!-- BROKEN ON PURPOSE — no name at all. -->
+              <button class="ac-btn ac-btn-icon ac-btn--outline" type="button" data-ac-ib-name="bare"
+                      data-ac-demo-broken="button-name">
+                <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" />
+                </svg>
+              </button>
+              <p class="ac-ib-case__label">nothing</p>
+              <p class="ac-ib-case__out"><code data-ac-ib-out="bare">&mdash;</code></p>
+            </div>
+
+            <div class="ac-ib-case">
+              <!-- BROKEN ON PURPOSE — the label is on the wrapper, not the button. -->
+              <span aria-label="Delete project" data-ac-demo-broken="aria-prohibited-attr button-name">
+                <button class="ac-btn ac-btn-icon ac-btn--outline" type="button" data-ac-ib-name="wrapped">
+                  <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" />
+                  </svg>
+                </button>
+              </span>
+              <p class="ac-ib-case__label"><code>aria-label</code> on the <code>&lt;span&gt;</code></p>
+              <p class="ac-ib-case__out"><code data-ac-ib-out="wrapped">&mdash;</code></p>
+            </div>
+
+            <div class="ac-ib-case">
+              <!-- HALF WRONG ON PURPOSE — a name, from the last resort. -->
+              <button class="ac-btn ac-btn-icon ac-btn--outline" type="button" title="Delete project"
+                      data-ac-ib-name="title">
+                <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" />
+                </svg>
+              </button>
+              <p class="ac-ib-case__label"><code>title</code> only</p>
+              <p class="ac-ib-case__out"><code data-ac-ib-out="title">&mdash;</code></p>
+            </div>
+
+            <div class="ac-ib-case">
+              <button class="ac-btn ac-btn-icon ac-btn--solid" type="button" aria-label="Delete project"
+                      data-ac-ib-name="fixed">
+                <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" />
+                </svg>
+              </button>
+              <p class="ac-ib-case__label"><code>aria-label</code> &mdash; the fix</p>
+              <p class="ac-ib-case__out"><code data-ac-ib-out="fixed">&mdash;</code></p>
+            </div>
+          </div>
+
+          <!-- Rendered empty and already in the accessibility tree. A live region
+               created at the moment it has something to say announces nothing. -->
+          <p class="ac-ib__verdict" role="status" data-ac-ib-names-verdict></p>
+        </div>
       </div>
 
-      <!-- Not a live region: it is a table you look at, and it changes only when
-           the script measures at load. -->
-      <dl class="ac-ib-readout" data-ac-ib-sizes-readout>
-        <div class="ac-ib-readout__row">
-          <dt>Default</dt>
-          <dd>target <code data-ac-ib-out="default">&mdash;</code></dd>
-          <dd>glyph <code data-ac-ib-out="default-glyph">&mdash;</code></dd>
-        </div>
-        <div class="ac-ib-readout__row">
-          <dt>Small</dt>
-          <dd>target <code data-ac-ib-out="sm">&mdash;</code></dd>
-          <dd>glyph <code data-ac-ib-out="sm-glyph">&mdash;</code></dd>
-        </div>
-        <div class="ac-ib-readout__row">
-          <dt>Shrink-wrapped</dt>
-          <dd>target <code data-ac-ib-out="tiny">&mdash;</code></dd>
-          <dd>glyph <code data-ac-ib-out="tiny-glyph">&mdash;</code></dd>
-        </div>
-      </dl>
+      <!-- ==================================================================
+           EXAMPLE 4 · A visible word missing from the name
+           CSS [BTN] + [ICON] + [PANEL]. JS [CORE] + [VOICE].
 
-      <p class="ac-ib__verdict" role="status" data-ac-ib-sizes-verdict></p>
+           SC 2.5.3, and it is the criterion an icon rail fails most often. Both
+           buttons below have a visible word under them. Voice control does not
+           read the word — it matches what you say against the accessible name,
+           so a button captioned "Share" and named "Send this project to a
+           teammate" cannot be operated by saying "click Share", by the person
+           looking straight at it.
+
+           The command box is a mock of that lookup, not a screen reader and not
+           a real speech engine: it matches your text against each button's
+           accessible name, the way Voice Control and Voice Access do.
+
+           Type share and nothing matches. Type archive and one does. The fix is
+           not to shorten the name — it is to start the name with the visible
+           text and keep whatever else it needs after that.
+           ================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">4 &middot; A visible word missing from the name</h4>
+
+        <div class="ac-ib-panel" data-ac-ib-voice>
+          <div class="ac-ib-rail">
+            <div class="ac-ib-rail__item">
+              <button class="ac-btn ac-btn-icon ac-btn--outline" type="button" aria-label="Archive project"
+                      data-ac-ib-voice-btn>
+                <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </button>
+              <span class="ac-ib-rail__word" aria-hidden="true">Archive</span>
+            </div>
+
+            <div class="ac-ib-rail__item">
+              <!-- BROKEN ON PURPOSE — the visible word is not in the name. -->
+              <button class="ac-btn ac-btn-icon ac-btn--outline" type="button"
+                      aria-label="Send this project to a teammate" data-ac-ib-voice-btn>
+                <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <circle cx="6" cy="12" r="2" />
+                  <circle cx="17" cy="6" r="2" />
+                  <circle cx="17" cy="18" r="2" />
+                  <path d="m8 11 7-3.5M8 13l7 3.5" />
+                </svg>
+              </button>
+              <span class="ac-ib-rail__word" aria-hidden="true">Share</span>
+            </div>
+          </div>
+
+          <p class="ac-ib__note">
+            The captions are <code>aria-hidden</code>, so each button announces
+            once. They are still visible text, and SC 2.5.3 is about what you can
+            see.
+          </p>
+
+          <form class="ac-ib-command" data-ac-ib-voice-form>
+            <div class="ac-ib-command__field">
+              <label class="ac-ib-command__label" for="ac-ib-command">Say a command</label>
+              <input class="ac-ib-command__input" type="text" id="ac-ib-command" name="command"
+                     value="click Share" autocomplete="off" />
+            </div>
+            <button class="ac-btn ac-btn--solid ac-btn--sm" type="submit">Match it</button>
+          </form>
+
+          <p class="ac-ib__verdict" role="status" data-ac-ib-voice-log></p>
+        </div>
+      </div>
+
+      <!-- ==================================================================
+           EXAMPLE 5 · A target shrink-wrapped to its glyph
+           CSS [BTN] + [ICON] + [PANEL] + [BROKEN]. JS [CORE] + [SIZES].
+
+           SC 2.5.8 asks for 24×24 CSS pixels, and an icon button is the control
+           that fails it, because a 20px glyph in a box shrink-wrapped to a 20px
+           glyph looks completely finished.
+
+           Both dimensions matter here in a way they do not for a text button,
+           which gets its width from its label whatever you do. Take the label
+           away and min-width is the only thing holding the box open.
+
+           The readout measures the button and the glyph inside it separately,
+           live. The glyph stays the same size while the target more than
+           doubles: the padding is the target, and it costs nothing to draw.
+
+           The third is under the floor on purpose. The row is spaced far enough
+           apart to pass SC 2.5.8's spacing exception, so the size is the only
+           thing wrong with it.
+           ================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">5 &middot; A target shrink-wrapped to its glyph</h4>
+
+        <div class="ac-ib-panel" data-ac-ib-sizes>
+          <div class="ac-ib-row ac-ib-row--spaced">
+            <button class="ac-btn ac-btn-icon ac-btn--solid" type="button" aria-label="Mute notifications">
+              <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 9h4l5-4v14l-5-4H4Z" />
+                <path d="M17 9a4 4 0 0 1 0 6" />
+              </svg>
+            </button>
+            <button class="ac-btn ac-btn-icon ac-btn--sm ac-btn--solid" type="button" aria-label="Next page">
+              <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M6 5 15 12 6 19Z" />
+                <path d="M18 5v14" />
+              </svg>
+            </button>
+            <!-- BROKEN ON PURPOSE — shrink-wrapped to its glyph, under the floor. -->
+            <button class="ac-btn ac-btn-icon ac-btn-icon--tiny ac-btn--solid" type="button"
+                    data-ac-demo-broken="target-size"
+                    aria-label="Stop export">
+              <svg class="ac-btn-icon__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M6 6h12v12H6Z" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Not a live region: it is a table you look at, and it changes only
+               when the script measures at load. -->
+          <dl class="ac-ib-readout" data-ac-ib-sizes-readout>
+            <div class="ac-ib-readout__row">
+              <dt>Default</dt>
+              <dd>target <code data-ac-ib-out="default">&mdash;</code></dd>
+              <dd>glyph <code data-ac-ib-out="default-glyph">&mdash;</code></dd>
+            </div>
+            <div class="ac-ib-readout__row">
+              <dt>Small</dt>
+              <dd>target <code data-ac-ib-out="sm">&mdash;</code></dd>
+              <dd>glyph <code data-ac-ib-out="sm-glyph">&mdash;</code></dd>
+            </div>
+            <div class="ac-ib-readout__row">
+              <dt>Shrink-wrapped</dt>
+              <dd>target <code data-ac-ib-out="tiny">&mdash;</code></dd>
+              <dd>glyph <code data-ac-ib-out="tiny-glyph">&mdash;</code></dd>
+            </div>
+          </dl>
+
+          <p class="ac-ib__verdict" role="status" data-ac-ib-sizes-verdict></p>
+        </div>
+      </div>
     </div>
   </div>
 </div>

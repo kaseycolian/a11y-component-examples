@@ -13,10 +13,10 @@ test.beforeEach(async ({ page }) => {
    example 5's third is under the target floor. Each of those is a sentence in
    docs.md that would otherwise be a promise. */
 
-/* --- example 1 · the specimen --------------------------------------------- */
+/* --- example 1 · weights, accents and sizes ------------------------------- */
 
 test('every specimen has a name, and the glyph is hidden from the name', async ({ page }) => {
-  for (const name of ['Play', 'Search the set list', 'Bookmark Ruby Soho', 'Close the set list']) {
+  for (const name of ['Play', 'Search projects', 'Bookmark project', 'Close panel']) {
     const btn = page.getByRole('button', { name, exact: true });
     await expect(btn).toHaveAccessibleName(name);
     // No ARIA role anywhere. A <button> already has one.
@@ -45,7 +45,7 @@ test('the glyph is an inline SVG stroked with the button own text color', async 
   expect(solid.stroke).toBe(solid.color);
   expect(solid.fill).toBe('none');
 
-  const ghost = await read('Search the set list');
+  const ghost = await read('Search projects');
   expect(ghost.stroke).toBe(ghost.color);
   expect(ghost.color).not.toBe(solid.color);
 });
@@ -60,10 +60,10 @@ test('the icon button is square, and --sm lands on the 24px floor exactly', asyn
   // The default: 44 in both directions. min-width is doing the work an absent
   // label would otherwise do.
   expect(await box('Play')).toEqual({ w: 44, h: 44 });
-  expect(await box('Close the set list')).toEqual({ w: 24, h: 24 });
+  expect(await box('Close panel')).toEqual({ w: 24, h: 24 });
 });
 
-/* --- example 2 · aria-label versus real text ------------------------------ */
+/* --- example 2 · aria-label, or clipped real text ------------------------- */
 
 test('all three variants announce the same name, and only two contain the words', async ({
   page,
@@ -73,15 +73,15 @@ test('all three variants announce the same name, and only two contain the words'
   const labeled = page.locator('[data-ac-ib-find="labeled"]');
 
   for (const btn of [byLabel, clipped, labeled]) {
-    await expect(btn).toHaveAccessibleName('Add to the queue');
+    await expect(btn).toHaveAccessibleName('Add teammate');
   }
 
   // innerText includes clipped text — it only drops display:none and
   // visibility:hidden — which is exactly the property find-in-page and a
   // translation tool rely on. The aria-label version has nothing to find.
   expect((await byLabel.innerText()).trim()).toBe('');
-  expect(await clipped.innerText()).toContain('Add to the queue');
-  expect(await labeled.innerText()).toContain('Add to the queue');
+  expect(await clipped.innerText()).toContain('Add teammate');
+  expect(await labeled.innerText()).toContain('Add teammate');
 });
 
 test('--labeled un-clips the same markup rather than replacing it', async ({ page }) => {
@@ -99,7 +99,7 @@ test('--labeled un-clips the same markup rather than replacing it', async ({ pag
   expect(boxes[1]).toBeGreaterThan(boxes[0]);
 });
 
-/* --- example 3 · the accessible name is the only name --------------------- */
+/* --- example 3 · buttons with no accessible name -------------------------- */
 
 test('two of the four have no accessible name at all', async ({ page }) => {
   // Nothing on it.
@@ -109,8 +109,8 @@ test('two of the four have no accessible name at all', async ({ page }) => {
   await expect(page.locator('[data-ac-ib-name="wrapped"]')).toHaveAccessibleName('');
 
   // These two do have one, from different sources.
-  await expect(page.locator('[data-ac-ib-name="title"]')).toHaveAccessibleName('Delete the take');
-  await expect(page.locator('[data-ac-ib-name="fixed"]')).toHaveAccessibleName('Delete the take');
+  await expect(page.locator('[data-ac-ib-name="title"]')).toHaveAccessibleName('Delete project');
+  await expect(page.locator('[data-ac-ib-name="fixed"]')).toHaveAccessibleName('Delete project');
 });
 
 test('the readout names the source each name came from', async ({ page }) => {
@@ -129,7 +129,7 @@ test('the readout names the source each name came from', async ({ page }) => {
   await expect(page.locator('[data-ac-ib-names-verdict]')).toHaveText(/^2 of these four/);
 });
 
-/* --- example 4 · SC 2.5.3, label in name ---------------------------------- */
+/* --- example 4 · a visible word missing from the name (SC 2.5.3) ---------- */
 
 test('the visible caption is in one name and not the other', async ({ page }) => {
   const items = page.locator('.ac-ib-rail__item');
@@ -156,13 +156,13 @@ test('the voice lookup finds one button by its caption and not the other', async
   await expect(log).toHaveText(/Nothing is named "share"/);
   await expect(log).toHaveAttribute('data-ac-ib-bad', 'true');
 
-  await field.fill('click Queue');
+  await field.fill('click Archive');
   await field.press('Enter');
-  await expect(log).toHaveText(/"Queue this track" matched "queue"/);
+  await expect(log).toHaveText(/"Archive project" matched "archive"/);
   await expect(log).not.toHaveAttribute('data-ac-ib-bad', /.*/);
 });
 
-/* --- example 5 · target size ---------------------------------------------- */
+/* --- example 5 · a target shrink-wrapped to its glyph --------------------- */
 
 test('the readout measures the target and the glyph separately', async ({ page }) => {
   const text = (key) => page.locator(`[data-ac-ib-out="${key}"]`).innerText();
@@ -186,7 +186,7 @@ test('the undersized target is reported, by name and in the readout', async ({ p
   );
 
   const verdict = page.locator('[data-ac-ib-sizes-verdict]');
-  await expect(verdict).toHaveText(/"Stop the take" is under 24×24/);
+  await expect(verdict).toHaveText(/"Stop export" is under 24×24/);
 });
 
 test('every icon button on the page clears 24×24 except the one that is meant not to', async ({
@@ -200,7 +200,7 @@ test('every icon button on the page clears 24×24 except the one that is meant n
       })
       .map((el) => el.getAttribute('aria-label')),
   );
-  expect(short).toEqual(['Stop the take']);
+  expect(short).toEqual(['Stop export']);
 });
 
 /* --- the shared obligations ----------------------------------------------- */
@@ -221,7 +221,7 @@ test('the transition is gated on the motion token', async ({ page }) => {
 test('under forced colors the ghost weight gets a border it does not otherwise have', async ({
   page,
 }) => {
-  const ghost = page.getByRole('button', { name: 'Search the set list', exact: true });
+  const ghost = page.getByRole('button', { name: 'Search projects', exact: true });
 
   const before = await ghost.evaluate((el) => getComputedStyle(el).borderTopColor);
   expect(before).toBe('rgba(0, 0, 0, 0)');
