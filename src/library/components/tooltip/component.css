@@ -11,7 +11,7 @@
      [ICON]        examples 2, 4, 5. The square icon-only trigger.
      [TOGGLETIP]   example 4.
      [FIELD]       example 5. A label, a hint and an input, kept minimal. The
-                   Field and Text Input components own the canonical versions.
+                   Form Field and Text Input components own the canonical versions.
      [FORCED]      always ship this. High Contrast rebuilds every cue.
 
    Copy the file whole for the library version.
@@ -216,7 +216,7 @@
    [CORE] is required with this section. */
 
 /* --- [FIELD] example 5 --------------------------------------------------
-   Minimal on purpose. Field owns .ac-field* and Text Input owns .ac-input;
+   Minimal on purpose. Form Field owns .ac-field* and Text Input owns .ac-input;
    these are local so this file stands alone. */
 
 .ac-tooltip-field {

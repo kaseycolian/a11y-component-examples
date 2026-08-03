@@ -107,4 +107,4 @@ kinder — see `fieldset-group`.
 ## Related
 
 [Dropdown](../dropdown/) is the styled-rows version, and says plainly what it costs.
-[Field](../field/) is the canonical home for `.ac-field*`, repeated here so this file stands alone.
+[Form Field](../field/) is the canonical home for `.ac-field*`, repeated here so this file stands alone.

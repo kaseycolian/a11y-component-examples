@@ -15,7 +15,7 @@ sections say which examples need them.
 | `<label for>` → `input.id` | The only association that works everywhere. Clicking the label focuses the input, and the name is announced with no ARIA. |
 | `type` | Picks the on-screen keyboard and the browser's own validation. |
 | `autocomplete` | SC 1.3.5. Lets a password manager fill the form and saves anyone with a motor impairment from typing an address by hand. |
-| `aria-describedby` | Points at the hint, and at the error when there is one. A space-separated list — see Field. |
+| `aria-describedby` | Points at the hint, and at the error when there is one. A space-separated list — see Form Field. |
 
 ## autocomplete is the one to get right
 
@@ -132,10 +132,10 @@ component, treat the above as intent, not measurement.
 ## Related
 
 `.ac-field`, `.ac-field__label`, `.ac-field__hint` and `.ac-field__error` are **canonical in the
-[Field](../field/) component**, which also covers the `aria-describedby` list and the `role="alert"`
+[Form Field](../field/) component**, which also covers the `aria-describedby` list and the `role="alert"`
 timing rules. They are repeated here so this file stands alone — change one, change both.
 
-`.ac-input` is canonical *here*. Field carries a copy for its own demo.
+`.ac-input` is canonical *here*. Form Field carries a copy for its own demo.
 
 For an input with a trailing button — a search submit, a copy-to-clipboard, a password reveal — see
 `input-group`. Multi-line goes to `textarea`.

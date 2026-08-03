@@ -5,8 +5,8 @@
    Everything here is real component code; the demo frame (ac-demo-*) is in the
    site's own stylesheet, not this file.
 
-     [FIELD]        all examples. The label/hint wrapper. Canonical in the Field
-                    component; repeated so this file stands alone.
+     [FIELD]        all examples. The label/hint wrapper. Canonical in the Form
+                    Field component; repeated so this file stands alone.
      [CORE]         all examples. Wrapper, trigger, panel, options.
      [DECORATION]   examples 1 and 3. Icons, swatches, secondary text.
      [GROUPS]       example 2.
@@ -37,7 +37,7 @@
    scripts/check-tokens.mjs enforces it.
    =========================================================================== */
 
-/* --- [FIELD] the wrapper — canonical in the Field component ---------------- */
+/* --- [FIELD] the wrapper — canonical in the Form Field component ---------------- */
 
 .ac-field {
   display: flex;

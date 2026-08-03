@@ -117,6 +117,6 @@ useEffect(() => {
 
 ## Related
 
-`.ac-field` and `.ac-field__hint` are canonical in [Field](../field/); `.ac-input` is canonical in
+`.ac-field` and `.ac-field__hint` are canonical in [Form Field](../field/); `.ac-input` is canonical in
 [Text Input](../text-input/). Both are repeated here so this file stands alone — change one, change
 all three.

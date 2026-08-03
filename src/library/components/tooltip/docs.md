@@ -195,5 +195,5 @@ the whole time rather than only while it shows.
 ## Related
 
 `.ac-tooltip-btn` and `.ac-tooltip-field*` are local copies so this file stands alone; `button`,
-[Field](../field/) and [Text Input](../text-input/) own the canonical versions. [Disclosure](../disclosure/)
+[Form Field](../field/) and [Text Input](../text-input/) own the canonical versions. [Disclosure](../disclosure/)
 is the pattern when the content is a region and belongs in the tab order.

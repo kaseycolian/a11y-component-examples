@@ -115,6 +115,6 @@ useEffect(() => {
 
 ## Related
 
-`.ac-field`, `.ac-field__hint` and `.ac-field__error` are canonical in [Field](../field/), repeated
+`.ac-field`, `.ac-field__hint` and `.ac-field__error` are canonical in [Form Field](../field/), repeated
 here so this file stands alone — change one, change both. [Text Input](../text-input/) is the
 single-line case, and covers `autocomplete` and `inputmode`.

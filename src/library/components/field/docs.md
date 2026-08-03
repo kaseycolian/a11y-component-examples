@@ -1,24 +1,27 @@
 ## Before you copy
 
-Your framework probably has a better idiom for form state than this factory — React Hook Form,
-Angular's `FormControl`, Vue's `vee-validate`. Use it. **The ARIA wiring below is the same either
-way**, and it is the part almost every implementation gets wrong. Take the markup and the CSS, keep
-the attribute contract, and let your framework own the state.
+These files are a working reference, not a package. Move the markup into your own templates and the
+state into your own code. What has to survive that move is the ARIA below, the keyboard behavior, and
+where focus goes — those are the parts that make the component accessible, and the parts that are
+usually dropped.
 
-Each example on this page is separately copyable: the HTML sections are numbered, and the CSS and JS
-sections say which examples need them.
+Every example on this page is numbered and separately copyable. The CSS and JS sections name which
+examples need them.
 
-## The contract
+## Required markup
 
-| Element | Attribute | Why |
+Four elements, wired together by ids. Nothing here is a widget — every control is native, and the
+ARIA is only the wiring between them.
+
+| Element | Attribute | What it does |
 | --- | --- | --- |
-| `<label for>` | the control's `id` | The only association that works everywhere. Clicking it focuses the control; the name is announced with no ARIA at all. |
-| the control | `aria-describedby="<hint id> <error id>"` | Both ids, always, from init. |
-| the control | `aria-invalid="true"` | Only while a message is showing. The invalid styling is driven from it, so the two cannot disagree. |
+| `<label>` | `for` = the control's `id` | The only association that works everywhere. Clicking the label focuses the control, and the name is announced with no ARIA at all. |
+| The control | `aria-describedby="<hint id> <error id>"` | Both ids, always, written once at init. See below — this is the field that gets broken. |
+| The control | `aria-invalid="true"` | Only while a message is showing. The invalid styling is driven from this attribute, so the two cannot disagree. |
 | `.ac-field__hint` | an `id` | Instructions. Announced after the label and the value. |
-| `.ac-field__error` | an `id` and `role="alert"` | Announced the moment text lands in it. |
+| `.ac-field__error` | an `id` and `role="alert"` | Announced the moment text lands in it. Present and empty from the start, never `hidden`. |
 
-### aria-describedby is a list, written once
+### `aria-describedby` is a list, written once
 
 ```js
 control.setAttribute('aria-describedby', errorId);   // wrong: the hint is now gone
@@ -55,23 +58,27 @@ One input: the input. A group of them: the `<fieldset>`, whose `<legend>` is alr
 
 ## Keyboard
 
-Every control is native, so there is nothing to learn and no key handler in this component.
+Every control is native, so there is no key handler in this component.
 
-| Key | Action |
+| Key | What it does |
 | --- | --- |
-| <kbd>Tab</kbd> | To the control. A radio group is one stop, not one per radio. |
-| <kbd>&darr;</kbd> <kbd>&uarr;</kbd> | In a radio group: move **and** select. Native; do not reimplement. |
-| <kbd>Space</kbd> | Toggle a checkbox, select the focused radio. |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> | Moves to and from the control. A radio group is one stop, not one per radio. |
+| <kbd>↑</kbd> / <kbd>↓</kbd> | In a radio group, moves **and** selects in one action. Native — do not reimplement it. |
+| <kbd>Space</kbd> | Toggles a checkbox, or selects the focused radio. |
+
+**Keys deliberately not bound.** All of them. A field that needs a key handler to be accessible is a
+broken field. Note the one thing <kbd>Tab</kbd> decides here: **leaving** the control is when to
+validate, never on every keystroke — see below.
 
 ## States
 
-| State | Signaled by |
-| --- | --- |
-| Hover | Border takes the blue accent. Skipped when disabled (`:hover:enabled`). |
-| Focus | 3px outline, 2px offset, via `:focus-visible` — keyboard only, not on click. |
-| Disabled | Dashed border plus reduced opacity. The hint stays readable, which is why it is not a `placeholder`. |
-| Invalid | Border goes to 2px in the danger color, **and** there is a message to read. Two cues, so nothing rests on hue (SC 1.4.1). |
-| Empty | The error element is present with no height, so nothing jumps when a message appears. |
+| State | Signaled by | Never signaled by |
+| --- | --- | --- |
+| hover | The border takes the blue accent. Skipped when disabled (`:hover:enabled`). | — |
+| focus | A 3px outline at 2px offset, via `:focus-visible` — keyboard only, not on click. | — |
+| disabled | A dashed border plus reduced opacity. The hint stays readable, which is why it is not a `placeholder`. | — |
+| invalid | The border goes to 2px in the danger color, **and** there is a message to read. | Color alone (SC 1.4.1). Two cues, always. |
+| empty | The error element is present with no height, so nothing jumps when a message appears. | — |
 
 Under `forced-colors` the accent collapses to the user's text color, so the invalid border widens to
 3px — width is the only cue left. Disabled loses its opacity, leaving the dashed border.
@@ -81,8 +88,8 @@ Under `forced-colors` the accent collapses to the user's text color, so the inva
 Expected: `"<label>, edit text, <hint>"` on focus; on a failed check the alert interrupts with the
 message, which then stays in the description.
 
-**Not yet verified against real assistive technology.** Alert timing and whether a description list
-is read in full are exactly what varies across NVDA, JAWS, VoiceOver and TalkBack. Until
+**Not yet verified against real assistive technology.** Alert timing, and whether a description list
+is read in full, are exactly what varies across NVDA, JAWS, VoiceOver and TalkBack. Until
 `docs/at-support.md` has a row for this component, treat the above as intent, not measurement.
 
 ## Validation
@@ -92,24 +99,24 @@ element instead of the browser's bubble, which is transient, unstyleable and unr
 
 | When | What happens |
 | --- | --- |
-| `blur` | Validate; show a message if the value is not acceptable. |
+| `blur` | Validate, and show a message if the value is not acceptable. |
 | `input` / `change` | Only *removes* a message, the moment the value becomes valid. |
 
-Browser messages say what is wrong but never what to do, so override per control:
+Browser messages say what is wrong but never what to do, so override them per control:
 
 ```html
 <input type="email" required
        data-ac-error-missing="Enter the email address you use at work."
-       data-ac-error-invalid="Enter an address in the form ruby.soho@example.com." />
+       data-ac-error-invalid="Enter an address in the form jordan.lee@example.com." />
 ```
 
-`missing` covers `validity.valueMissing`, `invalid` covers the rest; `control.validationMessage` is
-the fallback.
+`missing` covers `validity.valueMissing`, `invalid` covers the rest, and
+`control.validationMessage` is the fallback.
 
-**Validate-on-blur is a tradeoff, hence opt-in.** Tabbing through an untouched required field errors
-at you for a mistake you have not made. On a long form prefer submit-time: `check()` each field,
-`focus()` the first failure, and add an error summary at the top linking to each. Set `novalidate` on
-the `<form>` so the native bubble stays out of the way.
+**Validate-on-blur is a tradeoff, which is why it is opt-in.** Tabbing through an untouched required
+field errors at you for a mistake you have not made. On a long form prefer submit-time: `check()`
+each field, `focus()` the first failure, and add an error summary at the top linking to each. Set
+`novalidate` on the `<form>` so the native bubble stays out of the way.
 
 An alert populated in **server-rendered HTML** is deliberately not announced at load — the user has
 done nothing yet. They hear it on reaching the field. Example 3 is that case.
@@ -118,10 +125,8 @@ done nothing yet. They hear it on reaching the field. Example 3 is that case.
 
 The hardest part of this component is not the code.
 
-- Say **what to do**: "Enter a date in the past" beats "Invalid date".
+- Say **what to do**. "Enter a date in the past" beats "Invalid date".
 - Name the field if the message could be read out of context.
-- Never use `placeholder` as the label. It vanishes on first keystroke, usually fails contrast, and
-  translation tooling misses it.
 - The asterisk is decoration (`aria-hidden`); `required` is what announces. If you use one, add a
   visible legend explaining it.
 
@@ -144,34 +149,52 @@ f.destroy();
 
 `setError` writes `textContent`, never HTML — a validation message is often an echo of user input.
 
-Idempotent; a second call returns the existing instance. `destroy()` restores the original
+Idempotent: a second call returns the existing instance. `destroy()` restores the original
 `aria-describedby`, the original `aria-invalid`, and any message the HTML shipped with.
 
-To drive it from a framework lifecycle, delete the auto-init block:
+## Using it in a framework
+
+Delete the auto-init block at the bottom of `component.js` and call the factory from your own
+lifecycle. In React:
 
 ```jsx
+const ref = useRef(null);
+
 useEffect(() => {
   const f = AC.createField(ref.current);
   return () => f.destroy();
 }, []);
 ```
 
-## What to watch for
+## Common mistakes
 
-- **Never put the error inside the label.** It becomes part of the accessible name, so the control
+- **`aria-describedby` assigned rather than built.** One line of JavaScript sets it to the error id
+  and the hint is gone for good. This is the bug this component exists for.
+- **An error element created at the moment there is an error.** A `role="alert"` has to already be in
+  the accessibility tree for the text landing in it to register as a change. Ship it empty.
+- **A `placeholder` used as the label.** It vanishes on the first keystroke, usually fails contrast,
+  and translation tooling misses it.
+- **The error put inside the `<label>`.** It becomes part of the accessible name, so the control
   announces the whole message every time focus lands on it, forever.
-- **One `role="alert"` per field, not per form.** A shared region means the second error overwrites
-  the first, and fixing field two announces nothing about field one.
-- **`aria-required` is redundant** when `required` is present. Only `aria-required` means the browser
-  never validates and `:invalid` never matches.
-- **`autocomplete` is a success criterion** (SC 1.3.5), not a nicety — and the most-skipped one in
-  this group.
+- **One `role="alert"` for the whole form.** The second error overwrites the first, and fixing field
+  two announces nothing about field one. One region per field.
+- **`aria-invalid` left `true` after the value is fixed.** The state and the styling then disagree.
+  Drive both from the same attribute.
+- **Validation on every keystroke.** It announces a half-typed value as wrong. Validate on blur, clear
+  on input.
+- **`aria-required` instead of `required`.** `aria-required` alone means the browser never validates
+  and `:invalid` never matches. When `required` is present, `aria-required` is redundant.
+- **No `autocomplete`.** SC 1.3.5 is a success criterion, not a nicety, and it is the most-skipped one
+  in this group.
 
 ## Related
 
-`.ac-field*` is canonical here; Dropdown carries its own copy so it stands alone. Change one, change
-both. `.ac-input`, `.ac-textarea`, `.ac-group` and `.ac-choice` are provisional — `text-input`,
-`textarea` and `fieldset-group` will own them.
+`.ac-field*` is canonical here; [Custom Select](../dropdown/) carries its own copy so it stands alone.
+Change one, change both.
+
+- [Text Input](../text-input/) — the `type`, `inputmode` and `autocomplete` that go in the control.
+- [Fieldset](../fieldset-group/) — the group spelling, in full.
+- [Live Region](../live-region/) — why the error element has to exist before it has anything to say.
 
 Reference: the [WAI forms tutorial](https://www.w3.org/WAI/tutorials/forms/), not the APG — the APG
 covers widgets with no native element, and this is nothing but native elements.

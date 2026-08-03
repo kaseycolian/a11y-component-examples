@@ -167,5 +167,5 @@ mounted and empty.
 
 This is the canonical home of `.ac-group`. [Radio group](../radio-group/), [checkbox](../checkbox/)
 and [switch](../switch/) each carry a copy so their files stand alone — change one, change all of
-them. [Field](../field/) is the single-control version: a label, a hint and an error for one input,
+them. [Form Field](../field/) is the single-control version: a label, a hint and an error for one input,
 where no group is wanted.

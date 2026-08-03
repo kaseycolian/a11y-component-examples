@@ -1,12 +1,12 @@
 <!-- ===========================================================================
-     FIELD — label + control + hint + error
+     FORM FIELD — label + control + hint + error
 
      WHAT TO COPY
        Any one example below is self-contained. Take its section, plus the
        matching [CORE] sections of component.css and component.js.
        Copy all three files whole for the library-grade version.
 
-     THE CONTRACT (the same in every example)
+     REQUIRED MARKUP (the same in every example)
        label[for]  ->  control.id
        control     ->  aria-describedby="<hint id> <error id>"   both ids, always
        control     ->  aria-invalid="true"   only while there is a message
@@ -15,156 +15,168 @@
      aria-describedby is a space-separated LIST written once. Adding the error
      by assigning to the attribute would delete the hint.
 
-     ac-demo-* / ac-demo__* is scaffolding for this page only — the grid, the
-     per-example headings, the legend. Never copy it into your app.
+     There is no Common mistakes section on this page: every example here is
+     correct markup, and the six are six states rather than six verdicts. The
+     mistakes are written up in docs.md instead.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the section
+     heading, the grid, the per-example headings, the legend. Never copy it.
      =========================================================================== -->
 
-<p class="ac-demo__legend">
-  <span class="ac-field__required" aria-hidden="true">*</span>
-  Required. The asterisk is decoration; the control's <code>required</code> attribute is what
-  announces.
-</p>
+<div class="ac-demo-section">
+  <h3 class="ac-demo-section__title">Correct examples</h3>
+  <p class="ac-demo-section__note">
+    All six are markup you can copy. They are the states one field passes through &mdash; empty,
+    validated, rejected by the server, locked, long, and grouped.
+  </p>
 
-<div class="ac-demo-grid">
-  <!-- ======================================================================
-       EXAMPLE 1 · Text input with a hint
-       The baseline. CSS [CORE] + [CONTROLS]. No JS needed beyond [CORE].
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">1 &middot; Text input with a hint</h3>
+  <p class="ac-demo__legend">
+    <span class="ac-field__required" aria-hidden="true">*</span>
+    Required. The asterisk is decoration; the control's <code>required</code> attribute is what
+    announces.
+  </p>
 
-    <div class="ac-field" data-ac-field>
-      <label class="ac-field__label" for="ac-demo-name">Display name</label>
-      <input class="ac-input" id="ac-demo-name" type="text" name="display-name"
-             autocomplete="nickname" />
-      <p class="ac-field__hint" id="ac-demo-name-hint">Shown beside anything you post.</p>
-      <!-- Empty, but present: an alert added at the same moment as its text is
-           not announced. -->
-      <p class="ac-field__error" id="ac-demo-name-error" role="alert"></p>
+  <div class="ac-demo-grid">
+    <!-- ======================================================================
+         EXAMPLE 1 · Text input with a hint
+         The baseline. CSS [CORE] + [CONTROLS]. No JS needed beyond [CORE].
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">1 &middot; Text input with a hint</h4>
+
+      <div class="ac-field" data-ac-field>
+        <label class="ac-field__label" for="ac-demo-name">Display name</label>
+        <input class="ac-input" id="ac-demo-name" type="text" name="display-name"
+               autocomplete="nickname" />
+        <p class="ac-field__hint" id="ac-demo-name-hint">Shown beside anything you post.</p>
+        <!-- Empty, but present: an alert added at the same moment as its text is
+             not announced. -->
+        <p class="ac-field__error" id="ac-demo-name-error" role="alert"></p>
+      </div>
     </div>
-  </div>
 
-  <!-- ======================================================================
-       EXAMPLE 2 · Validation on blur
-       Adds data-ac-validate. CSS [CORE] + [CONTROLS] + [INVALID].
-       JS [CORE] + [VALIDATION].
-       Try it: Tab out empty, then type something without an @.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">2 &middot; Validation on blur</h3>
+    <!-- ======================================================================
+         EXAMPLE 2 · Validation on blur
+         Adds data-ac-validate. CSS [CORE] + [CONTROLS] + [INVALID].
+         JS [CORE] + [VALIDATION].
+         Try it: Tab out empty, then type something without an @.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">2 &middot; Validation on blur</h4>
 
-    <div class="ac-field" data-ac-field data-ac-validate>
-      <label class="ac-field__label" for="ac-demo-email">
-        Work email <span class="ac-field__required" aria-hidden="true">*</span>
-      </label>
-      <!-- Browser messages say what is wrong, never what to do, so override them. -->
-      <input class="ac-input" id="ac-demo-email" type="email" name="email"
-             autocomplete="email" required
-             data-ac-error-missing="Enter the email address you use at work."
-             data-ac-error-invalid="Enter an address in the form ruby.soho@example.com." />
-      <p class="ac-field__hint" id="ac-demo-email-hint">
-        Used only for your sign-in link.
-      </p>
-      <p class="ac-field__error" id="ac-demo-email-error" role="alert"></p>
+      <div class="ac-field" data-ac-field data-ac-validate>
+        <label class="ac-field__label" for="ac-demo-email">
+          Work email <span class="ac-field__required" aria-hidden="true">*</span>
+        </label>
+        <!-- Browser messages say what is wrong, never what to do, so override them. -->
+        <input class="ac-input" id="ac-demo-email" type="email" name="email"
+               autocomplete="email" required
+               data-ac-error-missing="Enter the email address you use at work."
+               data-ac-error-invalid="Enter an address in the form jordan.lee@example.com." />
+        <p class="ac-field__hint" id="ac-demo-email-hint">
+          Used only for your sign-in link.
+        </p>
+        <p class="ac-field__error" id="ac-demo-email-error" role="alert"></p>
+      </div>
     </div>
-  </div>
 
-  <!-- ======================================================================
-       EXAMPLE 3 · Error rendered by the server
-       No JS required at all — the state is in the markup. CSS [CORE] +
-       [CONTROLS] + [INVALID].
-       An alert already populated at load is deliberately NOT announced; the
-       user has done nothing yet. They hear it on reaching the field.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">3 &middot; Error from the server</h3>
+    <!-- ======================================================================
+         EXAMPLE 3 · Error rendered by the server
+         No JS required at all — the state is in the markup. CSS [CORE] +
+         [CONTROLS] + [INVALID].
+         An alert already populated at load is deliberately NOT announced; the
+         user has done nothing yet. They hear it on reaching the field.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">3 &middot; Error from the server</h4>
 
-    <div class="ac-field ac-field--invalid" data-ac-field>
-      <label class="ac-field__label" for="ac-demo-slug">Project URL</label>
-      <input class="ac-input" id="ac-demo-slug" type="text" name="slug"
-             value="bro hymn!" aria-invalid="true" />
-      <p class="ac-field__hint" id="ac-demo-slug-hint">
-        Lower-case letters, numbers and hyphens.
-      </p>
-      <p class="ac-field__error" id="ac-demo-slug-error" role="alert">
-        Replace the space and the exclamation mark with hyphens, like <code>my-project</code>.
-      </p>
+      <div class="ac-field ac-field--invalid" data-ac-field>
+        <label class="ac-field__label" for="ac-demo-slug">Project URL</label>
+        <input class="ac-input" id="ac-demo-slug" type="text" name="slug"
+               value="Q3 Report!" aria-invalid="true" />
+        <p class="ac-field__hint" id="ac-demo-slug-hint">
+          Lower-case letters, numbers and hyphens.
+        </p>
+        <p class="ac-field__error" id="ac-demo-slug-error" role="alert">
+          Replace the space and the exclamation mark with hyphens, like <code>my-project</code>.
+        </p>
+      </div>
     </div>
-  </div>
 
-  <!-- ======================================================================
-       EXAMPLE 4 · Disabled
-       CSS [CORE] + [CONTROLS]. The hint stays readable — the reason it is not
-       a placeholder.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">4 &middot; Disabled</h3>
+    <!-- ======================================================================
+         EXAMPLE 4 · Disabled
+         CSS [CORE] + [CONTROLS]. The hint stays readable — the reason it is not
+         a placeholder.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">4 &middot; Disabled</h4>
 
-    <div class="ac-field" data-ac-field>
-      <label class="ac-field__label" for="ac-demo-org">Organization</label>
-      <input class="ac-input" id="ac-demo-org" type="text" name="org"
-             value="Olympia Records" disabled />
-      <p class="ac-field__hint" id="ac-demo-org-hint">Set by your administrator.</p>
-      <p class="ac-field__error" id="ac-demo-org-error" role="alert"></p>
+      <div class="ac-field" data-ac-field>
+        <label class="ac-field__label" for="ac-demo-org">Organization</label>
+        <input class="ac-input" id="ac-demo-org" type="text" name="org"
+               value="Acme Corp" disabled />
+        <p class="ac-field__hint" id="ac-demo-org-hint">Set by your administrator.</p>
+        <p class="ac-field__error" id="ac-demo-org-error" role="alert"></p>
+      </div>
     </div>
-  </div>
 
-  <!-- ======================================================================
-       EXAMPLE 5 · Textarea, and text long enough to wrap
-       CSS [CORE] + [CONTROLS] + [INVALID]. Nothing truncates; resize stays on
-       (SC 1.4.4).
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">5 &middot; Textarea, long text</h3>
+    <!-- ======================================================================
+         EXAMPLE 5 · Textarea, and text long enough to wrap
+         CSS [CORE] + [CONTROLS] + [INVALID]. Nothing truncates; resize stays on
+         (SC 1.4.4).
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">5 &middot; Textarea, long text</h4>
 
-    <div class="ac-field ac-field--invalid" data-ac-field>
-      <label class="ac-field__label" for="ac-demo-reason">
-        Why do you need access to the production billing export?
-        <span class="ac-field__required" aria-hidden="true">*</span>
-      </label>
-      <textarea class="ac-textarea" id="ac-demo-reason" name="reason" rows="3" required
-                aria-invalid="true"
-                data-ac-error-missing="Say which report you are producing and who asked for it."></textarea>
-      <p class="ac-field__hint" id="ac-demo-reason-hint">
-        A sentence or two. Whoever reviews the request sees exactly this text.
-      </p>
-      <p class="ac-field__error" id="ac-demo-reason-error" role="alert">
-        Say which report you are producing and who asked for it &mdash; a reviewer cannot approve a
-        request that only says &ldquo;billing&rdquo;.
-      </p>
+      <div class="ac-field ac-field--invalid" data-ac-field>
+        <label class="ac-field__label" for="ac-demo-reason">
+          Why do you need access to the production billing export?
+          <span class="ac-field__required" aria-hidden="true">*</span>
+        </label>
+        <textarea class="ac-textarea" id="ac-demo-reason" name="reason" rows="3" required
+                  aria-invalid="true"
+                  data-ac-error-missing="Say which report you are producing and who asked for it."></textarea>
+        <p class="ac-field__hint" id="ac-demo-reason-hint">
+          A sentence or two. Whoever reviews the request sees exactly this text.
+        </p>
+        <p class="ac-field__error" id="ac-demo-reason-error" role="alert">
+          Say which report you are producing and who asked for it &mdash; a reviewer cannot approve a
+          request that only says &ldquo;billing&rdquo;.
+        </p>
+      </div>
     </div>
-  </div>
 
-  <!-- ======================================================================
-       EXAMPLE 6 · A group of controls
-       CSS [CORE] + [GROUPS] + [INVALID]. JS [CORE] + [VALIDATION].
-       The description and aria-invalid go on the <fieldset>, whose <legend> is
-       the group's name. On one radio they would describe only that radio.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">6 &middot; A group of controls</h3>
+    <!-- ======================================================================
+         EXAMPLE 6 · A group of controls
+         CSS [CORE] + [GROUPS] + [INVALID]. JS [CORE] + [VALIDATION].
+         The description and aria-invalid go on the <fieldset>, whose <legend> is
+         the group's name. On one radio they would describe only that radio.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">6 &middot; A group of controls</h4>
 
-    <div class="ac-field" data-ac-field data-ac-validate>
-      <fieldset class="ac-group">
-        <legend class="ac-field__label">Deploy on merge</legend>
-        <div class="ac-group__body">
-          <label class="ac-choice">
-            <input type="radio" name="ac-demo-deploy" value="always" required
-                   data-ac-error-missing="Choose when this branch should deploy." />
-            <span>Always</span>
-          </label>
-          <label class="ac-choice">
-            <input type="radio" name="ac-demo-deploy" value="approval" />
-            <span>Only after approval</span>
-          </label>
-          <label class="ac-choice">
-            <input type="radio" name="ac-demo-deploy" value="never" />
-            <span>Never</span>
-          </label>
-        </div>
-      </fieldset>
-      <p class="ac-field__hint" id="ac-demo-deploy-hint">Applies to this branch only.</p>
-      <p class="ac-field__error" id="ac-demo-deploy-error" role="alert"></p>
+      <div class="ac-field" data-ac-field data-ac-validate>
+        <fieldset class="ac-group">
+          <legend class="ac-field__label">Deploy on merge</legend>
+          <div class="ac-group__body">
+            <label class="ac-choice">
+              <input type="radio" name="ac-demo-deploy" value="always" required
+                     data-ac-error-missing="Choose when this branch should deploy." />
+              <span>Always</span>
+            </label>
+            <label class="ac-choice">
+              <input type="radio" name="ac-demo-deploy" value="approval" />
+              <span>Only after approval</span>
+            </label>
+            <label class="ac-choice">
+              <input type="radio" name="ac-demo-deploy" value="never" />
+              <span>Never</span>
+            </label>
+          </div>
+        </fieldset>
+        <p class="ac-field__hint" id="ac-demo-deploy-hint">Applies to this branch only.</p>
+        <p class="ac-field__error" id="ac-demo-deploy-error" role="alert"></p>
+      </div>
     </div>
   </div>
 </div>

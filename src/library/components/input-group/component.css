@@ -6,7 +6,7 @@
    the site's own stylesheet, not this file.
 
      [FIELD]     all examples. The label/hint/error wrapper. Canonical in the
-                 Field component; repeated so this file stands alone.
+                 Form Field component; repeated so this file stands alone.
      [INPUT]     all examples. .ac-input itself. Canonical in Text Input.
      [CORE]      all examples. The row, the joined edges, the addon button.
      [AFFIX]     example 4.
@@ -21,7 +21,7 @@
    scripts/check-tokens.mjs enforces it.
    =========================================================================== */
 
-/* --- [FIELD] the wrapper — canonical in the Field component ---------------- */
+/* --- [FIELD] the wrapper — canonical in the Form Field component ---------------- */
 
 .ac-field {
   display: flex;

@@ -190,7 +190,7 @@
     },
     {
       "slug": "field",
-      "name": "Field",
+      "name": "Form Field",
       "group": "forms-inputs",
       "useWhen": "A label, a hint and an error on one control, wired so both stay announced.",
       "tags": ["label", "hint", "error", "aria-describedby", "aria-invalid", "validation", "alert"],
@@ -199,7 +199,7 @@
       "files": ["html", "css", "js"],
       "status": "stable",
       "hasContract": true,
-      "_summaryRev": "4af45f3b"
+      "_summaryRev": "92f03ae7"
     },
     {
       "slug": "text-input",

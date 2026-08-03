@@ -153,7 +153,12 @@ Correct examples first, mistakes second, inside `component.html`:
   banners in `component.css` and `component.js` still line up.
 - An example that ends with the fix but exists to show the mistake belongs in **Common mistakes**.
   icon-button's example 3 — three broken buttons then the fixed one — is that case.
-- Omit the second section only when the component genuinely has no counter-example.
+- Omit the second section only when the component genuinely has no counter-example. `field` is the
+  worked example: all six of its demos are correct markup, so it ships one section, its file header
+  says why, and the failures are written up in `docs.md` instead. Do **not** invent a broken example
+  to fill the gap.
+- When there is only one correct example, the heading is singular — **Correct example**. `loading-button`
+  is that case.
 
 `ac-demo-section*` is demo scaffolding like the rest of `ac-demo-*`: it lives in `src/site/styles/site.css`
 and is never copied.
@@ -351,7 +356,7 @@ bound" note, and a `summary` in the new voice.
 | 2 | `icon-button` | [x] | No renumbering — 1 and 2 were already correct, 3 to 5 already the mistakes. `data-ac-icon-button` moved onto a wrapper `<div>`. Labels: Play / Add task / Search projects / Bookmark project / Share project / View options / Close panel, `Add teammate` ×3, `Delete project`, `Archive project` vs `Send this project to a teammate`, Mute notifications / Next page / Stop export. |
 | 3 | `loading-button` | [x] | No renumbering. `data-ac-loading-button` moved onto a wrapper `<div>`. Only one correct example, so its section heading is singular: **Correct example**. `Save set list` → `Save changes`, `Set list saved.` → `Changes saved.`, hint → `Project 462 · 12 tasks`. |
 | 4 | `chip-toggle` | [x] | **Renamed → Filter Chip**, and the first rename done, so it is the worked example: 11 other components mentioned it in prose and all were updated, including two that named an example number. Heavy renumber — old 4 and 5 were choice demos, not failures, so they moved into *Correct examples*: 1→1, 4→2, 5→3, 2→4, 3→5. That reordered `[ACCENTS]`/`[CHECK]` in the CSS and all four demo blocks in the JS, plus the spec's five sections. |
-| 5 | `field` | [ ] | rename → Form Field. Mirrored by the home page `PEEK_FILES` excerpt. |
+| 5 | `field` | [x] | **Renamed → Form Field.** **The first single-section page:** all six examples are correct markup, so there is no *Common mistakes* block — the file header says so, and the failures live in `docs.md` instead. No renumber, no wrapper `<div>` (auto-init already scopes to each `[data-ac-field]`). The home page `PEEK_FILES` excerpt mirrors this component and was updated in step. 14 other components referenced "Field" in prose. |
 | 6 | `text-input` | [ ] | 6 examples. |
 | 7 | `input-group` | [ ] | |
 | 8 | `textarea` | [ ] | |

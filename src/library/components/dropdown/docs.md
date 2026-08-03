@@ -233,7 +233,7 @@ would have been reviewed.
 
 ## Related
 
-`.ac-field`, `.ac-field__label` and `.ac-field__hint` are **canonical in the [Field](../field/)
+`.ac-field`, `.ac-field__label` and `.ac-field__hint` are **canonical in the [Form Field](../field/)
 component**. They are repeated here so this file stands alone — change one, change both.
 
 [Drawer](../drawer/) is the same idea for a panel that comes from the edge of the screen.
