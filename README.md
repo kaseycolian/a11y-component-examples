@@ -57,7 +57,31 @@ by the test suite. Alongside it, `agents/pitfalls.md` collects the platform beha
 correct-looking markup wrong, each one paid for by a real failure.
 
 The same files are served under the site's base path, so a fetcher needs no checkout; `llms.txt` is the
-entry point there. Claude Code picks up `.claude/skills/a11y-library/` on clone.
+entry point there.
+
+### Using it from your own repos
+
+A clone gets you the skill only while *this* repo is the open project, which is the one case you do not
+need it. Install once and the library is available from every repo on the machine:
+
+```sh
+git clone https://github.com/kaseycolian/a11y-component-examples.git
+cd a11y-component-examples
+npm run install:skill        # links the skill into ~/.claude/skills/ for Claude Code
+```
+
+That also writes `~/.claude/a11y-library.local.json` naming this clone, which is what lets a skill
+loaded from outside the checkout still resolve `agents/` and `library/`. Nothing is written inside the
+repo, and it runs before `npm install` — node builtins only.
+
+**Using an agent that is not Claude Code?** Add a pointer block to that project's `AGENTS.md` instead:
+
+```sh
+npm run install:agents-md -- ../your-project   # omit the path to print the block and paste it anywhere
+```
+
+Both routes record both doors — the clone on disk and the hosted URL — so an agent still gets there
+when one of them is unavailable. `npm run uninstall:skill` removes the link and keeps the config.
 
 Do not point an agent at `CLAUDE.md` or `docs/`. Those are for working *on* the library and cost tens of
 thousands of tokens to say nothing about how a component behaves. Why that side is built the way it is —

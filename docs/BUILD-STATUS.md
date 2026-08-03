@@ -325,15 +325,33 @@ but predates the conventions, so take its logic and not its layout. See item 1 u
 - **Markdown tables** — `scripts/rehype-scrollable-tables.mjs` wraps every `docs.md` table in a
   focusable `.table-scroll` region. Without it every component page overflowed sideways at 320px.
 - **Playwright** — `playwright.config.mjs`, three browser projects, `webServer` runs
-  `npm run build && npm run preview`. **Chromium and Firefox are installed; WebKit is not**, so
-  `npm run verify` still *fails* at the test step with "Executable doesn't exist" for every WebKit
-  test. Chromium is **1046/1046** in about 5 minutes — 716 component specs plus the 330 of the
-  shared gate. Firefox was installed on 2026-07-29 and **has not been run yet** — expect real
-  failures rather than none, since every spec was written against Chromium. Run
-  `npx playwright install webkit` to finish the set.
+  `npm run build && npm run preview`. All three browsers are now installed. First three-engine run,
+  2026-08-01:
+
+  | Project | Result |
+  | --- | --- |
+  | chromium | 1205 / 1205 pass, 9 min |
+  | firefox | 60 fail |
+  | webkit | 52 fail |
+
+  3,501 pass overall, 41.5 min. So `npm run verify` fails at the test step on a machine with all
+  three browsers — not for the old reason ("Executable doesn't exist") but because the cross-engine
+  failures this file told the next session to budget for are real and unworked. They are focus and
+  forced-colors assertions written against Chromium only; the one sampled was
+  `expect(locator).toBeFocused()` returning `inactive`, the unfocused-window behavior of Firefox and
+  WebKit rather than anything about the markup. CI installs chromium only and runs
+  `--project=chromium`, so none of this is on the CI path. **Gate a session with
+  `npx playwright test --project=chromium`**, which is the close-out command at the top of this file.
 - **CI** — `.github/workflows/ci.yml` on push to `main`, on every pull request, and by hand.
   `check:tokens` first because it is cheap and needs no browser, then the Chromium suite, then the
   HTML report as an artifact for 14 days. Separate from `deploy.yml`, which is unchanged.
+- **Skill installer** — `scripts/install-skill.mjs`, added 2026-08-01. `npm run install:skill`
+  junctions `.claude/skills/a11y-library/` into `~/.claude/skills/` and writes
+  `~/.claude/a11y-library.local.json` naming the clone, so the skill loads in other repos rather than
+  only while this one is open. `npm run install:agents-md -- <dir>` covers agents that do not read
+  `.claude/`, via a marked block in that project's `AGENTS.md`. Writes nothing inside this repo.
+  Imports `SKILL_NAME`, `SKILL_OUT`, `CONFIG_FILE` and `readBaseUrl` from the generator, so a rename
+  cannot half-succeed. Decisions and rejected options: **Installing out** in `docs/agent-layer.md`.
 
 ---
 

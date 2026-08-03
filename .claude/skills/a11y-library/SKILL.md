@@ -17,7 +17,7 @@ comes from. That is `agents/` and the component's own files, for everyone.
 
 ## Read in this order
 
-Repo-relative in a checkout of this library. Anywhere else the same paths resolve under `https://kaseycolian.github.io/a11y-component-examples/`.
+Repo-relative in a checkout of this library. Installed globally, `~/.claude/a11y-library.local.json` names the clone to resolve them against; with no clone they resolve under `https://kaseycolian.github.io/a11y-component-examples/`.
 
 | Tier | Read | Size | For |
 | --- | --- | --- | --- |

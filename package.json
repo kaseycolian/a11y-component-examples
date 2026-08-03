@@ -4,6 +4,11 @@
   "private": true,
   "type": "module",
   "description": "A reference library of WCAG 2.2 AA accessible UI components in vanilla HTML, CSS, and JavaScript — copy-paste ready for any framework.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kaseycolian/a11y-component-examples.git"
+  },
+  "homepage": "https://kaseycolian.github.io/a11y-component-examples/",
   "engines": {
     "node": ">=20"
   },
@@ -16,6 +21,14 @@
     "sync": "node scripts/sync-library.mjs",
     "new:component": "node scripts/new-component.mjs",
     "agents": "node scripts/build-agent-surfaces.mjs",
+
+    "//install:skill": "Run once after cloning, to use this library from OTHER repos. Links .claude/skills/a11y-library into ~/.claude/skills/ (junction on Windows, symlink elsewhere) and writes ~/.claude/a11y-library.local.json naming this clone. The skill then loads in every repo on this machine. Writes nothing inside this repo. Needs no npm install first — node builtins only.",
+    "install:skill": "node scripts/install-skill.mjs",
+    "//install:agents-md": "For agents that do not read .claude/. Adds a pointer block to another project's AGENTS.md, naming this clone and the hosted URL. Usage: npm run install:agents-md -- ../other-repo (the -- is what passes the path through npm). With no path, prints the block to stdout.",
+    "install:agents-md": "node scripts/install-skill.mjs --into",
+    "//uninstall:skill": "Removes the ~/.claude/skills/a11y-library link. Keeps the config, with the removal recorded in its history.",
+    "uninstall:skill": "node scripts/install-skill.mjs --uninstall",
+
     "check:tokens": "node scripts/check-tokens.mjs",
     "check:agents": "node scripts/build-agent-surfaces.mjs --check",
     "test": "playwright test",

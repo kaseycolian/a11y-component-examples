@@ -50,6 +50,7 @@ src/site/styles/ Site shell CSS. The header and footer are ports of theme-servic
                  see A11Y-WAY-PAGES.md there before restyling either.
 scripts/         sync-library (src -> public), check-tokens (linter), new-component (scaffolder),
                  build-agent-surfaces (renders AGENTS.md + agents/ + the skill),
+                 install-skill (links the skill into ~/.claude/skills/ so other repos can use it),
                  rehype-scrollable-tables (wraps docs.md tables so pages don't overflow at 320px)
 tests/           Site-shell specs (site-header) + the shared a11y gate every component must pass.
 AGENTS.md        GENERATED. The agent read path. Edit docs/agents/, run npm run agents.
@@ -68,6 +69,11 @@ generator fails when prose pushes a surface over one — `docs/agent-layer.md` s
 `.claude/` the same treatment would delete `settings.local.json`, which is machine-specific, gitignored,
 and unrecoverable. The skill is written in place, and a file under `.claude/skills/` counts as the
 generator's only if it carries the do-not-edit marker — so a skill of your own beside it is safe.
+
+`scripts/install-skill.mjs` is the same rule from the other side. It writes only outside this repo:
+the link at `~/.claude/skills/a11y-library` and the config beside it, nothing else under `.claude/`.
+It imports `SKILL_NAME`, `SKILL_OUT`, `CONFIG_FILE` and `readBaseUrl` from the generator rather than
+restating them, so renaming the skill folder or the config cannot be half-done.
 
 **An accessibility finding has four homes and belongs in exactly one.** A fact about the platform that
 makes correct-looking markup wrong → `docs/agents/pitfalls.src.md`. A fact about Playwright or axe that
@@ -285,6 +291,7 @@ npm run build          # prebuild syncs library + agents -> public
 npm run check:tokens   # the color linter
 npm run agents         # render AGENTS.md + agents/ (run after editing any meta.json)
 npm run check:agents   # --check: fail if a surface drifted from its source
+npm run install:skill  # link the skill into ~/.claude/skills/ (writes nothing in the repo)
 npm test               # Playwright a11y gate
 npm run verify         # both linters, then build, then test
 ```

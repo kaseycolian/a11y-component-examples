@@ -685,7 +685,8 @@ Seven things worth keeping:
 **Not done, deliberately:** the skill is not published to `public/`, so `sync-library.mjs` is untouched.
 Claude Code loads a skill from `.claude/` in a checkout and never over HTTP, and an agent that fetched
 the site reads `llms.txt` — the same slots through a different frame. Publishing it would be a fourth
-copy of Tier 0 that nothing would ever fetch.
+copy of Tier 0 that nothing would ever fetch. That reasoning still holds; what it did not anticipate is
+that a checkout is not the only way a *local* skill is loaded — see **Installing out**.
 
 **Verified:** `check:tokens` 34 files clean · `check:agents` **42 surfaces match** · `npm run build` 35
 pages · **chromium 1125/1125** (1123 before; the two new tests are the difference). Eight probes: a
@@ -1020,6 +1021,31 @@ exemption, no signal. `tabs` was fixed by hand instead and the limitation record
 or on a direct push, and touching any unrelated file under `agents/` satisfies it.
 
 ---
+
+## Installing out
+
+The three arrival paths — a checkout reads `AGENTS.md`, a fetcher reads `llms.txt`, Claude Code loads
+the skill — all assume the agent is already at the library. The consuming case is an agent in a
+different repo, where a committed `.claude/skills/` never loads. `scripts/install-skill.mjs` closes it.
+
+| Decision | Choice | Why |
+| --- | --- | --- |
+| Install mechanism | junction (Windows) / symlink, `cpSync` fallback | a linked skill tracks `npm run agents` with no re-run; the fallback reports itself, because a copy is the install that goes stale |
+| Read-path resolution | `repo` from the config, then `baseUrl` over HTTP | the clone is exact and needs no network; the URL survives a moved clone |
+| Config | `~/.claude/a11y-library.local.json`, `{ repo, version, baseUrl, history[] }` | same idiom as `theme-service` — one install pattern across both repos |
+| Shared constants | `SKILL_NAME`, `SKILL_OUT`, `CONFIG_FILE`, `readBaseUrl` exported by the generator | the skill *names* the config the installer *writes*; one owner means a rename cannot half-succeed |
+| Non-Claude agents | `--into <dir>` writes a marked, idempotent block to `<dir>/AGENTS.md`; `--print` to stdout | `AGENTS.md` is the one cross-agent convention that exists; the block routes and defers to it for the tiers |
+| Block trigger text | read from the generated `SKILL.md` frontmatter at install time | keeps it rendered from `docs/agents/preamble.md` — no fourth copy of Tier 0 |
+| Skill budget | 2,831 → 2,918 B against 3,072 | unchanged |
+| Rejected | `npx` from GitHub | needs the package published or a git-URL `bin`; the premise is a clone. `repository` and `homepage` are now set, which is what it would need first |
+
+**The failure mode this is built against.** A renamed config leaves the skill naming a file nothing
+writes. Nothing errors, and the HTTP fallback silently becomes the only path an installed skill has.
+The shared constants prevent the rename; the spec check *the skill names the config the installer
+actually writes* proves the sentence naming it is still rendered.
+
+This section is a table where the phase records around it are prose. That is deliberate — it is a set
+of decisions, not a narrative.
 
 ## Still open
 

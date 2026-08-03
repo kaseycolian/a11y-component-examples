@@ -30,6 +30,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
 import { TIER_2_BUDGET, SKILL_OUT } from '../../scripts/build-agent-surfaces.mjs';
+import { CONFIG_DISPLAY } from '../../scripts/install-skill.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const componentsDir = resolve(root, 'src/library/components');
@@ -366,6 +367,20 @@ test.describe('Tier 0 references', () => {
       if (err.status !== 1) throw err;
     }
     expect(ignored, `${SKILL_OUT} is gitignored, so the skill would never reach a clone`).toBe(false);
+  });
+
+  test('the skill names the config the installer actually writes', () => {
+    // Installed into ~/.claude/skills/, the skill sits outside the checkout its
+    // read path is written against; the config is how it finds one.
+    // scripts/install-skill.mjs imports the same constant, so the name cannot
+    // drift. What this asserts is that the sentence naming it is still rendered.
+    // Drop that sentence and nothing else fails -- the HTTP fallback silently
+    // becomes the only path an installed skill has.
+    const skill = read(resolve(root, SKILL_OUT));
+    expect(
+      skill,
+      `${SKILL_OUT} no longer names ${CONFIG_DISPLAY}, so an installed skill cannot find a clone`,
+    ).toContain(CONFIG_DISPLAY);
   });
 });
 
