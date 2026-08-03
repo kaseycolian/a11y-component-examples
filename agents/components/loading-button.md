@@ -15,6 +15,7 @@ In `library/components/loading-button/` — copy `component.{html,css,js}`, read
 
 ## Keyboard
 
+- `Tab` — native: the stop survives going busy, because aria-disabled is used and never disabled
 - `Enter / Space` — native: aria-disabled blocks the handler, so a second press does nothing
 
 **States:** idle, busy — aria-busy=true and aria-disabled=true, set only while pending

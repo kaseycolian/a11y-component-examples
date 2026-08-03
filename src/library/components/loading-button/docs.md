@@ -1,39 +1,76 @@
 ## Before you copy
 
-Your framework has a `<Button loading>` already and you should use it. **The four decisions on this
-page are the same either way** — they are about which attributes carry the pending state, not about
-how the component is built. Take the CSS, keep the contract, and let your framework own the state.
-This is enough for a person or an agent to start from.
+These files are a working reference, not a package. Move the markup into your own templates and the
+state into your own code. What has to survive that move is the ARIA below, the keyboard behavior, and
+where focus goes — those are the parts that make the component accessible, and the parts that are
+usually dropped.
 
-Each example is separately copyable: the HTML sections are numbered, and the CSS and JS sections say
-which examples need them.
+Every example on this page is numbered and separately copyable. The CSS and JS sections name which
+examples need them.
 
-## One sentence
+## Required markup
 
-A spinner is silent. Its state has to live in `aria-busy` and in a live region, never in the
-animation.
+A spinner is a picture. It says nothing to a screen reader, so the pending state has to be written
+somewhere a screen reader reads: `aria-busy` on the button, and a message in a live region beside it.
 
-## The contract
-
-| Piece | What it is | Why |
+| Element | Attribute | What it does |
 | --- | --- | --- |
-| `.ac-btn .ac-btn-loading` | both classes | the base is [Button](../button/)'s, copied |
-| `aria-busy="true"` | the state | it is also the CSS selector that draws the spinner, so you cannot show one without setting it |
-| `aria-disabled="true"` | while busy | a second press does nothing and announces "unavailable". **Never `disabled`** |
-| `aria-hidden="true"` on the spinner | keeps it out of the name | it has nothing to say |
-| a sibling `role="status"` | the announcement | rendered and **empty** before anything happens |
-| `type="button"` | not submitting a form | the default is `submit` |
-| the accessible name | **unchanged**, always | see below |
+| `<button>` | `class="ac-btn ac-btn-loading"` | Both classes. The base is [Button](../button/)'s, copied. |
+| `<button>` | `aria-busy="true"` | The machine-readable half of the state. It is also the CSS selector that draws the spinner, so you cannot show a spinner without setting it. |
+| `<button>` | `aria-disabled="true"` | Set while busy, so a second press does nothing and the control announces "unavailable". **Never `disabled`.** |
+| `<button>` | `type="button"` | Required unless it is submitting a form. The default is `submit`. |
+| `<span>` spinner | `aria-hidden="true"` | Keeps the spinner out of the accessible name. It has nothing to say. |
+| A sibling `<p>` | `role="status"` | The spoken half of the state. Rendered **empty**, before anything happens. |
+| The accessible name | — | **Never changes.** Not while busy, not when done. |
 
-## `aria-busy` is not enough on its own
+### `aria-busy` is not enough on its own
 
 It is a global ARIA state and it is well-formed on a button, but screen readers announce it
-inconsistently — some read "busy", some say nothing at all. So it is the machine-readable half of
-the state, and the live region is the half that actually speaks. Ship both.
+inconsistently — some read "busy", some say nothing at all. So it is the machine-readable half of the
+state, and the live region is the half that actually speaks. Ship both.
 
-Example 2 puts two spinners next to each other. The **spinner-only** one is drawn by a private
-`data-` attribute instead of `aria-busy`; it animates identically and its readout never moves.
-Nothing about it is invalid, and no automated check reports it.
+Example 2 puts two spinners side by side. The **spinner-only** one is drawn by a private `data-`
+attribute instead of `aria-busy`; it animates identically and its readout never moves. Nothing about
+it is invalid, and no automated check reports it.
+
+## Keyboard
+
+A native `<button>` supplies all of this. There is no key handler in `component.js`.
+
+| Key | What it does |
+| --- | --- |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> | Moves to and from the button. The stop survives going busy, because the busy state uses `aria-disabled` and never `disabled`. |
+| <kbd>Enter</kbd> | Activates the button, or does nothing while it is busy. |
+| <kbd>Space</kbd> | Activates the button, or does nothing while it is busy. |
+
+**Keys deliberately not bound.** None, and the click guard needs none either. A native button fires a
+*click* for both <kbd>Enter</kbd> and <kbd>Space</kbd>, so `preventDefault` on the click covers the
+keyboard.
+
+## States
+
+| State | Signaled by | Never signaled by |
+| --- | --- | --- |
+| busy | The spinner appearing, `aria-busy="true"`, and the status text. | The rotation alone. |
+| busy, to a pointer | `cursor: progress`. | — |
+| unavailable while busy | `aria-disabled` plus the click guard. | `disabled`, and no dimming — that is opacity over a color nobody chose. |
+| focus | A 3px `:focus-visible` ring at 2px offset. | The border. |
+
+Under `forced-colors: active` the ring itself survives, because it is a `border` on `currentColor` —
+it becomes `ButtonText` with the label. **Its gap does not.** Forced colors replaces `border-color`
+wholesale, and `transparent` comes back *opaque*, so the ring closes into a full circle and stops
+reading as turning. The gap has to be repainted in the button's own forced-colors background
+(`ButtonFace`, and `Highlight` on hover). A `box-shadow` or gradient spinner would have been dropped
+outright, with nothing that brings it back.
+
+## Screen reader behavior
+
+Not yet tested against a screen reader. What the markup asks for: "Save changes, button" on the way
+in, then "Saving…" from the status region, then "Changes saved." The name is the same at all three
+points.
+
+`aria-busy` announcements vary, and that variance is the argument for the region rather than against
+the attribute — it is still what a scripted check and any future assistive technology will read.
 
 ## Never `disabled` while loading
 
@@ -46,8 +83,7 @@ body. Three things break at once:
 
 `aria-disabled="true"` plus a click guard gives you the lock without any of that. The guard is one
 capture-phase listener on a container, lifted from [Button](../button/) — capture matters, because a
-handler bound on the button itself only wins if it was registered first. `preventDefault` covers
-<kbd>Enter</kbd> and <kbd>Space</kbd> for free.
+handler bound on the button itself only wins if it was registered first.
 
 Example 3 prints `document.activeElement` right after each press.
 
@@ -61,66 +97,6 @@ goes in the region; the button keeps its name. [Switch](../switch/) and
 
 Example 4 records the accessible name at each phase. The **renames itself** button ends with three.
 
-## The spinner is decoration
-
-It is `aria-hidden`, and it is gated on `--ac-motion` like every other animation here — so at
-`--ac-motion: 0` it stops turning. It must still show that something is pending. Two things make
-that work:
-
-- The ring **appears** when the button goes busy (`visibility: hidden` → `visible`), which is a
-  change with or without motion. The gap in the ring is a shape the resting button does not have.
-- The status line says "Saving…" either way.
-
-Example 5's dot is the counter-example: always visible, pending signaled only by the pulse. Turn
-motion off in that panel and its busy state is pixel-identical to its resting state.
-
-**SC 2.2.2 is a separate obligation.** A spinner that runs past five seconds needs a way to stop or
-a state that survives without it, whether or not anyone asked for reduced motion. See
-[Motion Preferences](../motion-preferences/).
-
-## Why `visibility: hidden` and not `display: none`
-
-`visibility: hidden` keeps the layout box, so the button is the same width busy and idle. Without
-it the button grows when it goes pending and moves out from under the pointer that just pressed it.
-(That kept box is usually the bug — see [Visually Hidden](../visually-hidden/) — and here it is the
-reason.)
-
-## States
-
-| State | Signaled by | Not by |
-| --- | --- | --- |
-| busy | the spinner appearing, `aria-busy`, and the status text | never the rotation alone |
-| busy, to a pointer | `cursor: progress` | — |
-| unavailable while busy | `aria-disabled` + the click guard | never `disabled`, and no dimming — that is opacity over a color nobody chose |
-| focus | a 3px `:focus-visible` ring at 2px offset | never the border |
-
-Under `forced-colors: active` the ring itself survives, because it is a `border` on `currentColor` —
-it becomes `ButtonText` with the label. **Its gap does not.** Forced colors replaces `border-color`
-wholesale, and `transparent` comes back *opaque*, so the ring closes into a full circle and stops
-reading as turning. The gap has to be repainted in the button's own forced-colors background
-(`ButtonFace`, and `Highlight` on hover). A `box-shadow` or gradient spinner would have been dropped
-outright, with nothing that brings it back.
-
-## Keyboard
-
-Nothing to write. A native `<button>` arrives with a tab stop, and <kbd>Enter</kbd> and
-<kbd>Space</kbd> both wired to a click — which is why the guard needs no key handler.
-
-| Key | Result |
-| --- | --- |
-| <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> | move to and from the button, busy or not |
-| <kbd>Enter</kbd> | activate, or nothing while busy |
-| <kbd>Space</kbd> | activate, or nothing while busy |
-
-## Screen reader behavior
-
-Not yet tested against a screen reader. What the markup asks for: "Save set list, button" on the way
-in, then "Saving…" from the status region, then "Set list saved." The name is the same at all three
-points.
-
-`aria-busy` announcements vary and that variance is the argument for the region, not against the
-attribute — it is still what a scripted check and any future AT will read.
-
 ## API
 
 ```js
@@ -132,8 +108,8 @@ c.refresh();                                  // re-run this page's readouts
 c.destroy();
 ```
 
-Idempotent: calling it twice on the same element returns the existing instance. `setBusy` is the
-only part worth lifting — everything else in `component.js` is this page checking its own claims.
+Idempotent: calling it twice on the same element returns the existing instance. `setBusy` is the only
+part worth lifting — everything else in `component.js` is this page checking its own claims.
 
 ## Using it in a framework
 
@@ -149,14 +125,29 @@ useEffect(() => {
 }, []);
 ```
 
-## What to watch for
+## Common mistakes
 
-- **A spinner and nothing else.** The whole component.
-- **`disabled` while loading.** Focus is gone and so is the explanation.
+- **A spinner and nothing else.** It is a picture. Nothing announces it.
+- **`disabled` while loading.** Focus is gone, and so is the explanation.
 - **A label that becomes the status.** One control, three names.
 - **A region created when there is something to say.** It has to already be in the accessibility
   tree — see [Live Region](../live-region/).
 - **The same message twice.** Setting a region to the string it already holds announces nothing;
   clear it a frame first.
-- **A pending cue that is only an animation.** It disappears under reduced motion.
-- **A button that resizes when it goes busy.** Reserve the spinner's box.
+- **A pending cue that is only an animation.** It disappears under reduced motion. The spinner here
+  is gated on `--ac-motion` like every other animation, so at `--ac-motion: 0` it stops turning — and
+  it still has to show that something is pending. Two things make that work: the ring **appears**
+  when the button goes busy (`visibility: hidden` → `visible`), which is a change with or without
+  motion, and the status line says "Saving…" either way. Example 5's dot is the counter-example:
+  always visible, pending signaled only by the pulse.
+- **A button that resizes when it goes busy.** Reserve the spinner's box with `visibility: hidden`,
+  not `display: none`. Without the kept box the button grows when it goes pending and moves out from
+  under the pointer that just pressed it.
+- **A spinner that runs past five seconds with no way out.** SC 2.2.2 is a separate obligation from
+  reduced motion. See [Reduced Motion](../motion-preferences/).
+
+## Related
+
+- [Button](../button/) — the base, and the `aria-disabled` click guard.
+- [Live Region](../live-region/) — why the region has to exist before it has anything to say.
+- [Reduced Motion](../motion-preferences/) — the gate the spinner reads.

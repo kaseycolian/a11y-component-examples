@@ -21,19 +21,19 @@ test('the busy state is aria-busy, a status message, and the same name throughou
   const btn = page.locator(run('one'));
   const status = page.locator('[data-ac-lb-status="one"]');
 
-  await expect(btn).toHaveAccessibleName('Save set list');
+  await expect(btn).toHaveAccessibleName('Save changes');
   await expect(btn).not.toHaveAttribute('aria-busy', /.*/);
   await expect(status).toHaveText('');
 
   await btn.click();
   await expect(btn).toHaveAttribute('aria-busy', 'true');
   // Announcing the state does not entitle you to rename the control.
-  await expect(btn).toHaveAccessibleName('Save set list');
+  await expect(btn).toHaveAccessibleName('Save changes');
   await expect(status).toHaveText('Saving…');
 
-  await expect(status).toHaveText('Set list saved.');
+  await expect(status).toHaveText('Changes saved.');
   await expect(btn).not.toHaveAttribute('aria-busy', /.*/);
-  await expect(btn).toHaveAccessibleName('Save set list');
+  await expect(btn).toHaveAccessibleName('Save changes');
 });
 
 test('the spinner is drawn by aria-busy and stays out of the name', async ({ page }) => {

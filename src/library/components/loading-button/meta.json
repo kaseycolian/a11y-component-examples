@@ -3,7 +3,7 @@
   "name": "Loading Button",
   "group": "buttons-actions",
   "order": 30,
-  "summary": "A button that reports its own pending state — aria-busy plus a live region, never disabled, and never a new name. Four live failures: the silent spinner, the lost focus, the label used as a status, and the cue that disappears when motion is off.",
+  "summary": "A loading button is a button that shows it is working after you press it. A spinner is a picture, so on its own it tells a screen reader nothing: the state has to go in `aria-busy` and in a live region beside the button. The button also has to keep its focus and keep its name while it works.",
   "tags": [
     "button",
     "aria-busy",
@@ -18,7 +18,7 @@
   "wcag": ["1.4.1", "2.1.1", "2.2.2", "2.4.3", "2.5.3", "4.1.2"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Examples 2 to 5 are live and half wrong on purpose. Example 2's spinner-only button announces nothing; example 3's disabled button drops focus to the document body the moment it is pressed; example 4's renaming button ends up with three different names; example 5's dot is indistinguishable from its resting state once motion is off.",
+  "demoNote": "Press any button here and the readouts record what a screen reader was handed. Every example under Common mistakes is live.",
   "contract": {
     "useWhen": "A button that is working, saying so to someone who cannot see the spinner.",
     "root": [".ac-btn-loading", ".ac-btn-loading-status"],
@@ -31,6 +31,10 @@
       ]
     },
     "keyboard": [
+      [
+        "Tab",
+        "native: the stop survives going busy, because aria-disabled is used and never disabled"
+      ],
       [
         "Enter / Space",
         "native: aria-disabled blocks the handler, so a second press does nothing"

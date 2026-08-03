@@ -1,12 +1,12 @@
 <!-- ===========================================================================
-     LOADING BUTTON — a spinner is silent
+     LOADING BUTTON
 
      WHAT TO COPY
-       Example 1 is the component. Examples 2 to 5 are the four ways a pending
-       state stops being announced. Each one names the CSS and JS sections it
-       needs.
+       Example 1 is the component. Examples 2 to 5 are mistakes, live, and are
+       not to be copied — each is a way a pending state stops being announced.
+       Each example names the CSS and JS sections it needs.
 
-     THE CONTRACT
+     REQUIRED MARKUP
        .ac-btn .ac-btn-loading   both classes. The base is button's, copied.
        aria-busy="true"          the state — and the selector that draws the
                                  spinner, so you cannot show one without it.
@@ -16,268 +16,291 @@
        role="status" sibling     rendered empty, before anything happens.
        The accessible name never changes.
 
-     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the two section
+     headings, the grid, and the per-example headings. Never copy it into your app.
      =========================================================================== -->
 
-<div class="ac-demo-grid" data-ac-loading-button>
-  <!-- ======================================================================
-       EXAMPLE 1 · The specimen
-       CSS [BTN] + [LOADING] + [STATUS] + [ACCENTS] + [PANEL]. JS [CORE] + [RUN].
+<div data-ac-loading-button>
+  <div class="ac-demo-section">
+    <h3 class="ac-demo-section__title">Correct example</h3>
+    <p class="ac-demo-section__note">
+      This is the markup to copy. A spinner is a picture, so the pending state has to live in
+      <code>aria-busy</code> and in a live region as well.
+    </p>
 
-       The spinner is drawn by [aria-busy="true"], so the attribute a screen
-       reader reads is the same one that draws it. It reserves its space with
-       visibility: hidden, so the button does not resize under the pointer.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">1 &middot; The specimen</h3>
+    <div class="ac-demo-grid">
+      <!-- ==================================================================
+           EXAMPLE 1 · A button that reports its pending state
+           CSS [BTN] + [LOADING] + [STATUS] + [ACCENTS] + [PANEL].
+           JS [CORE] + [RUN].
 
-    <div class="ac-lb-panel">
-      <div class="ac-lb-row">
-        <button class="ac-btn ac-btn-loading ac-btn--solid" type="button"
-                data-ac-lb-run="one" data-ac-lb-ms="1400" data-ac-lb-done="Set list saved.">
-          <span class="ac-btn-loading__spinner" aria-hidden="true"></span>
-          Save set list
-        </button>
-        <span class="ac-lb-hint">Gilman Street &middot; 12 tracks</span>
+           The spinner is drawn by [aria-busy="true"], so the attribute a screen
+           reader reads is the same one that draws it. It reserves its space
+           with visibility: hidden, so the button does not resize under the
+           pointer that just pressed it.
+           ================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">1 &middot; A button that reports its pending state</h4>
+
+        <div class="ac-lb-panel">
+          <div class="ac-lb-row">
+            <button class="ac-btn ac-btn-loading ac-btn--solid" type="button"
+                    data-ac-lb-run="one" data-ac-lb-ms="1400" data-ac-lb-done="Changes saved.">
+              <span class="ac-btn-loading__spinner" aria-hidden="true"></span>
+              Save changes
+            </button>
+            <span class="ac-lb-hint">Project 462 &middot; 12 tasks</span>
+          </div>
+
+          <!-- Rendered empty and already in the accessibility tree. A region
+               created at the moment it has something to say announces nothing. -->
+          <p class="ac-btn-loading-status" role="status" data-ac-lb-status="one"></p>
+
+          <p class="ac-lb__note">
+            Press it. The label never changes &mdash; the state is in
+            <code>aria-busy</code> and in the line above.
+          </p>
+        </div>
       </div>
-
-      <!-- Rendered empty and already in the accessibility tree. A region
-           created at the moment it has something to say announces nothing. -->
-      <p class="ac-btn-loading-status" role="status" data-ac-lb-status="one"></p>
-
-      <p class="ac-lb__note">
-        Press it. The label never changes &mdash; the state is in
-        <code>aria-busy</code> and in the line above.
-      </p>
     </div>
   </div>
 
-  <!-- ======================================================================
-       EXAMPLE 2 · A spinner is silent
-       CSS [BTN] + [LOADING] + [STATUS] + [PANEL] + [BROKEN].
-       JS [CORE] + [RUN] + [MIRROR].
+  <div class="ac-demo-section ac-demo-section--mistakes">
+    <h3 class="ac-demo-section__title">Common mistakes</h3>
+    <p class="ac-demo-section__note">
+      These four are live and wrong on purpose. Each is a pending state that a person who cannot see
+      the spinner never learns about.
+    </p>
 
-       Two buttons that look and animate the same. One spinner is driven by a
-       private data attribute, the other by aria-busy. The readouts print
-       everything assistive tech actually has to go on.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">2 &middot; A spinner is silent</h3>
+    <div class="ac-demo-grid">
+      <!-- ======================================================================
+           EXAMPLE 2 · A spinner with no aria-busy and no status
+           CSS [BTN] + [LOADING] + [STATUS] + [PANEL] + [BROKEN].
+           JS [CORE] + [RUN] + [MIRROR].
 
-    <div class="ac-lb-panel" data-ac-lb-mirror>
-      <div class="ac-lb-cases">
-        <div class="ac-lb-case">
-          <!-- BROKEN ON PURPOSE — no aria-busy, no status region. -->
-          <button class="ac-btn ac-btn-loading ac-btn--outline" type="button"
-                  data-ac-lb-run="mute" data-ac-lb-ms="1400" data-ac-lb-mute>
-            <span class="ac-btn-loading__spinner" aria-hidden="true"></span>
-            Save
-          </button>
-          <p class="ac-lb-case__label">spinner only</p>
+           Two buttons that look and animate the same. One spinner is driven by a
+           private data attribute, the other by aria-busy. The readouts print
+           everything assistive tech actually has to go on.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">2 &middot; A spinner with no <code>aria-busy</code></h4>
 
-          <dl class="ac-lb-readout">
-            <div class="ac-lb-readout__row">
-              <dt>name</dt><dd><code data-ac-lb-out="mute-name">&mdash;</code></dd>
+        <div class="ac-lb-panel" data-ac-lb-mirror>
+          <div class="ac-lb-cases">
+            <div class="ac-lb-case">
+              <!-- BROKEN ON PURPOSE — no aria-busy, no status region. -->
+              <button class="ac-btn ac-btn-loading ac-btn--outline" type="button"
+                      data-ac-lb-run="mute" data-ac-lb-ms="1400" data-ac-lb-mute>
+                <span class="ac-btn-loading__spinner" aria-hidden="true"></span>
+                Save
+              </button>
+              <p class="ac-lb-case__label">spinner only</p>
+
+              <dl class="ac-lb-readout">
+                <div class="ac-lb-readout__row">
+                  <dt>name</dt><dd><code data-ac-lb-out="mute-name">&mdash;</code></dd>
+                </div>
+                <div class="ac-lb-readout__row">
+                  <dt>aria-busy</dt><dd><code data-ac-lb-out="mute-busy">&mdash;</code></dd>
+                </div>
+                <div class="ac-lb-readout__row">
+                  <dt>announced</dt><dd><code data-ac-lb-out="mute-said">&mdash;</code></dd>
+                </div>
+              </dl>
             </div>
-            <div class="ac-lb-readout__row">
-              <dt>aria-busy</dt><dd><code data-ac-lb-out="mute-busy">&mdash;</code></dd>
+
+            <div class="ac-lb-case">
+              <button class="ac-btn ac-btn-loading ac-btn--solid" type="button"
+                      data-ac-lb-run="said" data-ac-lb-ms="1400">
+                <span class="ac-btn-loading__spinner" aria-hidden="true"></span>
+                Save
+              </button>
+              <p class="ac-lb-case__label">the specimen</p>
+
+              <dl class="ac-lb-readout">
+                <div class="ac-lb-readout__row">
+                  <dt>name</dt><dd><code data-ac-lb-out="said-name">&mdash;</code></dd>
+                </div>
+                <div class="ac-lb-readout__row">
+                  <dt>aria-busy</dt><dd><code data-ac-lb-out="said-busy">&mdash;</code></dd>
+                </div>
+                <div class="ac-lb-readout__row">
+                  <dt>announced</dt><dd><code data-ac-lb-out="said-said">&mdash;</code></dd>
+                </div>
+              </dl>
+
+              <p class="ac-btn-loading-status" role="status" data-ac-lb-status="said"></p>
             </div>
-            <div class="ac-lb-readout__row">
-              <dt>announced</dt><dd><code data-ac-lb-out="mute-said">&mdash;</code></dd>
-            </div>
-          </dl>
-        </div>
+          </div>
 
-        <div class="ac-lb-case">
-          <button class="ac-btn ac-btn-loading ac-btn--solid" type="button"
-                  data-ac-lb-run="said" data-ac-lb-ms="1400">
-            <span class="ac-btn-loading__spinner" aria-hidden="true"></span>
-            Save
-          </button>
-          <p class="ac-lb-case__label">the specimen</p>
-
-          <dl class="ac-lb-readout">
-            <div class="ac-lb-readout__row">
-              <dt>name</dt><dd><code data-ac-lb-out="said-name">&mdash;</code></dd>
-            </div>
-            <div class="ac-lb-readout__row">
-              <dt>aria-busy</dt><dd><code data-ac-lb-out="said-busy">&mdash;</code></dd>
-            </div>
-            <div class="ac-lb-readout__row">
-              <dt>announced</dt><dd><code data-ac-lb-out="said-said">&mdash;</code></dd>
-            </div>
-          </dl>
-
-          <p class="ac-btn-loading-status" role="status" data-ac-lb-status="said"></p>
-        </div>
-      </div>
-
-      <p class="ac-lb__verdict" role="status" data-ac-lb-mirror-verdict></p>
-    </div>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 3 · Never disabled while loading
-       CSS [BTN] + [LOADING] + [STATUS] + [PANEL]. JS [CORE] + [RUN] + [FOCUS].
-
-       Press each one and watch where focus went. disabled removes the tab stop
-       the instant it is set, so the browser drops focus to the body.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">3 &middot; Never <code>disabled</code> while loading</h3>
-
-    <div class="ac-lb-panel" data-ac-lb-focus>
-      <div class="ac-lb-cases">
-        <div class="ac-lb-case">
-          <!-- BROKEN ON PURPOSE — hard disabled while pending. -->
-          <button class="ac-btn ac-btn-loading ac-btn--outline" type="button"
-                  data-ac-lb-run="hard" data-ac-lb-ms="1400" data-ac-lb-hard>
-            <span class="ac-btn-loading__spinner" aria-hidden="true"></span>
-            Save
-          </button>
-          <p class="ac-lb-case__label"><code>disabled</code></p>
-          <p class="ac-lb-case__out">focus went to <code data-ac-lb-out="hard-focus">&mdash;</code></p>
-          <p class="ac-btn-loading-status" role="status" data-ac-lb-status="hard"></p>
-        </div>
-
-        <div class="ac-lb-case">
-          <button class="ac-btn ac-btn-loading ac-btn--solid" type="button"
-                  data-ac-lb-run="soft" data-ac-lb-ms="1400">
-            <span class="ac-btn-loading__spinner" aria-hidden="true"></span>
-            Save
-          </button>
-          <p class="ac-lb-case__label"><code>aria-disabled</code></p>
-          <p class="ac-lb-case__out">focus went to <code data-ac-lb-out="soft-focus">&mdash;</code></p>
-          <p class="ac-btn-loading-status" role="status" data-ac-lb-status="soft"></p>
+          <p class="ac-lb__verdict" role="status" data-ac-lb-mirror-verdict></p>
         </div>
       </div>
 
-      <p class="ac-lb__verdict" role="status" data-ac-lb-focus-verdict></p>
-    </div>
-  </div>
+      <!-- ======================================================================
+           EXAMPLE 3 · Never disabled while loading
+           CSS [BTN] + [LOADING] + [STATUS] + [PANEL]. JS [CORE] + [RUN] + [FOCUS].
 
-  <!-- ======================================================================
-       EXAMPLE 4 · The name has to stay still
-       CSS [BTN] + [LOADING] + [STATUS] + [PANEL]. JS [CORE] + [RUN] + [NAMES].
+           Press each one and watch where focus went. disabled removes the tab stop
+           the instant it is set, so the browser drops focus to the body.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">3 &middot; <code>disabled</code> while loading</h4>
 
-       One button renames itself as it works. The readouts record the
-       accessible name at each phase.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">4 &middot; The name has to stay still</h3>
-
-    <div class="ac-lb-panel" data-ac-lb-names>
-      <div class="ac-lb-cases">
-        <div class="ac-lb-case">
-          <!-- BROKEN ON PURPOSE — the label is being used as the status. -->
-          <button class="ac-btn ac-btn-loading ac-btn--outline" type="button"
-                  data-ac-lb-run="swap" data-ac-lb-ms="1400" data-ac-lb-swap>
-            <span class="ac-btn-loading__spinner" aria-hidden="true"></span>
-            <span data-ac-lb-swap-text>Save</span>
-          </button>
-          <p class="ac-lb-case__label">renames itself</p>
-
-          <dl class="ac-lb-readout">
-            <div class="ac-lb-readout__row">
-              <dt>at rest</dt><dd><code data-ac-lb-out="swap-idle">&mdash;</code></dd>
+        <div class="ac-lb-panel" data-ac-lb-focus>
+          <div class="ac-lb-cases">
+            <div class="ac-lb-case">
+              <!-- BROKEN ON PURPOSE — hard disabled while pending. -->
+              <button class="ac-btn ac-btn-loading ac-btn--outline" type="button"
+                      data-ac-lb-run="hard" data-ac-lb-ms="1400" data-ac-lb-hard>
+                <span class="ac-btn-loading__spinner" aria-hidden="true"></span>
+                Save
+              </button>
+              <p class="ac-lb-case__label"><code>disabled</code></p>
+              <p class="ac-lb-case__out">focus went to <code data-ac-lb-out="hard-focus">&mdash;</code></p>
+              <p class="ac-btn-loading-status" role="status" data-ac-lb-status="hard"></p>
             </div>
-            <div class="ac-lb-readout__row">
-              <dt>saving</dt><dd><code data-ac-lb-out="swap-busy">&mdash;</code></dd>
-            </div>
-            <div class="ac-lb-readout__row">
-              <dt>done</dt><dd><code data-ac-lb-out="swap-done">&mdash;</code></dd>
-            </div>
-          </dl>
-        </div>
 
-        <div class="ac-lb-case">
-          <button class="ac-btn ac-btn-loading ac-btn--solid" type="button"
-                  data-ac-lb-run="keep" data-ac-lb-ms="1400">
-            <span class="ac-btn-loading__spinner" aria-hidden="true"></span>
-            Save
-          </button>
-          <p class="ac-lb-case__label">keeps its name</p>
+            <div class="ac-lb-case">
+              <button class="ac-btn ac-btn-loading ac-btn--solid" type="button"
+                      data-ac-lb-run="soft" data-ac-lb-ms="1400">
+                <span class="ac-btn-loading__spinner" aria-hidden="true"></span>
+                Save
+              </button>
+              <p class="ac-lb-case__label"><code>aria-disabled</code></p>
+              <p class="ac-lb-case__out">focus went to <code data-ac-lb-out="soft-focus">&mdash;</code></p>
+              <p class="ac-btn-loading-status" role="status" data-ac-lb-status="soft"></p>
+            </div>
+          </div>
 
-          <dl class="ac-lb-readout">
-            <div class="ac-lb-readout__row">
-              <dt>at rest</dt><dd><code data-ac-lb-out="keep-idle">&mdash;</code></dd>
-            </div>
-            <div class="ac-lb-readout__row">
-              <dt>saving</dt><dd><code data-ac-lb-out="keep-busy">&mdash;</code></dd>
-            </div>
-            <div class="ac-lb-readout__row">
-              <dt>done</dt><dd><code data-ac-lb-out="keep-done">&mdash;</code></dd>
-            </div>
-          </dl>
-
-          <p class="ac-btn-loading-status" role="status" data-ac-lb-status="keep"></p>
+          <p class="ac-lb__verdict" role="status" data-ac-lb-focus-verdict></p>
         </div>
       </div>
 
-      <p class="ac-lb__verdict" role="status" data-ac-lb-names-verdict></p>
-    </div>
-  </div>
+      <!-- ======================================================================
+           EXAMPLE 4 · The name has to stay still
+           CSS [BTN] + [LOADING] + [STATUS] + [PANEL]. JS [CORE] + [RUN] + [NAMES].
 
-  <!-- ======================================================================
-       EXAMPLE 5 · The spinner is decoration
-       CSS [BTN] + [LOADING] + [STATUS] + [PANEL] + [BROKEN].
-       JS [CORE] + [RUN] + [MOTION].
+           One button renames itself as it works. The readouts record the
+           accessible name at each phase.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">4 &middot; A button that renames itself</h4>
 
-       Turn motion off in this panel, then press both. The ring is still there
-       and the status line still speaks; the dot is indistinguishable from its
-       resting state.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">5 &middot; The spinner is decoration</h3>
+        <div class="ac-lb-panel" data-ac-lb-names>
+          <div class="ac-lb-cases">
+            <div class="ac-lb-case">
+              <!-- BROKEN ON PURPOSE — the label is being used as the status. -->
+              <button class="ac-btn ac-btn-loading ac-btn--outline" type="button"
+                      data-ac-lb-run="swap" data-ac-lb-ms="1400" data-ac-lb-swap>
+                <span class="ac-btn-loading__spinner" aria-hidden="true"></span>
+                <span data-ac-lb-swap-text>Save</span>
+              </button>
+              <p class="ac-lb-case__label">renames itself</p>
 
-    <div class="ac-lb-panel" data-ac-lb-motion>
-      <div class="ac-lb-row">
-        <input class="ac-lb-check" type="checkbox" id="ac-lb-motion" data-ac-lb-motion-toggle />
-        <label class="ac-lb-check__label" for="ac-lb-motion">Reduce motion in this panel</label>
+              <dl class="ac-lb-readout">
+                <div class="ac-lb-readout__row">
+                  <dt>at rest</dt><dd><code data-ac-lb-out="swap-idle">&mdash;</code></dd>
+                </div>
+                <div class="ac-lb-readout__row">
+                  <dt>saving</dt><dd><code data-ac-lb-out="swap-busy">&mdash;</code></dd>
+                </div>
+                <div class="ac-lb-readout__row">
+                  <dt>done</dt><dd><code data-ac-lb-out="swap-done">&mdash;</code></dd>
+                </div>
+              </dl>
+            </div>
+
+            <div class="ac-lb-case">
+              <button class="ac-btn ac-btn-loading ac-btn--solid" type="button"
+                      data-ac-lb-run="keep" data-ac-lb-ms="1400">
+                <span class="ac-btn-loading__spinner" aria-hidden="true"></span>
+                Save
+              </button>
+              <p class="ac-lb-case__label">keeps its name</p>
+
+              <dl class="ac-lb-readout">
+                <div class="ac-lb-readout__row">
+                  <dt>at rest</dt><dd><code data-ac-lb-out="keep-idle">&mdash;</code></dd>
+                </div>
+                <div class="ac-lb-readout__row">
+                  <dt>saving</dt><dd><code data-ac-lb-out="keep-busy">&mdash;</code></dd>
+                </div>
+                <div class="ac-lb-readout__row">
+                  <dt>done</dt><dd><code data-ac-lb-out="keep-done">&mdash;</code></dd>
+                </div>
+              </dl>
+
+              <p class="ac-btn-loading-status" role="status" data-ac-lb-status="keep"></p>
+            </div>
+          </div>
+
+          <p class="ac-lb__verdict" role="status" data-ac-lb-names-verdict></p>
+        </div>
       </div>
 
-      <div class="ac-lb-cases">
-        <div class="ac-lb-case">
-          <button class="ac-btn ac-btn-loading ac-btn--solid" type="button"
-                  data-ac-lb-run="ring" data-ac-lb-ms="1400">
-            <span class="ac-btn-loading__spinner" aria-hidden="true"></span>
-            Save
-          </button>
-          <p class="ac-lb-case__label">ring, plus the status line</p>
+      <!-- ======================================================================
+           EXAMPLE 5 · The spinner is decoration
+           CSS [BTN] + [LOADING] + [STATUS] + [PANEL] + [BROKEN].
+           JS [CORE] + [RUN] + [MOTION].
 
-          <dl class="ac-lb-readout">
-            <div class="ac-lb-readout__row">
-              <dt>at rest</dt><dd><code data-ac-lb-out="ring-idle">&mdash;</code></dd>
-            </div>
-            <div class="ac-lb-readout__row">
-              <dt>saving</dt><dd><code data-ac-lb-out="ring-busy">&mdash;</code></dd>
-            </div>
-          </dl>
+           Turn motion off in this panel, then press both. The ring is still there
+           and the status line still speaks; the dot is indistinguishable from its
+           resting state.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">5 &middot; A cue that is only an animation</h4>
 
-          <p class="ac-btn-loading-status" role="status" data-ac-lb-status="ring"></p>
-        </div>
+        <div class="ac-lb-panel" data-ac-lb-motion>
+          <div class="ac-lb-row">
+            <input class="ac-lb-check" type="checkbox" id="ac-lb-motion" data-ac-lb-motion-toggle />
+            <label class="ac-lb-check__label" for="ac-lb-motion">Reduce motion in this panel</label>
+          </div>
 
-        <div class="ac-lb-case">
-          <!-- BROKEN ON PURPOSE — the only cue is the animation. -->
-          <button class="ac-btn ac-btn-loading ac-btn--outline" type="button"
-                  data-ac-lb-run="dot" data-ac-lb-ms="1400" data-ac-lb-mute>
-            <span class="ac-lb-dot" aria-hidden="true"></span>
-            Save
-          </button>
-          <p class="ac-lb-case__label">a pulsing dot</p>
+          <div class="ac-lb-cases">
+            <div class="ac-lb-case">
+              <button class="ac-btn ac-btn-loading ac-btn--solid" type="button"
+                      data-ac-lb-run="ring" data-ac-lb-ms="1400">
+                <span class="ac-btn-loading__spinner" aria-hidden="true"></span>
+                Save
+              </button>
+              <p class="ac-lb-case__label">ring, plus the status line</p>
 
-          <dl class="ac-lb-readout">
-            <div class="ac-lb-readout__row">
-              <dt>at rest</dt><dd><code data-ac-lb-out="dot-idle">&mdash;</code></dd>
+              <dl class="ac-lb-readout">
+                <div class="ac-lb-readout__row">
+                  <dt>at rest</dt><dd><code data-ac-lb-out="ring-idle">&mdash;</code></dd>
+                </div>
+                <div class="ac-lb-readout__row">
+                  <dt>saving</dt><dd><code data-ac-lb-out="ring-busy">&mdash;</code></dd>
+                </div>
+              </dl>
+
+              <p class="ac-btn-loading-status" role="status" data-ac-lb-status="ring"></p>
             </div>
-            <div class="ac-lb-readout__row">
-              <dt>saving</dt><dd><code data-ac-lb-out="dot-busy">&mdash;</code></dd>
+
+            <div class="ac-lb-case">
+              <!-- BROKEN ON PURPOSE — the only cue is the animation. -->
+              <button class="ac-btn ac-btn-loading ac-btn--outline" type="button"
+                      data-ac-lb-run="dot" data-ac-lb-ms="1400" data-ac-lb-mute>
+                <span class="ac-lb-dot" aria-hidden="true"></span>
+                Save
+              </button>
+              <p class="ac-lb-case__label">a pulsing dot</p>
+
+              <dl class="ac-lb-readout">
+                <div class="ac-lb-readout__row">
+                  <dt>at rest</dt><dd><code data-ac-lb-out="dot-idle">&mdash;</code></dd>
+                </div>
+                <div class="ac-lb-readout__row">
+                  <dt>saving</dt><dd><code data-ac-lb-out="dot-busy">&mdash;</code></dd>
+                </div>
+              </dl>
             </div>
-          </dl>
+          </div>
+
+          <p class="ac-lb__verdict" role="status" data-ac-lb-motion-verdict></p>
         </div>
       </div>
-
-      <p class="ac-lb__verdict" role="status" data-ac-lb-motion-verdict></p>
     </div>
   </div>
 </div>
