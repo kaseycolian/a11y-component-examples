@@ -1,10 +1,11 @@
 # Authoring a component
 
 `CLAUDE.md` says what the code must satisfy, and the `contract` block in `meta.json` is what the
-component owes its agent-facing side. `component-specs.md` has the up-front design decisions, for the
-components it has an entry for — it predates most of the library, so a new slug will not be in it.
-This file is about the parts that are judgement rather than rule: what makes a good demo, how to write
-the docs, and what a useful test actually asserts.
+component owes its agent-facing side. `docs/rewrite-pass.md` holds the writing rules — the voice, the
+canonical `docs.md` heading order, and the shared demo vocabulary. `component-specs.md` has the up-front
+design decisions, for the components it has an entry for — it predates most of the library, so a new slug
+will not be in it. This file is about the parts that are judgement rather than rule: what makes a good
+demo, how to write the docs, and what a useful test actually asserts.
 
 Start with `npm run new:component -- <slug> --group <id> --name "Name"`.
 
@@ -28,6 +29,13 @@ hard parts. Every demo should include whichever of these apply:
 The dropdown demo is the model: five selects covering decorated options, `<optgroup>`, a disabled
 option, a disabled control, and an empty list.
 
+**Correct examples and mistakes are two sections, correct first.** Both are `ac-demo-section` blocks
+inside `component.html`, each with an `<h3 class="ac-demo-section__title">` — `Correct examples` and
+`Common mistakes`. Per-example titles are `<h4 class="ac-demo__title">`, and the numbering runs `1..N`
+continuously across both sections so the `EXAMPLE 3 ·` banners in the CSS and JS still line up. An
+example that ends with the fix but exists to show the mistake goes in the second section. `CLAUDE.md` >
+**Copyability** has the markup.
+
 **Comment the markup.** The HTML is read as documentation. Say why an attribute is there, not what
 it is. `<!-- The heading lets screen-reader users jump between sections -->` earns its line;
 `<!-- button -->` does not.
@@ -36,25 +44,32 @@ it is. `<!-- The heading lets screen-reader users jump between sections -->` ear
 
 ## Writing `docs.md`
 
-House style, in order:
+The heading order is fixed. `docs/rewrite-pass.md` is canonical; this is the working summary:
 
-1. **How it works** — the shape of the pattern in two or three sentences, then a table of every ARIA
-   attribute and *why* it is there. The "why" column is the point of the whole document.
-2. **Keyboard** — a table. If the component behaves differently open vs closed, use two columns.
-   Include keys you deliberately did **not** bind and say why (the disclosure explains why it has no
-   Escape handler).
-3. **Screen reader behavior** — what NVDA, JAWS, VoiceOver and TalkBack actually announce. Where
+1. **Before you copy** — the shared paragraph, verbatim. These files are a working reference, not a
+   package; the ARIA, the keyboard behavior and the focus handling are what has to survive the move
+   into your own code.
+2. **Required markup** — a table of every element and attribute, in DOM order:
+   `| Element | Attribute | What it does |`. The third column is the point of the whole document.
+3. **Keyboard** — `| Key | What it does |`, always present, even when the native element supplies every
+   key. If behavior differs by state, add a third column named for the state — never a second table.
+   Finish with the keys you deliberately did **not** bind and why (the disclosure explains why it has
+   no Escape handler).
+4. **States** — `| State | Signaled by | Never signaled by |`. How each is signaled without color.
+5. **Screen reader behavior** — what NVDA, JAWS, VoiceOver and TalkBack actually announce. Where
    they differ, say so. Never write what *should* happen as if it were tested; if it has not been
    verified, mark it in `at-support.md` as untested and say nothing here.
-4. **States** — how each is signaled *without* relying on color.
-5. **API** — the factory options and every method.
-6. **Using it in a framework** — the React snippet, and a sentence on Angular. People arrive here
-   from a framework and leave if they cannot see how it fits.
-7. **What to watch for** — the mistakes people actually make.
+6. *Up to two component-specific sections*, with plain descriptive titles. Only where the pattern
+   genuinely needs one.
+7. **API** — the factory options and every method. JS components only.
+8. **Using it in a framework** — the React snippet. People arrive here from a framework and leave if
+   they cannot see how it fits. JS components only.
+9. **Common mistakes** — the mistakes people actually make. Bulleted, bold lead-in, one sentence each.
+10. **Related** — links only.
 
-**Tone:** explain the reasoning, not just the rule. "Do not use `display: none`" is a rule someone
-will break. "`display: none` removes it from the accessibility tree, which is the one thing this
-utility exists to avoid" is a reason they will remember.
+**Tone:** direct and dry, and explain the reasoning rather than only the rule. "Do not use
+`display: none`" is a rule someone will break. "`display: none` removes it from the accessibility tree,
+which is the one thing this utility exists to avoid" is a reason they will remember.
 
 **Be honest about limits.** The dropdown's docs say plainly that it is not a filtering combobox and
 that `<select multiple>` is unsupported. A library that overstates its coverage is worse than one
@@ -107,7 +122,7 @@ component without it. The cost is some repetition; the benefit is that every com
 independent, which the per-page CSS loading verifies on every build.
 
 When two components need the same behavior, copy it and let them diverge. If a genuinely reusable
-utility emerges, it becomes its own Foundations entry that people can choose to copy — not an
+utility emerges, it becomes its own General Concepts entry that people can choose to copy — not an
 import.
 
 ---

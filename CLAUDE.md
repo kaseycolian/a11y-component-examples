@@ -18,9 +18,14 @@ The two contracts share one thing: **where a component's behavior comes from.** 
 ordered next steps, and the gotchas already solved. It is a build log and nothing else: never the place
 to look up how a component behaves.
 
+**A library-wide copy and structure pass is in progress.** Every component's writing is being rewritten
+one at a time, and `docs/rewrite-pass.md` is the tracker: the style rules, the per-component procedure,
+and the 33-row checklist. Read it before touching any human-facing string.
+
 | Need | File |
 | --- | --- |
 | What's done, what's next | `docs/BUILD-STATUS.md` |
+| The copy rewrite: rules, procedure, next component | `docs/rewrite-pass.md` |
 | The ARIA contract + keyboard map for a **built** component | `agents/components/<slug>.md` — generated from its `meta.json` and asserted against the shipped markup |
 | The up-front design decisions behind one, and its CSS gotchas | `docs/component-specs.md` (read one entry, not the file) |
 | What a component assumes about the page it lands in | `agents/conventions.md` — the reasoning behind **Non-negotiable conventions** below |
@@ -199,36 +204,46 @@ served by each file standing alone.
 roster changes every session and the copy shouldn't need editing when it does. Say what the library
 *is*, not how much of it there is.
 
-**The voice is a11y-as-the-main-road.** `a11y` reads like *alley* — the side street accessibility
-usually gets pushed down, visited late and in a hurry. This library's position is that it belongs on
-the main road and that it can be fun. Make that point where it lands naturally; never twice on a page.
+**The voice is direct, dry, and definitive.** Say what a thing is and what it does. No metaphor, no
+aphorism, no sentence whose subject is a concept ("A spinner is silent"). Never open with a paradox
+or a reversal — open with the component. One idea per sentence; prefer a period to an em dash. Name
+an attribute when the attribute is the point, and do not name three in a lede. Never apologize for
+the library and never hedge about frameworks.
 
-**Demo content is 90s punk, obliquely.** Song and album titles, place names and lyric fragments —
-never the band names themselves. Nothing vulgar. Prefer `462` and `99` when a number is arbitrary.
-Fake credentials look obviously fake but keep a valid shape (`sk_test_` prefix, right length, right
-character set) so the example still teaches the format.
+**Demo content is one generic business app**, shared across every component so a reader never
+context-switches: people (`Jordan Lee`), `@example.com` addresses, `Order 462` / `Invoice 99`,
+actions like `Save changes` and `Delete project`, fields like `Work email` and `Full name`, statuses
+like `Shipped` / `Pending` / `Failed`. Prefer `462` and `99` when a number is arbitrary. Fake
+credentials look obviously fake but keep a valid shape (`sk_test_` prefix, right length, right
+character set) so the example still teaches the format. The full vocabulary table is in
+`docs/rewrite-pass.md`.
 
 **Text that renders on a component page is short and scannable.** The demo titles, the `__note`
 paragraphs, captions, verdicts and readout labels get one or two plain sentences each — enough to
 point at what the example is showing. Everything longer goes in `docs.md` or in a source comment,
-where a reader has opted in. `loading-button` is the reference. Never write "the left one" or "the
-right-hand readout": the demo grid stacks its cases at every real width, so name the case instead.
+where a reader has opted in. Never write "the left one" or "the right-hand readout": the demo grid
+stacks its cases at every real width, so name the case instead.
+
+**An example title names what the example contains, not what it argues.** `2 · State shown by color
+only`, not `2 · Pressed is not a color`.
 
 **The `summary` in `meta.json` is written to a person, not to a search index.** It renders as the
 lede at the top of the component page, on the index card, and as the page description, so it is the
-first sentence anyone reads about the component. Say what the thing is for and what the hard part
-about it is, in the order a person would explain it out loud. Two or three sentences, ~50 words.
+first sentence anyone reads about the component. Two or three sentences, ~50 words, in this order:
+what it is, what it is for, the one thing that makes it hard.
 
-Do **not** write it as a declarative string of clauses — `A filter chip that is a toggle button, not
-a checkbox — aria-pressed carries the state, and a tick carries it where color cannot. Four live
-failures: …` is the old style and reads as keywords bolted together. Write instead: *A chip is a
-filter you can switch on and off, and the temptation is to reach for a checkbox. It is a button that
-remembers, so `aria-pressed` is what tells a screen reader it is on — and something other than color
-has to say the same thing on screen.*
+```
+A filter chip is a button that stays pressed. Use it to switch a filter on and off without
+submitting a form. It is not a checkbox, so `aria-pressed` carries the state, and the on state
+needs a second cue besides color.
+```
 
-Rules of thumb: lead with the reader's problem, not the ARIA attribute; name at most one attribute,
-and only when it *is* the point; never enumerate the examples or count the failures — the demo notes
-and the page already do that. Keep it a helpful guide, not an index entry.
+Never enumerate the examples or count the failures — the demo notes and the page already do that.
+
+**`docs.md` has one canonical heading order**, and `docs/rewrite-pass.md` is where it is written
+down: Before you copy, Required markup, Keyboard, States, Screen reader behavior, up to two
+component-specific sections, API, Using it in a framework, Common mistakes, Related. `## Keyboard`
+is mandatory even when the native element supplies every key.
 
 **Say it once, in as few words as carry the information.** Comments and docs here are load-bearing:
 they explain *why* a non-obvious accessibility decision was made, and that's the bar. Cut restated
@@ -244,7 +259,7 @@ pieces that make it work. So all three files carry the **same numbered sections 
 EXAMPLE 3 · Server-rendered error
 ```
 
-- **`component.html`** — one banner per example, with a visible `<h3 class="ac-demo__title">` so the
+- **`component.html`** — one banner per example, with a visible `<h4 class="ac-demo__title">` so the
   rendered demo and the HTML tab match by eye.
 - **`component.css` / `component.js`** — sectioned by *concern*, since concerns are shared. Every
   section header names which examples need it: `[CORE — all examples]`, `[3, 5, 6]`,
@@ -252,9 +267,30 @@ EXAMPLE 3 · Server-rendered error
 - **Each file opens with a copy map**: a few lines saying "want just example 2? take these
   sections." The whole file is the fully-fledged library version; the map is how someone takes less.
 
-`ac-demo-*` and `ac-demo__*` are **demo scaffolding, never part of a component** — the grid, the
-per-example headings, the legend. They live in `src/site/styles/site.css`, **not** in any
-`component.css`, so that everything in a component's own files is real component code. Use the
+**Correct examples and mistakes are two separate sections**, correct first, so a visitor can tell at a
+glance which markup to take. Both live in `component.html`:
+
+```html
+<div class="ac-demo-section">
+  <h3 class="ac-demo-section__title">Correct examples</h3>
+  <p class="ac-demo-section__note">One sentence on what this group shows.</p>
+  <div class="ac-demo-grid"> … </div>
+</div>
+<div class="ac-demo-section ac-demo-section--mistakes">
+  <h3 class="ac-demo-section__title">Common mistakes</h3>
+  …
+</div>
+```
+
+Examples stay numbered `1..N` **continuously across both sections** so the `EXAMPLE 3 ·` banners in the
+CSS and JS still line up. An example that ends with the fix but exists to show the mistake belongs in
+*Common mistakes*. The page is `h1` → `h2 Live example` → `h3` section → `h4` example, and axe's
+`heading-order` runs on it — never skip a level. Omit the second section only when the component
+genuinely has no counter-example.
+
+`ac-demo-*` and `ac-demo__*` are **demo scaffolding, never part of a component** — the grid, the two
+section headings, the per-example headings, the legend. They live in `src/site/styles/site.css`, **not**
+in any `component.css`, so that everything in a component's own files is real component code. Use the
 classes in `component.html` and say in the file header that they are not to be copied.
 
 **An example that is broken on purpose says so in the markup.** The shared a11y gate
@@ -270,9 +306,11 @@ broken variant and repair it — `.ac-t-broken-link` has to keep the raw accent 
 accent in the library is mixed toward `--text`, or typography's example 4 stops being a failure.
 The same shape as a `[FORCED]` block reaching a broken variant.
 
-**Every `docs.md` states the framework caveat once**, near the top: your framework probably has a
-better idiom for this, but the ARIA attributes and their wiring are the same either way, and this is
-enough for a person or an agent to start from. Don't apologize for it beyond that.
+**Every `docs.md` opens with the same `## Before you copy` paragraph.** It says these files are a
+working reference rather than a package, that the reader moves the markup into their own templates and
+the state into their own code, and that the ARIA, the keyboard behavior and the focus handling are what
+has to survive that move. It never says the reader's framework has a better version of this — the
+verbatim text is in `docs/rewrite-pass.md`.
 
 ## Environment gotchas
 

@@ -12,46 +12,46 @@
 export const GROUPS = [
   {
     id: 'foundations',
-    name: 'Foundations',
+    name: 'General Concepts',
     summary:
-      'The primitives everything else is built on: focus, motion, announcements, and the utilities that make the rest possible.',
+      'The base behaviors every other component depends on: focus indicators, screen reader announcements, motion preferences, type, and hiding content correctly.',
   },
   {
     id: 'buttons-actions',
     name: 'Buttons & Actions',
-    summary: 'Things a person presses, and how each one reports what it did.',
+    summary: 'Controls a person presses, and how each one reports what it did.',
   },
   {
     id: 'forms-inputs',
     name: 'Forms & Inputs',
     summary:
-      'Labeled, described, and error-wired controls. The field wrapper here is the backbone every other input reuses.',
+      'Form controls with a label, a hint, and an error message wired to them. Form Field is the wrapper the other inputs reuse.',
   },
   {
     id: 'overlays-disclosure',
     name: 'Overlays & Disclosure',
     summary:
-      'Content that appears on demand, where focus has to go somewhere sensible and come back again.',
+      'Content that appears on demand. Each one has to move focus into the new content and put it back when the content closes.',
   },
   {
     id: 'navigation',
     name: 'Navigation',
-    summary: 'Moving between views and sections without losing your place.',
+    summary: 'Moving between views and between sections of one page, without losing the keyboard.',
   },
   {
     id: 'feedback-status',
     name: 'Feedback & Status',
-    summary:
-      'Telling someone what happened -- in a way that reaches a screen reader, not just an eye.',
+    summary: 'Reporting what happened, in a way a screen reader reads out and not only an eye sees.',
   },
   {
     id: 'data-display',
     name: 'Data Display',
-    summary: 'Structured content that keeps its structure when it is read aloud or reflowed.',
+    summary:
+      'Structured content that keeps its structure when it is read aloud, zoomed, or reflowed onto a phone.',
   },
   {
     id: 'compositions',
     name: 'Compositions',
-    summary: 'Several components working together, the way they would in a real screen.',
+    summary: 'Several components working together, the way they would on a real screen.',
   },
 ];

@@ -89,33 +89,55 @@ const html = `<!-- =============================================================
        matching [CORE] sections of component.css and component.js.
        Copy all three files whole for the library-grade version.
 
-     THE CONTRACT (the same in every example)
+     REQUIRED MARKUP (the same in every example)
        TODO: the two or three attributes that make this work. The full contract
        is the "contract" block in meta.json. This block is the reason the file
        exists.
 
-     ac-demo-* / ac-demo__* is scaffolding for this page only — the grid and the
-     per-example headings. Never copy it into your app.
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the two section
+     headings, the grid and the per-example headings. Never copy it into your app.
      =========================================================================== -->
 
-<div class="ac-demo-grid">
-  <!-- ======================================================================
-       EXAMPLE 1 · TODO the baseline case
-       CSS [CORE]. ${withJs ? 'JS [CORE].' : 'No JS.'}
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">1 &middot; TODO</h3>
+<div class="ac-demo-section">
+  <h3 class="ac-demo-section__title">Correct examples</h3>
+  <p class="ac-demo-section__note">TODO: one sentence on what this group shows.</p>
 
-    <div class="ac-${slug}"${withJs ? ` data-ac-${slug}` : ''}>
-      <!-- TODO -->
+  <div class="ac-demo-grid">
+    <!-- ====================================================================
+         EXAMPLE 1 · TODO the baseline case
+         CSS [CORE]. ${withJs ? 'JS [CORE].' : 'No JS.'}
+         ==================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">1 &middot; TODO</h4>
+
+      <div class="ac-${slug}"${withJs ? ` data-ac-${slug}` : ''}>
+        <!-- TODO -->
+      </div>
     </div>
-  </div>
 
-  <!-- ======================================================================
-       EXAMPLE 2 · TODO an awkward state
-       Ship the ones people get wrong: disabled, empty, error, long text that
-       has to wrap. One example each, numbered, so they can be copied apart.
-       ====================================================================== -->
+    <!-- ====================================================================
+         EXAMPLE 2 · TODO an awkward state
+         Ship the ones people get wrong: disabled, empty, error, long text that
+         has to wrap. One example each, numbered, so they can be copied apart.
+         ==================================================================== -->
+  </div>
+</div>
+
+<!-- The counter-examples, second, so a visitor can tell at a glance which
+     markup to take. Numbering continues from the section above — do not restart
+     it, or the EXAMPLE banners in component.css and component.js stop lining up.
+     Anything broken on purpose carries data-ac-demo-broken="<axe-rule-id> ...",
+     which the shared a11y gate asserts still fails. Delete this whole block if
+     the component genuinely has no counter-example. -->
+<div class="ac-demo-section ac-demo-section--mistakes">
+  <h3 class="ac-demo-section__title">Common mistakes</h3>
+  <p class="ac-demo-section__note">TODO: one sentence. These are live and wrong on purpose.</p>
+
+  <div class="ac-demo-grid">
+    <!-- ====================================================================
+         EXAMPLE 3 · TODO the mistake people actually make
+         ==================================================================== -->
+  </div>
 </div>
 `;
 
@@ -250,12 +272,13 @@ const meta = `{
   "name": "${name}",
   "group": "${group}",
   "order": 100,
-  "summary": "TODO: two or three sentences of prose, written to a person. Lead with the reader's problem, not the ARIA attribute. Never enumerate or count the examples. See CLAUDE.md > Writing style; status-text is the reference.",
+  "summary": "TODO: two or three sentences, ~50 words, in this order -- what it is, what it is for, the one thing that makes it hard. Direct and dry. Name at most one attribute. Never enumerate or count the examples. See CLAUDE.md > Writing style.",
   "tags": [],
   "apg": null,
   "wcag": [],
   "status": "draft",
   "files": [${withJs ? '"html", "css", "js"' : '"html", "css"'}],
+  "demoNote": "TODO: one or two sentences saying what to try on the page. Not a list of every example.",
   "contract": {
     "useWhen": "TODO: one line -- when to reach for this rather than the nearest alternative. It is also this component's row in the agent index, where the whole roster shares one budget.",
     "root": [".ac-${slug}"],
@@ -275,39 +298,45 @@ const meta = `{
 
 const docs = `## Before you copy
 
-Your framework may have a better idiom for this than ${withJs ? `\`AC.create${pascal}\`` : 'these classes'}.
-Use it. **The ARIA wiring below is the same either way**, and it is the part almost every
-implementation gets wrong. Take the markup and the CSS, keep the attribute contract, and let your
-framework own the state.
+These files are a working reference, not a package. Move the markup into your own templates and the
+state into your own code. What has to survive that move is the ARIA below, the keyboard behavior, and
+where focus goes — those are the parts that make the component accessible, and the parts that are
+usually dropped.
 
-Each example on this page is separately copyable: the HTML sections are numbered, and the CSS${
-  withJs ? ' and JS' : ''
-}
-sections say which examples need them.
+Every example on this page is numbered and separately copyable. The CSS${withJs ? ' and JS' : ''} sections name which
+examples need them.
 
-## The contract
+## Required markup
 
-TODO: the shape of the pattern in two or three sentences, then the table.
+TODO: two or three sentences on the shape of the pattern, then the table. Rows in
+DOM order, top to bottom.
 
-| Element | Attribute | Why |
+| Element | Attribute | What it does |
 | --- | --- | --- |
 | | | |
 
 ## Keyboard
 
-| Key | Action |
+TODO: every key in contract.keyboard, in this order -- Tab, Enter, Space, arrows,
+Home/End, Esc, typing. Keep this table even if the native element supplies every
+key. Finish with the keys you deliberately did not bind, and why.
+
+| Key | What it does |
 | --- | --- |
 | <kbd>Tab</kbd> | |
+
+## States
+
+TODO: default, hover, focus, active, disabled, empty, error -- whichever apply.
+
+| State | Signaled by | Never signaled by |
+| --- | --- | --- |
+| | | |
 
 ## Screen reader behavior
 
 TODO: what NVDA, JAWS, VoiceOver and TalkBack actually announce, and anywhere
 they differ. Say what was tested rather than what should happen.
-
-## States
-
-TODO: default, hover, focus, active, disabled, empty, error -- whichever apply.
-Note how each is signaled without relying on color.
 ${
   withJs
     ? `
@@ -337,9 +366,14 @@ useEffect(() => {
 `
     : ''
 }
-## What to watch for
+## Common mistakes
 
-TODO: the mistakes people actually make with this pattern.
+TODO: the mistakes people actually make with this pattern. Bulleted, bold lead-in,
+one sentence each.
+
+## Related
+
+TODO: links to the components this one sits next to, or delete this section.
 `;
 
 const spec = `import { test, expect } from '@playwright/test';

@@ -98,8 +98,9 @@ app has a sticky header, this is on you.
 
 **`ac-demo-*`, `ac-demo__*` and `data-ac-demo-broken` are page scaffolding**
 
-The demo grid, the per-example headings, the readouts, and the markers on the examples that are broken
-on purpose. They live in the site's own stylesheet, never in a `component.css`, so that everything
-inside a component's own files is real component code. Do not copy them — and never copy from inside an
-element carrying `data-ac-demo-broken`, which is wrong by design and labeled with what it is wrong
-about.
+The demo grid, the two section headings that split correct examples from mistakes, the per-example
+headings, the readouts, and the markers on the examples that are broken on purpose. They live in the
+site's own stylesheet, never in a `component.css`, so that everything inside a component's own files is
+real component code. Do not copy them — and never copy anything under the **Common mistakes** heading or
+from inside an element carrying `data-ac-demo-broken`, which is wrong by design and labeled with what it
+is wrong about.

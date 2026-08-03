@@ -4,7 +4,7 @@
 
 Pick one, then read `agents/components/<slug>.md` — not this file twice.
 
-## Foundations
+## General Concepts
 
 - **skip-link** — The first focusable thing on the page, and a target that accepts focus.
 - **visually-hidden** — Text for screen readers only, in nine declarations that all matter.

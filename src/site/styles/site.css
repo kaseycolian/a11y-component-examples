@@ -667,6 +667,47 @@ code {
    Keeping it here means what a visitor copies out of the code panel is only ever
    real component code. The file headers say not to copy these classes. */
 
+/* The two groups a demo is split into: correct examples first, then the ones
+   that are wrong on purpose. A visitor has to be able to tell which is which
+   before reading a word of the examples, so the split is a heading rather than
+   a color or an ordering convention. `<h3>` here and `<h4>` on each example
+   below it -- the page runs h1, h2 "Live example", h3 section, h4 example, and
+   axe's heading-order rule is in the gate. */
+.ac-demo-section {
+  width: 100%;
+}
+
+.ac-demo-section + .ac-demo-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+/* h3's own size and weight, with its top margin dropped: the section rule above
+   already supplies the separation. */
+.ac-demo-section__title {
+  margin: 0 0 0.4rem;
+  font-size: 1.1rem;
+}
+
+.ac-demo-section__note {
+  margin: 0 0 1.5rem;
+  max-width: 70ch;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* The counter-examples. The heading *word* is what says these are wrong -- the
+   bar and the color only agree with it, so nothing is carried by color alone
+   (SC 1.4.1). --accent-pink-text rather than the raw accent because 17.6px bold
+   is under the large-text threshold and needs the full 4.5:1. */
+.ac-demo-section--mistakes .ac-demo-section__title {
+  padding-left: 0.7rem;
+  border-left: 4px solid var(--accent-pink);
+  color: var(--accent-pink-text);
+  text-shadow: var(--tglow-pink-sm);
+}
+
 .ac-demo-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
@@ -707,6 +748,18 @@ code {
   .ac-demo__title {
     color: CanvasText;
     border-bottom-color: CanvasText;
+  }
+
+  /* Forced colors drops the accent, so the bar is what is left to separate the
+     two section headings. It has to be repainted in a system color or it comes
+     back as CanvasText-on-Canvas and reads as nothing. */
+  .ac-demo-section--mistakes .ac-demo-section__title {
+    color: CanvasText;
+    border-left-color: CanvasText;
+  }
+
+  .ac-demo-section + .ac-demo-section {
+    border-top-color: CanvasText;
   }
 }
 
