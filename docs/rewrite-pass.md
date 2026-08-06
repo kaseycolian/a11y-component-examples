@@ -10,6 +10,51 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 
 ---
 
+## START HERE
+
+**Phase 0 is done. Components 1–6 are done. Next up is row 7, `input-group`.**
+
+Last updated 2026-08-06. The last component commit is `03b184c` (`Rewrite text-input`); this note is the
+one after it. Working tree clean, `main` pushed, and the repo was left green:
+
+```
+check:tokens                      34 files clean
+check:agents                      42 surfaces match their sources
+npm run build                     35 pages
+playwright --project=chromium     1205 passed   (the whole suite, 10.9 min)
+```
+
+Re-run that last line before you start if you want to be sure nothing drifted. It is the honest
+baseline — if something is red before you have touched anything, it is not your change.
+
+Read these three things before touching anything, in this order:
+
+1. **This file**, top to bottom. It is ~250 lines and it is the whole contract.
+2. **`button`'s four files** — `src/library/components/button/{meta.json,component.html,docs.md}` and
+   `tests/button.spec.mjs`. It is the worked example of every rule below.
+3. **The row you are about to do**, in [The roster](#the-roster). The notes on rows 1–6 record what
+   actually bit, and they are the reason this file is worth reading rather than skimming.
+
+Then follow [The procedure](#the-procedure) for `input-group`, exactly.
+
+### What the last session learned, in one place
+
+- **Three shapes exist, not one.** Most components split into *Correct examples* + *Common mistakes*
+  (`button`, `icon-button`, `chip-toggle`). One correct example means a singular heading, *Correct
+  example* (`loading-button`). No counter-examples at all means **one section only**, with the file
+  header saying why (`field`, `text-input`). Never invent a broken example to fill a gap.
+- **Renumbering is the expensive part.** It ripples into `[SECTION] example N` markers in the CSS and
+  JS, the order of the blocks in those files, the spec's section comments and block order, and any
+  *other* component's prose that names an example number. `chip-toggle` is the worked example.
+- **A rename is 10–15 files, not one.** `grep -rn "<Old Display Name>" src/ docs/` after every one, and
+  look for the name wrapped across two lines of a comment — that is what escaped the first pass twice.
+- **The `docs.md` component-specific cap is two sections.** When a component has more, place them
+  rather than delete them: `text-input`'s *Read-only is not disabled* became a `###` under States.
+- **Never let a fake credential look like real hex.** It cost a blocked push and a `filter-branch`.
+  See [The demo vocabulary](#the-demo-vocabulary).
+
+---
+
 ## Why
 
 Every human-facing surface was written in a compressed, allusive voice that states claims without
@@ -201,6 +246,18 @@ push would go through. Get the shape right the first time.
 
 `dropdown` is already product-flavored (`Deploy target`, `Production`, `app.example.com`). It is the model.
 
+**How much is left, per component.** Run this to see where the punk text is concentrated, so a heavy
+row can be budgeted as more than one sitting:
+
+```sh
+grep -riEc "setlist|merch|zine|distro|matinee|salad days|ruby soho|gilman|bakesale|olympia" \
+  src/library/components/*/component.html | grep -v ":0"
+```
+
+As of 2026-08-06 the heaviest are `tabs` (24 hits), `data-table` (16), `modal` (13), `jump-nav` (11),
+`fieldset-group` and `prose-surface` (9 each), `native-select` (8) and `radio-group` (7). Everything
+else is five or fewer. The four rows finished so far are gone from this list.
+
 ---
 
 ## Naming decisions
@@ -208,20 +265,23 @@ push would go through. Get the shape right the first time.
 Settled. Do not re-litigate. **Display name only** — `meta.json` `name`. Slugs, folders, URLs and spec
 paths do not move.
 
-| slug | old name | new name |
-| --- | --- | --- |
-| `chip-toggle` | Chip Toggle | **Filter Chip** |
-| `dropdown` | Dropdown / Listbox | **Custom Select** |
-| `effects` | Effects | **Background Effects** |
-| `field` | Field | **Form Field** |
-| `fieldset-group` | Fieldset Group | **Fieldset** |
-| `focus-ring` | Focus Ring | **Focus Indicator** |
-| `jump-nav` | Jump Nav | **In-Page Navigation** |
-| `motion-preferences` | Motion Preferences | **Reduced Motion** |
-| `notice` | Notice | **Alert** |
-| `prose-surface` | Prose Surface | **Rich Text Content** |
-| `result-panel` | Result Panel | **Copyable Result** |
-| `status-text` | Status Text | **Status Label** |
+| slug | old name | new name | done |
+| --- | --- | --- | --- |
+| `chip-toggle` | Chip Toggle | **Filter Chip** | [x] |
+| `field` | Field | **Form Field** | [x] |
+| `dropdown` | Dropdown / Listbox | **Custom Select** | [ ] |
+| `effects` | Effects | **Background Effects** | [ ] |
+| `fieldset-group` | Fieldset Group | **Fieldset** | [ ] |
+| `focus-ring` | Focus Ring | **Focus Indicator** | [ ] |
+| `jump-nav` | Jump Nav | **In-Page Navigation** | [ ] |
+| `motion-preferences` | Motion Preferences | **Reduced Motion** | [ ] |
+| `notice` | Notice | **Alert** | [ ] |
+| `prose-surface` | Prose Surface | **Rich Text Content** | [ ] |
+| `result-panel` | Result Panel | **Copyable Result** | [ ] |
+| `status-text` | Status Text | **Status Label** | [ ] |
+
+A rename happens **in that component's own pass**, not ahead of it. Two are already applied, and the
+prose in every other component was updated at the same time.
 
 Unchanged, because they are already the standard term: badge, button, checkbox, data-table, disclosure,
 drawer, icon-button, input-group, live-region, loading-button, modal, native-select, radio-group,
@@ -358,8 +418,8 @@ bound" note, and a `summary` in the new voice.
 | 4 | `chip-toggle` | [x] | **Renamed → Filter Chip**, and the first rename done, so it is the worked example: 11 other components mentioned it in prose and all were updated, including two that named an example number. Heavy renumber — old 4 and 5 were choice demos, not failures, so they moved into *Correct examples*: 1→1, 4→2, 5→3, 2→4, 3→5. That reordered `[ACCENTS]`/`[CHECK]` in the CSS and all four demo blocks in the JS, plus the spec's five sections. |
 | 5 | `field` | [x] | **Renamed → Form Field.** **The first single-section page:** all six examples are correct markup, so there is no *Common mistakes* block — the file header says so, and the failures live in `docs.md` instead. No renumber, no wrapper `<div>` (auto-init already scopes to each `[data-ac-field]`). The home page `PEEK_FILES` excerpt mirrors this component and was updated in step. 14 other components referenced "Field" in prose. |
 | 6 | `text-input` | [x] | Single section, like `field` — six decisions, no verdicts. CSS-only, so no wrapper `<div>` and no renumber. **First component to take the new fake-key shape**: `sk_test_462abcdefg99abcdefg462abcdefg`. `docs.md` had four component-specific sections against a cap of two: *Read-only is not disabled* became a `###` under States, and *Placeholders* collapsed into one Common mistakes bullet. |
-| 7 | `input-group` | [ ] | |
-| 8 | `textarea` | [ ] | |
+| 7 | `input-group` | [ ] | **NEXT.** Carries `sk_test_99RubySoho462Linoleum` for the copy-to-clipboard example, and `tests/input-group.spec.mjs:141` asserts the clipboard contents **exactly** — the key and the assertion move together. Take the new fake-key shape. |
+| 8 | `textarea` | [ ] | Demo body text mentions Olympia. |
 | 9 | `native-select` | [ ] | CSS-only. |
 | 10 | `radio-group` | [ ] | CSS-only. |
 | 11 | `checkbox` | [ ] | |
