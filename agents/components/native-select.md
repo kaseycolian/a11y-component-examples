@@ -2,7 +2,7 @@
 
 # Native Select
 
-The native select, which is the better default on a phone.
+One choice from a list of text options, and the better default on a phone.
 
 In `library/components/native-select/` — copy `component.{html,css}`, read `docs.md` for why.
 
@@ -15,7 +15,15 @@ In `library/components/native-select/` — copy `component.{html,css}`, read `do
 
 ## Keyboard
 
-- `ArrowDown / Home` — native: the OS picker owns all of it
+- `Tab` — native: moves to and from the control. A disabled select is skipped
+- `Enter / Space` — native: Space opens the list, Enter submits the form from a closed select
+- `ArrowDown / ArrowUp` — native: moves through the options, skipping the disabled ones
+- `Home / End` — native: jumps to the first or last option
+- `Shift + ArrowDown / ArrowUp` — native: extends the selection in a multiple select
+- `Ctrl + ArrowDown / ArrowUp` — native: moves without selecting in a multiple select
+- `Ctrl + Space` — native: adds or removes the focused option in a multiple select
+- `Ctrl + A` — native: selects every option in a multiple select
+- `Any letter` — native: type-ahead jumps to the next option starting with it
 
 **States:** invalid — aria-invalid=true on the control, set only while the error shows, disabled
 

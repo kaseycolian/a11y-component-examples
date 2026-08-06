@@ -27,7 +27,7 @@ Pick one, then read `agents/components/<slug>.md` — not this file twice.
 - **text-input** — A text field, with the type and autocomplete that make it fillable.
 - **input-group** — A text field with a button or an affix joined to its edge, both reachable at 200% zoom.
 - **textarea** — A multi-line field that keeps its resize handle, with a counter that announces on a pause.
-- **native-select** — The native select, which is the better default on a phone.
+- **native-select** — One choice from a list of text options, and the better default on a phone.
 - **radio-group** — One answer out of a few, where the arrows both move and choose.
 - **checkbox** — A native checkbox, kept focusable under whatever you draw over it.
 - **switch** — An on/off that applies immediately, with the thumb as the second cue.

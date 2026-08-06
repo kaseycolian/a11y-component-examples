@@ -12,15 +12,15 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 
 ## START HERE
 
-**Phase 0 is done. Components 1–8 are done. Next up is row 9, `native-select`.**
+**Phase 0 is done. Components 1–9 are done. Next up is row 10, `radio-group`.**
 
-Last updated 2026-08-06. This note is part of the `textarea` commit. The repo was left green:
+Last updated 2026-08-06. This note is part of the `native-select` commit. The repo was left green:
 
 ```
 check:tokens                      34 files clean
 check:agents                      42 surfaces match their sources
 npm run build                     35 pages
-playwright --project=chromium     textarea 22 · agent-surfaces 117 · a11y -g textarea 36
+playwright --project=chromium     native-select 17 · agent-surfaces 117 · a11y -g native-select 30
 ```
 
 The whole suite was last run in full at row 6: 1205 passed, 10.9 min.
@@ -36,7 +36,7 @@ Read these three things before touching anything, in this order:
 3. **The row you are about to do**, in [The roster](#the-roster). The notes on rows 1–6 record what
    actually bit, and they are the reason this file is worth reading rather than skimming.
 
-Then follow [The procedure](#the-procedure) for `native-select`, exactly.
+Then follow [The procedure](#the-procedure) for `radio-group`, exactly.
 
 ### What the last session learned, in one place
 
@@ -58,7 +58,12 @@ Then follow [The procedure](#the-procedure) for `native-select`, exactly.
 - **When the Keyboard table outgrows `contract.keyboard`, grow the contract.** A key whose effect
   starts `native:` costs the spec nothing — agent-surfaces §3 skips it — so <kbd>Enter</kbd> and
   <kbd>Space</kbd> went into `input-group`'s contract and <kbd>Enter</kbd> into `textarea`'s rather
-  than being documented off-contract, where nothing would keep the two in step.
+  than being documented off-contract, where nothing would keep the two in step. Watch the Tier 2
+  budget when doing it wholesale: nine rows took `native-select` from 0.9 KB to 1.6 KB of 1.8 KB.
+- **Rewriting demo content can invalidate a test's premise, not just its strings.** `native-select`
+  asserted type-ahead by pressing `g` for an option valued `gilman` — but type-ahead matches option
+  **text**, and the replacement options had no `g` word. A green suite after a content swap is not
+  proof; reread what each assertion is actually claiming.
 - **Never let a fake credential look like real hex.** It cost a blocked push and a `filter-branch`.
   See [The demo vocabulary](#the-demo-vocabulary).
 
@@ -429,8 +434,8 @@ bound" note, and a `summary` in the new voice.
 | 6 | `text-input` | [x] | Single section, like `field` — six decisions, no verdicts. CSS-only, so no wrapper `<div>` and no renumber. **First component to take the new fake-key shape**: `sk_test_462abcdefg99abcdefg462abcdefg`. `docs.md` had four component-specific sections against a cap of two: *Read-only is not disabled* became a `###` under States, and *Placeholders* collapsed into one Common mistakes bullet. |
 | 7 | `input-group` | [x] | Single section — all five examples are correct markup. No renumber. Three demo strings were asserted **exactly** by the spec and had to move with it: the fake key, the password value (`Password462`) and the search label (`Search orders`). `contract.keyboard` gained <kbd>Enter</kbd> and <kbd>Space</kbd>, both `native:`, so the mandatory Keyboard table could account for form submit and button activation. `docs.md` had five component-specific sections against a cap of two: affixes became a `###` under Required markup, invalid a `###` under States, and reveal + copy were folded into one *The two scripted addons* section with a `###` each. |
 | 8 | `textarea` | [x] | Single section, no renumber. `contract.keyboard` gained <kbd>Enter</kbd> (`native:`) so the Keyboard table could say the thing that separates a textarea from an input — it inserts a line break rather than submitting. Five component-specific sections against a cap of two: *resize* became a `###` under Required markup, *Read-only is not disabled* a `###` under States (as in `text-input`), *No maxlength* a `###` inside the counter section. Spec: two demo strings and one section comment. |
-| 9 | `native-select` | [ ] | **NEXT.** CSS-only. |
-| 10 | `radio-group` | [ ] | CSS-only. |
+| 9 | `native-select` | [x] | CSS-only, single section, no renumber. The whole demo domain was a band tour, so **every id changed** (`ac-ns-venue` → `ac-ns-country`, `-tour` → `-assignee`, `-slot` → `-window`, `-label` → `-org`, `-merch` → `-speed`, `-riders` → `-notify`) and the spec moved with it: 12 selectors, 6 names, 4 option values, 2 regexes. **Type-ahead asserts on option *text*, not value** — the old test pressed `g` for `gilman`; the new options made that a no-match, so it presses `u` for `United Kingdom` and expects `gb`. `contract.keyboard` went from one vague row to nine `native:` rows, including the four `multiple`-only modifiers, which took the Tier 2 surface from 0.9 KB to **1.6 KB against the 1.8 KB budget** — the second-tightest after `dropdown`. |
+| 10 | `radio-group` | [ ] | **NEXT.** CSS-only. |
 | 11 | `checkbox` | [ ] | |
 | 12 | `switch` | [ ] | 4 examples. |
 | 13 | `fieldset-group` | [ ] | rename → Fieldset. |

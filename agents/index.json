@@ -244,14 +244,14 @@
       "slug": "native-select",
       "name": "Native Select",
       "group": "forms-inputs",
-      "useWhen": "The native select, which is the better default on a phone.",
+      "useWhen": "One choice from a list of text options, and the better default on a phone.",
       "tags": ["select", "optgroup", "no-js", "appearance-none", "os-picker", "multiple"],
       "wcag": ["1.3.1", "1.4.1", "1.4.11", "2.1.1", "2.5.8", "3.3.1", "4.1.2"],
       "apg": null,
       "files": ["html", "css"],
       "status": "stable",
       "hasContract": true,
-      "_summaryRev": "869a47a9"
+      "_summaryRev": "e1c30f9d"
     },
     {
       "slug": "radio-group",
