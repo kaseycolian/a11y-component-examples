@@ -12,15 +12,15 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 
 ## START HERE
 
-**Phase 0 is done. Components 1–7 are done. Next up is row 8, `textarea`.**
+**Phase 0 is done. Components 1–8 are done. Next up is row 9, `native-select`.**
 
-Last updated 2026-08-06. This note is part of the `input-group` commit. The repo was left green:
+Last updated 2026-08-06. This note is part of the `textarea` commit. The repo was left green:
 
 ```
 check:tokens                      34 files clean
 check:agents                      42 surfaces match their sources
 npm run build                     35 pages
-playwright --project=chromium     input-group 20 · agent-surfaces 117 · a11y -g input-group 33
+playwright --project=chromium     textarea 22 · agent-surfaces 117 · a11y -g textarea 36
 ```
 
 The whole suite was last run in full at row 6: 1205 passed, 10.9 min.
@@ -36,7 +36,7 @@ Read these three things before touching anything, in this order:
 3. **The row you are about to do**, in [The roster](#the-roster). The notes on rows 1–6 record what
    actually bit, and they are the reason this file is worth reading rather than skimming.
 
-Then follow [The procedure](#the-procedure) for `textarea`, exactly.
+Then follow [The procedure](#the-procedure) for `native-select`, exactly.
 
 ### What the last session learned, in one place
 
@@ -55,6 +55,10 @@ Then follow [The procedure](#the-procedure) for `textarea`, exactly.
   States, and two merged under a single new `##` with a `###` each.
 - **The spec asserts demo strings exactly, and not only the obvious ones.** `input-group` had three:
   a fake key, a password value and a field label. Grep the spec for every string you rewrite.
+- **When the Keyboard table outgrows `contract.keyboard`, grow the contract.** A key whose effect
+  starts `native:` costs the spec nothing — agent-surfaces §3 skips it — so <kbd>Enter</kbd> and
+  <kbd>Space</kbd> went into `input-group`'s contract and <kbd>Enter</kbd> into `textarea`'s rather
+  than being documented off-contract, where nothing would keep the two in step.
 - **Never let a fake credential look like real hex.** It cost a blocked push and a `filter-branch`.
   See [The demo vocabulary](#the-demo-vocabulary).
 
@@ -424,8 +428,8 @@ bound" note, and a `summary` in the new voice.
 | 5 | `field` | [x] | **Renamed → Form Field.** **The first single-section page:** all six examples are correct markup, so there is no *Common mistakes* block — the file header says so, and the failures live in `docs.md` instead. No renumber, no wrapper `<div>` (auto-init already scopes to each `[data-ac-field]`). The home page `PEEK_FILES` excerpt mirrors this component and was updated in step. 14 other components referenced "Field" in prose. |
 | 6 | `text-input` | [x] | Single section, like `field` — six decisions, no verdicts. CSS-only, so no wrapper `<div>` and no renumber. **First component to take the new fake-key shape**: `sk_test_462abcdefg99abcdefg462abcdefg`. `docs.md` had four component-specific sections against a cap of two: *Read-only is not disabled* became a `###` under States, and *Placeholders* collapsed into one Common mistakes bullet. |
 | 7 | `input-group` | [x] | Single section — all five examples are correct markup. No renumber. Three demo strings were asserted **exactly** by the spec and had to move with it: the fake key, the password value (`Password462`) and the search label (`Search orders`). `contract.keyboard` gained <kbd>Enter</kbd> and <kbd>Space</kbd>, both `native:`, so the mandatory Keyboard table could account for form submit and button activation. `docs.md` had five component-specific sections against a cap of two: affixes became a `###` under Required markup, invalid a `###` under States, and reveal + copy were folded into one *The two scripted addons* section with a `###` each. |
-| 8 | `textarea` | [ ] | **NEXT.** Demo body text mentions Olympia. |
-| 9 | `native-select` | [ ] | CSS-only. |
+| 8 | `textarea` | [x] | Single section, no renumber. `contract.keyboard` gained <kbd>Enter</kbd> (`native:`) so the Keyboard table could say the thing that separates a textarea from an input — it inserts a line break rather than submitting. Five component-specific sections against a cap of two: *resize* became a `###` under Required markup, *Read-only is not disabled* a `###` under States (as in `text-input`), *No maxlength* a `###` inside the counter section. Spec: two demo strings and one section comment. |
+| 9 | `native-select` | [ ] | **NEXT.** CSS-only. |
 | 10 | `radio-group` | [ ] | CSS-only. |
 | 11 | `checkbox` | [ ] | |
 | 12 | `switch` | [ ] | 4 examples. |

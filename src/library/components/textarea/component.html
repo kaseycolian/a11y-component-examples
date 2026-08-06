@@ -6,7 +6,7 @@
        matching sections of component.css, and of component.js for 2 and 3.
        Copy the file whole for the library-grade version.
 
-     THE CONTRACT
+     REQUIRED MARKUP
        label[for]  ->  textarea.id     never a placeholder as the label
        textarea    ->  aria-describedby="<hint id>"
        counter     ->  a visible count (aria-hidden) + a throttled role="status"
@@ -21,143 +21,156 @@
        straight to `input` reads "1 character. 2 characters. 3 characters." over
        the top of what the user is typing.
 
-     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     There is no Common mistakes section on this page: every example here is
+     correct markup. The mistakes are written up in docs.md instead.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the section
+     heading, the grid, and the per-example headings. Never copy it.
      =========================================================================== -->
 
-<div class="ac-demo-grid">
-  <!-- ======================================================================
-       EXAMPLE 1 · The baseline
-       CSS [FIELD] + [CORE]. No JavaScript.
+<div class="ac-demo-section">
+  <h3 class="ac-demo-section__title">Correct examples</h3>
+  <p class="ac-demo-section__note">
+    All five are markup you can copy. A textarea is accessible on its own, so these cover what gets
+    added to it — a counter, autogrow — and what gets taken away from it.
+  </p>
 
-       rows sets the starting height; everything past it scrolls. A textarea is
-       already accessible — this example is only about not breaking it.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">1 &middot; The baseline</h3>
+  <div class="ac-demo-grid">
+    <!-- ======================================================================
+         EXAMPLE 1 · Baseline textarea
+         CSS [FIELD] + [CORE]. No JavaScript.
 
-    <div class="ac-field">
-      <label class="ac-field__label" for="ac-ta-notes">Release notes</label>
-      <textarea class="ac-textarea" id="ac-ta-notes" name="notes" rows="4"
-                aria-describedby="ac-ta-notes-hint"></textarea>
-      <p class="ac-field__hint" id="ac-ta-notes-hint">
-        Markdown is fine. Drag the corner to make it taller.
-      </p>
+         rows sets the starting height; everything past it scrolls. A textarea is
+         already accessible — this example is only about not breaking it.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">1 &middot; Baseline textarea</h4>
+
+      <div class="ac-field">
+        <label class="ac-field__label" for="ac-ta-notes">Notes</label>
+        <textarea class="ac-textarea" id="ac-ta-notes" name="notes" rows="4"
+                  aria-describedby="ac-ta-notes-hint"></textarea>
+        <p class="ac-field__hint" id="ac-ta-notes-hint">
+          Markdown is fine. Drag the corner to make it taller.
+        </p>
+      </div>
     </div>
-  </div>
 
-  <!-- ======================================================================
-       EXAMPLE 2 · Character counter
-       CSS [FIELD] + [CORE] + [COUNTER]. JS [CORE] + [COUNTER].
+    <!-- ======================================================================
+         EXAMPLE 2 · Character counter
+         CSS [FIELD] + [CORE] + [COUNTER]. JS [CORE] + [COUNTER].
 
-       Three separate jobs, deliberately kept apart:
+         Three separate jobs, deliberately kept apart:
 
-         the hint       states the limit up front, and is read with the field
-         the visible    counts every keystroke; aria-hidden, so it is not read
-         the status     announces on a 1s pause, and only near or over the limit
+           the hint       states the limit up front, and is read with the field
+           the visible    counts every keystroke; aria-hidden, so it is not read
+           the status     announces on a 1s pause, and only near or over the limit
 
-       There is no maxlength. A hard stop at the limit silently swallows
-       keystrokes and tells the user nothing (SC 3.3.1) — worse on a phone, where
-       the field is half covered by the keyboard. Over-typing is allowed and
-       reported instead.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">2 &middot; Character counter</h3>
+         There is no maxlength. A hard stop at the limit silently swallows
+         keystrokes and tells the user nothing (SC 3.3.1) — worse on a phone,
+         where the field is half covered by the keyboard. Over-typing is allowed
+         and reported instead.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">2 &middot; Character counter</h4>
 
-    <div class="ac-field" data-ac-textarea>
-      <label class="ac-field__label" for="ac-ta-bio">Short bio</label>
-      <textarea class="ac-textarea" id="ac-ta-bio" name="bio" rows="4"
-                data-ac-limit="462" aria-describedby="ac-ta-bio-hint"
-      >Started the label out of a garage in Olympia. Still books every show by hand.</textarea>
-      <p class="ac-field__hint" id="ac-ta-bio-hint">Up to 462 characters.</p>
-      <p class="ac-textarea__count" data-ac-count aria-hidden="true"></p>
-      <!-- Present and empty from the start: a live region inserted along with
-           its text has no change for a screen reader to notice. -->
-      <p class="ac-textarea__status" role="status" data-ac-count-status></p>
+      <div class="ac-field" data-ac-textarea>
+        <label class="ac-field__label" for="ac-ta-bio">Short bio</label>
+        <textarea class="ac-textarea" id="ac-ta-bio" name="bio" rows="4"
+                  data-ac-limit="462" aria-describedby="ac-ta-bio-hint"
+        >Support lead at Example Co. Handles billing questions and account changes.</textarea>
+        <p class="ac-field__hint" id="ac-ta-bio-hint">Up to 462 characters.</p>
+        <p class="ac-textarea__count" data-ac-count aria-hidden="true"></p>
+        <!-- Present and empty from the start: a live region inserted along with
+             its text has no change for a screen reader to notice. -->
+        <p class="ac-textarea__status" role="status" data-ac-count-status></p>
+      </div>
     </div>
-  </div>
 
-  <!-- ======================================================================
-       EXAMPLE 3 · Grows with its content
-       CSS [FIELD] + [CORE] + [GROW]. JS [CORE] + [AUTOGROW].
+    <!-- ======================================================================
+         EXAMPLE 3 · Grows with its content
+         CSS [FIELD] + [CORE] + [GROW]. JS [CORE] + [AUTOGROW].
 
-       Height follows the text, capped by max-height in CSS so a long value
-       scrolls rather than pushing the page down forever.
+         Height follows the text, capped by max-height in CSS so a long value
+         scrolls rather than pushing the page down forever.
 
-       The resize handle still works, and once it is used the script stops
-       adjusting the height. Growing back over a size the user chose by hand is
-       the component overruling them.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">3 &middot; Grows with its content</h3>
+         The resize handle still works, and once it is used the script stops
+         adjusting the height. Growing back over a size the user chose by hand is
+         the component overruling them.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">3 &middot; Grows with its content</h4>
 
-    <div class="ac-field" data-ac-textarea>
-      <label class="ac-field__label" for="ac-ta-reply">Reply</label>
-      <textarea class="ac-textarea ac-textarea--grow" id="ac-ta-reply" name="reply"
-                rows="2" data-ac-autogrow aria-describedby="ac-ta-reply-hint"
-      >Time Bomb is back in the setlist.</textarea>
-      <p class="ac-field__hint" id="ac-ta-reply-hint">
-        Type a few lines. Resize it by hand and it stops second-guessing you.
-      </p>
+      <div class="ac-field" data-ac-textarea>
+        <label class="ac-field__label" for="ac-ta-reply">Reply</label>
+        <textarea class="ac-textarea ac-textarea--grow" id="ac-ta-reply" name="reply"
+                  rows="2" data-ac-autogrow aria-describedby="ac-ta-reply-hint"
+        >Thanks — I have reopened Order 462 so you can edit it.</textarea>
+        <p class="ac-field__hint" id="ac-ta-reply-hint">
+          Type a few lines. Resize it by hand and it stops second-guessing you.
+        </p>
+      </div>
     </div>
-  </div>
 
-  <!-- ======================================================================
-       EXAMPLE 4 · Invalid
-       CSS [FIELD] + [CORE] + [INVALID]. No JavaScript.
+    <!-- ======================================================================
+         EXAMPLE 4 · Invalid value
+         CSS [FIELD] + [CORE] + [INVALID]. No JavaScript.
 
-       Same contract as Form Field: aria-invalid drives the styling, and the message
-       sits in a role="alert" that is always present. Server-rendered here, which
-       is the case worth showing — the page arrives with the error already on it.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">4 &middot; Invalid</h3>
+         Same contract as Form Field: aria-invalid drives the styling, and the
+         message sits in a role="alert" that is always present. Server-rendered
+         here, which is the case worth showing — the page arrives with the error
+         already on it.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">4 &middot; Invalid value</h4>
 
-    <div class="ac-field ac-field--invalid">
-      <label class="ac-field__label" for="ac-ta-why">Why this release matters</label>
-      <textarea class="ac-textarea" id="ac-ta-why" name="why" rows="3" required
-                aria-invalid="true" aria-describedby="ac-ta-why-hint ac-ta-why-error"
-      >tbd</textarea>
-      <p class="ac-field__hint" id="ac-ta-why-hint">Two sentences is plenty.</p>
-      <p class="ac-field__error" id="ac-ta-why-error" role="alert">
-        Say something a reader can use &mdash; <code>tbd</code> is not a summary.
-      </p>
+      <div class="ac-field ac-field--invalid">
+        <label class="ac-field__label" for="ac-ta-why">Reason for the refund</label>
+        <textarea class="ac-textarea" id="ac-ta-why" name="why" rows="3" required
+                  aria-invalid="true" aria-describedby="ac-ta-why-hint ac-ta-why-error"
+        >tbd</textarea>
+        <p class="ac-field__hint" id="ac-ta-why-hint">Two sentences is plenty.</p>
+        <p class="ac-field__error" id="ac-ta-why-error" role="alert">
+          Say something a reader can use &mdash; <code>tbd</code> is not a summary.
+        </p>
+      </div>
     </div>
-  </div>
 
-  <!-- ======================================================================
-       EXAMPLE 5 · Read-only is not disabled
-       CSS [FIELD] + [CORE] + [READONLY]. No JavaScript.
+    <!-- ======================================================================
+         EXAMPLE 5 · Read-only is not disabled
+         CSS [FIELD] + [CORE] + [READONLY]. No JavaScript.
 
-       readonly  focusable, scrollable, selectable, submitted with the form
-       disabled  skipped by Tab, announces nothing, NOT submitted
+         readonly  focusable, scrollable, selectable, submitted with the form
+         disabled  skipped by Tab, announces nothing, NOT submitted
 
-       The difference matters more here than anywhere else: a disabled textarea
-       cannot be scrolled with the keyboard, so anything past the visible lines is
-       simply gone for a keyboard user.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">5 &middot; Read-only vs disabled</h3>
+         The difference matters more here than anywhere else: a disabled textarea
+         cannot be scrolled with the keyboard, so anything past the visible lines
+         is simply gone for a keyboard user.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">5 &middot; Read-only vs disabled</h4>
 
-    <div class="ac-field">
-      <label class="ac-field__label" for="ac-ta-log">Deploy log</label>
-      <textarea class="ac-textarea" id="ac-ta-log" name="log" rows="3" readonly
-                aria-describedby="ac-ta-log-hint"
-      >12:01 build 462 queued
+      <div class="ac-field">
+        <label class="ac-field__label" for="ac-ta-log">Deploy log</label>
+        <textarea class="ac-textarea" id="ac-ta-log" name="log" rows="3" readonly
+                  aria-describedby="ac-ta-log-hint"
+        >12:01 build 462 queued
 12:02 tests passed, 99 of 99
-12:04 published to olympia-1
+12:04 published to app.example.com
 12:04 cache purged</textarea>
-      <p class="ac-field__hint" id="ac-ta-log-hint">
-        Read-only, so it can still be focused, scrolled and copied.
-      </p>
-    </div>
+        <p class="ac-field__hint" id="ac-ta-log-hint">
+          Read-only, so it can still be focused, scrolled and copied.
+        </p>
+      </div>
 
-    <div class="ac-field">
-      <label class="ac-field__label" for="ac-ta-legacy">Legacy description</label>
-      <textarea class="ac-textarea" id="ac-ta-legacy" name="legacy" rows="2" disabled
-                aria-describedby="ac-ta-legacy-hint">none</textarea>
-      <p class="ac-field__hint" id="ac-ta-legacy-hint">
-        Disabled: not focusable, not scrollable, not submitted.
-      </p>
+      <div class="ac-field">
+        <label class="ac-field__label" for="ac-ta-legacy">Legacy description</label>
+        <textarea class="ac-textarea" id="ac-ta-legacy" name="legacy" rows="2" disabled
+                  aria-describedby="ac-ta-legacy-hint">none</textarea>
+        <p class="ac-field__hint" id="ac-ta-legacy-hint">
+          Disabled: not focusable, not scrollable, not submitted.
+        </p>
+      </div>
     </div>
   </div>
 </div>

@@ -10,10 +10,10 @@ test.beforeEach(async ({ page }) => {
 // rendered. Most of what can go wrong here is announcement timing and the resize
 // handle, so that is what most of these cover.
 
-/* --- example 1 · the baseline --------------------------------------------- */
+/* --- example 1 · baseline textarea ----------------------------------------- */
 
 test('every textarea is labeled, and the first one is described', async ({ page }) => {
-  await expect(page.locator('#ac-ta-notes')).toHaveAccessibleName('Release notes');
+  await expect(page.locator('#ac-ta-notes')).toHaveAccessibleName('Notes');
   await expect(page.locator('#ac-ta-notes')).toHaveAccessibleDescription(/Markdown is fine/);
 
   const fields = page.locator('.ac-textarea');
@@ -75,7 +75,7 @@ test('the live region stays silent while there is room left', async ({ page }) =
   await expect(status).toHaveText('');
 
   await field.click();
-  await field.pressSequentially('every night', { delay: 20 });
+  await field.pressSequentially(' a few words', { delay: 20 });
 
   // Well inside the limit, so there is nothing worth interrupting for -- even
   // after the idle delay has passed.

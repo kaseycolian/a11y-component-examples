@@ -2,7 +2,7 @@
 
 # Textarea
 
-A multi-line field you can still resize, and a counter that is not chatty.
+A multi-line field that keeps its resize handle, with a counter that announces on a pause.
 
 In `library/components/textarea/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
@@ -16,6 +16,7 @@ In `library/components/textarea/` — copy `component.{html,css,js}`, read `docs
 ## Keyboard
 
 - `Tab` — native: moves out of the field. It does not insert a tab
+- `Enter` — native: inserts a line break. It does not submit the form
 
 **States:** invalid — aria-invalid=true on the control, set only while the error shows, over the limit
 
