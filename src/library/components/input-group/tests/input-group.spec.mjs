@@ -22,7 +22,7 @@ test('the addon is a real submit button inside a real form', async ({ page }) =>
 });
 
 test('the field is labeled, and not by its placeholder or its button', async ({ page }) => {
-  await expect(page.locator('#ac-ig-q')).toHaveAccessibleName('Search components');
+  await expect(page.locator('#ac-ig-q')).toHaveAccessibleName('Search orders');
   await expect(page.locator('#ac-ig-q')).toHaveAccessibleDescription(
     /Enter submits/,
   );
@@ -101,7 +101,7 @@ test('revealing keeps the value and the caret where they were', async ({ page })
   await input.evaluate((el) => el.setSelectionRange(3, 3));
   await page.getByRole('button', { name: 'Show password' }).click();
 
-  expect(await input.inputValue()).toBe('TimeBomb462');
+  expect(await input.inputValue()).toBe('Password462');
   // Changing `type` resets the selection in most browsers; the script puts it
   // back, because the user was probably mid-word.
   expect(await input.evaluate((el) => el.selectionStart)).toBe(3);
@@ -138,7 +138,7 @@ test('copy puts the field value on the clipboard', async ({ page, context, brows
   await page.getByRole('button', { name: 'Copy API key' }).click();
 
   const clipboard = await page.evaluate(() => navigator.clipboard.readText());
-  expect(clipboard).toBe('sk_test_99RubySoho462Linoleum');
+  expect(clipboard).toBe('sk_test_462abcdefg99abcdefg462abcdefg');
 });
 
 test('the copied value is read-only, not disabled, so it can still be selected', async ({

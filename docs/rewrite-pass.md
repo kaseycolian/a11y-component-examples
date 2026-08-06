@@ -12,17 +12,18 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 
 ## START HERE
 
-**Phase 0 is done. Components 1–6 are done. Next up is row 7, `input-group`.**
+**Phase 0 is done. Components 1–7 are done. Next up is row 8, `textarea`.**
 
-Last updated 2026-08-06. The last component commit is `03b184c` (`Rewrite text-input`); this note is the
-one after it. Working tree clean, `main` pushed, and the repo was left green:
+Last updated 2026-08-06. This note is part of the `input-group` commit. The repo was left green:
 
 ```
 check:tokens                      34 files clean
 check:agents                      42 surfaces match their sources
 npm run build                     35 pages
-playwright --project=chromium     1205 passed   (the whole suite, 10.9 min)
+playwright --project=chromium     input-group 20 · agent-surfaces 117 · a11y -g input-group 33
 ```
+
+The whole suite was last run in full at row 6: 1205 passed, 10.9 min.
 
 Re-run that last line before you start if you want to be sure nothing drifted. It is the honest
 baseline — if something is red before you have touched anything, it is not your change.
@@ -35,7 +36,7 @@ Read these three things before touching anything, in this order:
 3. **The row you are about to do**, in [The roster](#the-roster). The notes on rows 1–6 record what
    actually bit, and they are the reason this file is worth reading rather than skimming.
 
-Then follow [The procedure](#the-procedure) for `input-group`, exactly.
+Then follow [The procedure](#the-procedure) for `textarea`, exactly.
 
 ### What the last session learned, in one place
 
@@ -50,6 +51,10 @@ Then follow [The procedure](#the-procedure) for `input-group`, exactly.
   look for the name wrapped across two lines of a comment — that is what escaped the first pass twice.
 - **The `docs.md` component-specific cap is two sections.** When a component has more, place them
   rather than delete them: `text-input`'s *Read-only is not disabled* became a `###` under States.
+  `input-group` had five and needed all three moves — one `###` under Required markup, one under
+  States, and two merged under a single new `##` with a `###` each.
+- **The spec asserts demo strings exactly, and not only the obvious ones.** `input-group` had three:
+  a fake key, a password value and a field label. Grep the spec for every string you rewrite.
 - **Never let a fake credential look like real hex.** It cost a blocked push and a `filter-branch`.
   See [The demo vocabulary](#the-demo-vocabulary).
 
@@ -256,7 +261,7 @@ grep -riEc "setlist|merch|zine|distro|matinee|salad days|ruby soho|gilman|bakesa
 
 As of 2026-08-06 the heaviest are `tabs` (24 hits), `data-table` (16), `modal` (13), `jump-nav` (11),
 `fieldset-group` and `prose-surface` (9 each), `native-select` (8) and `radio-group` (7). Everything
-else is five or fewer. The four rows finished so far are gone from this list.
+else is five or fewer. The finished rows are gone from this list.
 
 ---
 
@@ -418,8 +423,8 @@ bound" note, and a `summary` in the new voice.
 | 4 | `chip-toggle` | [x] | **Renamed → Filter Chip**, and the first rename done, so it is the worked example: 11 other components mentioned it in prose and all were updated, including two that named an example number. Heavy renumber — old 4 and 5 were choice demos, not failures, so they moved into *Correct examples*: 1→1, 4→2, 5→3, 2→4, 3→5. That reordered `[ACCENTS]`/`[CHECK]` in the CSS and all four demo blocks in the JS, plus the spec's five sections. |
 | 5 | `field` | [x] | **Renamed → Form Field.** **The first single-section page:** all six examples are correct markup, so there is no *Common mistakes* block — the file header says so, and the failures live in `docs.md` instead. No renumber, no wrapper `<div>` (auto-init already scopes to each `[data-ac-field]`). The home page `PEEK_FILES` excerpt mirrors this component and was updated in step. 14 other components referenced "Field" in prose. |
 | 6 | `text-input` | [x] | Single section, like `field` — six decisions, no verdicts. CSS-only, so no wrapper `<div>` and no renumber. **First component to take the new fake-key shape**: `sk_test_462abcdefg99abcdefg462abcdefg`. `docs.md` had four component-specific sections against a cap of two: *Read-only is not disabled* became a `###` under States, and *Placeholders* collapsed into one Common mistakes bullet. |
-| 7 | `input-group` | [ ] | **NEXT.** Carries `sk_test_99RubySoho462Linoleum` for the copy-to-clipboard example, and `tests/input-group.spec.mjs:141` asserts the clipboard contents **exactly** — the key and the assertion move together. Take the new fake-key shape. |
-| 8 | `textarea` | [ ] | Demo body text mentions Olympia. |
+| 7 | `input-group` | [x] | Single section — all five examples are correct markup. No renumber. Three demo strings were asserted **exactly** by the spec and had to move with it: the fake key, the password value (`Password462`) and the search label (`Search orders`). `contract.keyboard` gained <kbd>Enter</kbd> and <kbd>Space</kbd>, both `native:`, so the mandatory Keyboard table could account for form submit and button activation. `docs.md` had five component-specific sections against a cap of two: affixes became a `###` under Required markup, invalid a `###` under States, and reveal + copy were folded into one *The two scripted addons* section with a `###` each. |
+| 8 | `textarea` | [ ] | **NEXT.** Demo body text mentions Olympia. |
 | 9 | `native-select` | [ ] | CSS-only. |
 | 10 | `radio-group` | [ ] | CSS-only. |
 | 11 | `checkbox` | [ ] | |

@@ -2,7 +2,7 @@
 
 # Input Group
 
-A text input with a button joined to it, both reachable at 200% zoom.
+A text field with a button or an affix joined to its edge, both reachable at 200% zoom.
 
 In `library/components/input-group/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
@@ -16,7 +16,9 @@ In `library/components/input-group/` — copy `component.{html,css,js}`, read `d
 
 ## Keyboard
 
-- `Tab` — native: the button is a real sibling, so it is its own stop
+- `Tab` — native: the addon is a real sibling, so it is its own stop
+- `Enter` — native: submits the form from the field, activates the focused addon
+- `Space` — native: activates the focused addon button
 
 **States:** invalid, revealed
 

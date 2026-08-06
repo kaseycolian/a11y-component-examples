@@ -3,15 +3,15 @@
   "name": "Input Group",
   "group": "forms-inputs",
   "order": 30,
-  "summary": "An input with a button or a text affix joined to it: search and submit, password reveal, copy to clipboard. The addon is a real sibling button, never an overlay sitting on top of the value.",
+  "summary": "An input group is a text field with a button or a text affix joined to its edge: search and submit, a password reveal, a copy button. The addon is a real sibling in a flex row, never an overlay, because an overlay covers the value at 200% zoom.",
   "tags": ["input", "button", "addon", "affix", "password", "clipboard", "live-region"],
   "apg": null,
   "wcag": ["1.3.1", "1.4.4", "2.5.3", "2.5.8", "3.3.2", "4.1.2"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Zoom to 200% and watch the addon push the field narrower instead of covering the text. The password button changes its name rather than carrying aria-pressed, and the copy confirmation goes to a live region rather than rewriting the button.",
+  "demoNote": "Zoom to 200% and watch the addon narrow the field instead of covering the text. Press Show and then Copy, and compare how each button reports what happened.",
   "contract": {
-    "useWhen": "A text input with a button joined to it, both reachable at 200% zoom.",
+    "useWhen": "A text field with a button or an affix joined to its edge, both reachable at 200% zoom.",
     "root": [".ac-input-group"],
     "aria": {
       "the input": [
@@ -27,7 +27,15 @@
     "keyboard": [
       [
         "Tab",
-        "native: the button is a real sibling, so it is its own stop"
+        "native: the addon is a real sibling, so it is its own stop"
+      ],
+      [
+        "Enter",
+        "native: submits the form from the field, activates the focused addon"
+      ],
+      [
+        "Space",
+        "native: activates the focused addon button"
       ]
     ],
     "states": [

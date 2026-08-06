@@ -15,7 +15,7 @@ Repo-relative. Over HTTP the same files sit under `https://kaseycolian.github.io
 | Tier | Read | Size | For |
 | --- | --- | --- | --- |
 | 1 | `agents/index.md` | 3.2 KB | The roster. Find your component, then stop. |
-| 1 | `agents/index.json` | 19.6 KB | Every field, for filtering by tag or SC. |
+| 1 | `agents/index.json` | 19.7 KB | Every field, for filtering by tag or SC. |
 | 2 | `agents/components/<slug>.md` | ≤ 1.8 KB | The contract: roles, attributes, keys, states, what goes wrong, the JS API. |
 | 3 | `library/components/<slug>/component.{html,css,js}` | varies | The code. Copy from here. |
 | 4 | `library/components/<slug>/{docs.md,meta.json}` | varies | Why it is built that way. Read when the code surprises you. |

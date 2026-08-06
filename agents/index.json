@@ -218,14 +218,14 @@
       "slug": "input-group",
       "name": "Input Group",
       "group": "forms-inputs",
-      "useWhen": "A text input with a button joined to it, both reachable at 200% zoom.",
+      "useWhen": "A text field with a button or an affix joined to its edge, both reachable at 200% zoom.",
       "tags": ["input", "button", "addon", "affix", "password", "clipboard", "live-region"],
       "wcag": ["1.3.1", "1.4.4", "2.5.3", "2.5.8", "3.3.2", "4.1.2"],
       "apg": null,
       "files": ["html", "css", "js"],
       "status": "stable",
       "hasContract": true,
-      "_summaryRev": "cd00b12d"
+      "_summaryRev": "2deaaa16"
     },
     {
       "slug": "textarea",
