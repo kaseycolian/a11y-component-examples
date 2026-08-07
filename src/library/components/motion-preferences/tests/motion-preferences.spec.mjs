@@ -131,22 +131,22 @@ test('the page cannot turn motion back on once the OS has asked for less', async
 
 /* --- example 1 · a gated animation actually stops -------------------------- */
 
-test('the record turns, and the toggle is what stops it', async ({ page }) => {
-  const record = page.locator('.ac-motion-record');
+test('the disc turns, and the toggle is what stops it', async ({ page }) => {
+  const disc = page.locator('.ac-motion-disc');
 
-  await expect(record).toHaveCSS('animation-duration', '4s');
+  await expect(disc).toHaveCSS('animation-duration', '4s');
 
-  const before = await record.evaluate((el) => getComputedStyle(el).transform);
+  const before = await disc.evaluate((el) => getComputedStyle(el).transform);
   await page.waitForTimeout(400);
-  const during = await record.evaluate((el) => getComputedStyle(el).transform);
+  const during = await disc.evaluate((el) => getComputedStyle(el).transform);
   expect(during).not.toBe(before);
 
   await page.locator('.ac-switch__track').click();
 
-  await expect(record).toHaveCSS('animation-duration', '0s');
-  const stoppedA = await record.evaluate((el) => getComputedStyle(el).transform);
+  await expect(disc).toHaveCSS('animation-duration', '0s');
+  const stoppedA = await disc.evaluate((el) => getComputedStyle(el).transform);
   await page.waitForTimeout(400);
-  const stoppedB = await record.evaluate((el) => getComputedStyle(el).transform);
+  const stoppedB = await disc.evaluate((el) => getComputedStyle(el).transform);
   expect(stoppedB).toBe(stoppedA);
 });
 
@@ -155,7 +155,7 @@ test('the record turns, and the toggle is what stops it', async ({ page }) => {
 test('the ticker is not a live region', async ({ page }) => {
   const item = page.locator('[data-ac-motion-ticker-item]');
 
-  await expect(item).toHaveText('Salad Days');
+  await expect(item).toHaveText('Order 462 shipped');
   // aria-live on content that advances on a timer makes the page unusable.
   expect(
     await page.$eval('[data-ac-motion-ticker]', (el) => el.querySelector('[aria-live]') !== null),
@@ -344,12 +344,12 @@ test('nothing scrolls sideways at 320px', async ({ page }) => {
 
 /* --- forced colors -------------------------------------------------------- */
 
-test('the record keeps an edge when its gradient is discarded', async ({ page }) => {
+test('the disc keeps an edge when its gradient is discarded', async ({ page }) => {
   await page.emulateMedia({ forcedColors: 'active' });
   await page.goto(PAGE);
 
   const border = await page
-    .locator('.ac-motion-record')
+    .locator('.ac-motion-disc')
     .evaluate((el) => getComputedStyle(el).borderTopColor);
   expect(border).not.toBe('rgba(0, 0, 0, 0)');
 });

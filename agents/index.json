@@ -112,7 +112,7 @@
     },
     {
       "slug": "motion-preferences",
-      "name": "Motion Preferences",
+      "name": "Reduced Motion",
       "group": "foundations",
       "useWhen": "One motion token: a page can add the restriction, never override the OS.",
       "tags": ["motion", "prefers-reduced-motion", "animation", "vestibular", "tokens", "cascade", "matchmedia", "pause-stop-hide"],
@@ -121,7 +121,7 @@
       "files": ["html", "css", "js"],
       "status": "stable",
       "hasContract": true,
-      "_summaryRev": "74afc318"
+      "_summaryRev": "a3ed9801"
     },
     {
       "slug": "effects",

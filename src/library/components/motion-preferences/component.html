@@ -1,15 +1,15 @@
 <!-- ===========================================================================
-     MOTION PREFERENCES — the gate every other component in this library reads
+     REDUCED MOTION — the gate every other component in this library reads
 
      WHAT TO COPY
        Example 2 first: it sets the gate, and 1, 3, 4 and 5 all read it. After
        that each example is a separate section of component.css and component.js.
        Copy all three files whole for the library-grade version.
 
-     THE CONTRACT
+     REQUIRED MARKUP
        .ac-motion-scope          the element the gate is defined on. In your app
-                                 this is <html>. Here it is the demo grid, so
-                                 this page's toggle does not fight the site
+                                 this is <html>. Here it wraps this page's
+                                 examples, so the toggle does not fight the site
                                  header's own.
        data-motion="off"         written on that element by the toggle. Absent
                                  means "no page-level opinion" — never "on".
@@ -22,216 +22,242 @@
        the reader's operating system. Only one of them can set it back to 1, and
        it is not the page. Example 5 is what happens when you get that backwards.
 
-     ac-demo-* / ac-demo__* is scaffolding for this page only — the grid and the
-     per-example headings. Never copy it into your app.
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the section
+     headings, the grid, and the per-example headings. Never copy it.
      =========================================================================== -->
 
-<div class="ac-demo-grid ac-motion-scope" data-ac-motion>
-  <!-- ======================================================================
-       EXAMPLE 1 · One gated animation
-       CSS [GATE] + [CORE] + [SPIN]. No JavaScript.
-
-       The record turns for as long as the page is open, which makes it exactly
-       the kind of thing SC 2.2.2 is about: content that moves automatically,
-       runs longer than five seconds, and sits beside something you are trying
-       to read. The toggle in example 2 is its pause mechanism. A looping
-       animation with no way to stop it fails, however tasteful the loop.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">1 &middot; One gated animation</h3>
-
-    <div class="ac-motion-stage">
-      <div class="ac-motion-record">
-        <span class="ac-motion-record__label">Repeater</span>
-      </div>
-    </div>
-
-    <p class="ac-motion__note">
-      <code>animation-duration: calc(var(--ac-motion) * 4s)</code> &mdash; at 0 the
-      duration is zero, so the disc holds still instead of turning.
+<div class="ac-motion-scope" data-ac-motion>
+  <div class="ac-demo-section">
+    <h3 class="ac-demo-section__title">Correct examples</h3>
+    <p class="ac-demo-section__note">
+      Example 2 sets the gate and the other three read it. Flip its toggle and watch every example on
+      the page answer at once.
     </p>
-  </div>
 
-  <!-- ======================================================================
-       EXAMPLE 2 · The toggle, and the readout that proves the asymmetry
-       CSS [GATE] + [CORE] + [SWITCH] + [READOUT]. JS [CORE] + [READOUT].
+    <div class="ac-demo-grid">
+      <!-- ====================================================================
+           EXAMPLE 1 · A gated animation
+           CSS [GATE] + [CORE] + [SPIN]. No JavaScript.
 
-       The switch writes data-motion="off" and removes it again. It never writes
-       "on", because there is no such state to write: on is the absence of an
-       opinion, which is what lets the operating system keep the last word.
+           The disc turns for as long as the page is open, which makes it exactly
+           the kind of thing SC 2.2.2 is about: content that moves automatically,
+           runs longer than five seconds, and sits beside something you are
+           trying to read. The toggle in example 2 is its pause mechanism. A
+           looping animation with no way to stop it fails, however tasteful the
+           loop.
+           ==================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">1 &middot; A gated animation</h4>
 
-       When the OS already asks for reduced motion the control would be a lie, so
-       it goes aria-disabled rather than disabled — it keeps its tab stop, and
-       the note explaining why is announced with it. A disabled input is skipped
-       and explains nothing.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">2 &middot; The toggle and the readout</h3>
+        <div class="ac-motion-stage">
+          <div class="ac-motion-disc">
+            <span class="ac-motion-disc__label">Syncing</span>
+          </div>
+        </div>
 
-    <div class="ac-motion-field">
-      <label class="ac-switch" for="ac-motion-toggle">
-        <input class="ac-switch__input" type="checkbox" id="ac-motion-toggle"
-               data-ac-motion-input aria-describedby="ac-motion-note" />
-        <span class="ac-switch__track" aria-hidden="true"><span class="ac-switch__thumb"></span></span>
-        <span class="ac-switch__text">Reduce motion on this page</span>
-      </label>
-
-      <!-- Revealed by the script only when the OS asks for reduced motion. The
-           aria-describedby above points at it from the start and that is safe:
-           a hidden element is out of the accessibility tree, so it contributes
-           nothing until it is shown.
-
-           Visible text rather than a title attribute — title is not announced
-           by TalkBack at all, is inconsistent in NVDA and JAWS, and never
-           appears for a touch user. -->
-      <p class="ac-motion__note" id="ac-motion-note" data-ac-motion-locked-note hidden>
-        Your system already asks for reduced motion, so animation stays off.
-      </p>
-    </div>
-
-    <!-- Not a live region: it is a reference table you look at, and three rows
-         re-announced on every keystroke would bury the one sentence below it. -->
-    <dl class="ac-motion-readout" data-ac-motion-readout>
-      <div class="ac-motion-readout__row">
-        <dt>Your system says</dt>
-        <dd><code data-ac-motion-out="os">&mdash;</code></dd>
+        <p class="ac-motion__note">
+          <code>animation-duration: calc(var(--ac-motion) * 4s)</code> &mdash; at 0 the
+          duration is zero, so the disc holds still instead of turning.
+        </p>
       </div>
-      <div class="ac-motion-readout__row">
-        <dt>This page says</dt>
-        <dd><code data-ac-motion-out="attr">&mdash;</code></dd>
-      </div>
-      <div class="ac-motion-readout__row">
-        <dt><code>--ac-motion</code> resolves to</dt>
-        <dd><code data-ac-motion-out="resolved">&mdash;</code></dd>
-      </div>
-    </dl>
 
-    <!-- Polite, and the only thing on the page that speaks. The switch already
-         announces checked/unchecked, so this carries the outcome instead of
-         repeating the state. -->
-    <p class="ac-motion__verdict" role="status" data-ac-motion-verdict></p>
-  </div>
+      <!-- ====================================================================
+           EXAMPLE 2 · The toggle and the readout
+           CSS [GATE] + [CORE] + [SWITCH] + [READOUT]. JS [CORE] + [READOUT].
 
-  <!-- ======================================================================
-       EXAMPLE 3 · Motion the CSS gate cannot reach
-       CSS [GATE] + [CORE] + [TICKER]. JS [CORE] + [TICKER].
+           The switch writes data-motion="off" and removes it again. It never
+           writes "on", because there is no such state to write: on is the
+           absence of an opinion, which is what lets the operating system keep
+           the last word.
 
-       A setTimeout is not a transition, so no token stops it. The script has to
-       ask, and it asks the same question CSS does — it reads the resolved
-       --ac-motion off the scope, so the page toggle and the OS preference are
-       one source of truth for both languages. matchMedia alone would see the
-       system setting and miss the toggle.
+           When the OS already asks for reduced motion the control would be a
+           lie, so it goes aria-disabled rather than disabled — it keeps its tab
+           stop, and the note explaining why is announced with it. A disabled
+           input is skipped and explains nothing.
+           ==================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">2 &middot; The toggle and the readout</h4>
 
-       SC 2.2.2 is a separate obligation and does not go away when motion is on:
-       anything auto-updating past five seconds needs a pause control, for the
-       reader who is simply trying to finish a sentence.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">3 &middot; What the gate cannot reach</h3>
+        <div class="ac-motion-field">
+          <label class="ac-switch" for="ac-motion-toggle">
+            <input class="ac-switch__input" type="checkbox" id="ac-motion-toggle"
+                   data-ac-motion-input aria-describedby="ac-motion-note" />
+            <span class="ac-switch__track" aria-hidden="true"><span class="ac-switch__thumb"></span></span>
+            <span class="ac-switch__text">Reduce motion on this page</span>
+          </label>
 
-    <div class="ac-motion-ticker" data-ac-motion-ticker
-         data-ac-motion-ticker-items="Salad Days|Waiting Room|Bikeage|Sink With Kalifornija">
-      <p class="ac-motion-ticker__now">
-        <span class="ac-motion-ticker__label">Now playing</span>
-        <!-- Deliberately not aria-live. A carousel that announces itself every
-             few seconds makes the page unusable, and SC 4.1.3 is about status
-             changes the user caused, not content that advances on its own. -->
-        <span class="ac-motion-ticker__item" data-ac-motion-ticker-item>Salad Days</span>
-      </p>
+          <!-- Revealed by the script only when the OS asks for reduced motion.
+               The aria-describedby above points at it from the start and that is
+               safe: a hidden element is out of the accessibility tree, so it
+               contributes nothing until it is shown.
 
-      <!-- The label changes, and there is no aria-pressed. A toggle button that
-           both renames itself and reports a pressed state announces the change
-           twice, and the two can disagree. Pick one; the visible words are the
-           one a sighted user reads anyway. -->
-      <button class="ac-motion__btn" type="button" data-ac-motion-ticker-toggle>Pause</button>
-
-      <p class="ac-motion__note" data-ac-motion-ticker-note></p>
-    </div>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 4 · Reduced is not removed
-       CSS [GATE] + [CORE] + [REVEAL]. JS [CORE] + [REVEAL].
-
-       There are two knobs and they give different answers.
-
-       Gate the DISTANCE and the transition survives as a cross-fade. Right for
-       anything that tells the reader where something came from, because a
-       jump-cut loses them: the panel was not there, and now it is, and nothing
-       said so.
-
-       Gate the DURATION and the motion is gone outright. Right for decoration —
-       a looping shimmer has nothing to say and should simply stop.
-
-       It is vestibular distress that reduced motion is mostly about: large
-       movement across the viewport, parallax, zoom. Opacity is not that. So a
-       fade is a legitimate answer to prefers-reduced-motion, and removing every
-       transition on the page is a heavier hand than the preference asked for.
-
-       Flip example 2 and replay to see them diverge.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">4 &middot; Reduced is not removed</h3>
-
-    <div class="ac-motion-reveals" data-ac-motion-reveals>
-      <button class="ac-motion__btn" type="button" data-ac-motion-replay>Replay both</button>
-
-      <div class="ac-motion-pair">
-        <div class="ac-motion-panel">
-          <h4 class="ac-motion-panel__title">Distance gated</h4>
-          <p class="ac-motion-reveal ac-motion-reveal--distance" data-ac-motion-reveal>
-            Doors at 8, and the second band never showed.
+               Visible text rather than a title attribute — title is not
+               announced by TalkBack at all, is inconsistent in NVDA and JAWS,
+               and never appears for a touch user. -->
+          <p class="ac-motion__note" id="ac-motion-note" data-ac-motion-locked-note hidden>
+            Your system already asks for reduced motion, so animation stays off.
           </p>
         </div>
 
-        <div class="ac-motion-panel">
-          <h4 class="ac-motion-panel__title">Duration gated</h4>
-          <p class="ac-motion-reveal ac-motion-reveal--duration" data-ac-motion-reveal>
-            Doors at 8, and the second band never showed.
+        <!-- Not a live region: it is a reference table you look at, and three
+             rows re-announced on every keystroke would bury the one sentence
+             below it. -->
+        <dl class="ac-motion-readout" data-ac-motion-readout>
+          <div class="ac-motion-readout__row">
+            <dt>Your system says</dt>
+            <dd><code data-ac-motion-out="os">&mdash;</code></dd>
+          </div>
+          <div class="ac-motion-readout__row">
+            <dt>This page says</dt>
+            <dd><code data-ac-motion-out="attr">&mdash;</code></dd>
+          </div>
+          <div class="ac-motion-readout__row">
+            <dt><code>--ac-motion</code> resolves to</dt>
+            <dd><code data-ac-motion-out="resolved">&mdash;</code></dd>
+          </div>
+        </dl>
+
+        <!-- Polite, and the only thing on the page that speaks. The switch
+             already announces checked/unchecked, so this carries the outcome
+             instead of repeating the state. -->
+        <p class="ac-motion__verdict" role="status" data-ac-motion-verdict></p>
+      </div>
+
+      <!-- ====================================================================
+           EXAMPLE 3 · Ticker driven by setInterval
+           CSS [GATE] + [CORE] + [TICKER]. JS [CORE] + [TICKER].
+
+           A setTimeout is not a transition, so no token stops it. The script has
+           to ask, and it asks the same question CSS does — it reads the resolved
+           --ac-motion off the scope, so the page toggle and the OS preference
+           are one source of truth for both languages. matchMedia alone would see
+           the system setting and miss the toggle.
+
+           SC 2.2.2 is a separate obligation and does not go away when motion is
+           on: anything auto-updating past five seconds needs a pause control,
+           for the reader who is simply trying to finish a sentence.
+           ==================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">3 &middot; Ticker driven by <code>setInterval</code></h4>
+
+        <div class="ac-motion-ticker" data-ac-motion-ticker
+             data-ac-motion-ticker-items="Order 462 shipped|Invoice 99 paid|Sam Rivera added a note|Export report finished">
+          <p class="ac-motion-ticker__now">
+            <span class="ac-motion-ticker__label">Latest activity</span>
+            <!-- Deliberately not aria-live. A feed that announces itself every
+                 few seconds makes the page unusable, and SC 4.1.3 is about
+                 status changes the user caused, not content that advances on its
+                 own. -->
+            <span class="ac-motion-ticker__item" data-ac-motion-ticker-item>Order 462 shipped</span>
           </p>
+
+          <!-- The label changes, and there is no aria-pressed. A toggle button
+               that both renames itself and reports a pressed state announces the
+               change twice, and the two can disagree. Pick one; the visible
+               words are the one a sighted user reads anyway. -->
+          <button class="ac-motion__btn" type="button" data-ac-motion-ticker-toggle>Pause</button>
+
+          <p class="ac-motion__note" data-ac-motion-ticker-note></p>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           EXAMPLE 4 · Distance gated and duration gated
+           CSS [GATE] + [CORE] + [REVEAL]. JS [CORE] + [REVEAL].
+
+           There are two knobs and they give different answers.
+
+           Gate the DISTANCE and the transition survives as a cross-fade. Right
+           for anything that tells the reader where something came from, because
+           a jump-cut loses them: the panel was not there, and now it is, and
+           nothing said so.
+
+           Gate the DURATION and the motion is gone outright. Right for
+           decoration — a looping shimmer has nothing to say and should simply
+           stop.
+
+           It is vestibular distress that reduced motion is mostly about: large
+           movement across the viewport, parallax, zoom. Opacity is not that. So
+           a fade is a legitimate answer to prefers-reduced-motion, and removing
+           every transition on the page is a heavier hand than the preference
+           asked for.
+
+           Flip example 2 and replay to see them diverge.
+           ==================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">4 &middot; Distance gated and duration gated</h4>
+
+        <div class="ac-motion-reveals" data-ac-motion-reveals>
+          <button class="ac-motion__btn" type="button" data-ac-motion-replay>Replay both</button>
+
+          <div class="ac-motion-pair">
+            <div class="ac-motion-panel">
+              <h5 class="ac-motion-panel__title">Distance gated</h5>
+              <p class="ac-motion-reveal ac-motion-reveal--distance" data-ac-motion-reveal>
+                Invoice 99 was sent to the billing contact.
+              </p>
+            </div>
+
+            <div class="ac-motion-panel">
+              <h5 class="ac-motion-panel__title">Duration gated</h5>
+              <p class="ac-motion-reveal ac-motion-reveal--duration" data-ac-motion-reveal>
+                Invoice 99 was sent to the billing contact.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ======================================================================
-       EXAMPLE 5 · Broken on purpose, live
-       CSS [GATE] + [CORE] + [BROKEN]. JS [CORE] + [BROKEN].
+  <div class="ac-demo-section ac-demo-section--mistakes">
+    <h3 class="ac-demo-section__title">Common mistakes</h3>
+    <p class="ac-demo-section__note">
+      One example, and it is the only mistake this component has. It is live: pressing the button
+      really does overrule your operating system.
+    </p>
 
-       One extra rule, placed after the media query:
+    <div class="ac-demo-grid">
+      <!-- ====================================================================
+           EXAMPLE 5 · A page rule that overrides the OS
+           CSS [GATE] + [CORE] + [BROKEN]. JS [CORE] + [BROKEN].
 
-           [data-motion="on"] { --ac-motion: 1; }
+           One extra rule, placed after the media query:
 
-       Same specificity as the rule in the media query, so source order decides,
-       and it comes later. A visitor who asked their operating system for reduced
-       motion now has it overruled by a page control — and the readout in example
-       2 says so out loud while it is happening.
+               [data-motion="on"] { --ac-motion: 1; }
 
-       This is why the toggle has no "on" to write. The bug is not the button; it
-       is having a third state at all.
+           Same specificity as the rule in the media query, so source order
+           decides, and it comes later. A visitor who asked their operating
+           system for reduced motion now has it overruled by a page control — and
+           the readout in example 2 says so out loud while it is happening.
 
-       The button below deliberately ignores your system setting. The chip it
-       starts is a slow opacity fade with no movement and no flashing, and
-       Restore puts it back.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">5 &middot; The override that beats the OS</h3>
+           This is why the toggle has no "on" to write. The bug is not the
+           button; it is having a third state at all.
 
-    <div class="ac-motion-override">
-      <p class="ac-motion-chip"><span class="ac-motion-chip__dot"></span> 462 unread</p>
+           The button below deliberately ignores your system setting. The chip it
+           starts is a slow opacity fade with no movement and no flashing, and
+           Restore puts it back.
+           ==================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">5 &middot; A page rule that overrides the OS</h4>
 
-      <div class="ac-motion-override__actions">
-        <button class="ac-motion__btn ac-motion__btn--warn" type="button" data-ac-motion-force>
-          Force animation on
-        </button>
-        <button class="ac-motion__btn" type="button" data-ac-motion-restore>Restore</button>
+        <div class="ac-motion-override">
+          <p class="ac-motion-chip"><span class="ac-motion-chip__dot"></span> 462 unread</p>
+
+          <div class="ac-motion-override__actions">
+            <button class="ac-motion__btn ac-motion__btn--warn" type="button" data-ac-motion-force>
+              Force animation on
+            </button>
+            <button class="ac-motion__btn" type="button" data-ac-motion-restore>Restore</button>
+          </div>
+
+          <p class="ac-motion__note">
+            Forcing it writes <code>data-motion="on"</code> on the scope. Nothing else
+            on the page changes, and every gated animation restarts &mdash; including
+            for a reader whose system asked for none.
+          </p>
+        </div>
       </div>
-
-      <p class="ac-motion__note">
-        Forcing it writes <code>data-motion="on"</code> on the scope. Nothing else
-        on the page changes, and every gated animation restarts &mdash; including
-        for a reader whose system asked for none.
-      </p>
     </div>
   </div>
 </div>

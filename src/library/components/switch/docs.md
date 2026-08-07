@@ -201,6 +201,6 @@ that is already mounted, and keep the `aria-disabled` click guard.
 alone — change one, change both.
 
 - [Checkbox](../checkbox/) — the same native input with the looser promise.
-- [Motion Preferences](../motion-preferences/) — the site header's **Reduce motion** control is
+- [Reduced Motion](../motion-preferences/) — the site header's **Reduce motion** control is
   example 4 in production: it cannot honestly be changed when the OS already asks for reduced motion,
   but the reason has to stay reachable.

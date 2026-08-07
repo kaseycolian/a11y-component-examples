@@ -98,7 +98,7 @@ will silently lose the styling everywhere else.
 `fx-pulse` loops forever, and anything that moves automatically for more than five seconds needs a
 mechanism to pause, stop or hide it. On this site that mechanism is **Reduce motion** in the header.
 The reasoning, the cascade and the reason a page toggle can only ever *add* the restriction are all
-on the [Motion Preferences](../motion-preferences/) page; this page only adds one finding.
+on the [Reduced Motion](../motion-preferences/) page; this page only adds one finding.
 
 **The two gate forms do not reach the same elements**, and `effects.css` ships both of them.
 

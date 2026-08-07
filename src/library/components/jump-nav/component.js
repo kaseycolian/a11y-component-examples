@@ -223,7 +223,7 @@
     }
 
     /** The resolved motion token, not matchMedia: the page's own toggle is
-        invisible to the media query. Motion Preferences has the argument. */
+        invisible to the media query. Reduced Motion has the argument. */
     function motionOn(el) {
       var style = getComputedStyle(el);
       var value = style.getPropertyValue('--ac-motion') || style.getPropertyValue('--motion');

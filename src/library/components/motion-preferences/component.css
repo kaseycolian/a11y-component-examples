@@ -1,5 +1,5 @@
 /* ===========================================================================
-   MOTION PREFERENCES
+   REDUCED MOTION
 
    WHAT TO COPY — sections are marked with the examples that need them.
    Everything here is real component code; the demo frame (ac-demo-*) lives in
@@ -24,8 +24,8 @@
    =========================================================================== */
 
 /* --- [GATE] the whole component, in three rules ---------------------------
-   Put .ac-motion-scope on <html> in your app. It is on the demo grid here only
-   so this page's toggle does not fight the site header's own.
+   Put .ac-motion-scope on <html> in your app. Here it wraps this page's two
+   example sections, so the toggle does not fight the site header's own.
 
    --ac-motion is a 1/0 multiplier, not a duration. Multiply durations by it to
    remove an animation, and distances by it to keep the fade and drop the
@@ -298,7 +298,7 @@
   padding: 0.5rem 0;
 }
 
-.ac-motion-record {
+.ac-motion-disc {
   display: grid;
   place-items: center;
   width: 7.5rem;
@@ -318,7 +318,7 @@
   animation: ac-motion-spin calc(var(--ac-motion, var(--motion, 1)) * 4s) linear infinite;
 }
 
-.ac-motion-record__label {
+.ac-motion-disc__label {
   display: grid;
   place-items: center;
   width: 3.2rem;
@@ -527,7 +527,7 @@
 }
 
 /* --- [FORCED] Windows High Contrast — always ship this --------------------
-   forced-colors drops color-mix, our accents and the record's gradient, which
+   forced-colors drops color-mix, our accents and the disc's gradient, which
    would leave the switch a blank pill and the disc a blank circle. Motion is
    untouched by forced colors — it is a separate preference and this component
    is the one place worth saying so. */
@@ -593,14 +593,14 @@
     color: CanvasText;
   }
 
-  /* The grooves are a gradient and vanish, so the disc needs an edge of its
-     own or it disappears into the page. */
-  .ac-motion-record {
+  /* The rings are a gradient and vanish, so the disc needs an edge of its own
+     or it disappears into the page. */
+  .ac-motion-disc {
     border-color: CanvasText;
     background: Canvas;
   }
 
-  .ac-motion-record__label {
+  .ac-motion-disc__label {
     forced-color-adjust: none;
     border: 1px solid CanvasText;
     background: Canvas;

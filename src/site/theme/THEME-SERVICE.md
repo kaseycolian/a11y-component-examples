@@ -85,8 +85,8 @@ a future update session does not "fix" their absence:
 Per `effects.css`, `--motion` resolves to `0` under `[data-motion="off"]` **or**
 `prefers-reduced-motion: reduce`, and the media query is last in the cascade. So the site's motion
 toggle can only *add* the restriction — it cannot re-enable animation for a visitor whose OS asks
-for reduced motion. That is correct behavior and is documented for visitors on the Motion
-Preferences page rather than worked around.
+for reduced motion. That is correct behavior and is documented for visitors on the Reduced Motion
+page rather than worked around.
 
 ## History
 

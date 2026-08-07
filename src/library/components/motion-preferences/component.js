@@ -1,5 +1,5 @@
 /* ===========================================================================
-   MOTION PREFERENCES
+   REDUCED MOTION
 
    WHAT TO COPY
      [CORE]       every example. The scope, the toggle, and the one function
