@@ -38,7 +38,7 @@ not exist, takes the links out of the tab order one by one, and leaves `aria-con
 nobody built — which is invisible on screen, and is what example 5 prints.
 
 `page` is for a link to the page you are already on. `location` is for a position within it, which is
-what an in-page anchor is. [Jump Nav](../jump-nav/) is that pattern in full.
+what an in-page anchor is. [In-Page Navigation](../jump-nav/) is that pattern in full.
 
 ## Keyboard
 
@@ -215,7 +215,7 @@ field, a playing video. Render them all and toggle `hidden`.
 
 ## Related
 
-- [Jump Nav](../jump-nav/) — the pattern for a row that moves you around a page rather than swapping a
+- [In-Page Navigation](../jump-nav/) — the pattern for a row that moves you around a page rather than swapping a
   panel.
 - [Filter Chip](../chip-toggle/) — the other side of the roving-tabindex trade, and where the
   generated-content finding comes from.

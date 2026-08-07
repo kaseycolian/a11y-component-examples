@@ -385,7 +385,7 @@
     },
     {
       "slug": "jump-nav",
-      "name": "Jump Nav",
+      "name": "In-Page Navigation",
       "group": "navigation",
       "useWhen": "In-page links to sections, where focus has to actually land on the target.",
       "tags": ["jump-nav", "in-page", "anchor", "aria-current", "scroll-margin", "intersection-observer", "landmark", "focus", "forced-colors"],
@@ -394,7 +394,7 @@
       "files": ["html", "css", "js"],
       "status": "stable",
       "hasContract": true,
-      "_summaryRev": "288e3b5c"
+      "_summaryRev": "12bfa7a5"
     },
     {
       "slug": "notice",

@@ -18,7 +18,7 @@ test('the nav is named, and it is a list of links', async ({ page }) => {
   const nav = page.getByRole('navigation', { name: 'On this page', exact: true });
   // Exactly one. Example 5's named case used to reuse this name, which made
   // two navigation landmarks called the same thing on a page whose fifth
-  // example is about that -- it is "Album sections" now.
+  // example is about that -- it is "Order sections" now.
   await expect(nav).toHaveCount(1);
 
   const list = nav.first().getByRole('list');
@@ -28,7 +28,7 @@ test('the nav is named, and it is a list of links', async ({ page }) => {
 });
 
 test('every target is focusable and out of the tab order', async ({ page }) => {
-  for (const id of ['jn1-salad', 'jn1-nausea', 'jn1-cannonball', 'jn1-freak']) {
+  for (const id of ['jn1-summary', 'jn1-items', 'jn1-shipping', 'jn1-payment']) {
     const target = page.locator(`#${id}`);
     await expect(target).toHaveAttribute('tabindex', '-1');
     await expect(target).toHaveClass(/ac-jump-nav__target/);
@@ -38,12 +38,12 @@ test('every target is focusable and out of the tab order', async ({ page }) => {
 test('exactly one link is current, and it is the section you are in', async ({ page }) => {
   const nav = page.locator('.ac-jump-nav[data-ac-jump-root="#jn1-doc"]');
   await expect(nav.locator('[aria-current]')).toHaveCount(1);
-  await expect(nav.locator('a[href="#jn1-salad"]')).toHaveAttribute('aria-current', 'location');
+  await expect(nav.locator('a[href="#jn1-summary"]')).toHaveAttribute('aria-current', 'location');
 
   // location, not page: page is a link *to* the page you are on.
   await page.locator('#jn1-doc').evaluate((el) => el.scrollTo(0, el.scrollHeight));
 
-  await expect(nav.locator('a[href="#jn1-freak"]')).toHaveAttribute('aria-current', 'location', {
+  await expect(nav.locator('a[href="#jn1-payment"]')).toHaveAttribute('aria-current', 'location', {
     timeout: 5000,
   });
   await expect(nav.locator('[aria-current]')).toHaveCount(1);
@@ -52,14 +52,14 @@ test('exactly one link is current, and it is the section you are in', async ({ p
 /* --- what the jump actually moves ----------------------------------------- */
 
 test('following a link focuses the heading it points at', async ({ page }) => {
-  await page.locator('a[href="#jn2b-longview"]').click();
-  await expect(page.locator('#jn2b-longview')).toBeFocused();
+  await page.locator('a[href="#jn2b-summary"]').click();
+  await expect(page.locator('#jn2b-summary')).toBeFocused();
 });
 
 test('without tabindex the jump throws focus back to the document', async ({ page }) => {
-  const link = page.locator('a[href="#jn2a-longview"]');
+  const link = page.locator('a[href="#jn2a-summary"]');
   await link.click();
-  await expect(page.locator('#jn2a-longview')).not.toBeFocused();
+  await expect(page.locator('#jn2a-summary')).not.toBeFocused();
   // Not left on the link either: an unfocusable fragment target sends the
   // browser to the document's viewport, so the next Tab starts at the top of
   // the page rather than at the section that was asked for.
@@ -69,21 +69,21 @@ test('without tabindex the jump throws focus back to the document', async ({ pag
 test('tabindex="0" lands the jump and buys a stop on every heading', async ({ page }) => {
   await page.locator('[data-ac-jn-land-case="zero"] .ac-jn-doc').focus();
   await page.keyboard.press('Tab');
-  await expect(page.locator('#jn2c-longview')).toBeFocused();
+  await expect(page.locator('#jn2c-summary')).toBeFocused();
 
   // The same walk through the case that gets it right reaches no heading.
   await page.locator('[data-ac-jn-land-case="minus"] .ac-jn-doc').focus();
   await page.keyboard.press('Tab');
-  await expect(page.locator('#jn2b-longview')).not.toBeFocused();
+  await expect(page.locator('#jn2b-summary')).not.toBeFocused();
 });
 
 test('the landing readout names what took focus', async ({ page }) => {
-  await page.locator('a[href="#jn2a-longview"]').click();
+  await page.locator('a[href="#jn2a-summary"]').click();
   const bad = page.locator('[data-ac-jn-out="land-none"]');
   await expect(bad).toHaveText(/^<body>/);
   await expect(bad).toHaveAttribute('data-ac-jn-bad', 'true');
 
-  await page.locator('a[href="#jn2b-longview"]').click();
+  await page.locator('a[href="#jn2b-summary"]').click();
   const good = page.locator('[data-ac-jn-out="land-minus"]');
   await expect(good).toHaveText(/\(heading\)/);
   await expect(good).not.toHaveAttribute('data-ac-jn-bad', 'true');
@@ -97,15 +97,15 @@ test('the target clears whatever is stuck to the top', async ({ page }) => {
   // component's own offset has to win -- a value near 156px here would mean it
   // did not, and every heading would land most of the way out of the box.
   const inBox = await page
-    .locator('#jn1-salad')
+    .locator('#jn1-summary')
     .evaluate((el) => getComputedStyle(el).scrollMarginTop);
   expect(cssNumber(inBox)).toBeLessThan(20);
 
   const clear = await page
-    .locator('#jn3b-nausea')
+    .locator('#jn3b-items')
     .evaluate((el) => getComputedStyle(el).scrollMarginTop);
   const under = await page
-    .locator('#jn3a-nausea')
+    .locator('#jn3a-items')
     .evaluate((el) => getComputedStyle(el).scrollMarginTop);
 
   expect(cssNumber(under)).toBe(0);
@@ -113,14 +113,14 @@ test('the target clears whatever is stuck to the top', async ({ page }) => {
 });
 
 test('the clearance readout measures the overlap both ways', async ({ page }) => {
-  await page.locator('a[href="#jn3a-nausea"]').click();
+  await page.locator('a[href="#jn3a-items"]').click();
   await expect(page.locator('[data-ac-jn-out="clear-under"]')).toHaveText(/obscured by \d+px/);
   await expect(page.locator('[data-ac-jn-out="clear-under"]')).toHaveAttribute(
     'data-ac-jn-bad',
     'true',
   );
 
-  await page.locator('a[href="#jn3b-nausea"]').click();
+  await page.locator('a[href="#jn3b-items"]').click();
   await expect(page.locator('[data-ac-jn-out="clear-clear"]')).toHaveText(/clear by \d+px/);
 });
 
@@ -160,7 +160,7 @@ test('two unnamed navs are one entry repeated', async ({ page }) => {
   await expect(unnamed).toHaveAttribute('data-ac-jn-bad', 'true');
 
   const named = page.locator('[data-ac-jn-out="mark-named"]');
-  await expect(named).toHaveText('Album sections · Site sections');
+  await expect(named).toHaveText('Order sections · Workspace sections');
   await expect(named).not.toHaveAttribute('data-ac-jn-bad', 'true');
 });
 
@@ -172,8 +172,8 @@ test('current is carried by more than the color', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
 
   const nav = page.locator('.ac-jump-nav[data-ac-jump-root="#jn1-doc"]');
-  const current = nav.locator('a[href="#jn1-salad"]');
-  const rest = nav.locator('a[href="#jn1-nausea"]');
+  const current = nav.locator('a[href="#jn1-summary"]');
+  const rest = nav.locator('a[href="#jn1-items"]');
 
   const edge = (loc) => loc.evaluate((el) => getComputedStyle(el).borderLeftColor);
   const fill = (loc) => loc.evaluate((el) => getComputedStyle(el).backgroundColor);
@@ -185,9 +185,9 @@ test('current is carried by more than the color', async ({ page }) => {
 });
 
 test('the target keeps a ring on a click-initiated focus', async ({ page }) => {
-  await page.locator('a[href="#jn1-nausea"]').click();
+  await page.locator('a[href="#jn1-items"]').click();
   const outline = await page
-    .locator('#jn1-nausea')
+    .locator('#jn1-items')
     .evaluate((el) => getComputedStyle(el).outlineWidth);
   // :focus-visible would not match a pointer-initiated move, and the site's own
   // `:focus:not(:focus-visible) { outline: none }` would cancel a single class.
@@ -235,8 +235,8 @@ test.describe('forced colors', () => {
 
   test('current is still distinguishable when the tint is dropped', async ({ page }) => {
     const nav = page.locator('.ac-jump-nav[data-ac-jump-root="#jn1-doc"]');
-    const current = nav.locator('a[href="#jn1-salad"]');
-    const rest = nav.locator('a[href="#jn1-nausea"]');
+    const current = nav.locator('a[href="#jn1-summary"]');
+    const rest = nav.locator('a[href="#jn1-items"]');
 
     const fill = (loc) => loc.evaluate((el) => getComputedStyle(el).backgroundColor);
     const ink = (loc) => loc.evaluate((el) => getComputedStyle(el).color);

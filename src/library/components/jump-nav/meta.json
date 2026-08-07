@@ -1,9 +1,9 @@
 {
   "slug": "jump-nav",
-  "name": "Jump Nav",
+  "name": "In-Page Navigation",
   "group": "navigation",
   "order": 20,
-  "summary": "A list of links into the page you are already on is the easiest navigation there is to build, and the one most likely to leave a keyboard reader exactly where they were. Whether following a link moves the keyboard at all comes down to one attribute on the thing it points at. Knowing which section you are in is the harder half.",
+  "summary": "In-page navigation is a list of links to sections of the page you are already on. Use it when a long document needs a way in other than scrolling. Following a link moves the keyboard only if the target can take focus, so one attribute on the heading decides whether the jump landed.",
   "tags": [
     "jump-nav",
     "in-page",
@@ -19,7 +19,7 @@
   "wcag": ["1.3.1", "1.4.1", "2.4.1", "2.4.3", "2.4.7", "2.4.11", "2.5.8", "4.1.2"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Examples 2 to 5 are live. Example 2 presses the same link into three documents one attribute apart and prints what took focus; example 3 measures the overlap between the heading and the bar stuck above it; example 4 counts scroll events against section changes on one document; example 5 prints the landmark menu two navs produce with and without names.",
+  "demoNote": "Everything under Common mistakes is live. Press a link in example 2 and the readout prints what the browser actually gave focus to; every number on this page is measured rather than claimed.",
   "contract": {
     "useWhen": "In-page links to sections, where focus has to actually land on the target.",
     "root": [".ac-jump-nav"],
@@ -37,7 +37,11 @@
     "keyboard": [
       [
         "Tab",
-        "after the jump the next stop is inside the target — if it took focus"
+        "native: after the jump the next stop is inside the target — if it took focus"
+      ],
+      [
+        "Enter",
+        "native: follows the focused link, which is the jump"
       ]
     ],
     "states": [

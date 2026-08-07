@@ -295,7 +295,7 @@
 
    Written at (0,2,0) so it beats .ac-prose's own overflow rather than depending
    on which of two single-class rules was declared last -- Icon Button found that
-   one and Jump Nav found it again. */
+   one and In-Page Navigation found it again. */
 .ac-prose.ac-ps-clip {
   max-height: 9rem;
   overflow: hidden;

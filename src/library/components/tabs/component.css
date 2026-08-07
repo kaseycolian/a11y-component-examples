@@ -9,7 +9,7 @@
      [BROKEN]  example 3. Delete it. It fades panels out with opacity so the
                readout has something to catch.
      [NAV]     example 5. A row of links, which is the thing tabs are not.
-               Delete it; Jump Nav owns that pattern.
+               Delete it; In-Page Navigation owns that pattern.
      [PANEL]   the frame around each example on this page. Delete it.
      [FORCED]  always ship this. Selected is drawn with a tint and a bar, and
                forced colors drops both.

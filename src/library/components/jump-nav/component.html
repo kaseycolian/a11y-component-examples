@@ -1,12 +1,12 @@
 <!-- ===========================================================================
-     JUMP NAV — a list of links into the page you are already on, and the two
-     things that decide whether following one actually took you anywhere
+     IN-PAGE NAVIGATION — a list of links into the page you are already on, and
+     the two things that decide whether following one actually took you anywhere
 
      WHAT TO COPY
        Example 1 is the component. Examples 2 to 5 are the four ways an
        on-this-page nav goes wrong, live. Each names the CSS and JS it needs.
 
-     THE CONTRACT
+     REQUIRED MARKUP
        <nav aria-label>   a name, because a page has more than one nav and the
                           landmark list shows the name or nothing.
        <ul> <li> <a>      a real list, so the number of sections is announced.
@@ -20,408 +20,438 @@
      versus location distinction; example 5 there has both live. This page owns
      the scroll half: which section is current, and how that is worked out.
 
-     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
-     Neither is anything named ac-jn-*.
+     There is one correct example, so its section heading is singular. The four
+     under Common mistakes each measure the failure rather than describing it.
+
+     The section headings inside each demo document are <h5>, because this page
+     runs h1, h2, h3, h4 above them. The level is a property of the page the nav
+     lands in — pick yours from your own outline.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the two section
+     headings, the grid, and the per-example headings. Never copy it, and never
+     copy anything named ac-jn-*.
      =========================================================================== -->
 
-<div class="ac-demo-grid" data-ac-jump-page>
-  <!-- ======================================================================
-       EXAMPLE 1 · The specimen
-       CSS [NAV] + [TARGET] + [PANEL]. JS [CORE].
-
-       A nav over a scrolling document. Scroll it and the current link marks
-       itself; follow a link and focus lands on the heading.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">1 &middot; The specimen</h3>
-
-    <!-- The name is "On this page", not "On this page navigation": a screen
-         reader appends the role already. -->
-    <nav class="ac-jump-nav" aria-label="On this page"
-         data-ac-jump-nav data-ac-jump-root="#jn1-doc">
-      <!-- A real list. Arriving reads "list, 4 items", which is the size of
-           the page before you have read any of it. A bare row of <a> says
-           nothing about how many there are. -->
-      <ul class="ac-jump-nav__list">
-        <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn1-salad">Salad Days</a></li>
-        <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn1-nausea">Nausea</a></li>
-        <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn1-cannonball">Cannonball</a></li>
-        <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn1-freak">Freak Scene</a></li>
-      </ul>
-    </nav>
-
-    <!-- The scrolling box is this page's stand-in for your page. It is a
-         scroll container, so it needs tabindex="0", role="region" and a name
-         of its own or it is a tab stop with neither — Background Effects has
-         that finding. Your page needs none of this. -->
-    <div class="ac-jn-doc" id="jn1-doc" tabindex="0" role="region" aria-label="Tour notes">
-      <section class="ac-jn-sec">
-        <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn1-salad" tabindex="-1">Salad Days</h4>
-        <p>Two nights at the old ice rink. 462 through the door on the second one.</p>
-      </section>
-      <section class="ac-jn-sec">
-        <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn1-nausea" tabindex="-1">Nausea</h4>
-        <p>The van made it as far as the coast road and no further.</p>
-      </section>
-      <section class="ac-jn-sec">
-        <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn1-cannonball" tabindex="-1">Cannonball</h4>
-        <p>Merch table ran out of the ruby pressing by nine. 99 of them.</p>
-      </section>
-      <section class="ac-jn-sec">
-        <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn1-freak" tabindex="-1">Freak Scene</h4>
-        <p>Load-out through the kitchen, same as every year.</p>
-      </section>
-    </div>
-
-    <p class="ac-jn__note">
-      The current link is marked from an <code>IntersectionObserver</code>, and nothing announces the
-      change &mdash; it is a consequence of scrolling, not news.
+<div data-ac-jump-page>
+  <div class="ac-demo-section">
+    <h3 class="ac-demo-section__title">Correct example</h3>
+    <p class="ac-demo-section__note">
+      This is the markup to copy. A named <code>&lt;nav&gt;</code>, a real list, and a heading that can
+      take focus &mdash; the last of which is what makes following a link move the keyboard.
     </p>
-  </div>
 
-  <!-- ======================================================================
-       EXAMPLE 2 · Did the jump land?
-       CSS [NAV] + [TARGET] + [BROKEN] + [PANEL]. JS [FOCUS] + [LANDING].
+    <div class="ac-demo-grid">
+      <!-- ======================================================================
+           EXAMPLE 1 · A nav over a scrolling document
+           CSS [NAV] + [TARGET] + [PANEL]. JS [CORE].
 
-       Three documents, one attribute apart on their headings. Press a link
-       and the readout prints what the browser gave focus to.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">2 &middot; Did the jump land?</h3>
+           A nav over a scrolling document. Scroll it and the current link marks
+           itself; follow a link and focus lands on the heading.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">1 &middot; A nav over a scrolling document</h4>
 
-    <div class="ac-jn-panel" data-ac-jn-landing>
-      <div class="ac-jn-cases">
-        <!-- BROKEN ON PURPOSE — no tabindex, so the heading cannot take focus.
-             The browser does not leave focus on the link either: it focuses
-             the document's viewport, and the next Tab starts from the top. -->
-        <div class="ac-jn-case" data-ac-jn-land-case="none">
-          <p class="ac-jn-case__label">no <code>tabindex</code> &mdash; broken on purpose</p>
-          <nav class="ac-jump-nav" aria-label="Sections, no tabindex">
-            <ul class="ac-jump-nav__list">
-              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn2a-longview">Longview</a></li>
-              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn2a-pepper">Pepper</a></li>
-            </ul>
-          </nav>
-          <div class="ac-jn-doc ac-jn-doc--short" tabindex="0" role="region" aria-label="Sections, no tabindex">
-            <section class="ac-jn-sec">
-              <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn2a-longview">Longview</h4>
-              <p>Ninety minutes of soundcheck for a twenty minute set.</p>
-            </section>
-            <section class="ac-jn-sec">
-              <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn2a-pepper">Pepper</h4>
-              <p>Second on, before the room filled up.</p>
-            </section>
-          </div>
-          <dl class="ac-jn-readout">
-            <div class="ac-jn-readout__row">
-              <dt>focus landed on</dt>
-              <dd><code data-ac-jn-out="land-none">press a link</code></dd>
-            </div>
-            <div class="ac-jn-readout__row">
-              <dt>tab stops in the document</dt>
-              <dd><code data-ac-jn-out="stops-none">&mdash;</code></dd>
-            </div>
-          </dl>
+        <!-- The name is "On this page", not "On this page navigation": a screen
+             reader appends the role already. -->
+        <nav class="ac-jump-nav" aria-label="On this page"
+             data-ac-jump-nav data-ac-jump-root="#jn1-doc">
+          <!-- A real list. Arriving reads "list, 4 items", which is the size of
+               the page before you have read any of it. A bare row of <a> says
+               nothing about how many there are. -->
+          <ul class="ac-jump-nav__list">
+            <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn1-summary">Summary</a></li>
+            <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn1-items">Items</a></li>
+            <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn1-shipping">Shipping</a></li>
+            <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn1-payment">Payment</a></li>
+          </ul>
+        </nav>
+
+        <!-- The scrolling box is this page's stand-in for your page. It is a
+             scroll container, so it needs tabindex="0", role="region" and a name
+             of its own or it is a tab stop with neither — Background Effects has
+             that finding. Your page needs none of this. -->
+        <div class="ac-jn-doc" id="jn1-doc" tabindex="0" role="region" aria-label="Order 462">
+          <section class="ac-jn-sec">
+            <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn1-summary" tabindex="-1">Summary</h5>
+            <p>Placed 7 March by Jordan Lee. Four items, total $248.00.</p>
+          </section>
+          <section class="ac-jn-sec">
+            <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn1-items" tabindex="-1">Items</h5>
+            <p>Two desks, a chair and a lamp. One is on back order until April.</p>
+          </section>
+          <section class="ac-jn-sec">
+            <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn1-shipping" tabindex="-1">Shipping</h5>
+            <p>Shipped 12 March to Manchester. Tracking was emailed the same day.</p>
+          </section>
+          <section class="ac-jn-sec">
+            <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn1-payment" tabindex="-1">Payment</h5>
+            <p>Paid by card ending 4462. Invoice 99 was issued on the 11th.</p>
+          </section>
         </div>
 
-        <div class="ac-jn-case" data-ac-jn-land-case="minus">
-          <p class="ac-jn-case__label"><code>tabindex="-1"</code></p>
-          <nav class="ac-jump-nav" aria-label="Sections, focusable headings">
-            <ul class="ac-jump-nav__list">
-              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn2b-longview">Longview</a></li>
-              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn2b-pepper">Pepper</a></li>
-            </ul>
-          </nav>
-          <div class="ac-jn-doc ac-jn-doc--short" tabindex="0" role="region" aria-label="Sections, focusable headings">
-            <section class="ac-jn-sec">
-              <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn2b-longview" tabindex="-1">Longview</h4>
-              <p>Ninety minutes of soundcheck for a twenty minute set.</p>
-            </section>
-            <section class="ac-jn-sec">
-              <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn2b-pepper" tabindex="-1">Pepper</h4>
-              <p>Second on, before the room filled up.</p>
-            </section>
-          </div>
-          <dl class="ac-jn-readout">
-            <div class="ac-jn-readout__row">
-              <dt>focus landed on</dt>
-              <dd><code data-ac-jn-out="land-minus">press a link</code></dd>
-            </div>
-            <div class="ac-jn-readout__row">
-              <dt>tab stops in the document</dt>
-              <dd><code data-ac-jn-out="stops-minus">&mdash;</code></dd>
-            </div>
-          </dl>
-        </div>
-
-        <!-- BROKEN ON PURPOSE — tabindex="0" lands the jump and buys a Tab
-             stop on every heading in the document. -->
-        <div class="ac-jn-case" data-ac-jn-land-case="zero">
-          <p class="ac-jn-case__label"><code>tabindex="0"</code> &mdash; broken on purpose</p>
-          <nav class="ac-jump-nav" aria-label="Sections, headings in the tab order">
-            <ul class="ac-jump-nav__list">
-              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn2c-longview">Longview</a></li>
-              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn2c-pepper">Pepper</a></li>
-            </ul>
-          </nav>
-          <div class="ac-jn-doc ac-jn-doc--short" tabindex="0" role="region" aria-label="Sections, headings in the tab order">
-            <section class="ac-jn-sec">
-              <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn2c-longview" tabindex="0">Longview</h4>
-              <p>Ninety minutes of soundcheck for a twenty minute set.</p>
-            </section>
-            <section class="ac-jn-sec">
-              <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn2c-pepper" tabindex="0">Pepper</h4>
-              <p>Second on, before the room filled up.</p>
-            </section>
-          </div>
-          <dl class="ac-jn-readout">
-            <div class="ac-jn-readout__row">
-              <dt>focus landed on</dt>
-              <dd><code data-ac-jn-out="land-zero">press a link</code></dd>
-            </div>
-            <div class="ac-jn-readout__row">
-              <dt>tab stops in the document</dt>
-              <dd><code data-ac-jn-out="stops-zero">&mdash;</code></dd>
-            </div>
-          </dl>
-        </div>
+        <p class="ac-jn__note">
+          The current link is marked from an <code>IntersectionObserver</code>, and nothing announces the
+          change &mdash; it is a consequence of scrolling, not news.
+        </p>
       </div>
 
-      <p class="ac-jn__note">
-        The stop count is asked of the browser, not matched from a selector: each candidate is
-        focused and <code>document.activeElement</code> read back.
-      </p>
-      <p class="ac-jn__note">
-        An unfocusable target does not leave focus on the link. It goes to the document, and the
-        next <kbd>Tab</kbd> starts at the top of the page.
-      </p>
     </div>
   </div>
 
-  <!-- ======================================================================
-       EXAMPLE 3 · Under the sticky bar
-       CSS [NAV] + [TARGET] + [BROKEN] + [PANEL]. JS [CLEARANCE].
+  <div class="ac-demo-section ac-demo-section--mistakes">
+    <h3 class="ac-demo-section__title">Common mistakes</h3>
+    <p class="ac-demo-section__note">
+      These four are live and wrong on purpose, and each one is measured rather than described:
+      the readouts ask the browser what took focus, how far the heading is from the bar, and how
+      often the current section actually changed.
+    </p>
 
-       SC 2.4.11. Two identical documents with a bar stuck to the top of each,
-       one clearing it and one not. The readout measures the overlap.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">3 &middot; Under the sticky bar</h3>
+    <div class="ac-demo-grid">
+      <!-- ======================================================================
+           EXAMPLE 2 · The same link into three documents
+           CSS [NAV] + [TARGET] + [BROKEN] + [PANEL]. JS [FOCUS] + [LANDING].
 
-    <div class="ac-jn-panel" data-ac-jn-clearance>
-      <div class="ac-jn-cases">
-        <!-- BROKEN ON PURPOSE — scroll-margin-top: 0 puts the heading exactly
-             at the top of the scrollport, which is where the bar is. -->
-        <div class="ac-jn-case" data-ac-jn-clear-case="under">
-          <p class="ac-jn-case__label">no clearance &mdash; broken on purpose</p>
-          <nav class="ac-jump-nav" aria-label="Sections, no clearance">
+           Three documents, one attribute apart on their headings. Press a link
+           and the readout prints what the browser gave focus to.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">2 &middot; The same link into three documents</h4>
+
+        <div class="ac-jn-panel" data-ac-jn-landing>
+          <div class="ac-jn-cases">
+            <!-- BROKEN ON PURPOSE — no tabindex, so the heading cannot take focus.
+                 The browser does not leave focus on the link either: it focuses
+                 the document's viewport, and the next Tab starts from the top. -->
+            <div class="ac-jn-case" data-ac-jn-land-case="none">
+              <p class="ac-jn-case__label">no <code>tabindex</code> &mdash; broken on purpose</p>
+              <nav class="ac-jump-nav" aria-label="Sections, no tabindex">
+                <ul class="ac-jump-nav__list">
+                  <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn2a-summary">Summary</a></li>
+                  <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn2a-items">Items</a></li>
+                </ul>
+              </nav>
+              <div class="ac-jn-doc ac-jn-doc--short" tabindex="0" role="region" aria-label="Sections, no tabindex">
+                <section class="ac-jn-sec">
+                  <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn2a-summary">Summary</h5>
+                  <p>Placed 7 March by Jordan Lee.</p>
+                </section>
+                <section class="ac-jn-sec">
+                  <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn2a-items">Items</h5>
+                  <p>Four items, one on back order.</p>
+                </section>
+              </div>
+              <dl class="ac-jn-readout">
+                <div class="ac-jn-readout__row">
+                  <dt>focus landed on</dt>
+                  <dd><code data-ac-jn-out="land-none">press a link</code></dd>
+                </div>
+                <div class="ac-jn-readout__row">
+                  <dt>tab stops in the document</dt>
+                  <dd><code data-ac-jn-out="stops-none">&mdash;</code></dd>
+                </div>
+              </dl>
+            </div>
+
+            <div class="ac-jn-case" data-ac-jn-land-case="minus">
+              <p class="ac-jn-case__label"><code>tabindex="-1"</code></p>
+              <nav class="ac-jump-nav" aria-label="Sections, focusable headings">
+                <ul class="ac-jump-nav__list">
+                  <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn2b-summary">Summary</a></li>
+                  <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn2b-items">Items</a></li>
+                </ul>
+              </nav>
+              <div class="ac-jn-doc ac-jn-doc--short" tabindex="0" role="region" aria-label="Sections, focusable headings">
+                <section class="ac-jn-sec">
+                  <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn2b-summary" tabindex="-1">Summary</h5>
+                  <p>Placed 7 March by Jordan Lee.</p>
+                </section>
+                <section class="ac-jn-sec">
+                  <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn2b-items" tabindex="-1">Items</h5>
+                  <p>Four items, one on back order.</p>
+                </section>
+              </div>
+              <dl class="ac-jn-readout">
+                <div class="ac-jn-readout__row">
+                  <dt>focus landed on</dt>
+                  <dd><code data-ac-jn-out="land-minus">press a link</code></dd>
+                </div>
+                <div class="ac-jn-readout__row">
+                  <dt>tab stops in the document</dt>
+                  <dd><code data-ac-jn-out="stops-minus">&mdash;</code></dd>
+                </div>
+              </dl>
+            </div>
+
+            <!-- BROKEN ON PURPOSE — tabindex="0" lands the jump and buys a Tab
+                 stop on every heading in the document. -->
+            <div class="ac-jn-case" data-ac-jn-land-case="zero">
+              <p class="ac-jn-case__label"><code>tabindex="0"</code> &mdash; broken on purpose</p>
+              <nav class="ac-jump-nav" aria-label="Sections, headings in the tab order">
+                <ul class="ac-jump-nav__list">
+                  <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn2c-summary">Summary</a></li>
+                  <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn2c-items">Items</a></li>
+                </ul>
+              </nav>
+              <div class="ac-jn-doc ac-jn-doc--short" tabindex="0" role="region" aria-label="Sections, headings in the tab order">
+                <section class="ac-jn-sec">
+                  <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn2c-summary" tabindex="0">Summary</h5>
+                  <p>Placed 7 March by Jordan Lee.</p>
+                </section>
+                <section class="ac-jn-sec">
+                  <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn2c-items" tabindex="0">Items</h5>
+                  <p>Four items, one on back order.</p>
+                </section>
+              </div>
+              <dl class="ac-jn-readout">
+                <div class="ac-jn-readout__row">
+                  <dt>focus landed on</dt>
+                  <dd><code data-ac-jn-out="land-zero">press a link</code></dd>
+                </div>
+                <div class="ac-jn-readout__row">
+                  <dt>tab stops in the document</dt>
+                  <dd><code data-ac-jn-out="stops-zero">&mdash;</code></dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+
+          <p class="ac-jn__note">
+            The stop count is asked of the browser, not matched from a selector: each candidate is
+            focused and <code>document.activeElement</code> read back.
+          </p>
+          <p class="ac-jn__note">
+            An unfocusable target does not leave focus on the link. It goes to the document, and the
+            next <kbd>Tab</kbd> starts at the top of the page.
+          </p>
+        </div>
+      </div>
+
+      <!-- ======================================================================
+           EXAMPLE 3 · Under the sticky bar
+           CSS [NAV] + [TARGET] + [BROKEN] + [PANEL]. JS [CLEARANCE].
+
+           SC 2.4.11. Two identical documents with a bar stuck to the top of each,
+           one clearing it and one not. The readout measures the overlap.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">3 &middot; Under the sticky bar</h4>
+
+        <div class="ac-jn-panel" data-ac-jn-clearance>
+          <div class="ac-jn-cases">
+            <!-- BROKEN ON PURPOSE — scroll-margin-top: 0 puts the heading exactly
+                 at the top of the scrollport, which is where the bar is. -->
+            <div class="ac-jn-case" data-ac-jn-clear-case="under">
+              <p class="ac-jn-case__label">no clearance &mdash; broken on purpose</p>
+              <nav class="ac-jump-nav" aria-label="Sections, no clearance">
+                <ul class="ac-jump-nav__list">
+                  <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn3a-items">Items</a></li>
+                  <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn3a-shipping">Shipping</a></li>
+                </ul>
+              </nav>
+              <div class="ac-jn-doc ac-jn-doc--sticky ac-jn-doc--under" tabindex="0" role="region"
+                   aria-label="Sections, no clearance">
+                <p class="ac-jn-doc__bar" data-ac-jn-bar>Order 462</p>
+                <section class="ac-jn-sec">
+                  <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn3a-summary" tabindex="-1">Summary</h5>
+                  <p>Placed 7 March by Jordan Lee.</p>
+                </section>
+                <section class="ac-jn-sec">
+                  <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn3a-items" tabindex="-1">Items</h5>
+                  <p>Shipped 12 March to Manchester.</p>
+                </section>
+                <section class="ac-jn-sec">
+                  <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn3a-shipping" tabindex="-1">Shipping</h5>
+                  <p>Paid by card ending 4462.</p>
+                </section>
+              </div>
+              <dl class="ac-jn-readout">
+                <div class="ac-jn-readout__row">
+                  <dt>after the jump</dt>
+                  <dd><code data-ac-jn-out="clear-under">press a link</code></dd>
+                </div>
+              </dl>
+            </div>
+
+            <div class="ac-jn-case" data-ac-jn-clear-case="clear">
+              <p class="ac-jn-case__label"><code>--ac-jump-offset</code> set to the bar's height</p>
+              <nav class="ac-jump-nav" aria-label="Sections, clearing the bar">
+                <ul class="ac-jump-nav__list">
+                  <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn3b-items">Items</a></li>
+                  <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn3b-shipping">Shipping</a></li>
+                </ul>
+              </nav>
+              <div class="ac-jn-doc ac-jn-doc--sticky" tabindex="0" role="region"
+                   aria-label="Sections, clearing the bar">
+                <p class="ac-jn-doc__bar" data-ac-jn-bar>Order 462</p>
+                <section class="ac-jn-sec">
+                  <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn3b-summary" tabindex="-1">Summary</h5>
+                  <p>Placed 7 March by Jordan Lee.</p>
+                </section>
+                <section class="ac-jn-sec">
+                  <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn3b-items" tabindex="-1">Items</h5>
+                  <p>Shipped 12 March to Manchester.</p>
+                </section>
+                <section class="ac-jn-sec">
+                  <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn3b-shipping" tabindex="-1">Shipping</h5>
+                  <p>Paid by card ending 4462.</p>
+                </section>
+              </div>
+              <dl class="ac-jn-readout">
+                <div class="ac-jn-readout__row">
+                  <dt>after the jump</dt>
+                  <dd><code data-ac-jn-out="clear-clear">press a link</code></dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+
+          <p class="ac-jn__note">
+            The bar here stands in for your page header. Measure it rather than guessing &mdash; the
+            site's own <code>--header-h</code> has three values and two of them are wraps.
+          </p>
+        </div>
+      </div>
+
+      <!-- ======================================================================
+           EXAMPLE 4 · Scroll events against section changes
+           CSS [NAV] + [TARGET] + [PANEL]. JS [COST].
+
+           One document with both instruments on it. Scroll it to the end and
+           compare how often each one would have had something to do.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">4 &middot; Scroll events against section changes</h4>
+
+        <div class="ac-jn-panel" data-ac-jn-cost>
+          <nav class="ac-jump-nav" aria-label="On this page, instrumented"
+               data-ac-jump-nav data-ac-jump-root="#jn4-doc">
             <ul class="ac-jump-nav__list">
-              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn3a-nausea">Nausea</a></li>
-              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn3a-cannonball">Cannonball</a></li>
+              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn4-summary">Summary</a></li>
+              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn4-items">Items</a></li>
+              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn4-shipping">Shipping</a></li>
+              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn4-payment">Payment</a></li>
             </ul>
           </nav>
-          <div class="ac-jn-doc ac-jn-doc--sticky ac-jn-doc--under" tabindex="0" role="region"
-               aria-label="Sections, no clearance">
-            <p class="ac-jn-doc__bar" data-ac-jn-bar>Tour notes</p>
+
+          <div class="ac-jn-doc" id="jn4-doc" tabindex="0" role="region" aria-label="Order 462, instrumented">
             <section class="ac-jn-sec">
-              <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn3a-salad" tabindex="-1">Salad Days</h4>
-              <p>Two nights at the old ice rink.</p>
+              <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn4-summary" tabindex="-1">Summary</h5>
+              <p>Placed 7 March by Jordan Lee. Four items, total $248.00.</p>
             </section>
             <section class="ac-jn-sec">
-              <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn3a-nausea" tabindex="-1">Nausea</h4>
-              <p>The van made it as far as the coast road.</p>
+              <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn4-items" tabindex="-1">Items</h5>
+              <p>Two desks, a chair and a lamp. One is on back order until April.</p>
             </section>
             <section class="ac-jn-sec">
-              <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn3a-cannonball" tabindex="-1">Cannonball</h4>
-              <p>Ruby pressing gone by nine. 99 of them.</p>
+              <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn4-shipping" tabindex="-1">Shipping</h5>
+              <p>Shipped 12 March to Manchester. Tracking was emailed the same day.</p>
+            </section>
+            <section class="ac-jn-sec">
+              <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn4-payment" tabindex="-1">Payment</h5>
+              <p>Paid by card ending 4462. Invoice 99 was issued on the 11th.</p>
             </section>
           </div>
+
+          <div class="ac-jn-controls">
+            <button class="ac-jn-btn" type="button" data-ac-jn-cost-run>Scroll to the end</button>
+            <button class="ac-jn-btn" type="button" data-ac-jn-cost-reset>Reset</button>
+          </div>
+
           <dl class="ac-jn-readout">
             <div class="ac-jn-readout__row">
-              <dt>after the jump</dt>
-              <dd><code data-ac-jn-out="clear-under">press a link</code></dd>
+              <dt>scroll events</dt>
+              <dd><code data-ac-jn-out="cost-scroll">0</code></dd>
+            </div>
+            <div class="ac-jn-readout__row">
+              <dt>current section changed</dt>
+              <dd><code data-ac-jn-out="cost-change">0</code></dd>
+            </div>
+            <div class="ac-jn-readout__row">
+              <dt>a live region on the nav would have said</dt>
+              <dd><code data-ac-jn-out="cost-verdict">&mdash;</code></dd>
             </div>
           </dl>
         </div>
+      </div>
 
-        <div class="ac-jn-case" data-ac-jn-clear-case="clear">
-          <p class="ac-jn-case__label"><code>--ac-jump-offset</code> set to the bar's height</p>
-          <nav class="ac-jump-nav" aria-label="Sections, clearing the bar">
-            <ul class="ac-jump-nav__list">
-              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn3b-nausea">Nausea</a></li>
-              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn3b-cannonball">Cannonball</a></li>
-            </ul>
-          </nav>
-          <div class="ac-jn-doc ac-jn-doc--sticky" tabindex="0" role="region"
-               aria-label="Sections, clearing the bar">
-            <p class="ac-jn-doc__bar" data-ac-jn-bar>Tour notes</p>
+      <!-- ======================================================================
+           EXAMPLE 5 · Two navs with no aria-label
+           CSS [NAV] + [TARGET] + [PANEL]. JS [LANDMARKS].
+
+           Nothing here is measured. The failure is a missing attribute, and there
+           is nothing on screen to see it with.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">5 &middot; Two navs with no <code>aria-label</code></h4>
+
+        <div class="ac-jn-panel" data-ac-jn-landmarks>
+          <div class="ac-jn-cases">
+            <!-- BROKEN ON PURPOSE — two navigation landmarks, no way to tell them
+                 apart in a landmark menu. -->
+            <div class="ac-jn-case" data-ac-jn-mark-case="unnamed" data-ac-demo-broken="landmark-unique">
+              <p class="ac-jn-case__label">no <code>aria-label</code> &mdash; broken on purpose</p>
+              <nav class="ac-jump-nav">
+                <ul class="ac-jump-nav__list">
+                  <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn5-summary">Summary</a></li>
+                  <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn5-items">Items</a></li>
+                </ul>
+              </nav>
+              <nav class="ac-jump-nav">
+                <ul class="ac-jump-nav__list">
+                  <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn5-summary">Orders</a></li>
+                  <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn5-items">Invoices</a></li>
+                </ul>
+              </nav>
+            </div>
+
+            <div class="ac-jn-case" data-ac-jn-mark-case="named">
+              <p class="ac-jn-case__label">named</p>
+              <!-- Not "On this page": example 1 already uses that name, and two
+                   navigation landmarks with the same name on one page are the very
+                   thing the unnamed pair beside this one is about. -->
+              <nav class="ac-jump-nav" aria-label="Order sections">
+                <ul class="ac-jump-nav__list">
+                  <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn5-summary">Summary</a></li>
+                  <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn5-items">Items</a></li>
+                </ul>
+              </nav>
+              <nav class="ac-jump-nav" aria-label="Workspace sections">
+                <ul class="ac-jump-nav__list">
+                  <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn5-summary">Orders</a></li>
+                  <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn5-items">Invoices</a></li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+
+          <div class="ac-jn-doc ac-jn-doc--short" tabindex="0" role="region" aria-label="Shared sections">
             <section class="ac-jn-sec">
-              <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn3b-salad" tabindex="-1">Salad Days</h4>
-              <p>Two nights at the old ice rink.</p>
+              <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn5-summary" tabindex="-1">Summary</h5>
+              <p>Both navs above point here.</p>
             </section>
             <section class="ac-jn-sec">
-              <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn3b-nausea" tabindex="-1">Nausea</h4>
-              <p>The van made it as far as the coast road.</p>
-            </section>
-            <section class="ac-jn-sec">
-              <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn3b-cannonball" tabindex="-1">Cannonball</h4>
-              <p>Ruby pressing gone by nine. 99 of them.</p>
+              <h5 class="ac-jump-nav__target ac-jn-sec__title" id="jn5-items" tabindex="-1">Items</h5>
+              <p>And both point here.</p>
             </section>
           </div>
+
           <dl class="ac-jn-readout">
             <div class="ac-jn-readout__row">
-              <dt>after the jump</dt>
-              <dd><code data-ac-jn-out="clear-clear">press a link</code></dd>
+              <dt>landmark menu, unnamed</dt>
+              <dd><code data-ac-jn-out="mark-unnamed">&mdash;</code></dd>
+            </div>
+            <div class="ac-jn-readout__row">
+              <dt>landmark menu, named</dt>
+              <dd><code data-ac-jn-out="mark-named">&mdash;</code></dd>
             </div>
           </dl>
+
+          <p class="ac-jn__note">
+            The name leaves out the word &ldquo;navigation&rdquo;. A screen reader appends the role, so
+            &ldquo;On this page navigation&rdquo; is read twice over.
+          </p>
         </div>
       </div>
-
-      <p class="ac-jn__note">
-        The bar here stands in for your page header. Measure it rather than guessing &mdash; the
-        site's own <code>--header-h</code> has three values and two of them are wraps.
-      </p>
-    </div>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 4 · What watching the scroll costs
-       CSS [NAV] + [TARGET] + [PANEL]. JS [COST].
-
-       One document with both instruments on it. Scroll it to the end and
-       compare how often each one would have had something to do.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">4 &middot; What watching the scroll costs</h3>
-
-    <div class="ac-jn-panel" data-ac-jn-cost>
-      <nav class="ac-jump-nav" aria-label="On this page, instrumented"
-           data-ac-jump-nav data-ac-jump-root="#jn4-doc">
-        <ul class="ac-jump-nav__list">
-          <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn4-salad">Salad Days</a></li>
-          <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn4-nausea">Nausea</a></li>
-          <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn4-cannonball">Cannonball</a></li>
-          <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn4-freak">Freak Scene</a></li>
-        </ul>
-      </nav>
-
-      <div class="ac-jn-doc" id="jn4-doc" tabindex="0" role="region" aria-label="Tour notes, instrumented">
-        <section class="ac-jn-sec">
-          <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn4-salad" tabindex="-1">Salad Days</h4>
-          <p>Two nights at the old ice rink. 462 through the door on the second one.</p>
-        </section>
-        <section class="ac-jn-sec">
-          <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn4-nausea" tabindex="-1">Nausea</h4>
-          <p>The van made it as far as the coast road and no further.</p>
-        </section>
-        <section class="ac-jn-sec">
-          <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn4-cannonball" tabindex="-1">Cannonball</h4>
-          <p>Merch table ran out of the ruby pressing by nine. 99 of them.</p>
-        </section>
-        <section class="ac-jn-sec">
-          <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn4-freak" tabindex="-1">Freak Scene</h4>
-          <p>Load-out through the kitchen, same as every year.</p>
-        </section>
-      </div>
-
-      <div class="ac-jn-controls">
-        <button class="ac-jn-btn" type="button" data-ac-jn-cost-run>Scroll to the end</button>
-        <button class="ac-jn-btn" type="button" data-ac-jn-cost-reset>Reset</button>
-      </div>
-
-      <dl class="ac-jn-readout">
-        <div class="ac-jn-readout__row">
-          <dt>scroll events</dt>
-          <dd><code data-ac-jn-out="cost-scroll">0</code></dd>
-        </div>
-        <div class="ac-jn-readout__row">
-          <dt>current section changed</dt>
-          <dd><code data-ac-jn-out="cost-change">0</code></dd>
-        </div>
-        <div class="ac-jn-readout__row">
-          <dt>a live region on the nav would have said</dt>
-          <dd><code data-ac-jn-out="cost-verdict">&mdash;</code></dd>
-        </div>
-      </dl>
-    </div>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 5 · Two navs, and neither has a name
-       CSS [NAV] + [TARGET] + [PANEL]. JS [LANDMARKS].
-
-       Nothing here is measured. The failure is a missing attribute, and there
-       is nothing on screen to see it with.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">5 &middot; Two navs, and neither has a name</h3>
-
-    <div class="ac-jn-panel" data-ac-jn-landmarks>
-      <div class="ac-jn-cases">
-        <!-- BROKEN ON PURPOSE — two navigation landmarks, no way to tell them
-             apart in a landmark menu. -->
-        <div class="ac-jn-case" data-ac-jn-mark-case="unnamed" data-ac-demo-broken="landmark-unique">
-          <p class="ac-jn-case__label">no <code>aria-label</code> &mdash; broken on purpose</p>
-          <nav class="ac-jump-nav">
-            <ul class="ac-jump-nav__list">
-              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn5-salad">Salad Days</a></li>
-              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn5-nausea">Nausea</a></li>
-            </ul>
-          </nav>
-          <nav class="ac-jump-nav">
-            <ul class="ac-jump-nav__list">
-              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn5-salad">Shows</a></li>
-              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn5-nausea">Pressings</a></li>
-            </ul>
-          </nav>
-        </div>
-
-        <div class="ac-jn-case" data-ac-jn-mark-case="named">
-          <p class="ac-jn-case__label">named</p>
-          <!-- Not "On this page": example 1 already uses that name, and two
-               navigation landmarks with the same name on one page are the very
-               thing the unnamed pair beside this one is about. -->
-          <nav class="ac-jump-nav" aria-label="Album sections">
-            <ul class="ac-jump-nav__list">
-              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn5-salad">Salad Days</a></li>
-              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn5-nausea">Nausea</a></li>
-            </ul>
-          </nav>
-          <nav class="ac-jump-nav" aria-label="Site sections">
-            <ul class="ac-jump-nav__list">
-              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn5-salad">Shows</a></li>
-              <li class="ac-jump-nav__item"><a class="ac-jump-nav__link" href="#jn5-nausea">Pressings</a></li>
-            </ul>
-          </nav>
-        </div>
-      </div>
-
-      <div class="ac-jn-doc ac-jn-doc--short" tabindex="0" role="region" aria-label="Shared sections">
-        <section class="ac-jn-sec">
-          <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn5-salad" tabindex="-1">Salad Days</h4>
-          <p>Both navs above point here.</p>
-        </section>
-        <section class="ac-jn-sec">
-          <h4 class="ac-jump-nav__target ac-jn-sec__title" id="jn5-nausea" tabindex="-1">Nausea</h4>
-          <p>And both point here.</p>
-        </section>
-      </div>
-
-      <dl class="ac-jn-readout">
-        <div class="ac-jn-readout__row">
-          <dt>landmark menu, unnamed</dt>
-          <dd><code data-ac-jn-out="mark-unnamed">&mdash;</code></dd>
-        </div>
-        <div class="ac-jn-readout__row">
-          <dt>landmark menu, named</dt>
-          <dd><code data-ac-jn-out="mark-named">&mdash;</code></dd>
-        </div>
-      </dl>
-
-      <p class="ac-jn__note">
-        The name leaves out the word &ldquo;navigation&rdquo;. A screen reader appends the role, so
-        &ldquo;On this page navigation&rdquo; is read twice over.
-      </p>
     </div>
   </div>
 </div>
