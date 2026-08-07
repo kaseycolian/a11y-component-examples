@@ -3,8 +3,8 @@
 
    WHAT TO COPY
      [PLACE]      shared by both factories. Coordinates, flipping, clamping.
-     [CORE]       examples 1, 2 and 5. AC.createTooltip.
-     [TOGGLETIP]  example 4. AC.createToggletip.
+     [CORE]       examples 1, 2 and 4. AC.createTooltip.
+     [TOGGLETIP]  example 3. AC.createToggletip.
      [AUTO-INIT]  delete if you construct instances yourself.
 
    Example 3 needs none of this — it is the native `title` attribute, kept as a
@@ -84,7 +84,7 @@
     bubble.style.setProperty('--ac-tooltip-arrow-x', Math.round(arrow) + 'px');
   }
 
-  /* === [CORE] examples 1, 2 and 5 ======================================== */
+  /* === [CORE] examples 1, 2 and 4 ======================================== */
 
   /**
    * @param {HTMLElement} root element carrying [data-ac-tooltip]
@@ -274,7 +274,7 @@
     return api;
   }
 
-  /* === [TOGGLETIP] example 4 =============================================
+  /* === [TOGGLETIP] example 3 =============================================
      A different pattern with the same paint. It opens on click, so it works on
      touch, and it announces by inserting text into a live region that is
      already in the accessibility tree.

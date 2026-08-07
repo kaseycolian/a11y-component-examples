@@ -5,12 +5,12 @@
    Everything here is real component code; the demo frame (ac-demo-*) lives in
    the site's own stylesheet, not this file.
 
-     [CORE]        examples 1, 2, 4, 5. The host, the bubble, the arrow.
-     [BUTTON]      examples 1 and 3. A plain button, so the demo has one. The
+     [CORE]        examples 1 to 4. The host, the bubble, the arrow.
+     [BUTTON]      examples 1 and 5. A plain button, so the demo has one. The
                    Button component owns the canonical version.
-     [ICON]        examples 2, 4, 5. The square icon-only trigger.
-     [TOGGLETIP]   example 4.
-     [FIELD]       example 5. A label, a hint and an input, kept minimal. The
+     [ICON]        examples 2, 3, 4. The square icon-only trigger.
+     [TOGGLETIP]   example 3.
+     [FIELD]       example 4. A label, a hint and an input, kept minimal. The
                    Form Field and Text Input components own the canonical versions.
      [FORCED]      always ship this. High Contrast rebuilds every cue.
 
@@ -106,7 +106,7 @@
   border-width: 0 1px 1px 0;
 }
 
-/* --- [BUTTON] examples 1 and 3 -------------------------------------------
+/* --- [BUTTON] examples 1 and 5 -------------------------------------------
    Nothing tooltip-specific. Here so the two examples have a real button
    without depending on another component's stylesheet. */
 
@@ -143,7 +143,7 @@
   outline-offset: 2px;
 }
 
-/* --- [ICON] examples 2, 4, 5 --------------------------------------------
+/* --- [ICON] examples 2, 3, 4 --------------------------------------------
    A square target, not a bare glyph. A 16px question mark is a 16px hit area,
    which fails SC 2.5.8 and is miserable on a phone regardless. */
 
@@ -202,7 +202,7 @@
   border: 0;
 }
 
-/* --- [TOGGLETIP] example 4 ----------------------------------------------
+/* --- [TOGGLETIP] example 3 ----------------------------------------------
    There is deliberately no rule for .ac-toggletip__live. It is an empty inline
    span whose only job is to already exist, so that inserting text into it counts
    as a change a screen reader will announce — an inline element with no content
@@ -215,7 +215,7 @@
    The bubble component.js builds inside it reuses .ac-tooltip for the paint, so
    [CORE] is required with this section. */
 
-/* --- [FIELD] example 5 --------------------------------------------------
+/* --- [FIELD] example 4 --------------------------------------------------
    Minimal on purpose. Form Field owns .ac-field* and Text Input owns .ac-input;
    these are local so this file stands alone. */
 

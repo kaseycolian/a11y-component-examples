@@ -15,11 +15,11 @@ const host = (page, n) => page.locator('[data-ac-tooltip]').nth(n);
 /* --- example 1 · the baseline --------------------------------------------- */
 
 test('the bubble is a tooltip that describes its trigger', async ({ page }) => {
-  const trigger = page.getByRole('button', { name: 'Advance the show' });
-  const tip = page.locator('#ac-tip-advance');
+  const trigger = page.getByRole('button', { name: 'Export report' });
+  const tip = page.locator('#ac-tip-export');
 
   await expect(tip).toHaveAttribute('role', 'tooltip');
-  await expect(trigger).toHaveAttribute('aria-describedby', 'ac-tip-advance');
+  await expect(trigger).toHaveAttribute('aria-describedby', 'ac-tip-export');
   await expect(tip).toBeHidden();
 });
 
@@ -27,17 +27,17 @@ test('the description is announced while the bubble is still hidden', async ({ p
   // The reason aria-describedby is never toggled: an element referenced
   // directly is folded into the description even when it is hidden, so a screen
   // reader user does not wait for the bubble to appear.
-  const trigger = page.getByRole('button', { name: 'Advance the show' });
+  const trigger = page.getByRole('button', { name: 'Export report' });
 
-  await expect(page.locator('#ac-tip-advance')).toBeHidden();
+  await expect(page.locator('#ac-tip-export')).toBeHidden();
   await expect(trigger).toHaveAccessibleDescription(
-    'Confirms load-in, curfew and the guest list with the venue.',
+    'Downloads the last 30 days as a CSV.',
   );
 });
 
 test('hover shows it, and leaving hides it', async ({ page }) => {
-  const trigger = page.getByRole('button', { name: 'Advance the show' });
-  const tip = page.locator('#ac-tip-advance');
+  const trigger = page.getByRole('button', { name: 'Export report' });
+  const tip = page.locator('#ac-tip-export');
 
   await trigger.hover();
   await expect(tip).toBeVisible();
@@ -48,8 +48,8 @@ test('hover shows it, and leaving hides it', async ({ page }) => {
 });
 
 test('keyboard focus shows it — SC 1.4.13 is not satisfied by hover alone', async ({ page }) => {
-  const trigger = page.getByRole('button', { name: 'Advance the show' });
-  const tip = page.locator('#ac-tip-advance');
+  const trigger = page.getByRole('button', { name: 'Export report' });
+  const tip = page.locator('#ac-tip-export');
 
   // Focused from the keyboard, so :focus-visible matches and the bubble opens.
   await trigger.focus();
@@ -57,8 +57,8 @@ test('keyboard focus shows it — SC 1.4.13 is not satisfied by hover alone', as
 });
 
 test('a mouse click does not fire a tooltip at the person who clicked', async ({ page }) => {
-  const trigger = page.getByRole('button', { name: 'Advance the show' });
-  const tip = page.locator('#ac-tip-advance');
+  const trigger = page.getByRole('button', { name: 'Export report' });
+  const tip = page.locator('#ac-tip-export');
 
   // Click leaves the button focused but not focus-visible. Move the pointer away
   // afterwards, or the hover would be doing the work instead of the focus.
@@ -68,8 +68,8 @@ test('a mouse click does not fire a tooltip at the person who clicked', async ({
 });
 
 test('the tooltip is persistent — it does not time out', async ({ page }) => {
-  const trigger = page.getByRole('button', { name: 'Advance the show' });
-  const tip = page.locator('#ac-tip-advance');
+  const trigger = page.getByRole('button', { name: 'Export report' });
+  const tip = page.locator('#ac-tip-export');
 
   await trigger.hover();
   await expect(tip).toBeVisible();
@@ -79,8 +79,8 @@ test('the tooltip is persistent — it does not time out', async ({ page }) => {
 });
 
 test('Esc dismisses it with the pointer still on the trigger', async ({ page }) => {
-  const trigger = page.getByRole('button', { name: 'Advance the show' });
-  const tip = page.locator('#ac-tip-advance');
+  const trigger = page.getByRole('button', { name: 'Export report' });
+  const tip = page.locator('#ac-tip-export');
 
   await trigger.hover();
   await expect(tip).toBeVisible();
@@ -95,8 +95,8 @@ test('Esc dismisses it with the pointer still on the trigger', async ({ page }) 
 });
 
 test('leaving re-arms Esc, so the tooltip is not dismissed forever', async ({ page }) => {
-  const trigger = page.getByRole('button', { name: 'Advance the show' });
-  const tip = page.locator('#ac-tip-advance');
+  const trigger = page.getByRole('button', { name: 'Export report' });
+  const tip = page.locator('#ac-tip-export');
 
   await trigger.hover();
   await page.keyboard.press('Escape');
@@ -108,8 +108,8 @@ test('leaving re-arms Esc, so the tooltip is not dismissed forever', async ({ pa
 });
 
 test('the pointer can travel from the trigger onto the bubble', async ({ page }) => {
-  const trigger = page.getByRole('button', { name: 'Advance the show' });
-  const tip = page.locator('#ac-tip-advance');
+  const trigger = page.getByRole('button', { name: 'Export report' });
+  const tip = page.locator('#ac-tip-export');
 
   await trigger.hover();
   await expect(tip).toBeVisible();
@@ -124,7 +124,7 @@ test('the pointer can travel from the trigger onto the bubble', async ({ page })
 });
 
 test('the bubble is not a tab stop', async ({ page }) => {
-  await expect(page.locator('#ac-tip-advance')).not.toHaveAttribute('tabindex', /.*/);
+  await expect(page.locator('#ac-tip-export')).not.toHaveAttribute('tabindex', /.*/);
 });
 
 /* --- example 2 · the bubble as the name ----------------------------------- */
@@ -133,7 +133,7 @@ test('an icon-only trigger takes its name from the bubble', async ({ page }) => 
   const trigger = page.locator('[aria-labelledby="ac-tip-print"]');
 
   // aria-labelledby, not describedby: a description cannot supply a missing name.
-  await expect(trigger).toHaveAccessibleName('Print the run sheet');
+  await expect(trigger).toHaveAccessibleName('Print invoice');
   await expect(trigger).not.toHaveAttribute('aria-label', /.*/);
   // The factory must not add a second relationship on top of the authored one.
   await expect(trigger).not.toHaveAttribute('aria-describedby', /.*/);
@@ -145,10 +145,10 @@ test('the glyph contributes nothing to the name', async ({ page }) => {
   await expect(svg).toHaveAttribute('focusable', 'false');
 });
 
-/* --- example 4 · the toggletip -------------------------------------------- */
+/* --- example 3 · the toggletip -------------------------------------------- */
 
 test('the toggletip opens on click and announces through a live region', async ({ page }) => {
-  const trigger = page.getByRole('button', { name: 'What is a load-out?' });
+  const trigger = page.getByRole('button', { name: 'What counts as a seat?' });
   const live = page.locator('[data-ac-toggletip-live]');
 
   // Present and empty before the click, so the insertion is a change.
@@ -157,11 +157,11 @@ test('the toggletip opens on click and announces through a live region', async (
   expect((await live.innerHTML()).trim()).toBe('');
 
   await trigger.click();
-  await expect(live.locator('.ac-tooltip')).toHaveText(/Striking the stage/);
+  await expect(live.locator('.ac-tooltip')).toHaveText(/Deactivated teammates/);
 });
 
 test('the toggletip is not a disclosure', async ({ page }) => {
-  const trigger = page.getByRole('button', { name: 'What is a load-out?' });
+  const trigger = page.getByRole('button', { name: 'What counts as a seat?' });
 
   // The content is a message, not a region the button controls -- and the button
   // is not *described by* what it reveals.
@@ -173,7 +173,7 @@ test('the toggletip is not a disclosure', async ({ page }) => {
 });
 
 test('clicking the toggletip trigger again closes it, and focus never moves', async ({ page }) => {
-  const trigger = page.getByRole('button', { name: 'What is a load-out?' });
+  const trigger = page.getByRole('button', { name: 'What counts as a seat?' });
   const bubble = page.locator('[data-ac-toggletip-live] .ac-tooltip');
 
   await trigger.click();
@@ -186,7 +186,7 @@ test('clicking the toggletip trigger again closes it, and focus never moves', as
 });
 
 test('Esc and an outside click both close the toggletip', async ({ page }) => {
-  const trigger = page.getByRole('button', { name: 'What is a load-out?' });
+  const trigger = page.getByRole('button', { name: 'What counts as a seat?' });
   const bubble = page.locator('[data-ac-toggletip-live] .ac-tooltip');
 
   await trigger.click();
@@ -201,34 +201,36 @@ test('Esc and an outside click both close the toggletip', async ({ page }) => {
   await expect(bubble).toHaveCount(0);
 });
 
-/* --- example 5 · essential information stays visible ---------------------- */
+/* --- example 4 · essential information stays visible ---------------------- */
 
 test('the input keeps the requirement visible and the tooltip only adds to it', async ({
   page,
 }) => {
-  const input = page.locator('#ac-tip-set');
+  const input = page.locator('#ac-tip-seats');
 
   // Two ids, hint first: the requirement is heard before the story.
-  await expect(input).toHaveAttribute('aria-describedby', 'ac-tip-set-hint ac-tip-curfew');
-  await expect(page.locator('#ac-tip-set-hint')).toBeVisible();
-  await expect(input).toHaveAccessibleDescription(/99 is the most the room allows[\s\S]*curfew/);
+  await expect(input).toHaveAttribute('aria-describedby', 'ac-tip-seats-hint ac-tip-cap');
+  await expect(page.locator('#ac-tip-seats-hint')).toBeVisible();
+  await expect(input).toHaveAccessibleDescription(
+    /99 is the most your plan allows[\s\S]*capped at 99 seats/,
+  );
 });
 
 test('the help trigger is named by aria-label, not by its sentence-long bubble', async ({
   page,
 }) => {
-  const trigger = page.getByRole('button', { name: 'Why 99 minutes' });
+  const trigger = page.getByRole('button', { name: 'Why 99 seats' });
 
-  await expect(trigger).toHaveAccessibleName('Why 99 minutes');
-  await expect(trigger).toHaveAttribute('aria-describedby', 'ac-tip-curfew');
+  await expect(trigger).toHaveAccessibleName('Why 99 seats');
+  await expect(trigger).toHaveAttribute('aria-describedby', 'ac-tip-cap');
 });
 
 /* --- positioning ---------------------------------------------------------- */
 
 test('the bubble escapes overflow clipping by being fixed', async ({ page }) => {
-  const tip = page.locator('#ac-tip-advance');
+  const tip = page.locator('#ac-tip-export');
 
-  await page.getByRole('button', { name: 'Advance the show' }).hover();
+  await page.getByRole('button', { name: 'Export report' }).hover();
   await expect(tip).toBeVisible();
 
   expect(await tip.evaluate((el) => getComputedStyle(el).position)).toBe('fixed');
@@ -236,9 +238,9 @@ test('the bubble escapes overflow clipping by being fixed', async ({ page }) => 
 
 test('the arrow still points at the trigger after the bubble is clamped', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 640 });
-  const tip = page.locator('#ac-tip-advance');
+  const tip = page.locator('#ac-tip-export');
 
-  await page.getByRole('button', { name: 'Advance the show' }).hover();
+  await page.getByRole('button', { name: 'Export report' }).hover();
   await expect(tip).toBeVisible();
 
   const { arrowX, width } = await tip.evaluate((el) => ({
@@ -251,8 +253,8 @@ test('the arrow still points at the trigger after the bubble is clamped', async 
 
 test('a wide bubble does not widen the page at 320px', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 640 });
-  await page.getByRole('button', { name: 'Why 99 minutes' }).hover();
-  await expect(page.locator('#ac-tip-curfew')).toBeVisible();
+  await page.getByRole('button', { name: 'Why 99 seats' }).hover();
+  await expect(page.locator('#ac-tip-cap')).toBeVisible();
 
   // SC 1.4.10: no horizontal scroll, from the tooltip or anything else.
   const overflow = await page.evaluate(
@@ -295,7 +297,7 @@ test('the factory is idempotent and destroy() puts the DOM back', async ({ page 
 
   expect(result.same).toBe(true);
   expect(result.openWhileShown).toBe(true);
-  expect(result.describedby).toBe('ac-tip-advance');
+  expect(result.describedby).toBe('ac-tip-export');
   expect(result.hidden).toBe(true);
 });
 
@@ -304,8 +306,8 @@ test('a bubble with no id gets one, and destroy() removes the wiring it added', 
     const wrap = document.createElement('span');
     wrap.className = 'ac-tooltip-host';
     wrap.innerHTML =
-      '<button type="button">Sound check</button>' +
-      '<span class="ac-tooltip" role="tooltip" hidden>Doors at 19:30</span>';
+      '<button type="button">Save changes</button>' +
+      '<span class="ac-tooltip" role="tooltip" hidden>Writes to the workspace immediately.</span>';
     document.body.appendChild(wrap);
 
     const api = window.AC.createTooltip(wrap);
@@ -326,18 +328,18 @@ test('a bubble with no id gets one, and destroy() removes the wiring it added', 
 /* --- reduced motion ------------------------------------------------------- */
 
 test('reduced motion zeroes the fade, by either route', async ({ page }) => {
-  const tip = page.locator('#ac-tip-advance');
+  const tip = page.locator('#ac-tip-export');
 
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.reload();
-  await page.getByRole('button', { name: 'Advance the show' }).hover();
+  await page.getByRole('button', { name: 'Export report' }).hover();
   await expect(tip).toBeVisible();
   expect(await tip.evaluate((el) => getComputedStyle(el).transitionDuration)).toBe('0s');
 
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.reload();
   await page.evaluate(() => document.documentElement.setAttribute('data-motion', 'off'));
-  await page.getByRole('button', { name: 'Advance the show' }).hover();
+  await page.getByRole('button', { name: 'Export report' }).hover();
   await expect(tip).toBeVisible();
   expect(await tip.evaluate((el) => getComputedStyle(el).transitionDuration)).toBe('0s');
 });

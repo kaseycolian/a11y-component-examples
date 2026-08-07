@@ -2,11 +2,12 @@
      TOOLTIP — a short description that appears on hover *and* focus
 
      WHAT TO COPY
-       Any one example below is self-contained. Take its section plus the
-       matching sections of component.css, and of component.js for 1, 2, 4 and 5.
+       Examples 1 to 4 are the component. Example 5 is a mistake, live, and is
+       not to be copied. Take an example's section plus the matching sections of
+       component.css, and of component.js for 1, 2, 3 and 4.
        Copy the file whole for the library-grade version.
 
-     THE CONTRACT
+     REQUIRED MARKUP
        [data-ac-tooltip]   the wrapper the factory initializes
        the trigger         a real button or link, pointing at the bubble with
                            aria-describedby
@@ -18,7 +19,8 @@
          hoverable    the pointer can travel onto the bubble and it stays
          persistent   it does not time out on its own
        A hover-only tooltip that fades after three seconds fails all three, and
-       that is the tooltip most codebases already have.
+       that is the tooltip most codebases already have. Example 5 is the version
+       the browser ships, and it fails all three too.
 
      WHAT NEVER GOES IN ONE
        Anything interactive — a link, a button, a field. Focus can never reach
@@ -27,185 +29,213 @@
 
      WHAT NEVER GOES *ONLY* IN ONE
        Essential information. Touch users have no hover, so a tooltip is the one
-       place they cannot reach. Example 5 keeps the requirement visible and lets
+       place they cannot reach. Example 4 keeps the requirement visible and lets
        the tooltip add only the reason behind it.
 
-     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the two section
+     headings, the grid, the per-example headings and the legends. Never copy it.
      =========================================================================== -->
 
-<div class="ac-demo-grid">
-  <!-- ======================================================================
-       EXAMPLE 1 · The baseline
-       CSS [CORE] + [FORCED]. JS [CORE].
+<div class="ac-demo-section">
+  <h3 class="ac-demo-section__title">Correct examples</h3>
+  <p class="ac-demo-section__note">
+    This is the markup to copy. Press <kbd>Esc</kbd> with the pointer still on a trigger, then move
+    the pointer from a trigger onto its bubble &mdash; those two are what most tooltips fail.
+  </p>
 
-       A named button, a role="tooltip" bubble, and aria-describedby joining
-       them. That is the entire ARIA contract.
+  <div class="ac-demo-grid">
+    <!-- ======================================================================
+         EXAMPLE 1 · A description on hover and focus
+         CSS [CORE] + [BUTTON] + [FORCED]. JS [CORE].
 
-       aria-describedby stays on the trigger whether the bubble is visible or
-       not, and that is deliberate: an element referenced directly by
-       aria-describedby is folded into the description even while it is hidden,
-       so a screen reader reads it on focus without anything having to appear.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">1 &middot; The baseline</h3>
+         A named button, a role="tooltip" bubble, and aria-describedby joining
+         them. That is the entire ARIA contract.
 
-    <span class="ac-tooltip-host" data-ac-tooltip>
-      <button class="ac-tooltip-btn" type="button" aria-describedby="ac-tip-advance">
-        Advance the show
-      </button>
-      <span class="ac-tooltip" id="ac-tip-advance" role="tooltip" hidden>
-        Confirms load-in, curfew and the guest list with the venue.
-      </span>
-    </span>
+         aria-describedby stays on the trigger whether the bubble is visible or
+         not, and that is deliberate: an element referenced directly by
+         aria-describedby is folded into the description even while it is hidden,
+         so a screen reader reads it on focus without anything having to appear.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">1 &middot; A description on hover and focus</h4>
 
-    <p class="ac-demo__legend">
-      Hover it, or Tab to it. <kbd>Esc</kbd> dismisses it with the pointer still
-      on the button, and it stays gone until you leave and come back.
-    </p>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 2 · An icon-only trigger, where the tooltip is the name
-       CSS [CORE] + [ICON] + [FORCED]. JS [CORE].
-
-       aria-labelledby, not aria-describedby. A button with no text has no name,
-       and a description cannot supply one — "button" is all anyone would hear.
-
-       Two rules follow. The text has to be short, because it is now the name.
-       And there is no aria-label as well: a name from aria-label would win, and
-       the visible words would be the ones nobody hears.
-
-       The glyph is aria-hidden, so it contributes nothing to the name.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">2 &middot; Icon-only trigger</h3>
-
-    <span class="ac-tooltip-host" data-ac-tooltip>
-      <button class="ac-tooltip-icon" type="button" aria-labelledby="ac-tip-print">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path
-            d="M7 8V4h10v4M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M7 14h10v6H7z"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-      </button>
-      <span class="ac-tooltip" id="ac-tip-print" role="tooltip" hidden>Print the run sheet</span>
-    </span>
-
-    <p class="ac-demo__legend">
-      An icon-only control is the one case where the tooltip carries the name
-      rather than a description.
-    </p>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 3 · Why `title` is not a tooltip
-       No CSS, no JS. This is the thing you are replacing.
-
-       The native attribute is the cheapest tooltip and it fails on every axis
-       that matters. It stays here as a comparison — hover the button and try to
-       do any of the things the legend lists.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">3 &middot; Why <code>title</code> is not a tooltip</h3>
-
-    <button class="ac-tooltip-btn" type="button" title="Split is 70/30 after the door deal.">
-      Merch split
-    </button>
-
-    <p class="ac-demo__legend">
-      Never appears on keyboard focus. Times out while you are still reading.
-      Cannot be hovered, styled, wrapped or zoomed. Unreachable on touch. Some
-      screen readers read it, some ignore it, and some read it <em>instead of</em>
-      the label. Use it for nothing you need read.
-    </p>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 4 · A toggletip, for information touch users need
-       CSS [CORE] + [ICON] + [TOGGLETIP] + [FORCED]. JS [TOGGLETIP].
-
-       A tooltip describes its trigger. A toggletip is supplementary content the
-       trigger *reveals* — so it opens on click, which works on touch, and it is
-       announced by dropping the text into a live region that was already there.
-
-       Deliberately not a disclosure: no aria-expanded, and no aria-describedby
-       either. The button's name is the question, the answer is the
-       announcement, and the button is not *described by* what it opens.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">4 &middot; A toggletip</h3>
-
-    <span class="ac-tooltip-host" data-ac-toggletip>
-      <button class="ac-tooltip-icon" type="button" data-ac-toggletip-trigger>
-        <span aria-hidden="true">?</span>
-        <span class="ac-tooltip-icon__name">What is a load-out?</span>
-      </button>
-      <!-- Present and empty from the start. A live region inserted along with
-           its text gives a screen reader no change to notice. -->
-      <span class="ac-toggletip__live" role="status" data-ac-toggletip-live></span>
-      <template data-ac-toggletip-text>
-        Striking the stage and clearing the room. Ours runs 99 minutes.
-      </template>
-    </span>
-
-    <p class="ac-demo__legend">
-      Click, tap, <kbd>Enter</kbd> or <kbd>Space</kbd>. <kbd>Esc</kbd> or a click
-      outside closes it.
-    </p>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 5 · Essential information stays visible
-       CSS [CORE] + [ICON] + [FIELD] + [FORCED]. JS [CORE].
-
-       The rule someone has to know — minutes, and the ceiling — is visible help
-       text, because SC 3.3.2 wants instructions available to everyone and a
-       touch user cannot summon a tooltip at all.
-
-       The tooltip adds only the reason behind it, and both ids are in the
-       input's aria-describedby in reading order: the hint first, so the
-       requirement is heard before the story.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">5 &middot; Essential information stays visible</h3>
-
-    <div class="ac-tooltip-field">
-      <span class="ac-tooltip-field__row">
-        <label class="ac-tooltip-field__label" for="ac-tip-set">Set length</label>
-
-        <!-- aria-label names it, aria-describedby describes it. Unlike example 2
-             the bubble is a sentence, and a sentence makes a poor name. -->
-        <span class="ac-tooltip-host" data-ac-tooltip>
-          <button
-            class="ac-tooltip-icon"
-            type="button"
-            aria-label="Why 99 minutes"
-            aria-describedby="ac-tip-curfew"
-          >
-            <span aria-hidden="true">?</span>
-          </button>
-          <span class="ac-tooltip" id="ac-tip-curfew" role="tooltip" hidden>
-            Why the ceiling: curfew at the Berkeley room is hard, and the desk cuts
-            power at 23:00.
-          </span>
+      <span class="ac-tooltip-host" data-ac-tooltip>
+        <button class="ac-tooltip-btn" type="button" aria-describedby="ac-tip-export">
+          Export report
+        </button>
+        <span class="ac-tooltip" id="ac-tip-export" role="tooltip" hidden>
+          Downloads the last 30 days as a CSV.
         </span>
       </span>
 
-      <input
-        class="ac-tooltip-field__input"
-        id="ac-tip-set"
-        name="set-length"
-        type="text"
-        inputmode="numeric"
-        aria-describedby="ac-tip-set-hint ac-tip-curfew"
-      />
-      <p class="ac-tooltip-field__hint" id="ac-tip-set-hint">
-        In minutes. 99 is the most the room allows.
+      <p class="ac-demo__legend">
+        Hover it, or Tab to it. <kbd>Esc</kbd> dismisses it with the pointer still
+        on the button, and it stays gone until you leave and come back.
+      </p>
+    </div>
+
+    <!-- ======================================================================
+         EXAMPLE 2 · An icon-only trigger, where the bubble is the name
+         CSS [CORE] + [ICON] + [FORCED]. JS [CORE].
+
+         aria-labelledby, not aria-describedby. A button with no text has no name,
+         and a description cannot supply one — "button" is all anyone would hear.
+
+         Two rules follow. The text has to be short, because it is now the name.
+         And there is no aria-label as well: a name from aria-label would win, and
+         the visible words would be the ones nobody hears.
+
+         The glyph is aria-hidden, so it contributes nothing to the name.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">2 &middot; An icon-only trigger</h4>
+
+      <span class="ac-tooltip-host" data-ac-tooltip>
+        <button class="ac-tooltip-icon" type="button" aria-labelledby="ac-tip-print">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path
+              d="M7 8V4h10v4M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M7 14h10v6H7z"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+        <span class="ac-tooltip" id="ac-tip-print" role="tooltip" hidden>Print invoice</span>
+      </span>
+
+      <p class="ac-demo__legend">
+        An icon-only control is the one case where the tooltip carries the name
+        rather than a description.
+      </p>
+    </div>
+
+    <!-- ======================================================================
+         EXAMPLE 3 · A toggletip, for information touch users need
+         CSS [CORE] + [ICON] + [TOGGLETIP] + [FORCED]. JS [TOGGLETIP].
+
+         A tooltip describes its trigger. A toggletip is supplementary content the
+         trigger *reveals* — so it opens on click, which works on touch, and it is
+         announced by dropping the text into a live region that was already there.
+
+         Deliberately not a disclosure: no aria-expanded, and no aria-describedby
+         either. The button's name is the question, the answer is the
+         announcement, and the button is not *described by* what it opens.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">3 &middot; A toggletip</h4>
+
+      <span class="ac-tooltip-host" data-ac-toggletip>
+        <button class="ac-tooltip-icon" type="button" data-ac-toggletip-trigger>
+          <span aria-hidden="true">?</span>
+          <span class="ac-tooltip-icon__name">What counts as a seat?</span>
+        </button>
+        <!-- Present and empty from the start. A live region inserted along with
+             its text gives a screen reader no change to notice. -->
+        <span class="ac-toggletip__live" role="status" data-ac-toggletip-live></span>
+        <template data-ac-toggletip-text>
+          Anyone who can sign in to the workspace. Deactivated teammates do not count.
+        </template>
+      </span>
+
+      <p class="ac-demo__legend">
+        Click, tap, <kbd>Enter</kbd> or <kbd>Space</kbd>. <kbd>Esc</kbd> or a click
+        outside closes it.
+      </p>
+    </div>
+
+    <!-- ======================================================================
+         EXAMPLE 4 · Essential information stays visible
+         CSS [CORE] + [ICON] + [FIELD] + [FORCED]. JS [CORE].
+
+         The rule someone has to know — a whole number, and the ceiling — is
+         visible help text, because SC 3.3.2 wants instructions available to
+         everyone and a touch user cannot summon a tooltip at all.
+
+         The tooltip adds only the reason behind it, and both ids are in the
+         input's aria-describedby in reading order: the hint first, so the
+         requirement is heard before the explanation.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">4 &middot; Essential information stays visible</h4>
+
+      <div class="ac-tooltip-field">
+        <span class="ac-tooltip-field__row">
+          <label class="ac-tooltip-field__label" for="ac-tip-seats">Seats</label>
+
+          <!-- aria-label names it, aria-describedby describes it. Unlike example 2
+               the bubble is a sentence, and a sentence makes a poor name. -->
+          <span class="ac-tooltip-host" data-ac-tooltip>
+            <button
+              class="ac-tooltip-icon"
+              type="button"
+              aria-label="Why 99 seats"
+              aria-describedby="ac-tip-cap"
+            >
+              <span aria-hidden="true">?</span>
+            </button>
+            <span class="ac-tooltip" id="ac-tip-cap" role="tooltip" hidden>
+              Why the ceiling: the Team plan is capped at 99 seats. Upgrading raises it.
+            </span>
+          </span>
+        </span>
+
+        <input
+          class="ac-tooltip-field__input"
+          id="ac-tip-seats"
+          name="seats"
+          type="text"
+          inputmode="numeric"
+          aria-describedby="ac-tip-seats-hint ac-tip-cap"
+        />
+        <p class="ac-tooltip-field__hint" id="ac-tip-seats-hint">
+          A whole number. 99 is the most your plan allows.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ac-demo-section ac-demo-section--mistakes">
+  <h3 class="ac-demo-section__title">Common mistakes</h3>
+  <p class="ac-demo-section__note">
+    One example, live and wrong on purpose. It is the tooltip the browser already ships, and it is
+    the one most codebases are still using.
+  </p>
+
+  <div class="ac-demo-grid">
+    <!-- ======================================================================
+         EXAMPLE 5 · The native title attribute
+         CSS [BUTTON]. No JS.
+
+         The cheapest tooltip there is, and it fails on every axis that matters.
+         It stays here as a comparison — hover the button and try to do any of
+         the things the legend lists.
+
+         It carries no data-ac-demo-broken: none of its failures is an axe
+         violation, a focus-visible one or a target-size one, so the marker would
+         be a claim the gate then asserts and could not find.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">5 &middot; The native <code>title</code> attribute</h4>
+
+      <!-- .ac-tooltip-host with no data-ac-tooltip: the class is doing layout
+           only here, so this button sits the same way example 1's does. There is
+           no bubble for the factory to wire, which is the entire point. -->
+      <span class="ac-tooltip-host">
+        <!-- BROKEN ON PURPOSE — title is hover-only and times out. -->
+        <button class="ac-tooltip-btn" type="button" title="The address invoices are sent to.">
+          Billing contact
+        </button>
+      </span>
+
+      <p class="ac-demo__legend">
+        Never appears on keyboard focus. Times out while you are still reading.
+        Cannot be hovered, styled, wrapped or zoomed. Unreachable on touch. Some
+        screen readers read it, some ignore it, and some read it <em>instead of</em>
+        the label. Use it for nothing you need read.
       </p>
     </div>
   </div>

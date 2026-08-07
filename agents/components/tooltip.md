@@ -16,6 +16,7 @@ In `library/components/tooltip/` — copy `component.{html,css,js}`, read `docs.
 
 ## Keyboard
 
+- `Tab` — native: moves to the trigger, which shows the bubble. The bubble is never a tab stop
 - `Escape` — dismisses, and the dismissal is remembered until focus or the pointer moves
 
 **States:** shown, hidden, dismissed
