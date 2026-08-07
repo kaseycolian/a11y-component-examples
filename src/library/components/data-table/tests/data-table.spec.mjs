@@ -30,9 +30,9 @@ const readout = (page, key) => page.locator(`[data-ac-dt-out="${key}"]`);
 
 test('the caption is the table name, and the region shares it', async ({ page }) => {
   const table = page.locator('#dt1-cap').locator('xpath=ancestor::table');
-  await expect(table).toHaveAccessibleName('Merch table, second night');
+  await expect(table).toHaveAccessibleName('Stock by item');
 
-  const region = page.getByRole('region', { name: 'Merch table, second night', exact: true });
+  const region = page.getByRole('region', { name: 'Stock by item', exact: true });
   await expect(region).toHaveCount(1);
   await expect(region).toHaveAttribute('tabindex', '0');
 });
@@ -43,16 +43,16 @@ test('the specimen exposes headers in both directions', async ({ page }) => {
   await expect(table.getByRole('columnheader')).toHaveCount(4);
   await expect(table.getByRole('rowheader')).toHaveCount(4);
   await expect(table.getByRole('row')).toHaveCount(5);
-  await expect(table.getByRole('columnheader', { name: 'Left', exact: true })).toHaveCount(1);
-  await expect(table.getByRole('rowheader', { name: 'Clear pressing', exact: true })).toHaveCount(1);
+  await expect(table.getByRole('columnheader', { name: 'In stock', exact: true })).toHaveCount(1);
+  await expect(table.getByRole('rowheader', { name: 'Office chair', exact: true })).toHaveCount(1);
 });
 
 test('the number columns are right aligned on the header as well as the cells', async ({ page }) => {
   const table = page.locator('#dt1-cap').locator('xpath=ancestor::table');
   const align = (loc) => loc.evaluate((el) => getComputedStyle(el).textAlign);
 
-  expect(await align(table.getByRole('columnheader', { name: 'Left' }))).toBe('right');
-  expect(await align(table.getByRole('rowheader', { name: 'Zine' }))).toBe('left');
+  expect(await align(table.getByRole('columnheader', { name: 'In stock' }))).toBe('right');
+  expect(await align(table.getByRole('rowheader', { name: 'Desk lamp' }))).toBe('left');
 });
 
 /* --- example 2 · the card restyle ----------------------------------------- */
@@ -77,17 +77,17 @@ test('the data-label is folded into the cell name, and the header still says it'
   await expect(page.locator('#dt2a-cell')).toHaveAccessibleName('37');
   // ::before is part of the accessible name, so the column is now in the cell
   // as well as in the header it is still associated with.
-  await expect(page.locator('#dt2b-cell')).toHaveAccessibleName('Left: 37');
+  await expect(page.locator('#dt2b-cell')).toHaveAccessibleName('In stock: 37');
 
   const cards = page.locator('#dt2b-cap').locator('xpath=ancestor::table');
   // Clipped, not hidden -- so the columnheader is still in the tree, which is
   // exactly why the name is announced twice.
-  await expect(cards.getByRole('columnheader', { name: 'Left', exact: true })).toHaveCount(1);
+  await expect(cards.getByRole('columnheader', { name: 'In stock', exact: true })).toHaveCount(1);
 
   await expect(readout(page, 'cards-name-rows')).toHaveText('37');
-  await expect(readout(page, 'cards-name-cards')).toHaveText('Left: 37');
-  await expect(readout(page, 'cards-head-rows')).toHaveText('Left');
-  await expect(readout(page, 'cards-head-cards')).toHaveText('Left');
+  await expect(readout(page, 'cards-name-cards')).toHaveText('In stock: 37');
+  await expect(readout(page, 'cards-head-rows')).toHaveText('In stock');
+  await expect(readout(page, 'cards-head-cards')).toHaveText('In stock');
 });
 
 test('display: block no longer drops the roles in Chromium', async ({ page }) => {
@@ -97,9 +97,9 @@ test('display: block no longer drops the roles in Chromium', async ({ page }) =>
   const cards = page.locator('#dt2b-cap').locator('xpath=ancestor::table');
   const snapshot = await cards.ariaSnapshot();
 
-  expect(snapshot).toContain('table "Merch table, cards"');
-  expect(snapshot).toContain('rowheader "Clear pressing"');
-  expect(snapshot).toContain('columnheader "Left"');
+  expect(snapshot).toContain('table "Stock, cards"');
+  expect(snapshot).toContain('rowheader "Office chair"');
+  expect(snapshot).toContain('columnheader "In stock"');
 });
 
 /* --- example 3 · which cell is a header ----------------------------------- */
@@ -123,7 +123,7 @@ test('a bold row is a row of cells', async ({ page }) => {
 
 test('column headers alone leave the row anonymous', async ({ page }) => {
   const table = page.locator('#dt3b-cell').locator('xpath=ancestor::table');
-  expect(await roleOf(table.getByRole('columnheader', { name: 'Left' }))).toBe('columnheader');
+  expect(await roleOf(table.getByRole('columnheader', { name: 'In stock' }))).toBe('columnheader');
   expect(await roleOf(page.locator('#dt3b-row'))).toBe('cell');
 
   await expect(readout(page, 'head-col-half')).toHaveText('columnheader');
@@ -132,7 +132,7 @@ test('column headers alone leave the row anonymous', async ({ page }) => {
 
 test('scope both ways names the cell from two directions', async ({ page }) => {
   const table = page.locator('#dt3c-cell').locator('xpath=ancestor::table');
-  expect(await roleOf(table.getByRole('columnheader', { name: 'Left' }))).toBe('columnheader');
+  expect(await roleOf(table.getByRole('columnheader', { name: 'In stock' }))).toBe('columnheader');
   expect(await roleOf(page.locator('#dt3c-row'))).toBe('rowheader');
 
   await expect(readout(page, 'head-col-both')).toHaveText('columnheader');
@@ -167,13 +167,13 @@ test('the bare wrapper is a tab stop with no role and no name', async ({ page })
 test('the named wrapper announces, and shows a ring when it takes focus', async ({ page }) => {
   const named = page.locator('#dt4b-wrap');
   await expect(named).toHaveAttribute('role', 'region');
-  await expect(named).toHaveAccessibleName('Merch by night');
+  await expect(named).toHaveAccessibleName('Stock by month');
 
   await named.focus();
   const width = await named.evaluate((el) => getComputedStyle(el).outlineWidth);
   expect(cssNumber(width)).toBeGreaterThanOrEqual(3);
 
-  await expect(readout(page, 'scroll-named')).toHaveText('Merch by night, region');
+  await expect(readout(page, 'scroll-named')).toHaveText('Stock by month, region');
   await expect(readout(page, 'scroll-bare')).toHaveText(/no role, no name/);
 });
 
@@ -182,13 +182,13 @@ test('the named wrapper announces, and shows a ring when it takes focus', async 
 test('only a caption names the table', async ({ page }) => {
   await expect(page.locator('#dt5a')).toHaveAccessibleName('');
   await expect(page.locator('#dt5b')).toHaveAccessibleName(''); // the <p> names nothing
-  await expect(page.locator('#dt5c')).toHaveAccessibleName('Zines');
-  await expect(page.locator('#dt5d')).toHaveAccessibleName('Zines'); // clipped, still the name
+  await expect(page.locator('#dt5c')).toHaveAccessibleName('Stock');
+  await expect(page.locator('#dt5d')).toHaveAccessibleName('Stock'); // clipped, still the name
 
   await expect(readout(page, 'name-none')).toHaveText('—');
   await expect(readout(page, 'name-p')).toHaveText('—');
-  await expect(readout(page, 'name-caption')).toHaveText('Zines');
-  await expect(readout(page, 'name-clipped')).toHaveText('Zines');
+  await expect(readout(page, 'name-caption')).toHaveText('Stock');
+  await expect(readout(page, 'name-clipped')).toHaveText('Stock');
 });
 
 test('the clipped caption is off screen and the visible one is not', async ({ page }) => {

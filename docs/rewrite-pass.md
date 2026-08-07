@@ -12,25 +12,25 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 
 ## START HERE
 
-**Phase 0 is done. Components 1–31 are done. Next up is row 32, `data-table`.**
+**Phase 0 is done. Components 1–32 are done. Next up is row 33, `prose-surface` — the last one.**
 
-Last updated 2026-08-07, after row 31. The repo was left green:
+Last updated 2026-08-07, after row 32. The repo was left green:
 
 ```
 check:tokens                      34 files clean
 check:agents                      42 surfaces match their sources
 npm run build                     35 pages
-npx playwright test --project=chromium result-panel               29 passed
+npx playwright test --project=chromium data-table                 21 passed
 npx playwright test --project=chromium agent-surfaces            117 passed
-npx playwright test --project=chromium a11y -g "result-panel|prose-surface"  86 passed
+npx playwright test --project=chromium a11y -g data-table         34 passed
 ```
 
-The full suite was re-run at row 31: **1220 passed**, exit 0 — unchanged since row 21, because rows
-22 to 31 added no tests. It is the honest baseline: if something is red before you have touched
+The full suite was re-run at row 32: **1220 passed**, exit 0 — unchanged since row 21, because rows
+22 to 32 added no tests. It is the honest baseline: if something is red before you have touched
 anything, it is not your change.
 
 **A row that touches `src/site/` makes the whole suite the check, not the slug.** Row 22 changed
-`site.css` and needed it; rows 23 to 31 touched only their own folders and did not.
+`site.css` and needed it; rows 23 to 32 touched only their own folders and did not.
 
 **A full run can flake, so re-run before you conclude anything.** One at row 19 reported *4 failed,
 1202 passed*; the identical tree at row 20 came back 1206/1206. Nothing was fixed in between. Four
@@ -49,9 +49,10 @@ Read these three things before touching anything, in this order:
 3. **The row you are about to do**, in [The roster](#the-roster). Every finished row records what
    actually bit, and that is the reason this file is worth reading rather than skimming.
 
-Then follow [The procedure](#the-procedure) for `data-table`, exactly.
+Then follow [The procedure](#the-procedure) for `prose-surface`, exactly. It is the last row, and
+the last rename; after it, Phase 3 opens.
 
-**Where the pass stands.** 31 of 33 components done, in roster order — there is no reordering, so the
+**Where the pass stands.** 32 of 33 components done, in roster order — there is no reordering, so the
 next unticked row is always the next job. Eleven of the twelve renames are applied — `chip-toggle`,
 `dropdown`, `effects`, `field`, `fieldset-group`, `focus-ring`, `jump-nav`, `motion-preferences`,
 `notice`, `result-panel`, `status-text`. The last one, `prose-surface` → Rich Text Content, happens in
@@ -157,6 +158,15 @@ starting; every one of these cost a debugging detour the first time.
   `showModal()` leaves to the author. Retitling them made the page argue something the old `summary`
   did not, and the old `contract.useWhen` then agreed with neither. **Reread `useWhen` against the new
   titles, not only against the new summary** — `check:agents` fires its receipt on the summary alone.
+- **A section that is the canonical one under another name gets merged, not demoted.** `data-table`
+  had `## What a screen reader does with it` *and* `## Screen reader behavior`, and the first was the
+  better half of the second. Merging them freed a component-specific slot without losing a sentence.
+  Before demoting something to a `###` to get under the cap of two, check whether it is really one of
+  the ten canonical sections wearing a different title.
+- **A one-word demo string that is also a readout value needs an anchored replacement.**
+  `data-table`'s `Left` was a column header, a `data-label`, a readout, and part of the composed
+  `Left: 37`. Order the replacement list longest-first and match the bare word with its delimiters —
+  `>Left<`, `data-label="Left"`, `'Left: 37'` — rather than replacing the word on its own.
 - **The file header's own WHAT TO COPY line is the third tiebreaker for an ambiguous split.** After
   `data-ac-demo-broken` (decisive) and `contract.failureModes` (the shortlist), read what the
   component says about itself. `badge`'s example 4 is three correct answers and one live failure, and
@@ -632,8 +642,8 @@ bound" note, and a `summary` in the new voice.
 | 29 | `status-text` | [x] | **Renamed → Status Label**, and unlike `notice` the old name is a two-word proper noun, so a blanket replace is safe: 15 references in 5 components, all mechanical. Slug, `.ac-status` and `AC.createStatusText` all keep their spelling, and both the file header and `docs.md` say so. **The `typography` shape for the fourth row running** — all four of examples 2 to 5 are `contract.failureModes` entries, so example 1 stands alone under a singular *Correct example* and nothing renumbered. **The first row where the `summary` needed no work at all**: it was already in the new voice and already used the words "status label", so `check:agents` fired no receipt and `useWhen` needed no reread. **`contract.keyboard` did not exist and now does** — one `native:` <kbd>Tab</kbd> row saying nothing here is a tab stop, the `visually-hidden` precedent, because the mandatory Keyboard table needs something to agree with and a component with no focusable part still owes the reader that sentence. Two example titles were arguing rather than naming: *A tick is not a status* and *One region, not one per row* became *Four labels that all mean it worked* and *A live region per row, and one for the list*; the `docs.md` section keeps the argued heading, since that rule is about example titles. Content: Cold Water Flat / Ten Second Anthem / Cassette Only zine → Standing desk / Office chair / Monitor stand, and `4620` → `4462`. `docs.md` had five component-specific `##` against a cap of two: *The detail that does not fit* became a `###` under Required markup, *When the column gets narrow* a `###` under States, and *One region, not one per row* a `###` under *Everything here comes from the size*; that one and *A tick is not a status* stayed. `## Related` is new. |
 | 30 | `badge` | [x] | No rename. **The split was the closest call of the pass, and a third tiebreaker settled it.** Example 4 is *Badges with no number in them*: an abbreviation, a bare dot, a named dot and a zero — three correct answers and one live failure, so it reads as a correct-examples entry. `contract.failureModes` does not list the bare dot, which by the `effects` rule would put it in *Correct examples* and cost a renumber of 4→2, 2→3, 3→4, plus a JS block move. What decided it the other way is **the component's own file header**: *"Examples 2 to 5 are the four ways a number this small goes wrong, live."* The page had already classified itself. So the `typography` shape for the fifth row running, and nothing renumbered. **`contract.keyboard` and `contract.states` both did not exist and now do** — a `native:` <kbd>Tab</kbd> row saying the badge is never the tab stop, and four states the CSS already draws. Content was one line: *Zine 462 · the VFW hall issue* and *Thread · Storm Windows test pressing* → *Project 462 · Billing migration* and *Thread · Invoice 99 dispute*; the spec asserted neither. All six example titles were rewritten — every one of them argued (*Three is not a name*, *Attached, or merely nearby*, *When the digits stop counting*), which is this component's whole voice and exactly what the rule is against. `docs.md` had four component-specific `##` against a cap of two: *When there is no number to read* became a `###` under States and *When the count changes* a `###` under *Attach it, do not merely place it*; that one and *The number needs a subject* stayed. `## Related` is new. |
 | 31 | `result-panel` | [x] | **Renamed → Copyable Result.** Three references, the smallest ripple of the eleven, and both non-`meta.json` ones are in `prose-surface` — the two components that share the min-content finding. `.ac-result` and `AC.createResultPanel` keep their spelling. **The `typography` shape for the sixth row running**, confirmed by the file header the way `badge`'s was: *"Examples 2 to 5 are the four ways a panel made of other components goes wrong."* No renumber. Content was one URL repeated six times plus three query fragments: the whole demo was a punk gig link, and the fake key inside it was `sk_test_99RubySohoLinoleumStormWindows462` → `sk_test_462abcdefg99abcdefg462abcdefg`, the documented shape. **The key is the one string on this page that has to be got right the first time** — see [The demo vocabulary](#the-demo-vocabulary); `abcdefg` is deliberately not hex, which is what keeps GitHub's push protection out of it. `contract.keyboard` gained a `native:` <kbd>Enter</kbd> / <kbd>Space</kbd> row. `docs.md`: the `\| Key \| Where \| Does \|` table was the last one in the library for the second time — `tabs` cleared the others at row 26 and this one was missed by that sweep because it lives under a different heading order. Four component-specific `##` against a cap of two: *The copy button* became a `###` under Required markup and *The empty panel* a `###` under States; *What this component owns* and *The value has to be able to break* stayed. `## Related` is new, and `## Keyboard` had to be moved back above `## States` after the section shuffle. |
-| 32 | `data-table` | [ ] | **NEXT.** heavy punk content. CSS-only. |
-| 33 | `prose-surface` | [ ] | rename → Rich Text Content. heavy punk content. |
+| 32 | `data-table` | [x] | CSS-only, no rename, and the **`typography` shape for the seventh row running** — confirmed by the file header again: *"Examples 2 to 5 are the four ways a table loses the relationships it was built for."* No renumber, and no CSS section marker moved. The content sweep was the heaviest of the pass by volume: a merch table became a stock table, so `Merch table, second night` / `Ruby pressing` / `Clear pressing` / `Tour shirt` / `Zine` / `Thursday`–`Saturday` / `Made` / `Left` → `Stock by item` / `Standing desk` / `Office chair` / `Monitor stand` / `Desk lamp` / `Jan`–`Mar` / `Ordered` / `In stock`, across 8 captions, 6 column headers and 20 spec assertions. **`Left` was the trap**: it is a column name, a `data-label`, a readout value and part of the composed string `Left: 37`, so the replacement list is ordered longest-first and `>Left<` is matched with its angle brackets rather than bare. `docs.md` had five component-specific `##` against a cap of two: *`scope` when the browser could guess* and *A wide table scrolls, it does not restack* became `###` under Required markup, and **`## What a screen reader does with it` merged into `## Screen reader behavior`** rather than being demoted — it was the canonical section under another name. *The caption is the name* and *The card restyle* stayed. There is no `## API` and no `## Using it in a framework`, correctly: the canonical order marks both JS-only and this component has none. |
+| 33 | `prose-surface` | [ ] | **NEXT, and last.** rename → Rich Text Content. heavy punk content. |
 
 ### Phase 0 — the contract and the tracker
 
@@ -696,7 +706,7 @@ can quietly rot while the pass runs:
 ```sh
 DONE="button icon-button loading-button chip-toggle field text-input input-group textarea \
 native-select radio-group checkbox switch fieldset-group skip-link visually-hidden focus-ring \
-live-region typography motion-preferences effects disclosure dropdown modal drawer tooltip tabs jump-nav notice status-text badge result-panel"
+live-region typography motion-preferences effects disclosure dropdown modal drawer tooltip tabs jump-nav notice status-text badge result-panel data-table"
 P=""; for d in $DONE; do P="$P src/library/components/$d"; done
 ls -d $P | wc -l          # must equal the number of finished rows, or every grep below is vacuous
 
@@ -718,7 +728,7 @@ done
 grep -rn "Chip Toggle\|Dropdown / Listbox\|Fieldset Group\|Focus Ring\|Jump Nav\|Motion Preferences\|Result Panel\|Status Text" src/ docs/
 ```
 
-All five return nothing as of row 31 — and **check the sanity of `$P` before believing that**, because
+All five return nothing as of row 32 — and **check the sanity of `$P` before believing that**, because
 every one of them is a grep over a path list and a wrong `DONE` or a failed `cd` makes all five pass
 vacuously. `ls -d $P | wc -l` should print the number of finished rows. The rename sweep below returns
 only its own rows in

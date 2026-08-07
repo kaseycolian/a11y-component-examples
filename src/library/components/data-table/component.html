@@ -7,7 +7,7 @@
        loses the relationships it was built for, live. Each names the CSS it
        needs; there is no JavaScript in this component at all.
 
-     THE CONTRACT
+     REQUIRED MARKUP
        <caption>                     the table's accessible name. First child
                                      of <table>.
        <thead> + <th scope="col">    which column a cell is in.
@@ -20,478 +20,502 @@
      real accessibility tree by tests/data-table.spec.mjs, so it cannot drift.
      Typography's heading list is the same arrangement.
 
-     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
-     Neither is anything named ac-dt-*.
+     There is one correct example, so its section heading is singular. Each of
+     the four under Common mistakes puts its failing table beside a correct one,
+     because on screen the two are identical.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the two section
+     headings, the grid, and the per-example headings. Never copy it, and never
+     copy anything named ac-dt-*.
      =========================================================================== -->
 
-<div class="ac-demo-grid">
-  <!-- ======================================================================
-       EXAMPLE 1 · The specimen
-       CSS [TABLE] + [CAPTION] + [SCROLL].
+<div class="ac-demo-section">
+  <h3 class="ac-demo-section__title">Correct example</h3>
+  <p class="ac-demo-section__note">
+    This is the markup to copy. Four elements and two attributes &mdash; a caption, a
+    <code>thead</code>, <code>scope</code> both ways, and a wrapper that can be named. No script.
+  </p>
 
-       Four elements and two attributes. Nothing else, and no script.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">1 &middot; The specimen</h3>
+  <div class="ac-demo-grid">
+    <!-- ======================================================================
+         EXAMPLE 1 · A caption, scope both ways, and a named wrapper
+         CSS [TABLE] + [CAPTION] + [SCROLL].
 
-    <!-- The wrapper is named from the caption, so the name is written once and
-         the region and the table agree. Background Effects owns the finding
-         underneath: a scroll container is a tab stop with no role and no name
-         in Chromium, and no tab stop at all in Safari. -->
-    <div class="ac-table-scroll" tabindex="0" role="region" aria-labelledby="dt1-cap">
-      <table class="ac-table">
-        <caption class="ac-table__caption" id="dt1-cap">Merch table, second night</caption>
-        <thead>
-          <tr>
-            <th class="ac-table__head" scope="col">Item</th>
-            <th class="ac-table__head ac-table__num" scope="col">Price</th>
-            <th class="ac-table__head ac-table__num" scope="col">Made</th>
-            <th class="ac-table__head ac-table__num" scope="col">Left</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- The row header is the thing the row is about. A screen reader
-               reads it again every time you move sideways into a new cell. -->
-          <tr>
-            <th class="ac-table__row-head" scope="row">Ruby pressing</th>
-            <td class="ac-table__num">$18</td>
-            <td class="ac-table__num">99</td>
-            <td class="ac-table__num">0</td>
-          </tr>
-          <tr>
-            <th class="ac-table__row-head" scope="row">Clear pressing</th>
-            <td class="ac-table__num">$18</td>
-            <td class="ac-table__num">462</td>
-            <td class="ac-table__num">37</td>
-          </tr>
-          <tr>
-            <th class="ac-table__row-head" scope="row">Tour shirt</th>
-            <td class="ac-table__num">$15</td>
-            <td class="ac-table__num">120</td>
-            <td class="ac-table__num">44</td>
-          </tr>
-          <tr>
-            <th class="ac-table__row-head" scope="row">Zine</th>
-            <td class="ac-table__num">$3</td>
-            <td class="ac-table__num">200</td>
-            <td class="ac-table__num">112</td>
-          </tr>
-        </tbody>
-      </table>
+         Four elements and two attributes. Nothing else, and no script.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">1 &middot; A caption, scope both ways, and a named wrapper</h4>
+
+      <!-- The wrapper is named from the caption, so the name is written once and
+           the region and the table agree. Background Effects owns the finding
+           underneath: a scroll container is a tab stop with no role and no name
+           in Chromium, and no tab stop at all in Safari. -->
+      <div class="ac-table-scroll" tabindex="0" role="region" aria-labelledby="dt1-cap">
+        <table class="ac-table">
+          <caption class="ac-table__caption" id="dt1-cap">Stock by item</caption>
+          <thead>
+            <tr>
+              <th class="ac-table__head" scope="col">Item</th>
+              <th class="ac-table__head ac-table__num" scope="col">Price</th>
+              <th class="ac-table__head ac-table__num" scope="col">Ordered</th>
+              <th class="ac-table__head ac-table__num" scope="col">In stock</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- The row header is the thing the row is about. A screen reader
+                 reads it again every time you move sideways into a new cell. -->
+            <tr>
+              <th class="ac-table__row-head" scope="row">Standing desk</th>
+              <td class="ac-table__num">$18</td>
+              <td class="ac-table__num">99</td>
+              <td class="ac-table__num">0</td>
+            </tr>
+            <tr>
+              <th class="ac-table__row-head" scope="row">Office chair</th>
+              <td class="ac-table__num">$18</td>
+              <td class="ac-table__num">462</td>
+              <td class="ac-table__num">37</td>
+            </tr>
+            <tr>
+              <th class="ac-table__row-head" scope="row">Monitor stand</th>
+              <td class="ac-table__num">$15</td>
+              <td class="ac-table__num">120</td>
+              <td class="ac-table__num">44</td>
+            </tr>
+            <tr>
+              <th class="ac-table__row-head" scope="row">Desk lamp</th>
+              <td class="ac-table__num">$3</td>
+              <td class="ac-table__num">200</td>
+              <td class="ac-table__num">112</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="ac-dt__note">
+        Right alignment on the number columns is a class, not the old
+        <code>align</code> attribute &mdash; and it is on the <code>th</code> as well, so the label
+        sits over its own column.
+      </p>
     </div>
 
-    <p class="ac-dt__note">
-      Right alignment on the number columns is a class, not the old
-      <code>align</code> attribute &mdash; and it is on the <code>th</code> as well, so the label
-      sits over its own column.
-    </p>
   </div>
+</div>
 
-  <!-- ======================================================================
-       EXAMPLE 2 · The responsive card restyle
-       CSS [TABLE] + [CAPTION] + [SCROLL] + [BROKEN].
+<div class="ac-demo-section ac-demo-section--mistakes">
+  <h3 class="ac-demo-section__title">Common mistakes</h3>
+  <p class="ac-demo-section__note">
+    These four are live and wrong on purpose. Every readout under them is written by hand and
+    asserted against the real accessibility tree by the spec, so none of it can drift.
+  </p>
 
-       The same table twice. The second is the pattern everybody reaches for on
-       a phone: display: block on every part, the header row clipped, and the
-       column name put back per cell with content: attr(data-label).
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">2 &middot; The responsive card restyle</h3>
+  <div class="ac-demo-grid">
+    <!-- ======================================================================
+         EXAMPLE 2 · The responsive card restyle
+         CSS [TABLE] + [CAPTION] + [SCROLL] + [BROKEN].
 
-    <div class="ac-dt-cases">
-      <div class="ac-dt-case">
-        <p class="ac-dt-case__label">a table</p>
-        <div class="ac-table-scroll" tabindex="0" role="region" aria-labelledby="dt2a-cap">
+         The same table twice. The second is the pattern everybody reaches for on
+         a phone: display: block on every part, the header row clipped, and the
+         column name put back per cell with content: attr(data-label).
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">2 &middot; The responsive card restyle</h4>
+
+      <div class="ac-dt-cases">
+        <div class="ac-dt-case">
+          <p class="ac-dt-case__label">a table</p>
+          <div class="ac-table-scroll" tabindex="0" role="region" aria-labelledby="dt2a-cap">
+            <table class="ac-table">
+              <caption class="ac-table__caption" id="dt2a-cap">Stock, rows</caption>
+              <thead>
+                <tr>
+                  <th class="ac-table__head" scope="col">Item</th>
+                  <th class="ac-table__head ac-table__num" scope="col">Price</th>
+                  <th class="ac-table__head ac-table__num" scope="col">In stock</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th class="ac-table__row-head" scope="row">Office chair</th>
+                  <td class="ac-table__num">$18</td>
+                  <td class="ac-table__num" id="dt2a-cell">37</td>
+                </tr>
+                <tr>
+                  <th class="ac-table__row-head" scope="row">Monitor stand</th>
+                  <td class="ac-table__num">$15</td>
+                  <td class="ac-table__num">44</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- BROKEN ON PURPOSE — data-label is put back as generated content, and
+             generated content is folded into the accessible name. -->
+        <div class="ac-dt-case">
+          <p class="ac-dt-case__label">the same table as cards &mdash; broken on purpose</p>
+          <div class="ac-table-scroll" tabindex="0" role="region" aria-labelledby="dt2b-cap">
+            <table class="ac-table ac-dt-cards">
+              <caption class="ac-table__caption" id="dt2b-cap">Stock, cards</caption>
+              <thead>
+                <tr>
+                  <th class="ac-table__head" scope="col">Item</th>
+                  <th class="ac-table__head ac-table__num" scope="col">Price</th>
+                  <th class="ac-table__head ac-table__num" scope="col">In stock</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th class="ac-table__row-head" scope="row">Office chair</th>
+                  <td class="ac-table__num" data-label="Price">$18</td>
+                  <td class="ac-table__num" data-label="In stock" id="dt2b-cell">37</td>
+                </tr>
+                <tr>
+                  <th class="ac-table__row-head" scope="row">Monitor stand</th>
+                  <td class="ac-table__num" data-label="Price">$15</td>
+                  <td class="ac-table__num" data-label="In stock">44</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <dl class="ac-dt-readout">
+        <div class="ac-dt-readout__row">
+          <dt>a row's cells share a top edge</dt>
+          <dd><code data-ac-dt-out="cards-align-rows">yes</code> &middot;
+            <code data-ac-dt-out="cards-align-cards" data-ac-dt-bad="true">no</code></dd>
+        </div>
+        <div class="ac-dt-readout__row">
+          <dt>the cell reading 37 is named</dt>
+          <dd><code data-ac-dt-out="cards-name-rows">37</code> &middot;
+            <code data-ac-dt-out="cards-name-cards" data-ac-dt-bad="true">In stock: 37</code></dd>
+        </div>
+        <div class="ac-dt-readout__row">
+          <dt>its column header still says</dt>
+          <dd><code data-ac-dt-out="cards-head-rows">In stock</code> &middot;
+            <code data-ac-dt-out="cards-head-cards" data-ac-dt-bad="true">In stock</code></dd>
+        </div>
+      </dl>
+
+      <p class="ac-dt__note">
+        The column name is now in the cell and in the header, so it is read twice. The label was added
+        because the header row was clipped &mdash; and clipping keeps it in the accessibility tree.
+      </p>
+      <p class="ac-dt__note">
+        The roles survive: Chromium 151 still reports <code>table</code>, <code>row</code> and
+        <code>cell</code> under <code>display: block</code>. What is gone is the column on screen.
+      </p>
+    </div>
+
+    <!-- ======================================================================
+         EXAMPLE 3 · The same two columns three ways
+         CSS [TABLE] + [CAPTION] + [BROKEN].
+
+         Three tables that look the same. The difference is td against th, and it
+         is the difference between a grid of numbers and a table.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">3 &middot; The same two columns three ways</h4>
+
+      <div class="ac-dt-cases">
+        <!-- BROKEN ON PURPOSE — every cell is a <td>. The bold row is CSS. -->
+        <div class="ac-dt-case">
+          <p class="ac-dt-case__label">bold text, no <code>th</code> &mdash; broken on purpose</p>
+          <table class="ac-table ac-dt-fake-head">
+            <caption class="ac-table__caption">Stock, no headers</caption>
+            <tbody>
+              <tr>
+                <td>Item</td>
+                <td class="ac-table__num">In stock</td>
+              </tr>
+              <tr>
+                <td id="dt3a-row">Office chair</td>
+                <td class="ac-table__num" id="dt3a-cell">37</td>
+              </tr>
+            </tbody>
+          </table>
+          <dl class="ac-dt-readout">
+            <div class="ac-dt-readout__row">
+              <dt>column label is a</dt>
+              <dd><code data-ac-dt-out="head-col-none" data-ac-dt-bad="true">cell</code></dd>
+            </div>
+            <div class="ac-dt-readout__row">
+              <dt>row label is a</dt>
+              <dd><code data-ac-dt-out="head-row-none" data-ac-dt-bad="true">cell</code></dd>
+            </div>
+          </dl>
+        </div>
+
+        <!-- BROKEN ON PURPOSE — half of it. The column is named, the row is not. -->
+        <div class="ac-dt-case">
+          <p class="ac-dt-case__label">column headers only &mdash; broken on purpose</p>
           <table class="ac-table">
-            <caption class="ac-table__caption" id="dt2a-cap">Merch table, rows</caption>
+            <caption class="ac-table__caption">Stock, columns only</caption>
             <thead>
               <tr>
                 <th class="ac-table__head" scope="col">Item</th>
-                <th class="ac-table__head ac-table__num" scope="col">Price</th>
-                <th class="ac-table__head ac-table__num" scope="col">Left</th>
+                <th class="ac-table__head ac-table__num" scope="col">In stock</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <th class="ac-table__row-head" scope="row">Clear pressing</th>
-                <td class="ac-table__num">$18</td>
-                <td class="ac-table__num" id="dt2a-cell">37</td>
+                <td id="dt3b-row">Office chair</td>
+                <td class="ac-table__num" id="dt3b-cell">37</td>
+              </tr>
+            </tbody>
+          </table>
+          <dl class="ac-dt-readout">
+            <div class="ac-dt-readout__row">
+              <dt>column label is a</dt>
+              <dd><code data-ac-dt-out="head-col-half">columnheader</code></dd>
+            </div>
+            <div class="ac-dt-readout__row">
+              <dt>row label is a</dt>
+              <dd><code data-ac-dt-out="head-row-half" data-ac-dt-bad="true">cell</code></dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="ac-dt-case">
+          <p class="ac-dt-case__label"><code>scope</code> both ways</p>
+          <table class="ac-table">
+            <caption class="ac-table__caption">Stock, both ways</caption>
+            <thead>
+              <tr>
+                <th class="ac-table__head" scope="col">Item</th>
+                <th class="ac-table__head ac-table__num" scope="col">In stock</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th class="ac-table__row-head" scope="row" id="dt3c-row">Office chair</th>
+                <td class="ac-table__num" id="dt3c-cell">37</td>
+              </tr>
+            </tbody>
+          </table>
+          <dl class="ac-dt-readout">
+            <div class="ac-dt-readout__row">
+              <dt>column label is a</dt>
+              <dd><code data-ac-dt-out="head-col-both">columnheader</code></dd>
+            </div>
+            <div class="ac-dt-readout__row">
+              <dt>row label is a</dt>
+              <dd><code data-ac-dt-out="head-row-both">rowheader</code></dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <p class="ac-dt__note">
+        Moving into <code>37</code> reads the headers that point at it. In the first table there are
+        none, so it is announced as the number alone.
+      </p>
+    </div>
+
+    <!-- ======================================================================
+         EXAMPLE 4 · One wide table in two wrappers
+         CSS [TABLE] + [CAPTION] + [SCROLL] + [BROKEN].
+
+         The same wide table in two wrappers. Both scroll with a mouse. Only one
+         of them can be named, or seen when it takes focus.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">4 &middot; One wide table in two wrappers</h4>
+
+      <div class="ac-dt-stack">
+        <!-- BROKEN ON PURPOSE — overflow and nothing else. -->
+        <p class="ac-dt-case__label"><code>overflow-x: auto</code> alone &mdash; broken on purpose</p>
+        <div class="ac-dt-bare-scroll" id="dt4a-wrap" data-ac-demo-broken="scrollable-region-focusable">
+          <table class="ac-table">
+            <caption class="ac-table__caption">Stock by month, bare wrapper</caption>
+            <thead>
+              <tr>
+                <th class="ac-table__head" scope="col">Item</th>
+                <th class="ac-table__head ac-table__num" scope="col">Jan</th>
+                <th class="ac-table__head ac-table__num" scope="col">Feb</th>
+                <th class="ac-table__head ac-table__num" scope="col">Mar</th>
+                <th class="ac-table__head ac-table__num" scope="col">Ordered</th>
+                <th class="ac-table__head ac-table__num" scope="col">In stock</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th class="ac-table__row-head" scope="row">Standing desk</th>
+                <td class="ac-table__num">31</td>
+                <td class="ac-table__num">40</td>
+                <td class="ac-table__num">28</td>
+                <td class="ac-table__num">99</td>
+                <td class="ac-table__num">0</td>
               </tr>
               <tr>
-                <th class="ac-table__row-head" scope="row">Tour shirt</th>
-                <td class="ac-table__num">$15</td>
-                <td class="ac-table__num">44</td>
+                <th class="ac-table__row-head" scope="row">Office chair</th>
+                <td class="ac-table__num">120</td>
+                <td class="ac-table__num">180</td>
+                <td class="ac-table__num">125</td>
+                <td class="ac-table__num">462</td>
+                <td class="ac-table__num">37</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="ac-dt-case__label"><code>.ac-table-scroll</code></p>
+        <div class="ac-table-scroll" id="dt4b-wrap" tabindex="0" role="region" aria-labelledby="dt4b-cap">
+          <table class="ac-table">
+            <caption class="ac-table__caption" id="dt4b-cap">Stock by month</caption>
+            <thead>
+              <tr>
+                <th class="ac-table__head" scope="col">Item</th>
+                <th class="ac-table__head ac-table__num" scope="col">Jan</th>
+                <th class="ac-table__head ac-table__num" scope="col">Feb</th>
+                <th class="ac-table__head ac-table__num" scope="col">Mar</th>
+                <th class="ac-table__head ac-table__num" scope="col">Ordered</th>
+                <th class="ac-table__head ac-table__num" scope="col">In stock</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th class="ac-table__row-head" scope="row">Standing desk</th>
+                <td class="ac-table__num">31</td>
+                <td class="ac-table__num">40</td>
+                <td class="ac-table__num">28</td>
+                <td class="ac-table__num">99</td>
+                <td class="ac-table__num">0</td>
+              </tr>
+              <tr>
+                <th class="ac-table__row-head" scope="row">Office chair</th>
+                <td class="ac-table__num">120</td>
+                <td class="ac-table__num">180</td>
+                <td class="ac-table__num">125</td>
+                <td class="ac-table__num">462</td>
+                <td class="ac-table__num">37</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- BROKEN ON PURPOSE — data-label is put back as generated content, and
-           generated content is folded into the accessible name. -->
-      <div class="ac-dt-case">
-        <p class="ac-dt-case__label">the same table as cards &mdash; broken on purpose</p>
-        <div class="ac-table-scroll" tabindex="0" role="region" aria-labelledby="dt2b-cap">
-          <table class="ac-table ac-dt-cards">
-            <caption class="ac-table__caption" id="dt2b-cap">Merch table, cards</caption>
+      <dl class="ac-dt-readout">
+        <div class="ac-dt-readout__row">
+          <dt>bare wrapper announces as</dt>
+          <dd><code data-ac-dt-out="scroll-bare" data-ac-dt-bad="true">nothing &mdash; no role, no name</code></dd>
+        </div>
+        <div class="ac-dt-readout__row">
+          <dt><code>.ac-table-scroll</code> announces as</dt>
+          <dd><code data-ac-dt-out="scroll-named">Stock by month, region</code></dd>
+        </div>
+      </dl>
+
+      <p class="ac-dt__note">
+        Chromium hands the bare wrapper a tab stop anyway, with a 1px near-black ring nobody can see on
+        a dark page. Safari hands it nothing, so the table cannot be scrolled by keyboard at all
+        (SC 2.1.1).
+      </p>
+    </div>
+
+    <!-- ======================================================================
+         EXAMPLE 5 · A table named four ways
+         CSS [TABLE] + [CAPTION] + [BROKEN].
+
+         Four tables. Two have a name and two only look like they do.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">5 &middot; A table named four ways</h4>
+
+      <div class="ac-dt-cases">
+        <!-- BROKEN ON PURPOSE — no name at all. -->
+        <div class="ac-dt-case">
+          <p class="ac-dt-case__label">no caption &mdash; broken on purpose</p>
+          <table class="ac-table" id="dt5a">
             <thead>
-              <tr>
-                <th class="ac-table__head" scope="col">Item</th>
-                <th class="ac-table__head ac-table__num" scope="col">Price</th>
-                <th class="ac-table__head ac-table__num" scope="col">Left</th>
-              </tr>
+              <tr><th class="ac-table__head" scope="col">Item</th>
+                  <th class="ac-table__head ac-table__num" scope="col">In stock</th></tr>
             </thead>
             <tbody>
-              <tr>
-                <th class="ac-table__row-head" scope="row">Clear pressing</th>
-                <td class="ac-table__num" data-label="Price">$18</td>
-                <td class="ac-table__num" data-label="Left" id="dt2b-cell">37</td>
-              </tr>
-              <tr>
-                <th class="ac-table__row-head" scope="row">Tour shirt</th>
-                <td class="ac-table__num" data-label="Price">$15</td>
-                <td class="ac-table__num" data-label="Left">44</td>
-              </tr>
+              <tr><th class="ac-table__row-head" scope="row">Desk lamp</th>
+                  <td class="ac-table__num">112</td></tr>
             </tbody>
           </table>
+          <dl class="ac-dt-readout">
+            <div class="ac-dt-readout__row">
+              <dt>table name</dt>
+              <dd><code data-ac-dt-out="name-none" data-ac-dt-bad="true">&mdash;</code></dd>
+            </div>
+          </dl>
+        </div>
+
+        <!-- BROKEN ON PURPOSE — a paragraph that looks like a caption and names
+             nothing. Pixel-identical to the clipped-caption case. -->
+        <div class="ac-dt-case">
+          <p class="ac-dt-case__label">a <code>&lt;p&gt;</code> above it &mdash; broken on purpose</p>
+          <p class="ac-dt-fake-caption">Stock</p>
+          <table class="ac-table" id="dt5b">
+            <thead>
+              <tr><th class="ac-table__head" scope="col">Item</th>
+                  <th class="ac-table__head ac-table__num" scope="col">In stock</th></tr>
+            </thead>
+            <tbody>
+              <tr><th class="ac-table__row-head" scope="row">Desk lamp</th>
+                  <td class="ac-table__num">112</td></tr>
+            </tbody>
+          </table>
+          <dl class="ac-dt-readout">
+            <div class="ac-dt-readout__row">
+              <dt>table name</dt>
+              <dd><code data-ac-dt-out="name-p" data-ac-dt-bad="true">&mdash;</code></dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="ac-dt-case">
+          <p class="ac-dt-case__label"><code>&lt;caption&gt;</code></p>
+          <table class="ac-table" id="dt5c">
+            <caption class="ac-table__caption">Stock</caption>
+            <thead>
+              <tr><th class="ac-table__head" scope="col">Item</th>
+                  <th class="ac-table__head ac-table__num" scope="col">In stock</th></tr>
+            </thead>
+            <tbody>
+              <tr><th class="ac-table__row-head" scope="row">Desk lamp</th>
+                  <td class="ac-table__num">112</td></tr>
+            </tbody>
+          </table>
+          <dl class="ac-dt-readout">
+            <div class="ac-dt-readout__row">
+              <dt>table name</dt>
+              <dd><code data-ac-dt-out="name-caption">Stock</code></dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="ac-dt-case">
+          <p class="ac-dt-case__label"><code>&lt;caption&gt;</code>, clipped</p>
+          <table class="ac-table" id="dt5d">
+            <caption class="ac-table__caption ac-table__caption--clipped">Stock</caption>
+            <thead>
+              <tr><th class="ac-table__head" scope="col">Item</th>
+                  <th class="ac-table__head ac-table__num" scope="col">In stock</th></tr>
+            </thead>
+            <tbody>
+              <tr><th class="ac-table__row-head" scope="row">Desk lamp</th>
+                  <td class="ac-table__num">112</td></tr>
+            </tbody>
+          </table>
+          <dl class="ac-dt-readout">
+            <div class="ac-dt-readout__row">
+              <dt>table name</dt>
+              <dd><code data-ac-dt-out="name-clipped">Stock</code></dd>
+            </div>
+          </dl>
         </div>
       </div>
+
+      <p class="ac-dt__note">
+        The clipped caption and the paragraph look the same on screen. One names the table and one is a
+        sentence that happens to sit above it.
+      </p>
     </div>
-
-    <dl class="ac-dt-readout">
-      <div class="ac-dt-readout__row">
-        <dt>a row's cells share a top edge</dt>
-        <dd><code data-ac-dt-out="cards-align-rows">yes</code> &middot;
-          <code data-ac-dt-out="cards-align-cards" data-ac-dt-bad="true">no</code></dd>
-      </div>
-      <div class="ac-dt-readout__row">
-        <dt>the cell reading 37 is named</dt>
-        <dd><code data-ac-dt-out="cards-name-rows">37</code> &middot;
-          <code data-ac-dt-out="cards-name-cards" data-ac-dt-bad="true">Left: 37</code></dd>
-      </div>
-      <div class="ac-dt-readout__row">
-        <dt>its column header still says</dt>
-        <dd><code data-ac-dt-out="cards-head-rows">Left</code> &middot;
-          <code data-ac-dt-out="cards-head-cards" data-ac-dt-bad="true">Left</code></dd>
-      </div>
-    </dl>
-
-    <p class="ac-dt__note">
-      The column name is now in the cell and in the header, so it is read twice. The label was added
-      because the header row was clipped &mdash; and clipping keeps it in the accessibility tree.
-    </p>
-    <p class="ac-dt__note">
-      The roles survive: Chromium 151 still reports <code>table</code>, <code>row</code> and
-      <code>cell</code> under <code>display: block</code>. What is gone is the column on screen.
-    </p>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 3 · Which cell is a header
-       CSS [TABLE] + [CAPTION] + [BROKEN].
-
-       Three tables that look the same. The difference is td against th, and it
-       is the difference between a grid of numbers and a table.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">3 &middot; Which cell is a header</h3>
-
-    <div class="ac-dt-cases">
-      <!-- BROKEN ON PURPOSE — every cell is a <td>. The bold row is CSS. -->
-      <div class="ac-dt-case">
-        <p class="ac-dt-case__label">bold text, no <code>th</code> &mdash; broken on purpose</p>
-        <table class="ac-table ac-dt-fake-head">
-          <caption class="ac-table__caption">Left, no headers</caption>
-          <tbody>
-            <tr>
-              <td>Item</td>
-              <td class="ac-table__num">Left</td>
-            </tr>
-            <tr>
-              <td id="dt3a-row">Clear pressing</td>
-              <td class="ac-table__num" id="dt3a-cell">37</td>
-            </tr>
-          </tbody>
-        </table>
-        <dl class="ac-dt-readout">
-          <div class="ac-dt-readout__row">
-            <dt>column label is a</dt>
-            <dd><code data-ac-dt-out="head-col-none" data-ac-dt-bad="true">cell</code></dd>
-          </div>
-          <div class="ac-dt-readout__row">
-            <dt>row label is a</dt>
-            <dd><code data-ac-dt-out="head-row-none" data-ac-dt-bad="true">cell</code></dd>
-          </div>
-        </dl>
-      </div>
-
-      <!-- BROKEN ON PURPOSE — half of it. The column is named, the row is not. -->
-      <div class="ac-dt-case">
-        <p class="ac-dt-case__label">column headers only &mdash; broken on purpose</p>
-        <table class="ac-table">
-          <caption class="ac-table__caption">Left, columns only</caption>
-          <thead>
-            <tr>
-              <th class="ac-table__head" scope="col">Item</th>
-              <th class="ac-table__head ac-table__num" scope="col">Left</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td id="dt3b-row">Clear pressing</td>
-              <td class="ac-table__num" id="dt3b-cell">37</td>
-            </tr>
-          </tbody>
-        </table>
-        <dl class="ac-dt-readout">
-          <div class="ac-dt-readout__row">
-            <dt>column label is a</dt>
-            <dd><code data-ac-dt-out="head-col-half">columnheader</code></dd>
-          </div>
-          <div class="ac-dt-readout__row">
-            <dt>row label is a</dt>
-            <dd><code data-ac-dt-out="head-row-half" data-ac-dt-bad="true">cell</code></dd>
-          </div>
-        </dl>
-      </div>
-
-      <div class="ac-dt-case">
-        <p class="ac-dt-case__label"><code>scope</code> both ways</p>
-        <table class="ac-table">
-          <caption class="ac-table__caption">Left, both ways</caption>
-          <thead>
-            <tr>
-              <th class="ac-table__head" scope="col">Item</th>
-              <th class="ac-table__head ac-table__num" scope="col">Left</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th class="ac-table__row-head" scope="row" id="dt3c-row">Clear pressing</th>
-              <td class="ac-table__num" id="dt3c-cell">37</td>
-            </tr>
-          </tbody>
-        </table>
-        <dl class="ac-dt-readout">
-          <div class="ac-dt-readout__row">
-            <dt>column label is a</dt>
-            <dd><code data-ac-dt-out="head-col-both">columnheader</code></dd>
-          </div>
-          <div class="ac-dt-readout__row">
-            <dt>row label is a</dt>
-            <dd><code data-ac-dt-out="head-row-both">rowheader</code></dd>
-          </div>
-        </dl>
-      </div>
-    </div>
-
-    <p class="ac-dt__note">
-      Moving into <code>37</code> reads the headers that point at it. In the first table there are
-      none, so it is announced as the number alone.
-    </p>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 4 · A table wider than its column
-       CSS [TABLE] + [CAPTION] + [SCROLL] + [BROKEN].
-
-       The same wide table in two wrappers. Both scroll with a mouse. Only one
-       of them can be named, or seen when it takes focus.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">4 &middot; A table wider than its column</h3>
-
-    <div class="ac-dt-stack">
-      <!-- BROKEN ON PURPOSE — overflow and nothing else. -->
-      <p class="ac-dt-case__label"><code>overflow-x: auto</code> alone &mdash; broken on purpose</p>
-      <div class="ac-dt-bare-scroll" id="dt4a-wrap" data-ac-demo-broken="scrollable-region-focusable">
-        <table class="ac-table">
-          <caption class="ac-table__caption">Merch by night, bare wrapper</caption>
-          <thead>
-            <tr>
-              <th class="ac-table__head" scope="col">Item</th>
-              <th class="ac-table__head ac-table__num" scope="col">Thursday</th>
-              <th class="ac-table__head ac-table__num" scope="col">Friday</th>
-              <th class="ac-table__head ac-table__num" scope="col">Saturday</th>
-              <th class="ac-table__head ac-table__num" scope="col">Made</th>
-              <th class="ac-table__head ac-table__num" scope="col">Left</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th class="ac-table__row-head" scope="row">Ruby pressing</th>
-              <td class="ac-table__num">31</td>
-              <td class="ac-table__num">40</td>
-              <td class="ac-table__num">28</td>
-              <td class="ac-table__num">99</td>
-              <td class="ac-table__num">0</td>
-            </tr>
-            <tr>
-              <th class="ac-table__row-head" scope="row">Clear pressing</th>
-              <td class="ac-table__num">120</td>
-              <td class="ac-table__num">180</td>
-              <td class="ac-table__num">125</td>
-              <td class="ac-table__num">462</td>
-              <td class="ac-table__num">37</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <p class="ac-dt-case__label"><code>.ac-table-scroll</code></p>
-      <div class="ac-table-scroll" id="dt4b-wrap" tabindex="0" role="region" aria-labelledby="dt4b-cap">
-        <table class="ac-table">
-          <caption class="ac-table__caption" id="dt4b-cap">Merch by night</caption>
-          <thead>
-            <tr>
-              <th class="ac-table__head" scope="col">Item</th>
-              <th class="ac-table__head ac-table__num" scope="col">Thursday</th>
-              <th class="ac-table__head ac-table__num" scope="col">Friday</th>
-              <th class="ac-table__head ac-table__num" scope="col">Saturday</th>
-              <th class="ac-table__head ac-table__num" scope="col">Made</th>
-              <th class="ac-table__head ac-table__num" scope="col">Left</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th class="ac-table__row-head" scope="row">Ruby pressing</th>
-              <td class="ac-table__num">31</td>
-              <td class="ac-table__num">40</td>
-              <td class="ac-table__num">28</td>
-              <td class="ac-table__num">99</td>
-              <td class="ac-table__num">0</td>
-            </tr>
-            <tr>
-              <th class="ac-table__row-head" scope="row">Clear pressing</th>
-              <td class="ac-table__num">120</td>
-              <td class="ac-table__num">180</td>
-              <td class="ac-table__num">125</td>
-              <td class="ac-table__num">462</td>
-              <td class="ac-table__num">37</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <dl class="ac-dt-readout">
-      <div class="ac-dt-readout__row">
-        <dt>bare wrapper announces as</dt>
-        <dd><code data-ac-dt-out="scroll-bare" data-ac-dt-bad="true">nothing &mdash; no role, no name</code></dd>
-      </div>
-      <div class="ac-dt-readout__row">
-        <dt><code>.ac-table-scroll</code> announces as</dt>
-        <dd><code data-ac-dt-out="scroll-named">Merch by night, region</code></dd>
-      </div>
-    </dl>
-
-    <p class="ac-dt__note">
-      Chromium hands the bare wrapper a tab stop anyway, with a 1px near-black ring nobody can see on
-      a dark page. Safari hands it nothing, so the table cannot be scrolled by keyboard at all
-      (SC 2.1.1).
-    </p>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 5 · The caption is the name
-       CSS [TABLE] + [CAPTION] + [BROKEN].
-
-       Four tables. Two have a name and two only look like they do.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">5 &middot; The caption is the name</h3>
-
-    <div class="ac-dt-cases">
-      <!-- BROKEN ON PURPOSE — no name at all. -->
-      <div class="ac-dt-case">
-        <p class="ac-dt-case__label">no caption &mdash; broken on purpose</p>
-        <table class="ac-table" id="dt5a">
-          <thead>
-            <tr><th class="ac-table__head" scope="col">Item</th>
-                <th class="ac-table__head ac-table__num" scope="col">Left</th></tr>
-          </thead>
-          <tbody>
-            <tr><th class="ac-table__row-head" scope="row">Zine</th>
-                <td class="ac-table__num">112</td></tr>
-          </tbody>
-        </table>
-        <dl class="ac-dt-readout">
-          <div class="ac-dt-readout__row">
-            <dt>table name</dt>
-            <dd><code data-ac-dt-out="name-none" data-ac-dt-bad="true">&mdash;</code></dd>
-          </div>
-        </dl>
-      </div>
-
-      <!-- BROKEN ON PURPOSE — a paragraph that looks like a caption and names
-           nothing. Pixel-identical to the clipped-caption case. -->
-      <div class="ac-dt-case">
-        <p class="ac-dt-case__label">a <code>&lt;p&gt;</code> above it &mdash; broken on purpose</p>
-        <p class="ac-dt-fake-caption">Zines</p>
-        <table class="ac-table" id="dt5b">
-          <thead>
-            <tr><th class="ac-table__head" scope="col">Item</th>
-                <th class="ac-table__head ac-table__num" scope="col">Left</th></tr>
-          </thead>
-          <tbody>
-            <tr><th class="ac-table__row-head" scope="row">Zine</th>
-                <td class="ac-table__num">112</td></tr>
-          </tbody>
-        </table>
-        <dl class="ac-dt-readout">
-          <div class="ac-dt-readout__row">
-            <dt>table name</dt>
-            <dd><code data-ac-dt-out="name-p" data-ac-dt-bad="true">&mdash;</code></dd>
-          </div>
-        </dl>
-      </div>
-
-      <div class="ac-dt-case">
-        <p class="ac-dt-case__label"><code>&lt;caption&gt;</code></p>
-        <table class="ac-table" id="dt5c">
-          <caption class="ac-table__caption">Zines</caption>
-          <thead>
-            <tr><th class="ac-table__head" scope="col">Item</th>
-                <th class="ac-table__head ac-table__num" scope="col">Left</th></tr>
-          </thead>
-          <tbody>
-            <tr><th class="ac-table__row-head" scope="row">Zine</th>
-                <td class="ac-table__num">112</td></tr>
-          </tbody>
-        </table>
-        <dl class="ac-dt-readout">
-          <div class="ac-dt-readout__row">
-            <dt>table name</dt>
-            <dd><code data-ac-dt-out="name-caption">Zines</code></dd>
-          </div>
-        </dl>
-      </div>
-
-      <div class="ac-dt-case">
-        <p class="ac-dt-case__label"><code>&lt;caption&gt;</code>, clipped</p>
-        <table class="ac-table" id="dt5d">
-          <caption class="ac-table__caption ac-table__caption--clipped">Zines</caption>
-          <thead>
-            <tr><th class="ac-table__head" scope="col">Item</th>
-                <th class="ac-table__head ac-table__num" scope="col">Left</th></tr>
-          </thead>
-          <tbody>
-            <tr><th class="ac-table__row-head" scope="row">Zine</th>
-                <td class="ac-table__num">112</td></tr>
-          </tbody>
-        </table>
-        <dl class="ac-dt-readout">
-          <div class="ac-dt-readout__row">
-            <dt>table name</dt>
-            <dd><code data-ac-dt-out="name-clipped">Zines</code></dd>
-          </div>
-        </dl>
-      </div>
-    </div>
-
-    <p class="ac-dt__note">
-      The clipped caption and the paragraph look the same on screen. One names the table and one is a
-      sentence that happens to sit above it.
-    </p>
   </div>
 </div>
