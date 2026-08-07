@@ -128,7 +128,7 @@ test('the emoji label announces a character and the specimen announces a word', 
 
 test('the title attribute puts the reason nowhere the text can reach', async ({ page }) => {
   const label = page.locator('[data-ac-st-detail-case="title"]');
-  await expect(label).toHaveAttribute('title', 'Card ending 4620 was declined');
+  await expect(label).toHaveAttribute('title', 'Card ending 4462 was declined');
 
   // The element already has text, so the title is not in the accessible name.
   expect(await spoken(page, '[data-ac-st-detail-case="title"]')).toBe('Failed');
@@ -141,7 +141,7 @@ test('the hover bubble is in the stylesheet and not in the text', async ({ page 
   const declared = await page
     .locator('[data-ac-st-detail-case="tip"]')
     .evaluate((el) => getComputedStyle(el, '::after').content);
-  expect(declared).toContain('4620');
+  expect(declared).toContain('4462');
 
   expect(await spoken(page, '[data-ac-st-detail-case="tip"]')).toBe('Failed');
 });
@@ -149,14 +149,14 @@ test('the hover bubble is in the stylesheet and not in the text', async ({ page 
 test('the clipped detail is off screen and still announced', async ({ page }) => {
   const said = await spoken(page, '[data-ac-st-detail-case="good"]');
   expect(said).toContain('Failed');
-  expect(said).toContain('4620');
+  expect(said).toContain('4462');
 
   // Clipped, not removed: a 1px box that is still in the accessibility tree.
   const box = await page.locator('[data-ac-st-detail-case="good"] .ac-status__detail').boundingBox();
   expect(box.width).toBeLessThanOrEqual(2);
   expect(box.height).toBeLessThanOrEqual(2);
 
-  await expect(page.locator('[data-ac-st-out="detail-good"]')).toContainText('4620');
+  await expect(page.locator('[data-ac-st-out="detail-good"]')).toContainText('4462');
 });
 
 /* --- example 4 · one region, not one per row ------------------------------- */

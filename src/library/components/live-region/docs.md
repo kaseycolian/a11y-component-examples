@@ -238,6 +238,6 @@ message.
 
 ## Related
 
-- [Status Text](../status-text/) — the visible half of the same message.
+- [Status Label](../status-text/) — the visible half of the same message.
 - [Alert](../notice/) — a banner that is a live region when it appears after load.
 - [Loading Button](../loading-button/) — a button that announces its own progress.

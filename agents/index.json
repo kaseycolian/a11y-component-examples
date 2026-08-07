@@ -411,7 +411,7 @@
     },
     {
       "slug": "status-text",
-      "name": "Status Text",
+      "name": "Status Label",
       "group": "feedback-status",
       "useWhen": "A one-word status, at the scale where there is room for nothing else.",
       "tags": ["status", "label", "live-region", "visually-hidden", "generated-content", "accessible-name", "non-text-contrast", "forced-colors"],

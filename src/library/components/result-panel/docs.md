@@ -19,7 +19,7 @@ The panel announces. Nothing inside it does.
 | `.ac-result` | the panel | it owns the one live region inside it |
 | `.ac-result__value` | the value, monospace, wrapping | a `<code>`, deliberately not an `<output>` |
 | `.ac-result__status` | `role="status"`, in the markup, empty | the only thing on the panel that talks |
-| the verdict | a [Status Text](../status-text/) label with no live role | — |
+| the verdict | a [Status Label](../status-text/) label with no live role | — |
 | the count | a [Badge](../badge/) with no live role | — |
 | the reason | a [Alert](../notice/) with no live role | — |
 | the copy button | its name never changes | [Input Group](../input-group/)'s button, lifted |
@@ -32,7 +32,7 @@ own:
 
 - [Alert](../notice/) — a message that appears in response to an action goes into a region that was
   already there.
-- [Status Text](../status-text/) — one region for the list, never one per label.
+- [Status Label](../status-text/) — one region for the list, never one per label.
 - [Badge](../badge/) — the region belongs to the area the badge describes.
 
 Follow all three inside one panel and one button press produces four announcements. So the panel

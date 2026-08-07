@@ -94,7 +94,7 @@ readout prints what is announced, and without the prefix the success alert and t
 the same string.
 
 The tones here are the theme's four accents — blue, green, purple, pink — and there is no red.
-That is survivable exactly because the word carries it. [Status Text](../status-text/) is this
+That is survivable exactly because the word carries it. [Status Label](../status-text/) is this
 argument at label scale and points back here rather than repeating it.
 
 ## Static or announced
@@ -200,5 +200,5 @@ unconditionally and let only its contents be conditional.
 
 - [Live Region](../live-region/) — the announcement recipe this component uses, and where the
   clear-then-write reasoning lives.
-- [Status Text](../status-text/) — the same tone argument at label scale.
+- [Status Label](../status-text/) — the same tone argument at label scale.
 - [Form Field](../field/) — a validation message belongs to its field, not to a banner.

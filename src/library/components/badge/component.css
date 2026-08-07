@@ -168,7 +168,7 @@
 /* --- [SLOT] example 5 -----------------------------------------------------
    The region a changing count announces from. It belongs to the area the badge
    describes, never to the badge: a badge nested in a button is a live region
-   inside a control, and every arriving message then interrupts. Status Text
+   inside a control, and every arriving message then interrupts. Status Label
    has the argument, Live Region has the clear-then-write recipe. */
 
 .ac-bdg-slot {

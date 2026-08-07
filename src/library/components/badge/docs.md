@@ -90,7 +90,7 @@ that line the zero badge stays on screen — [Tooltip](../tooltip/) hit the same
 
 ## When the count changes
 
-[Status Text](../status-text/) has the argument about which element carries the live role, and it is
+[Status Label](../status-text/) has the argument about which element carries the live role, and it is
 sharper here: a corner badge is *inside a button*, so `role="status"` on it puts a live region inside
 a control. Every arriving message then interrupts, in a fragment — `4 unread messages`, with no verb
 and no subject a reader can act on.

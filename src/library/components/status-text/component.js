@@ -1,5 +1,5 @@
 /* ===========================================================================
-   STATUS TEXT
+   STATUS LABEL
 
    WHAT TO COPY
      [SET]        set a label's tone and word. This is the whole component —

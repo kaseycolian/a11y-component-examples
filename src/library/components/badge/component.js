@@ -118,7 +118,7 @@
        button it is nested in. Browser-confirmed in Chromium — the spec asserts
        it against the real accessibility tree, not against this walk.
 
-       Status Text and Filter Chip have the same walk. Nothing here handles
+       Status Label and Filter Chip have the same walk. Nothing here handles
        aria-label or aria-labelledby, because nothing on this page uses them:
        the whole argument is that real text composes and an attribute does
        not. */

@@ -152,7 +152,7 @@
    * @param {HTMLElement} panel an .ac-result element
    * @param {object} state
    * @param {string} [state.value] the value, or '' for none
-   * @param {string} [state.verdict] one word for the Status Text label
+   * @param {string} [state.verdict] one word for the Status Label label
    * @param {string} [state.tone] 'ok' | 'err' | 'muted'
    * @param {number} [state.count] the Badge count; 0 removes the badge
    * @param {string} [state.subject] plural noun for the count — 'parameters'
@@ -170,7 +170,7 @@
     var verdict = panel.querySelector('.ac-status');
     if (verdict && state.verdict) {
       // The tone and the word are set together and there is no way to set one
-      // alone, so the color and the text cannot drift. Status Text's rule.
+      // alone, so the color and the text cannot drift. Status Label's rule.
       verdict.className = 'ac-status ac-status--' + (state.tone || 'muted');
       var word = verdict.querySelector('.ac-status__text');
       if (word) word.textContent = state.verdict;

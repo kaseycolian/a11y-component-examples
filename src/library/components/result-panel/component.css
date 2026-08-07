@@ -10,7 +10,7 @@
                  taking the page sideways with it. Four lines, and the whole
                  of example 2.
      [STATUS]    examples 1, 3, 4 and 5. The panel's single live region.
-     [COMPOSED]  examples 1, 3 and 5. Local copies of Status Text, Badge and
+     [COMPOSED]  examples 1, 3 and 5. Local copies of Status Label, Badge and
                  Alert. Delete whichever of the three you already have.
      [BTN]       every example. A copy of Input Group's addon button.
      [BROKEN]    examples 2 and 4. Delete it. It reproduces two failures that
@@ -216,7 +216,7 @@
    Text, Badge and Alert each document when they should carry one; inside a
    panel that already has a region, the answer is never. */
 
-/* Status Text — the verdict. */
+/* Status Label — the verdict. */
 .ac-status {
   --ac-status-accent: var(--ac-text-muted, var(--text-muted, #bcadde));
 
