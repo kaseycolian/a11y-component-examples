@@ -1,12 +1,12 @@
 <!-- ===========================================================================
-     DROPDOWN / LISTBOX — a button, a listbox, and options you can read
+     CUSTOM SELECT — a button, a listbox, and options you can read
 
      WHAT TO COPY
        Any one example below is self-contained. Take its section, plus the
        matching [CORE] sections of component.css and component.js.
        Copy all three files whole for the library-grade version.
 
-     THE CONTRACT — it is all here in the markup
+     REQUIRED MARKUP — it is all here, and none of it is generated
        trigger  ->  <button>, aria-haspopup="listbox", aria-expanded,
                     aria-controls, aria-labelledby="<label id> <value id>"
        panel    ->  role="listbox", aria-labelledby="<label id>", hidden,
@@ -31,7 +31,12 @@
      that matters more than styled rows, `native-select` is the answer, and it
      is the better default on a phone anyway — it gets the OS picker.
 
-     ac-demo-* is scaffolding for this page only. Never copy it.
+     There is no Common mistakes section on this page: all six examples are
+     correct markup, and the six are six things a row can hold rather than six
+     verdicts. The mistakes are written up in docs.md instead.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the section
+     heading, the grid, and the per-example headings. Never copy it.
      =========================================================================== -->
 
 <!-- Icon sprite for example 1. Anywhere on the page is fine; it draws nothing
@@ -61,373 +66,387 @@
   </symbol>
 </svg>
 
-<div class="ac-demo-grid" data-ac-dropdown-page>
-  <!-- ======================================================================
-       EXAMPLE 1 · Icons and secondary text
-       CSS [FIELD] + [CORE] + [DECORATION]. JS [CORE] + [TYPEAHEAD].
+<div data-ac-dropdown-page>
+  <div class="ac-demo-section">
+    <h3 class="ac-demo-section__title">Correct examples</h3>
+    <p class="ac-demo-section__note">
+      All six are markup you can copy. They are six things a row can hold, and six states the control
+      can be in &mdash; decorated, grouped, swatched, locked, empty, and inside a form.
+    </p>
 
-       The label's `for` points at the trigger, which is a real <button> and so
-       a labelable element: clicking the label focuses it. aria-labelledby wins
-       the accessible name, so the current value survives.
+    <div class="ac-demo-grid">
+      <!-- ======================================================================
+           EXAMPLE 1 · Icons and secondary text
+           CSS [FIELD] + [CORE] + [DECORATION]. JS [CORE] + [TYPEAHEAD].
 
-       Icons render aria-hidden — no symbol name reaches the name. Secondary
-       text does not: it is information, so it belongs in the name, and this
-       option announces as "Production app.example.com".
+           The label's `for` points at the trigger, which is a real <button> and so
+           a labelable element: clicking the label focuses it. aria-labelledby wins
+           the accessible name, so the current value survives.
 
-       Also the type-ahead demo: open it and type "st".
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">1 &middot; Icons and secondary text</h3>
+           Icons render aria-hidden — no symbol name reaches the name. Secondary
+           text does not: it is information, so it belongs in the name, and this
+           option announces as "Production app.example.com".
 
-    <div class="ac-field">
-      <label class="ac-field__label" id="ac-dd-env-label" for="ac-dd-env-toggle">Deploy target</label>
+           Also the type-ahead demo: open it and type "st".
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">1 &middot; Icons and secondary text</h4>
 
-      <div class="ac-dropdown" data-ac-dropdown>
-        <button type="button" class="ac-dropdown__toggle" id="ac-dd-env-toggle"
-                aria-haspopup="listbox" aria-expanded="false" aria-controls="ac-dd-env-panel"
-                aria-labelledby="ac-dd-env-label ac-dd-env-value"
-                aria-describedby="ac-dd-env-hint">
-          <span class="ac-dropdown__value" id="ac-dd-env-value">Production</span>
-          <svg class="ac-dropdown__caret" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-            <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </button>
+        <div class="ac-field">
+          <label class="ac-field__label" id="ac-dd-env-label" for="ac-dd-env-toggle">Deploy target</label>
 
-        <div class="ac-dropdown__panel" id="ac-dd-env-panel" role="listbox"
-             aria-labelledby="ac-dd-env-label" hidden popover="manual">
-          <div class="ac-dropdown__list">
-            <div class="ac-dropdown__option" role="option" tabindex="-1"
-                 data-value="prod" aria-selected="true">
-              <svg class="ac-dropdown__icon" aria-hidden="true" focusable="false">
-                <use href="#ac-icon-rocket" />
+          <div class="ac-dropdown" data-ac-dropdown>
+            <button type="button" class="ac-dropdown__toggle" id="ac-dd-env-toggle"
+                    aria-haspopup="listbox" aria-expanded="false" aria-controls="ac-dd-env-panel"
+                    aria-labelledby="ac-dd-env-label ac-dd-env-value"
+                    aria-describedby="ac-dd-env-hint">
+              <span class="ac-dropdown__value" id="ac-dd-env-value">Production</span>
+              <svg class="ac-dropdown__caret" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" />
               </svg>
-              <span class="ac-dropdown__text">
-                <span class="ac-dropdown__primary">Production</span>
-                <span class="ac-dropdown__secondary">app.example.com</span>
-              </span>
-              <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
-            </div>
+            </button>
 
-            <div class="ac-dropdown__option" role="option" tabindex="-1"
-                 data-value="staging" aria-selected="false">
-              <svg class="ac-dropdown__icon" aria-hidden="true" focusable="false">
-                <use href="#ac-icon-flask" />
+            <div class="ac-dropdown__panel" id="ac-dd-env-panel" role="listbox"
+                 aria-labelledby="ac-dd-env-label" hidden popover="manual">
+              <div class="ac-dropdown__list">
+                <div class="ac-dropdown__option" role="option" tabindex="-1"
+                     data-value="prod" aria-selected="true">
+                  <svg class="ac-dropdown__icon" aria-hidden="true" focusable="false">
+                    <use href="#ac-icon-rocket" />
+                  </svg>
+                  <span class="ac-dropdown__text">
+                    <span class="ac-dropdown__primary">Production</span>
+                    <span class="ac-dropdown__secondary">app.example.com</span>
+                  </span>
+                  <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                </div>
+
+                <div class="ac-dropdown__option" role="option" tabindex="-1"
+                     data-value="staging" aria-selected="false">
+                  <svg class="ac-dropdown__icon" aria-hidden="true" focusable="false">
+                    <use href="#ac-icon-flask" />
+                  </svg>
+                  <span class="ac-dropdown__text">
+                    <span class="ac-dropdown__primary">Staging</span>
+                    <span class="ac-dropdown__secondary">staging.example.com</span>
+                  </span>
+                  <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                </div>
+
+                <div class="ac-dropdown__option" role="option" tabindex="-1"
+                     data-value="local" aria-selected="false">
+                  <svg class="ac-dropdown__icon" aria-hidden="true" focusable="false">
+                    <use href="#ac-icon-laptop" />
+                  </svg>
+                  <span class="ac-dropdown__text">
+                    <span class="ac-dropdown__primary">Local</span>
+                    <span class="ac-dropdown__secondary">localhost:3000</span>
+                  </span>
+                  <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- aria-describedby on the trigger, not on the panel: it describes the
+               control, and a closed panel is announcing nothing. -->
+          <p class="ac-field__hint" id="ac-dd-env-hint">
+            Type the first letters of a name to jump to it.
+          </p>
+        </div>
+      </div>
+
+      <!-- ======================================================================
+           EXAMPLE 2 · Groups, and an option nobody can choose
+           CSS [FIELD] + [CORE] + [GROUPS] + [DISABLED]. JS [CORE].
+
+           role="group" carries the group name and the visible label is aria-hidden,
+           or the name is announced twice — once as the group, once as text.
+
+           A disabled option keeps aria-disabled rather than being removed, so a
+           screen reader user learns it exists and why it is out. It has no tabindex
+           at all, so the arrows skip it.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">2 &middot; Groups and a disabled option</h4>
+
+        <div class="ac-field">
+          <label class="ac-field__label" id="ac-dd-region-label" for="ac-dd-region-toggle">Region</label>
+
+          <div class="ac-dropdown" data-ac-dropdown>
+            <button type="button" class="ac-dropdown__toggle" id="ac-dd-region-toggle"
+                    aria-haspopup="listbox" aria-expanded="false" aria-controls="ac-dd-region-panel"
+                    aria-labelledby="ac-dd-region-label ac-dd-region-value">
+              <span class="ac-dropdown__value" id="ac-dd-region-value">EU West</span>
+              <svg class="ac-dropdown__caret" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" />
               </svg>
-              <span class="ac-dropdown__text">
-                <span class="ac-dropdown__primary">Staging</span>
-                <span class="ac-dropdown__secondary">staging.example.com</span>
-              </span>
-              <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
-            </div>
+            </button>
 
-            <div class="ac-dropdown__option" role="option" tabindex="-1"
-                 data-value="local" aria-selected="false">
-              <svg class="ac-dropdown__icon" aria-hidden="true" focusable="false">
-                <use href="#ac-icon-laptop" />
+            <div class="ac-dropdown__panel" id="ac-dd-region-panel" role="listbox"
+                 aria-labelledby="ac-dd-region-label" hidden popover="manual">
+              <div class="ac-dropdown__list">
+                <div class="ac-dropdown__group" role="group" aria-label="Americas">
+                  <div class="ac-dropdown__group-label" aria-hidden="true">Americas</div>
+
+                  <div class="ac-dropdown__option" role="option" tabindex="-1"
+                       data-value="us-east" aria-selected="false">
+                    <span class="ac-dropdown__primary">US East</span>
+                    <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                  </div>
+
+                  <div class="ac-dropdown__option" role="option" tabindex="-1"
+                       data-value="us-west" aria-selected="false">
+                    <span class="ac-dropdown__primary">US West</span>
+                    <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                  </div>
+
+                  <!-- No tabindex: the roving focus walks [role="option"] that is
+                       not aria-disabled, so leaving it off is what skips it. -->
+                  <div class="ac-dropdown__option" role="option"
+                       data-value="sa-east" aria-selected="false" aria-disabled="true">
+                    <span class="ac-dropdown__primary">South America (at capacity)</span>
+                    <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                  </div>
+                </div>
+
+                <div class="ac-dropdown__group" role="group" aria-label="Europe">
+                  <div class="ac-dropdown__group-label" aria-hidden="true">Europe</div>
+
+                  <div class="ac-dropdown__option" role="option" tabindex="-1"
+                       data-value="eu-west" aria-selected="true">
+                    <span class="ac-dropdown__primary">EU West</span>
+                    <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                  </div>
+
+                  <div class="ac-dropdown__option" role="option" tabindex="-1"
+                       data-value="eu-north" aria-selected="false">
+                    <span class="ac-dropdown__primary">EU North</span>
+                    <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================================
+           EXAMPLE 3 · Color swatches
+           CSS [FIELD] + [CORE] + [DECORATION]. JS [CORE].
+
+           A swatch is the one place a literal color belongs: it is the author's
+           data rather than a stylesheet decision, which is why it is written
+           inline here and why the token linter has nothing to say about it.
+
+           The strip is aria-hidden, so the option announces as "Standard" and
+           nothing else — the name has to carry the meaning on its own, because
+           a color is exactly what some readers cannot use (SC 1.4.1).
+
+           This is the shape of the theme picker in this site's own header.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">3 &middot; Color swatches</h4>
+
+        <div class="ac-field">
+          <label class="ac-field__label" id="ac-dd-palette-label" for="ac-dd-palette-toggle">Chart palette</label>
+
+          <div class="ac-dropdown" data-ac-dropdown>
+            <button type="button" class="ac-dropdown__toggle" id="ac-dd-palette-toggle"
+                    aria-haspopup="listbox" aria-expanded="false" aria-controls="ac-dd-palette-panel"
+                    aria-labelledby="ac-dd-palette-label ac-dd-palette-value">
+              <span class="ac-dropdown__value" id="ac-dd-palette-value">Standard</span>
+              <svg class="ac-dropdown__caret" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" />
               </svg>
-              <span class="ac-dropdown__text">
-                <span class="ac-dropdown__primary">Local</span>
-                <span class="ac-dropdown__secondary">localhost:3000</span>
+            </button>
+
+            <div class="ac-dropdown__panel" id="ac-dd-palette-panel" role="listbox"
+                 aria-labelledby="ac-dd-palette-label" hidden popover="manual">
+              <div class="ac-dropdown__list">
+                <div class="ac-dropdown__option" role="option" tabindex="-1"
+                     data-value="standard" aria-selected="true">
+                  <span class="ac-dropdown__swatch" aria-hidden="true">
+                    <span style="background: #3b82f6"></span>
+                    <span style="background: #22c55e"></span>
+                    <span style="background: #f59e0b"></span>
+                  </span>
+                  <span class="ac-dropdown__primary">Standard</span>
+                  <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                </div>
+
+                <div class="ac-dropdown__option" role="option" tabindex="-1"
+                     data-value="colorblind-safe" aria-selected="false">
+                  <span class="ac-dropdown__swatch" aria-hidden="true">
+                    <span style="background: #0072b2"></span>
+                    <span style="background: #e69f00"></span>
+                    <span style="background: #009e73"></span>
+                  </span>
+                  <span class="ac-dropdown__primary">Colorblind safe</span>
+                  <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                </div>
+
+                <div class="ac-dropdown__option" role="option" tabindex="-1"
+                     data-value="high-contrast" aria-selected="false">
+                  <span class="ac-dropdown__swatch" aria-hidden="true">
+                    <span style="background: #111111"></span>
+                    <span style="background: #767676"></span>
+                    <span style="background: #e8e8e8"></span>
+                  </span>
+                  <span class="ac-dropdown__primary">High contrast</span>
+                  <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================================
+           EXAMPLE 4 · Disabled trigger
+           CSS [FIELD] + [CORE] + [DISABLED]. JS [CORE].
+
+           aria-disabled on the trigger, not the disabled attribute, so it stays
+           focusable and a keyboard user can reach it and hear why it is locked. A
+           disabled button is skipped by Tab and announces nothing at all.
+
+           The attribute is the state — there is no class to keep in sync, and
+           flipping it at runtime is the whole of "disable this dropdown".
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">4 &middot; Disabled trigger</h4>
+
+        <div class="ac-field">
+          <label class="ac-field__label" id="ac-dd-locked-label" for="ac-dd-locked-toggle">Billing plan</label>
+
+          <div class="ac-dropdown" data-ac-dropdown>
+            <button type="button" class="ac-dropdown__toggle" id="ac-dd-locked-toggle"
+                    aria-haspopup="listbox" aria-expanded="false" aria-controls="ac-dd-locked-panel"
+                    aria-labelledby="ac-dd-locked-label ac-dd-locked-value"
+                    aria-disabled="true">
+              <span class="ac-dropdown__value" id="ac-dd-locked-value">Team (contact sales to change)</span>
+              <svg class="ac-dropdown__caret" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+
+            <div class="ac-dropdown__panel" id="ac-dd-locked-panel" role="listbox"
+                 aria-labelledby="ac-dd-locked-label" hidden popover="manual">
+              <div class="ac-dropdown__list">
+                <div class="ac-dropdown__option" role="option" tabindex="-1"
+                     data-value="team" aria-selected="true">
+                  <span class="ac-dropdown__primary">Team (contact sales to change)</span>
+                  <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================================
+           EXAMPLE 5 · Empty list
+           CSS [FIELD] + [CORE] + [EMPTY]. JS [CORE].
+
+           The state everyone forgets to design. Say what is missing rather than "no
+           results". The panel keeps role="listbox" and focus lands on the panel
+           itself, so opening it reads the message out instead of silence.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">5 &middot; Empty list</h4>
+
+        <div class="ac-field">
+          <label class="ac-field__label" id="ac-dd-empty-label" for="ac-dd-empty-toggle">Saved filters</label>
+
+          <div class="ac-dropdown" data-ac-dropdown>
+            <button type="button" class="ac-dropdown__toggle" id="ac-dd-empty-toggle"
+                    aria-haspopup="listbox" aria-expanded="false" aria-controls="ac-dd-empty-panel"
+                    aria-labelledby="ac-dd-empty-label ac-dd-empty-value">
+              <span class="ac-dropdown__value ac-dropdown__value--empty" id="ac-dd-empty-value">
+                No saved filters yet
               </span>
-              <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
-            </div>
-          </div>
-        </div>
-      </div>
+              <svg class="ac-dropdown__caret" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
 
-      <!-- aria-describedby on the trigger, not on the panel: it describes the
-           control, and a closed panel is announcing nothing. -->
-      <p class="ac-field__hint" id="ac-dd-env-hint">
-        Type the first letters of a name to jump to it.
-      </p>
-    </div>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 2 · Groups, and an option nobody can choose
-       CSS [FIELD] + [CORE] + [GROUPS] + [DISABLED]. JS [CORE].
-
-       role="group" carries the group name and the visible label is aria-hidden,
-       or the name is announced twice — once as the group, once as text.
-
-       A disabled option keeps aria-disabled rather than being removed, so a
-       screen reader user learns it exists and why it is out. It has no tabindex
-       at all, so the arrows skip it.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">2 &middot; Groups and a disabled option</h3>
-
-    <div class="ac-field">
-      <label class="ac-field__label" id="ac-dd-region-label" for="ac-dd-region-toggle">Region</label>
-
-      <div class="ac-dropdown" data-ac-dropdown>
-        <button type="button" class="ac-dropdown__toggle" id="ac-dd-region-toggle"
-                aria-haspopup="listbox" aria-expanded="false" aria-controls="ac-dd-region-panel"
-                aria-labelledby="ac-dd-region-label ac-dd-region-value">
-          <span class="ac-dropdown__value" id="ac-dd-region-value">EU West</span>
-          <svg class="ac-dropdown__caret" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-            <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </button>
-
-        <div class="ac-dropdown__panel" id="ac-dd-region-panel" role="listbox"
-             aria-labelledby="ac-dd-region-label" hidden popover="manual">
-          <div class="ac-dropdown__list">
-            <div class="ac-dropdown__group" role="group" aria-label="Americas">
-              <div class="ac-dropdown__group-label" aria-hidden="true">Americas</div>
-
-              <div class="ac-dropdown__option" role="option" tabindex="-1"
-                   data-value="us-east" aria-selected="false">
-                <span class="ac-dropdown__primary">US East</span>
-                <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
-              </div>
-
-              <div class="ac-dropdown__option" role="option" tabindex="-1"
-                   data-value="us-west" aria-selected="false">
-                <span class="ac-dropdown__primary">US West</span>
-                <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
-              </div>
-
-              <!-- No tabindex: the roving focus walks [role="option"] that is
-                   not aria-disabled, so leaving it off is what skips it. -->
-              <div class="ac-dropdown__option" role="option"
-                   data-value="sa-east" aria-selected="false" aria-disabled="true">
-                <span class="ac-dropdown__primary">South America (at capacity)</span>
-                <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
-              </div>
-            </div>
-
-            <div class="ac-dropdown__group" role="group" aria-label="Europe">
-              <div class="ac-dropdown__group-label" aria-hidden="true">Europe</div>
-
-              <div class="ac-dropdown__option" role="option" tabindex="-1"
-                   data-value="eu-west" aria-selected="true">
-                <span class="ac-dropdown__primary">EU West</span>
-                <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
-              </div>
-
-              <div class="ac-dropdown__option" role="option" tabindex="-1"
-                   data-value="eu-north" aria-selected="false">
-                <span class="ac-dropdown__primary">EU North</span>
-                <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+            <div class="ac-dropdown__panel" id="ac-dd-empty-panel" role="listbox"
+                 aria-labelledby="ac-dd-empty-label" hidden popover="manual">
+              <div class="ac-dropdown__list">
+                <p class="ac-dropdown__empty">Save a filter and it shows up here.</p>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- ======================================================================
-       EXAMPLE 3 · Color swatches
-       CSS [FIELD] + [CORE] + [DECORATION]. JS [CORE].
+      <!-- ======================================================================
+           EXAMPLE 6 · In a form
+           CSS [FIELD] + [CORE]. JS [CORE] + [FORM].
 
-       The site header's own theme picker in miniature. A swatch is the one
-       place a literal color belongs: it is the author's data, not a stylesheet
-       decision, which is why it is written inline here and why the token linter
-       has nothing to say about it. The strip is aria-hidden, so the option
-       announces as "Rink Classic" and nothing else.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">3 &middot; Color swatches</h3>
+           Everything above sits outside a form and reports itself through the
+           ac:dropdown:change event. This one adds the one piece that makes it a
+           form field: a hidden input the script mirrors the chosen value into. No
+           other example needs it — delete the input and the [FORM] section with it.
 
-    <div class="ac-field">
-      <label class="ac-field__label" id="ac-dd-theme-label" for="ac-dd-theme-toggle">Palette</label>
+           The readout is a role="status" so the change is heard, not only seen.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">6 &middot; In a form</h4>
 
-      <div class="ac-dropdown" data-ac-dropdown>
-        <button type="button" class="ac-dropdown__toggle" id="ac-dd-theme-toggle"
-                aria-haspopup="listbox" aria-expanded="false" aria-controls="ac-dd-theme-panel"
-                aria-labelledby="ac-dd-theme-label ac-dd-theme-value">
-          <span class="ac-dropdown__value" id="ac-dd-theme-value">Rink Classic</span>
-          <svg class="ac-dropdown__caret" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-            <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </button>
+        <form class="ac-field" data-ac-dd-form>
+          <label class="ac-field__label" id="ac-dd-ship-label" for="ac-dd-ship-toggle">Shipping speed</label>
 
-        <div class="ac-dropdown__panel" id="ac-dd-theme-panel" role="listbox"
-             aria-labelledby="ac-dd-theme-label" hidden popover="manual">
-          <div class="ac-dropdown__list">
-            <div class="ac-dropdown__option" role="option" tabindex="-1"
-                 data-value="rink" aria-selected="true">
-              <span class="ac-dropdown__swatch" aria-hidden="true">
-                <span style="background: #ff2ec4"></span>
-                <span style="background: #5bff3a"></span>
-                <span style="background: #3ceaff"></span>
-              </span>
-              <span class="ac-dropdown__primary">Rink Classic</span>
-              <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+          <div class="ac-dropdown" data-ac-dropdown>
+            <button type="button" class="ac-dropdown__toggle" id="ac-dd-ship-toggle"
+                    aria-haspopup="listbox" aria-expanded="false" aria-controls="ac-dd-ship-panel"
+                    aria-labelledby="ac-dd-ship-label ac-dd-ship-value">
+              <span class="ac-dropdown__value" id="ac-dd-ship-value">Next day</span>
+              <svg class="ac-dropdown__caret" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+
+            <div class="ac-dropdown__panel" id="ac-dd-ship-panel" role="listbox"
+                 aria-labelledby="ac-dd-ship-label" hidden popover="manual">
+              <div class="ac-dropdown__list">
+                <div class="ac-dropdown__option" role="option" tabindex="-1"
+                     data-value="next-day" aria-selected="true">
+                  <span class="ac-dropdown__primary">Next day</span>
+                  <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                </div>
+
+                <div class="ac-dropdown__option" role="option" tabindex="-1"
+                     data-value="two-day" aria-selected="false">
+                  <span class="ac-dropdown__primary">Two day</span>
+                  <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                </div>
+
+                <div class="ac-dropdown__option" role="option" tabindex="-1"
+                     data-value="ground" aria-selected="false">
+                  <span class="ac-dropdown__primary">Ground</span>
+                  <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
+                </div>
+              </div>
             </div>
 
-            <div class="ac-dropdown__option" role="option" tabindex="-1"
-                 data-value="sunset" aria-selected="false">
-              <span class="ac-dropdown__swatch" aria-hidden="true">
-                <span style="background: #ff6b9d"></span>
-                <span style="background: #ffd166"></span>
-                <span style="background: #8b5cf6"></span>
-              </span>
-              <span class="ac-dropdown__primary">Synthwave Sunset</span>
-              <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
-            </div>
-
-            <div class="ac-dropdown__option" role="option" tabindex="-1"
-                 data-value="acid" aria-selected="false">
-              <span class="ac-dropdown__swatch" aria-hidden="true">
-                <span style="background: #c6ff00"></span>
-                <span style="background: #00e5ff"></span>
-                <span style="background: #ff3d81"></span>
-              </span>
-              <span class="ac-dropdown__primary">Acid Arcade</span>
-              <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
-            </div>
+            <!-- [FORM] the whole of form participation. It carries the name and the
+                 value, so FormData and a plain submit both work with nothing else
+                 to keep in sync. -->
+            <input type="hidden" name="speed" value="next-day" data-ac-dropdown-input />
           </div>
-        </div>
+
+          <p class="ac-field__hint" role="status">
+            Submitting would send <code data-ac-dd-out="form">speed=next-day</code>.
+          </p>
+        </form>
       </div>
     </div>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 4 · Disabled
-       CSS [FIELD] + [CORE] + [DISABLED]. JS [CORE].
-
-       aria-disabled on the trigger, not the disabled attribute, so it stays
-       focusable and a keyboard user can reach it and hear why it is locked. A
-       disabled button is skipped by Tab and announces nothing at all.
-
-       The attribute is the state — there is no class to keep in sync, and
-       flipping it at runtime is the whole of "disable this dropdown".
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">4 &middot; Disabled</h3>
-
-    <div class="ac-field">
-      <label class="ac-field__label" id="ac-dd-locked-label" for="ac-dd-locked-toggle">Billing plan</label>
-
-      <div class="ac-dropdown" data-ac-dropdown>
-        <button type="button" class="ac-dropdown__toggle" id="ac-dd-locked-toggle"
-                aria-haspopup="listbox" aria-expanded="false" aria-controls="ac-dd-locked-panel"
-                aria-labelledby="ac-dd-locked-label ac-dd-locked-value"
-                aria-disabled="true">
-          <span class="ac-dropdown__value" id="ac-dd-locked-value">Team (contact sales to change)</span>
-          <svg class="ac-dropdown__caret" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-            <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </button>
-
-        <div class="ac-dropdown__panel" id="ac-dd-locked-panel" role="listbox"
-             aria-labelledby="ac-dd-locked-label" hidden popover="manual">
-          <div class="ac-dropdown__list">
-            <div class="ac-dropdown__option" role="option" tabindex="-1"
-                 data-value="team" aria-selected="true">
-              <span class="ac-dropdown__primary">Team (contact sales to change)</span>
-              <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 5 · Empty
-       CSS [FIELD] + [CORE] + [EMPTY]. JS [CORE].
-
-       The state everyone forgets to design. Say what is missing rather than "no
-       results". The panel keeps role="listbox" and focus lands on the panel
-       itself, so opening it reads the message out instead of silence.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">5 &middot; Empty</h3>
-
-    <div class="ac-field">
-      <label class="ac-field__label" id="ac-dd-empty-label" for="ac-dd-empty-toggle">Saved filters</label>
-
-      <div class="ac-dropdown" data-ac-dropdown>
-        <button type="button" class="ac-dropdown__toggle" id="ac-dd-empty-toggle"
-                aria-haspopup="listbox" aria-expanded="false" aria-controls="ac-dd-empty-panel"
-                aria-labelledby="ac-dd-empty-label ac-dd-empty-value">
-          <span class="ac-dropdown__value ac-dropdown__value--empty" id="ac-dd-empty-value">
-            No saved filters yet
-          </span>
-          <svg class="ac-dropdown__caret" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-            <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </button>
-
-        <div class="ac-dropdown__panel" id="ac-dd-empty-panel" role="listbox"
-             aria-labelledby="ac-dd-empty-label" hidden popover="manual">
-          <div class="ac-dropdown__list">
-            <p class="ac-dropdown__empty">Save a filter and it shows up here.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 6 · In a form
-       CSS [FIELD] + [CORE]. JS [CORE] + [FORM].
-
-       Everything above sits outside a form and reports itself through the
-       ac:dropdown:change event. This one adds the one piece that makes it a
-       form field: a hidden input the script mirrors the chosen value into. No
-       other example needs it — delete the input and the [FORM] section with it.
-
-       The readout is a role="status" so the change is heard, not only seen.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">6 &middot; In a form</h3>
-
-    <form class="ac-field" data-ac-dd-form>
-      <label class="ac-field__label" id="ac-dd-ship-label" for="ac-dd-ship-toggle">Shipping speed</label>
-
-      <div class="ac-dropdown" data-ac-dropdown>
-        <button type="button" class="ac-dropdown__toggle" id="ac-dd-ship-toggle"
-                aria-haspopup="listbox" aria-expanded="false" aria-controls="ac-dd-ship-panel"
-                aria-labelledby="ac-dd-ship-label ac-dd-ship-value">
-          <span class="ac-dropdown__value" id="ac-dd-ship-value">Next day</span>
-          <svg class="ac-dropdown__caret" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-            <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </button>
-
-        <div class="ac-dropdown__panel" id="ac-dd-ship-panel" role="listbox"
-             aria-labelledby="ac-dd-ship-label" hidden popover="manual">
-          <div class="ac-dropdown__list">
-            <div class="ac-dropdown__option" role="option" tabindex="-1"
-                 data-value="next-day" aria-selected="true">
-              <span class="ac-dropdown__primary">Next day</span>
-              <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
-            </div>
-
-            <div class="ac-dropdown__option" role="option" tabindex="-1"
-                 data-value="two-day" aria-selected="false">
-              <span class="ac-dropdown__primary">Two day</span>
-              <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
-            </div>
-
-            <div class="ac-dropdown__option" role="option" tabindex="-1"
-                 data-value="ground" aria-selected="false">
-              <span class="ac-dropdown__primary">Ground</span>
-              <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- [FORM] the whole of form participation. It carries the name and the
-             value, so FormData and a plain submit both work with nothing else
-             to keep in sync. -->
-        <input type="hidden" name="speed" value="next-day" data-ac-dropdown-input />
-      </div>
-
-      <p class="ac-field__hint" role="status">
-        Submitting would send <code data-ac-dd-out="form">speed=next-day</code>.
-      </p>
-    </form>
   </div>
 </div>

@@ -12,25 +12,27 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 
 ## START HERE
 
-**Phase 0 is done. Components 1–21 are done. Next up is row 22, `dropdown`.**
+**Phase 0 is done. Components 1–22 are done. Next up is row 23, `modal`.**
 
-Last updated 2026-08-07, after row 21. The repo was left green:
+Last updated 2026-08-07, after row 22. The repo was left green:
 
 ```
 check:tokens                      34 files clean
 check:agents                      42 surfaces match their sources
 npm run build                     35 pages
-npx playwright test --project=chromium disclosure                 14 passed
+npx playwright test --project=chromium dropdown                   24 passed
 npx playwright test --project=chromium agent-surfaces            117 passed
-npx playwright test --project=chromium a11y -g disclosure         28 passed
+npx playwright test --project=chromium a11y -g dropdown           38 passed
+npx playwright test --project=chromium site-header site-nav site-home native-select drawer field
+                                                                 127 passed
 ```
 
-`a11y -g disclosure` is 28 rather than 27 because the pattern also catches `tooltip`'s "the
-toggletip is not a disclosure". That is the grep, not a stray test.
+The full suite was re-run at row 22: **1220 passed**, exit 0 — the same number as row 21, because
+this row added no tests. It is the honest baseline: if something is red before you have touched
+anything, it is not your change.
 
-The **full** suite was re-run at row 21: **1220 passed** in 9.6 minutes, exit 0. Row 20's baseline was
-1206 and row 21 wrote `disclosure`'s spec from nothing, which is exactly the 14 new tests. It is the
-honest baseline: if something is red before you have touched anything, it is not your change.
+**Row 22 changed `src/site/styles/site.css`, so the whole suite is the check, not the slug.** Any
+row that touches the shell is in the same position.
 
 **A full run can flake, so re-run before you conclude anything.** One at row 19 reported *4 failed,
 1202 passed*; the identical tree at row 20 came back 1206/1206. Nothing was fixed in between. Four
@@ -49,11 +51,11 @@ Read these three things before touching anything, in this order:
 3. **The row you are about to do**, in [The roster](#the-roster). Every finished row records what
    actually bit, and that is the reason this file is worth reading rather than skimming.
 
-Then follow [The procedure](#the-procedure) for `dropdown`, exactly.
+Then follow [The procedure](#the-procedure) for `modal`, exactly.
 
-**Where the pass stands.** 21 of 33 components done, in roster order — there is no reordering, so the
-next unticked row is always the next job. Six of the twelve renames are applied — `chip-toggle`,
-`effects`, `field`, `fieldset-group`, `focus-ring`, `motion-preferences`. The other six happen in
+**Where the pass stands.** 22 of 33 components done, in roster order — there is no reordering, so the
+next unticked row is always the next job. Seven of the twelve renames are applied — `chip-toggle`,
+`dropdown`, `effects`, `field`, `fieldset-group`, `focus-ring`, `motion-preferences`. The other five happen in
 their own rows, and [Naming decisions](#naming-decisions) is the ledger. Phase 3 (the site's own copy)
 is untouched and stays that way until all 33 are done.
 
@@ -150,6 +152,15 @@ starting; every one of these cost a debugging detour the first time.
   `hidden` attribute — so three of the four would have silently become correct examples. They are
   wired by a `createDisclosurePage` factory in the same file instead. Check 14 exempts the `Page`
   suffix, which is what makes this legal rather than an undocumented public API.
+- **The page-factory wrapper the pass keeps adding was quietly costing columns.** `.demo` is
+  `display: flex; flex-direction: column; align-items: flex-start`, so a `<div data-ac-button>` around
+  the sections is a flex item **sized to its content**, and the `.ac-demo-grid` inside it then lays out
+  in fewer columns than the panel has room for. It had been live since row 3 and nothing caught it:
+  `chip-toggle` and `loading-button` were rendering at two columns of three, and `dropdown` at one.
+  Fixed once, in `site.css`, with `.demo > :has(> .ac-demo-section) { width: 100% }` — matched by what
+  the wrapper contains rather than by a class, so a later component cannot forget it. **Measure rather
+  than eyeball**: `getComputedStyle(grid).gridTemplateColumns.split(' ').length` across every page is
+  what found it, and 29 of 33 pages were already right, which is why it read as normal.
 - **Ask axe rather than reasoning about it, and let the gate answer.** Whether `aria-expanded` on a
   role-less `<div>` trips `aria-allowed-attr`, and whether a dangling `aria-controls` is a violation
   or only an `incomplete`, both depend on axe internals that are quicker to run than to recall. Build
@@ -381,7 +392,7 @@ paths do not move.
 | --- | --- | --- | --- |
 | `chip-toggle` | Chip Toggle | **Filter Chip** | [x] |
 | `field` | Field | **Form Field** | [x] |
-| `dropdown` | Dropdown / Listbox | **Custom Select** | [ ] |
+| `dropdown` | Dropdown / Listbox | **Custom Select** | [x] |
 | `effects` | Effects | **Background Effects** | [x] |
 | `fieldset-group` | Fieldset Group | **Fieldset** | [x] |
 | `focus-ring` | Focus Ring | **Focus Indicator** | [x] |
@@ -552,8 +563,8 @@ bound" note, and a `summary` in the new voice.
 | 19 | `motion-preferences` | [x] | **Renamed → Reduced Motion.** Five references: three source comments and docs links in `effects`, `jump-nav` and `switch`, and **one in a vendored file** — `src/site/theme/THEME-SERVICE.md`, wrapped across two lines exactly as this file warns, and only a multiline grep found it. That file is safe to edit: its "Deliberate deviations" and "Motion behavior" sections are this repo's own record, not upstream boilerplate. None named an example number. Second row after `typography` where only the last example is a mistake, so **no renumber and no CSS marker moved**. `.ac-motion-scope` moved off the grid onto a wrapper `<div>` with `data-ac-motion`, since the spec's `SCOPE` locator has to stay singular. `.ac-motion-record` → `.ac-motion-disc`: the demo was a spinning vinyl record, and the vocabulary had reached the class name. **Third stranded heading** — example 4's two `.ac-motion-panel__title` were `h4` and are `h5` now; the spec never asserted their tag, so nothing failed and nothing would have. `contract.keyboard` went from one row to three, adding `native:` <kbd>Tab</kbd> and <kbd>Enter</kbd>; <kbd>Space</kbd> stays non-`native:` because the spec really presses it. `docs.md` had five component-specific `##` against a cap of two: *Reduced is not removed* became a `###` under States, *Persistence* and the no-third-state mechanism became `###` under *The asymmetry*, and *matchMedia* and *SC 2.2.2* became `###` under a renamed *What the gate does not cover*. `## Keyboard`, `## States` and `## Related` are new. Content: Syncing disc, an Order 462 / Invoice 99 activity ticker, `462 unread`. |
 | 20 | `effects` | [x] | **Renamed → Background Effects**, the joint-largest ripple of the twelve: 11 references in 7 components, only 5 of them `docs.md` links, and 4 of the 6 source comments needed re-wrapping because the name is 11 characters longer. **The split was the ambiguous one and `contract.failureModes` settled it** — example 5's "two motion gates with different reach" is listed there, and example 4 carries `data-ac-demo-broken`, so both are mistakes. That leaves example 1 alone in a singular *Correct example*, the `typography` shape: **no renumber, no CSS marker moved, no stranded heading** (the file ships no `<h3>`/`<h4>` but the five demo titles). Spec: the `demo(page).evaluate((grid) => …)` two-grid trap, and the two `.nth(1)` picks re-anchored on `.ac-fx-pair`. `aria-label="Set list, second night"` → `Recent orders`, asserted in three places. `docs.md` had six component-specific `##` against a cap of two: *fx-grid needs isolation* became a `###` under Required markup, *Motion* and *Forced colors* `###` under States, and the gradient and scrollbar sections stayed `##`. `## Keyboard`, `## States`, `## Screen reader behavior` and `## Related` are new, and the old *Before you copy* hedged about frameworks — deleted. `contract.keyboard` went from one row to three, adding `native:` arrows and Home/End for the scroll region. Content: Order 462 / Invoice 99 / Jordan Lee, a Billing frame, a Recent orders list of order and invoice statuses. |
 | 21 | `disclosure` | [x] | **The full retrofit, and the largest row so far: seven examples and a spec written from nothing.** The old page was three correct disclosures in an `.ac-disclosure-group` with no `ac-demo` anything, and its content was documentation in costume — the three panels answered questions *about the component*, so none of it survived. **The four `contract.failureModes` became examples 4 to 7 exactly**, which made the split trivial and the wiring the expensive part: `createDisclosure` repairs three of the four on sight, so all four are driven by a new `createDisclosurePage` in the same file (check 14 exempts the `Page` suffix). **Only one `data-ac-demo-broken` in the end, on example 7** — axe reads a role-less `<div aria-expanded>` as fine, and the dangling `aria-controls` only fails while the control is *expanded*, so example 7 ships open. Example 5 is the best failure on the page: `height: 0` on the panel, and the link inside it is still in the tab order, which the spec asks the browser rather than asserting. Fourth stranded-heading row — three `<h3 class="ac-disclosure__heading">` are `h5` now, and the spec asserts the tag on all three triggers. `contract.aria` gained `hidden` on the panel and `contract.keyboard` went from one row to three, adding `native:` <kbd>Tab</kbd> and a non-`native:` <kbd>Esc</kbd> whose effect is *nothing, deliberately* — the spec presses it and expects no change, which is how the "Keys deliberately not bound" reasoning got a test. `docs.md`: `## How it works` → `## Required markup`, `## Options` → `## API`, `## What to watch for` → `## Common mistakes`; `## Before you copy`, `## Keyboard`'s table shape, `## States` and `## Related` are new; the two component-specific sections are *Progressive enhancement* and *Disclosure or `<details>`*, the latter inheriting the argument the old demo panels were making. `.ac-disclosure-group` was dropped — stacking is a flex column with a gap and the CSS header says so. Referenced by `modal` ×1 and `tooltip` ×4; no rename, so those were prose-safe and untouched. Also fixed the stale note in `tests/shared/a11y.spec.mjs` that called this component the one still waiting on its retrofit. |
-| 22 | `dropdown` | [ ] | **NEXT.** rename → Custom Select. **25 bytes of Tier 2 headroom**, so the rename, a longer `useWhen` or an extra `keyboard` row has to be paid for elsewhere in the contract. 6 examples, 433 lines. |
-| 23 | `modal` | [ ] | 4 examples. |
+| 22 | `dropdown` | [x] | **Renamed → Custom Select**, and the Tier 2 budget was never the problem: `Dropdown / Listbox` is 5 bytes *longer* than the new name, so the rename bought headroom rather than spending it. 45 references in 16 files, and **only 4 were `docs.md` links** — the rest are source comments in the site shell (`SiteHeader.astro` ×7, `site-header.css` ×7, `THEME-SERVICE.md` ×4, `A11Y-WAY-PAGES.md` ×4), because the header's theme picker *is* this component. One more in `tests/site-header.spec.mjs`, including a test name. `field/docs.md` already said `[Custom Select]`, having anticipated the rename the way it anticipated `[Fieldset]`. Code identifiers do not move: `createDropdown`, `_acDropdown`, `.ac-dropdown`, `createDropdownPage`, the `DropdownChange` type. **Second single-section page after `field`'s shape** — all six examples are correct markup, so no *Common mistakes* block and no renumber; not one CSS or JS section marker moved. Only example 3's content was punk (`Rink Classic` / `Synthwave Sunset` / `Acid Arcade`, which are this site's own theme names) and it is a `Chart palette` of `Standard` / `Colorblind safe` / `High contrast` now, with the ids `ac-dd-theme-*` → `ac-dd-palette-*` and the spec's `toHaveAccessibleName` moving with them. `docs.md` had six component-specific `##` against a cap of two: *It is markup, not a script that writes markup* and *Decorating an option* became `###` under Required markup, *Where the value lives* a `###` under API, and *Not supported* a `###` under Keyboard, since multiple selection is entirely a keyboard-model argument; *The focus model* and *Positioning* stayed `##`. `## Screen reader behavior` and `## Using it in a framework` are new, and the old *Before you copy* opened by recommending the reader's own framework — deleted. **The row also fixed a layout defect three rows old**, in `site.css`; see the bullet above. |
+| 23 | `modal` | [ ] | **NEXT.** 4 examples. |
 | 24 | `drawer` | [ ] | 4 examples. |
 | 25 | `tooltip` | [ ] | |
 | 26 | `tabs` | [ ] | |
@@ -626,7 +637,7 @@ can quietly rot while the pass runs:
 ```sh
 DONE="button icon-button loading-button chip-toggle field text-input input-group textarea \
 native-select radio-group checkbox switch fieldset-group skip-link visually-hidden focus-ring \
-live-region typography motion-preferences effects disclosure"
+live-region typography motion-preferences effects disclosure dropdown"
 P=""; for d in $DONE; do P="$P src/library/components/$d"; done
 ls -d $P | wc -l          # must equal the number of finished rows, or every grep below is vacuous
 
@@ -645,19 +656,22 @@ done
 # Applied renames, across the whole repo rather than the finished rows -- an old
 # display name can come back in any component's prose. Add each new one as you
 # apply it, and drop the slug's own folder from the [ ] rows still to come.
-grep -rn "Chip Toggle\|Fieldset Group\|Focus Ring\|Motion Preferences" src/ docs/
+grep -rn "Chip Toggle\|Dropdown / Listbox\|Fieldset Group\|Focus Ring\|Motion Preferences" src/ docs/
 ```
 
-All five return nothing as of row 21 — and **check the sanity of `$P` before believing that**, because
+All five return nothing as of row 22 — and **check the sanity of `$P` before believing that**, because
 every one of them is a grep over a path list and a wrong `DONE` or a failed `cd` makes all five pass
 vacuously. `ls -d $P | wc -l` should print the number of finished rows. The rename sweep below returns
 only its own rows in
 [Naming decisions](#naming-decisions) and the command line above — anything in `src/` is a real hit.
 Add each new row to `DONE` as you tick it.
 
-`Field` and `Effects` are deliberately not in that last sweep. Both are ordinary words, and `Effects`
-now matches its own new name everywhere. The useful checks are `grep -rn "\[Field\]" src/` and
-`grep -rn "\[Effects\]" src/`, for a cross-link whose text was not updated.
+`Field`, `Effects` and bare `Dropdown` are deliberately not in that last sweep. The first two are
+ordinary words, and `Effects` now matches its own new name everywhere; `Dropdown` is inside
+`createDropdown`, `_acDropdown`, `createDropdownPage` and the `DropdownChange` type, none of which
+move, so it returns dozens of correct hits. The useful checks are `grep -rn "\[Field\]" src/`,
+`grep -rn "\[Effects\]" src/` and `grep -rn "\[Dropdown\]" src/`, for a cross-link whose text was not
+updated. The full old name `Dropdown / Listbox` is unambiguous and is swept above.
 
 ---
 

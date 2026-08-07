@@ -255,11 +255,12 @@ test('icons and swatches are decoration; secondary text is content', async ({ pa
   await expect(options.nth(0)).toHaveAccessibleName('Production app.example.com');
 
   // The swatch demo carries no text beyond the label, so its name stays clean --
-  // and neither does the tick, which is a real character but aria-hidden.
+  // and neither does the tick, which is a real character but aria-hidden. A
+  // palette named only by its colors would be unusable here, which is the point.
   await page.keyboard.press('Escape');
-  const palette = dd(page, 'theme');
+  const palette = dd(page, 'palette');
   await palette.toggle.click();
-  await expect(palette.options.nth(0)).toHaveAccessibleName('Rink Classic');
+  await expect(palette.options.nth(0)).toHaveAccessibleName('Standard');
 });
 
 test('the form example submits the chosen value', async ({ page }) => {

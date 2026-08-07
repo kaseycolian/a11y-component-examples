@@ -1,15 +1,15 @@
 {
   "slug": "dropdown",
-  "name": "Dropdown / Listbox",
+  "name": "Custom Select",
   "group": "overlays-disclosure",
   "order": 20,
-  "summary": "A styled select is the pattern people reach for and then get wrong — the current value stops being announced, or the arrow keys land on nothing. Here the button, the listbox and every option are real markup you can read and copy, and the script only opens it, moves focus, and remembers what you chose.",
+  "summary": "A custom select is a button that opens a listbox you styled yourself. Use it when a native <select> cannot carry what a row has to show — an icon, a second line, a color swatch. It needs JavaScript, and the trigger has to announce the current value, not only its label.",
   "tags": ["listbox", "select", "combobox", "popover", "top-layer", "roving-tabindex"],
   "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/listbox/",
   "wcag": ["1.4.1", "1.4.11", "1.4.13", "2.1.1", "2.4.3", "2.5.8", "4.1.2"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "The panel anchors to its trigger at every width, and flips above it when there is no room below. For a panel that rises from the bottom of the screen, see the Drawer component. This one needs JavaScript; Native Select is the answer when that is not on offer.",
+  "demoNote": "Open any of these and type the first letters of an option to jump to it. The panel anchors to its trigger at every width, and flips above it when there is no room below.",
   "contract": {
     "useWhen": "A custom select, for when the native one cannot be styled the way you need. Needs JavaScript.",
     "root": [".ac-dropdown"],
@@ -41,6 +41,14 @@
     },
     "keyboard": [
       [
+        "Tab",
+        "close, then tab on from the trigger"
+      ],
+      [
+        "Enter / Space",
+        "open it, or choose the focused option"
+      ],
+      [
         "ArrowDown / ArrowUp",
         "move between options, wrapping"
       ],
@@ -49,16 +57,8 @@
         "first / last option"
       ],
       [
-        "Enter / Space",
-        "open it, or choose the focused option"
-      ],
-      [
         "Escape",
         "close, keeping the current value"
-      ],
-      [
-        "Tab",
-        "close, then tab on from the trigger"
       ],
       [
         "Any letter",

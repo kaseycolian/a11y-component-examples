@@ -128,7 +128,7 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
 
 ### native-select
 - **Markup** Native `<select class="ac-select">` styled with `appearance: none` + a background caret.
-- **Gotcha** Ship this alongside the custom Dropdown and say plainly that the native one is the better default on mobile — it gets the OS picker. The custom one is for when you need the styling.
+- **Gotcha** Ship this alongside Custom Select and say plainly that the native one is the better default on mobile — it gets the OS picker. The custom one is for when you need the styling.
 
 ### radio-group
 - **Markup** `<fieldset>` + `<legend>`, native `<input type="radio">` sharing a `name`.

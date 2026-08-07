@@ -64,9 +64,9 @@ Recorded so a future update does not "fix" them.
    lie on the components picker. Upstream's lamp row was ported too, as `.console__lamps`, and has
    since been removed outright — see deviation 18.
 2. **`.theme-console .dropdown-*` became `.console .ac-dropdown__*`.** The picker is this library's
-   own Dropdown, not theme-service's `dropdown.js` — `theme-select.js` is deliberately not vendored
+   own Custom Select, not theme-service's `dropdown.js` — `theme-select.js` is deliberately not vendored
    (see `THEME-SERVICE.md`). The rules are the same rules; only the class names differ. Since the
-   Dropdown became authored markup the picker is written out in `SiteHeader.astro` rather than grown
+   Custom Select became authored markup the picker is written out in `SiteHeader.astro` rather than grown
    from a `<select>`, so what these rules style is in the template beside them.
 3. **The rail is `90rem`, not the source's `1600px`,** in both `.hdr-inner` and `.ftr-inner`. This
    site has a sidebar and a content column between them, and all three should share an edge.
@@ -82,9 +82,9 @@ Recorded so a future update does not "fix" them.
 7. **The header carries `--header-h`, `--console-h`, `.hdr-note` and the `.switch` rules,** none of
    which are upstream. The first two exist because anchors have to clear a sticky header here
    (SC 2.4.11); `.switch` exists because `components.css` is deliberately not vendored. A `.console__go`
-   button lived here too, for the case where the Dropdown script never landed and a native `<select>`
+   button lived here too, for the case where the Custom Select script never landed and a native `<select>`
    would have navigated on every arrow key. Both it and the fallback `.console select` rules went when
-   the Dropdown became authored markup: there is no `<select>` in the header any more, so there is
+   the Custom Select became authored markup: there is no `<select>` in the header any more, so there is
    nothing to fall back to.
 8. **An extra header breakpoint at 900px.** It tracks where this site's sidebar disappears, which the
    source has no equivalent of. (The 760px one is gone: it existed only to hide the brand descriptor,

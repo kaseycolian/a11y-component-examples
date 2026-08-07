@@ -585,7 +585,7 @@ code {
    that. It is also why a heading over prose is free to keep h3's green.
 
    The whole cell is clickable, but only the title is a real link -- so the
-   accessible name stays "Dropdown", not the entire card's text. */
+   accessible name stays "Custom Select", not the entire card's text. */
 .card__link {
   font-size: 1.02rem;
   font-weight: 700;
@@ -674,6 +674,18 @@ code {
    below it -- the page runs h1, h2 "Live example", h3 section, h4 example, and
    axe's heading-order rule is in the gate. */
 .ac-demo-section {
+  width: 100%;
+}
+
+/* Several components wrap their sections in one element so a page factory has a
+   single root to bind to -- `<div data-ac-button>`, `.ac-motion-scope`. That
+   wrapper is a flex item of `.demo`, which is `align-items: flex-start` so a lone
+   small component does not stretch across the panel, and a flex item at
+   flex-start is sized to its content. The grid inside then lays out in fewer
+   columns than it has room for: dropdown lost two of three, loading-button and
+   chip-toggle one each. Matched by what it contains rather than by a class, so a
+   component added later cannot forget it. */
+.demo > :has(> .ac-demo-section) {
   width: 100%;
 }
 

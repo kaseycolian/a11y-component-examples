@@ -53,7 +53,7 @@ must not revert — is `src/site/styles/A11Y-WAY-PAGES.md`.
   built from scratch against the theme tokens and reproduce the visual language of the
   theme-service's `discovery/draft-3/index.html` gallery.
 - **Fonts:** replaced with the theme fonts (`--font-ui` / `--font-mono`).
-- **Selector:** custom — built from this library's own Dropdown component (dogfooding), placed in
+- **Selector:** custom — built from this library's own Custom Select component (dogfooding), placed in
   the sticky site header alongside a motion toggle. Lists all 16 themes grouped Dark / Light, plus
   an "Auto (system)" option.
 - **Existing themes:** none (greenfield).
@@ -73,9 +73,9 @@ a future update session does not "fix" their absence:
    defined by the vendored files. `src/library/tokens/tokens.css` defines those same names with the
    same semantics, so a repo that later adds `components.css` stays compatible.
 
-2. **`theme-select.js` is not vendored.** The theme picker is the library's own Dropdown component,
+2. **`theme-select.js` is not vendored.** The theme picker is the library's own Custom Select component,
    which supports a swatch per option — a better showcase than a bare `<select>`, and it keeps the
-   site built from the components it documents. Since the Dropdown became authored markup there is no
+   site built from the components it documents. Since the Custom Select became authored markup there is no
    `<select>` behind it at all: `SiteHeader.astro` writes the trigger, the panel and every option, and
    the header script talks to it through `ac:dropdown:change` and `setValue()`. `theme-init.js` (the
    anti-flash bootstrap) *is* vendored and used as shipped.
@@ -95,7 +95,7 @@ page rather than worked around.
 - `2026-07-27` — Applied theme-service `v0.3.0` to a greenfield repo. Vendored `theme.css`,
   `effects.css`, `themes.index.json`, and `theme-init.js` into `src/site/theme/`. Deliberately
   skipped `components.css` and `theme-select.js` (see "Deliberate deviations" above). Theme picker
-  and motion toggle placed in the sticky site header, built from this library's own Dropdown and
+  and motion toggle placed in the sticky site header, built from this library's own Custom Select and
   Switch components.
 - `2026-07-30` — Redesigned the site header to match the theme-service's own
   (`assets/site-header.css`), so the two apps read as one brand. Vendored the four brand assets

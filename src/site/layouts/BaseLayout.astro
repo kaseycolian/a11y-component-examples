@@ -64,7 +64,7 @@ const fullTitle = pageTitle(title);
     <link rel="stylesheet" href={`${base}theme/effects.css`} />
 
     {/*
-      The header's theme picker is this library's own Dropdown, so the shell is a
+      The header's theme picker is this library's own Custom Select, so the shell is a
       consumer of the library like any other app: it loads the real served file,
       the same bytes the copy panel shows. It comes before the per-page slot on
       purpose -- a component page's own stylesheet must win any shared selector,
@@ -90,7 +90,7 @@ const fullTitle = pageTitle(title);
     {/*
       Enhances the header's theme <select>. `defer` runs it after the header
       markup is parsed; `is:inline` keeps Astro from bundling it, so this is the
-      same file the Dropdown page hands out. On that page it loads twice, which
+      same file the Custom Select page hands out. On that page it loads twice, which
       is harmless -- createDropdown returns the existing instance rather than
       binding a second set of listeners.
     */}

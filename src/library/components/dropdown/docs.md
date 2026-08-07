@@ -1,88 +1,14 @@
 ## Before you copy
 
-Your framework has a select component, and it may well be better integrated than this one. **Check
-what it does with the four things below**, because these are what such components usually get wrong:
-the accessible name of the trigger, whether focus is real or `aria-activedescendant`, whether the
-panel is in the top layer, and whether a disabled option is still discoverable.
+These files are a working reference, not a package. Move the markup into your own templates and the
+state into your own code. What has to survive that move is the ARIA below, the keyboard behavior, and
+where focus goes — those are the parts that make the component accessible, and the parts that are
+usually dropped.
 
-If you only take one idea from this file, take the first one.
+Every example on this page is numbered and separately copyable. The CSS and JS sections name which
+examples need them.
 
-Each example on this page is separately copyable: the HTML sections are numbered, and the CSS and JS
-sections say which examples need them.
-
-## It is markup, not a script that writes markup
-
-The trigger, the panel, every option, every group and every swatch are authored in
-`component.html`. Nothing in the code panel is a preview of something the script assembles later —
-what you see there is what runs, and the whole ARIA contract is readable without opening a devtools
-inspector.
-
-That is not only a copyability argument. A component that builds itself has two descriptions of
-itself, the markup and the builder, and they drift. Here there is one.
-
-The script does what markup cannot: opens the panel, keeps it anchored to its trigger, moves focus
-between options, and commits a choice.
-
-**This needs JavaScript.** Without it you get a button that does nothing. That is the honest cost of
-a custom listbox, and it is why `native-select` exists alongside it — a real `<select>` needs no
-script and gets the OS picker on a phone, which is a better experience than anything on this page.
-Reach for this one when you need styled rows.
-
-## Where the value lives
-
-The selected option is the one carrying `aria-selected="true"` — the same attribute a screen reader
-reads, so there is no second copy to keep in sync. The root mirrors it as `data-value`, and choosing
-an option dispatches a bubbling event:
-
-```js
-root.addEventListener('ac:dropdown:change', (event) => {
-  event.detail.value;   // the chosen option's data-value
-  event.detail.option;  // the option element itself
-});
-```
-
-**In a form**, add one hidden input inside the root and the script mirrors the value into it:
-
-```html
-<div class="ac-dropdown" data-ac-dropdown>
-  …
-  <input type="hidden" name="speed" value="next-day" data-ac-dropdown-input />
-</div>
-```
-
-That is the whole of form participation — `FormData` and a plain submit both read it like any other
-field. Example 6 is this; examples 1 to 5 are not, and neither ships the input.
-
-## Keyboard
-
-| Key | Closed | Open |
-| --- | --- | --- |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> | Open | Choose the focused option, close, return focus |
-| <kbd>↓</kbd> / <kbd>↑</kbd> | Open | Move between options, wrapping at both ends |
-| <kbd>Home</kbd> / <kbd>End</kbd> | Open at first / last | Jump to first / last |
-| <kbd>Esc</kbd> | — | Close without changing the value, return focus |
-| <kbd>Tab</kbd> | Move on | Close, then move on |
-| Any letter | Choose the first match | Jump to the first match |
-
-Type-ahead accumulates for 800ms, so typing `st` lands on "Staging" rather than jumping to the first
-`s` and then the first `t`. It matches on the option's `.ac-dropdown__primary` text. Disabled options
-are skipped by both arrows and type-ahead.
-
-## The focus model, and why it is this one
-
-When the panel opens, **DOM focus moves onto the option itself** — a roving `tabindex` across the
-rows — rather than staying on the button with `aria-activedescendant` pointing at the active row.
-
-Both are permitted by the APG. Real focus is used here because `aria-activedescendant` is unreliable
-on **VoiceOver for iOS** and on **TalkBack**, where the active option is often not announced as it
-changes. Mobile screen reader support is a requirement for this library, so the model that works on
-phones wins.
-
-The trade-off is that this is the *listbox* pattern rather than the *select-only combobox* pattern, so
-the trigger is a button with `aria-haspopup="listbox"` rather than `role="combobox"`. If you need a
-true combobox — a text input you type into to filter — this is not that component.
-
-## ARIA contract
+## Required markup
 
 | Element | Attributes |
 | --- | --- |
@@ -100,7 +26,23 @@ The `<label>`'s `for` points at the trigger. A `<button>` is a labelable element
 label reaches it the way clicking a label reaches a native select, and `aria-labelledby` still wins
 the name so the value survives.
 
-## Decorating an option
+**This needs JavaScript.** Without it you get a button that does nothing. That is the honest cost of
+a custom listbox, and it is why [Native Select](../native-select/) exists alongside it — a real
+`<select>` needs no script and gets the OS picker on a phone. Reach for this one when you need styled
+rows.
+
+### It is markup, not a script that writes markup
+
+The trigger, the panel, every option, every group and every swatch are authored in `component.html`.
+Nothing in the code panel is a preview of something the script assembles later, so the whole ARIA
+contract is readable without opening a devtools inspector.
+
+That is not only a copyability argument. A component that builds itself has two descriptions of
+itself — the markup and the builder — and they drift. Here there is one. The script does what markup
+cannot: opens the panel, keeps it anchored to its trigger, moves focus between options, and commits a
+choice.
+
+### Decorating an option
 
 Three optional pieces, all authored inside the option:
 
@@ -134,10 +76,75 @@ nothing to say about it.
 The trigger shows the option's `.ac-dropdown__primary` text — not the option's `textContent`, which
 also carries the tick and any secondary line.
 
+## Keyboard
+
+| Key | Closed | Open |
+| --- | --- | --- |
+| <kbd>Tab</kbd> | Move on | Close, then move on |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Open | Choose the focused option, close, return focus |
+| <kbd>↓</kbd> / <kbd>↑</kbd> | Open | Move between options, wrapping at both ends |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Open at first / last | Jump to first / last |
+| <kbd>Esc</kbd> | — | Close without changing the value, return focus |
+| Any letter | Choose the first match | Jump to the first match |
+
+Type-ahead accumulates for 800ms, so typing `st` lands on "Staging" rather than jumping to the first
+`s` and then the first `t`. It matches on the option's `.ac-dropdown__primary` text. Disabled options
+are skipped by both arrows and type-ahead.
+
+**Keys deliberately not bound.** <kbd>Shift</kbd> and <kbd>Ctrl</kbd> with the arrows, which is the
+next section.
+
+### Multiple selection is not supported
+
+It has a different keyboard model — <kbd>Shift</kbd>+arrows to extend, <kbd>Ctrl</kbd>+arrows to move
+without selecting — a different dismissal model, and `aria-multiselectable` on top. Bolting it onto
+this one would give the component two keyboard stories, and only one of them would have been reviewed.
+[Native Select](../native-select/) has `multiple`, and the browser supplies the whole model.
+
+## States
+
+Every one of these is an attribute in the markup, so nothing has to be kept in sync with a class:
+
+| State | Signaled by | Never signaled by |
+| --- | --- | --- |
+| open | `aria-expanded="true"` on the trigger, and the panel loses `hidden`. | — |
+| selected | `aria-selected="true"`, drawn with a tick as well as a color (SC 1.4.1). | The color alone. |
+| focused option | Real DOM focus, drawn with a solid border. | A background tint alone — a 16% wash does not reach the 3:1 SC 1.4.11 asks of a state indicator. |
+| disabled | `aria-disabled="true"` on the trigger, never the `disabled` attribute, so the control stays focusable and a keyboard user can reach it and hear why. | Removing the tab stop. A `disabled` button is skipped and announces nothing. |
+| disabled option | `aria-disabled="true"` and no `tabindex`, so it is announced and skipped rather than removed. | Deleting the row — then nobody learns the option exists. |
+| empty | A message in the panel saying what is missing rather than "no results", and the trigger shows the same. | Silence. The panel keeps `role="listbox"` and takes focus itself, so opening it reads the message out. |
+
+Under `forced-colors: active` every tint is dropped, so the `[FORCED]` block rebuilds each cue out of
+system colors. The tick and the focused option's border survive, because neither was a fill.
+
+## Screen reader behavior
+
+Expected: `"Deploy target, Production, has popup listbox, collapsed"` on the trigger, `"expanded"`
+after it opens, then `"Production app.example.com, selected, 1 of 3"` as focus lands on the first
+option. A group announces its `aria-label` on the way in; a disabled option announces as
+`"South America (at capacity), dimmed"` and cannot be reached with the arrows.
+
+**Not yet verified against real assistive technology.** Until `docs/at-support.md` has a row for this
+component, treat the above as intent, not measurement.
+
+## The focus model, and why it is this one
+
+When the panel opens, **DOM focus moves onto the option itself** — a roving `tabindex` across the
+rows — rather than staying on the button with `aria-activedescendant` pointing at the active row.
+
+Both are permitted by the APG. Real focus is used here because `aria-activedescendant` is unreliable
+on **VoiceOver for iOS** and on **TalkBack**, where the active option is often not announced as it
+changes. Mobile screen reader support is a requirement for this library, so the model that works on
+phones wins.
+
+The trade-off is that this is the *listbox* pattern rather than the *select-only combobox* pattern, so
+the trigger is a button with `aria-haspopup="listbox"` rather than `role="combobox"`. If you need a
+true combobox — a text input you type into to filter — this is not that component.
+
 ## Positioning
 
 The panel is `position: fixed` and, where the browser supports it, promoted to the **top layer** with
-the Popover API. That is the fix for the most common way a custom dropdown breaks in a real layout: an
+the Popover API. That is the fix for the most common way a custom select breaks in a real layout: an
 absolutely-positioned panel is clipped the moment any ancestor has `overflow: hidden` or a
 `transform`, and no amount of `z-index` rescues it.
 
@@ -158,23 +165,6 @@ window is narrow.
 Browsers without the Popover API fall back to a plain `position: fixed` panel. The only thing lost is
 top-layer stacking. The attribute is written in the markup, where it is inert on a browser that does
 not know it.
-
-## States
-
-Every one of these is an attribute in the markup, so nothing has to be kept in sync with a class:
-
-- **Disabled** — `aria-disabled="true"` on the trigger, not the `disabled` attribute, so the control
-  stays focusable and a keyboard user can reach it and hear why it is unavailable. A `disabled` button
-  is skipped by Tab and announces nothing. Flipping that attribute is the whole of disabling it.
-- **Disabled option** — kept in the list with `aria-disabled="true"` rather than removed, so a screen
-  reader user learns the option exists. Struck through, and skipped by arrows and type-ahead because
-  it carries no `tabindex`.
-- **Empty** — a message in the panel saying what is missing rather than "no results", and the trigger
-  shows the same. The panel keeps `role="listbox"` and takes focus itself, so opening it reads the
-  message out instead of silence.
-- **Selected** — marked with a tick as well as color, so it never rests on color alone (SC 1.4.1).
-- **Focused option** — a solid border, not just a background tint. A 16% wash does not reach the 3:1
-  contrast SC 1.4.11 asks of a state indicator.
 
 ## API
 
@@ -197,9 +187,39 @@ Idempotent: a second call on the same element returns the existing instance.
 the value before this script has run without caring which of the two lands first. The site header
 sets the current theme that way.
 
-To drive it from a framework lifecycle, delete the auto-init block:
+### Where the value lives
+
+The selected option is the one carrying `aria-selected="true"` — the same attribute a screen reader
+reads, so there is no second copy to keep in sync. The root mirrors it as `data-value`, and choosing
+an option dispatches a bubbling event:
+
+```js
+root.addEventListener('ac:dropdown:change', (event) => {
+  event.detail.value;   // the chosen option's data-value
+  event.detail.option;  // the option element itself
+});
+```
+
+**In a form**, add one hidden input inside the root and the script mirrors the value into it:
+
+```html
+<div class="ac-dropdown" data-ac-dropdown>
+  …
+  <input type="hidden" name="speed" value="next-day" data-ac-dropdown-input />
+</div>
+```
+
+That is the whole of form participation — `FormData` and a plain submit both read it like any other
+field. Example 6 is this; examples 1 to 5 are not, and none of them ships the input.
+
+## Using it in a framework
+
+Delete the auto-init block at the bottom of `component.js` and call the factory from your own
+lifecycle. In React:
 
 ```jsx
+const ref = useRef(null);
+
 useEffect(() => {
   const dd = AC.createDropdown(ref.current);
   ref.current.addEventListener('ac:dropdown:change', onChange);
@@ -209,33 +229,37 @@ useEffect(() => {
 // Options changed? dd.refresh(). Value set from outside? dd.setValue(v).
 ```
 
-## Not supported
+The script does not observe the option list, so `refresh()` after you change it is yours to call.
 
-**Multiple selection.** It has a different keyboard model (<kbd>Shift</kbd>+arrows to extend,
-<kbd>Ctrl</kbd>+arrows to move without selecting), a different dismissal model, and `aria-multiselectable`
-on top. Bolting it onto this one would give the component two keyboard stories, and only one of them
-would have been reviewed.
+## Common mistakes
 
-## What to watch for
+- **Shipping it where JavaScript may not run.** With the script off, the trigger is a button that does
+  nothing. [Native Select](../native-select/) is the answer then, and the better default on a phone
+  regardless.
+- **A trigger named by its label alone.** It never announces what is currently selected. Point
+  `aria-labelledby` at the value element as well. The script appends the value element's id if you
+  leave it out, but the markup is the better place to say it.
+- **`aria-activedescendant` instead of real focus.** Legal, and unreliable on iOS VoiceOver and
+  TalkBack. See the focus model above.
+- **A hidden `<select>` behind the custom one.** One value now lives in two places and they drift. The
+  hidden input in example 6 carries a value and nothing else — it has no options to disagree with.
+- **A disabled option that keeps its `tabindex`.** The arrows then land on something inert. Leave the
+  attribute off; that is what skips it.
+- **A `<div>` as the trigger.** `aria-expanded` on something with no role announces nothing, and you
+  owe the keyboard <kbd>Enter</kbd> and <kbd>Space</kbd> by hand.
+- **Forgetting `refresh()` after changing options.** The row list is read at startup and when the panel
+  opens; nothing observes it.
+- **Duplicate ids.** They are written out in the markup so the wiring reads clearly. Paste a block
+  twice and give the second copy its own, or the second trigger's `aria-controls` resolves to the first
+  copy's panel.
 
-- **It needs JavaScript.** With it off, the trigger is a button that does nothing. `native-select` is
-  the answer when that is not acceptable, and the better default on a phone regardless.
-- **Give it a real label**, and point `aria-labelledby` at the value element as well as the label. A
-  trigger named by its label alone never announces what is currently selected. The script appends the
-  value element's id if you leave it out, but the markup is the better place to say it.
-- **Call `refresh()` after changing options.** The row list is read when the panel opens and at
-  startup; the script does not observe the list.
-- **Ids are yours.** They are written out in the markup so the wiring reads clearly; the script fills
-  in only the ones you leave off. Paste a block twice and give the second copy its own, or the second
-  trigger's `aria-controls` resolves to the first copy's panel.
-- **Clicking the label opens the panel**, because the click is forwarded to the trigger. That is the
-  browser doing what `<label for>` means; if you would rather it only focused, drop the `for`.
+Clicking the label opens the panel, because the click is forwarded to the trigger. That is the browser
+doing what `<label for>` means, not a bug; drop the `for` if you would rather it only focused.
 
 ## Related
 
-`.ac-field`, `.ac-field__label` and `.ac-field__hint` are **canonical in the [Form Field](../field/)
-component**. They are repeated here so this file stands alone — change one, change both.
-
-[Drawer](../drawer/) is the same idea for a panel that comes from the edge of the screen.
-`native-select` is the plainer option, needs no script at all, and is the better default on mobile
-because it gets the OS picker.
+- [Native Select](../native-select/) — the plainer option. No script at all, and the better default on
+  mobile because it gets the OS picker.
+- [Drawer](../drawer/) — the same idea for a panel that comes from the edge of the screen.
+- [Form Field](../field/) — `.ac-field`, `.ac-field__label` and `.ac-field__hint` are **canonical
+  there**. They are repeated here so this file stands alone — change one, change both.

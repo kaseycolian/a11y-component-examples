@@ -270,7 +270,7 @@ exempts the `Page` suffix from the contract's `api`.
   re-flows without reordering, so Tab never runs back across the screen (SC 2.4.3). The rail is
   `90rem`, not theme-service's 1600px, so the brand and the theme console line up with the sidebar
   and content below. Brand strings are `SITE_NAME` + `SITE_BRAND_TAG` in `src/site/lib/site.mjs`.
-- **Both pickers are the library's own Dropdown**, loaded site-wide from
+- **Both pickers are the library's own Custom Select**, loaded site-wide from
   `public/library/components/dropdown/` by `BaseLayout`. The shell is a *consumer* of the library, so
   a regression in the dropdown breaks the site, not just a test. Each sits in a `.console` shell —
   a cap that names it, a flat trigger, an accent border and glow — keyed to `--accent-blue` for the
@@ -280,10 +280,10 @@ exempts the `Page` suffix from the contract's `api`.
   `src/site/styles/A11Y-WAY-PAGES.md`). Nothing reaches into the component's internals: the shell is
   the consumer's own CSS, and the two-class selectors win over the library's defaults by specificity
   rather than by stylesheet order. The components picker navigates on `ac:dropdown:change`, which is
-  safe because the Dropdown commits only on click or Enter and the described hint says so in advance
+  safe because the Custom Select commits only on click or Enter and the described hint says so in advance
   (SC 3.2.2). Covered by `tests/site-header.spec.mjs`.
 - **Both pickers are written out in `SiteHeader.astro`**, since the 2026-08-01 rebuild made the
-  Dropdown authored markup. There is no `<select>` in the header at all, so the `Go` button and the
+  Custom Select authored markup. There is no `<select>` in the header at all, so the `Go` button and the
   `.console select` fallback rules are gone with it: **without JavaScript the header pickers do
   nothing.** That is deliberate and it is the cost of a custom listbox — the sidebar nav still lists
   every component, and the site's default theme still renders. The theme script hands the stored theme
@@ -380,7 +380,7 @@ exempts the `Page` suffix from the contract's `api`.
   `box-sizing: border-box` cannot shrink a box below its own borders, so a 2px border made the "1px"
   clipped link 4px — the border moved into the three revealed states instead. The shell's own
   `.skip-link` in `site.css` predates this and is still hand-rolled; making `BaseLayout` a consumer of
-  `.ac-skip-link` the way the header consumes Dropdown is an open, unforced option.
+  `.ac-skip-link` the way the header consumes Custom Select is an open, unforced option.
 - [x] `visually-hidden` — done, **CSS-only** (`--no-js`), 17/17 tests in Chromium. **Canonical home for the
   clipping technique**; `skip-link`, `switch`, `textarea` and `tooltip` each keep a local copy on purpose,
   so a change here is a change in all five. Organized around the fact that *hiding is not one thing*:
@@ -611,7 +611,7 @@ exempts the `Page` suffix from the contract's `api`.
   over-typing is allowed and reported. Autogrow collapses the height before reading `scrollHeight`
   (otherwise it can only ever grow) and a `ResizeObserver` makes a hand-dragged height final.
 - [x] `native-select` — done, **CSS-only** (`--no-js`), 17/17 tests in Chromium. The recommendation
-  component: prefer this over the custom Dropdown unless you need styled rows, because on a phone it
+  component: prefer this over Custom Select unless you need styled rows, because on a phone it
   opens the OS picker. Caret is two `currentColor` gradients, so no image and no second rule for the
   disabled state — and under `forced-colors` it sets `appearance: auto` and lets the UA draw its own,
   since `background-image` is dropped there. `option`/`optgroup` get their own colors (Windows inherits
@@ -1227,6 +1227,10 @@ homes it belongs to, not in all of them.
 
 - **Node is not on the inherited PATH.** Prefix PowerShell calls with
   `$env:Path = "C:\nvm4w\nodejs;$env:Path"`.
+- **`.demo` is `align-items: flex-start`, so a wrapper around the demo sections shrinks to its
+  content** and the grid inside it silently lays out in fewer columns than the panel has room for.
+  Fixed once in `site.css`; the full write-up, including how it was measured, is the wrapper bullet in
+  `docs/rewrite-pass.md` under "What the finished rows learned".
 - **A wide element inside a header zone starves the other zones.** The reduced-motion note started
   beside the switch, and at 1080px and below that put an 18rem paragraph in an `auto` grid column:
   `auto` sizes to max-content, so the note took 288px of a 292px content box and the components
@@ -1491,11 +1495,11 @@ homes it belongs to, not in all of them.
 
 - **No `src/library/core/` shared modules.** Components are fully self-contained — deliberately not
   DRY, because a copy-paste library is better served by each file standing alone.
-- **Dropdown ships one focus model** (real DOM focus on options), not two. `aria-activedescendant`
+- **Custom Select ships one focus model** (real DOM focus on options), not two. `aria-activedescendant`
   is unreliable on iOS VoiceOver and TalkBack; the tradeoff is documented in its `docs.md`.
 - **A dropdown option's secondary line IS part of its accessible name.** Correct — it is real
   information, not decoration. Only the icon, the swatch and the tick are `aria-hidden`.
-- **Dropdown needs JavaScript, and does not apologize past one sentence.** The 2026-08-01 rebuild
+- **Custom Select needs JavaScript, and does not apologize past one sentence.** The 2026-08-01 rebuild
   traded the hidden `<select>` — and with it the no-JS fallback — for markup that carries its own
   contract. `native-select` is the component that needs no script, and it was always the better
   default on a phone.

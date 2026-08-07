@@ -10,7 +10,7 @@ const indexHref = `${base}components/`;
 const here = Astro.url.pathname;
 
 /*
-  Both pickers are the library's own Dropdown, which is authored markup: the
+  Both pickers are the library's own Custom Select, which is authored markup: the
   trigger, the panel and every option are written out below rather than built by
   a script. So the server has to render the current selection too -- which
   option wears aria-selected, and what the trigger reads. The script at the foot
@@ -116,7 +116,7 @@ const jumpLabel = here === indexHref
       */}
       <span class="console__cap" id="theme-cap">Theme</span>
       {/*
-        The picker is the library's own Dropdown, which is why theme-service's
+        The picker is the library's own Custom Select, which is why theme-service's
         theme-select.js is not vendored -- see src/site/theme/THEME-SERVICE.md.
         There is no <select> here at all: the markup below IS the component, the
         same shape the library ships on its own page.
@@ -224,8 +224,8 @@ const jumpLabel = here === indexHref
             Components
           </span>
           {/*
-            The same Dropdown the library ships, grouped exactly like the sidebar.
-            Navigating on the change event is safe here because the Dropdown
+            The same Custom Select the library ships, grouped exactly like the sidebar.
+            Navigating on the change event is safe here because the Custom Select
             commits a choice only on click or Enter -- it does not fire while you
             arrow through the list -- and the hint says what choosing does before
             you choose (SC 3.2.2). That was never true of a bare native select,
@@ -353,11 +353,11 @@ const jumpLabel = here === indexHref
 <script>
   const root = document.documentElement;
 
-  /** The Dropdown's own event, which carries the chosen option's data-value. */
+  /** The Custom Select's own event, which carries the chosen option's data-value. */
   type DropdownChange = CustomEvent<{ value: string }>;
 
   /* --- Components picker ---------------------------------------------------
-     Choosing an option is an explicit commit -- the Dropdown fires only on a
+     Choosing an option is an explicit commit -- the Custom Select fires only on a
      click or Enter, never while you arrow through the list -- so navigating
      here is a user action rather than a side effect of browsing (SC 3.2.2).
      The empty value is the "Jump to a component" placeholder, which goes
@@ -381,7 +381,7 @@ const jumpLabel = here === indexHref
     const current = root.getAttribute('data-theme') ?? '';
 
     // Both, because the two scripts have no fixed order: data-value is what the
-    // Dropdown reads when it initializes, and setValue corrects it when it
+    // Custom Select reads when it initializes, and setValue corrects it when it
     // already has.
     picker.dataset.value = current;
     (

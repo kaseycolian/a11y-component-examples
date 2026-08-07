@@ -2,7 +2,7 @@
  * The site shell's own header controls.
  *
  * This is not a component spec -- it covers the shell as a *consumer* of the
- * library. The theme picker is the Dropdown component loaded from the same
+ * library. The theme picker is the Custom Select component loaded from the same
  * served files a visitor copies, which makes the header the one place where a
  * regression in the library shows up as a broken site rather than a red test.
  */
@@ -19,7 +19,7 @@ const THEMES = JSON.parse(
   ),
 ).families.flatMap((family) => [family.dark, family.light]).filter(Boolean);
 
-// Two Dropdowns live in the header now, so each locator names which one.
+// Two Custom Selects live in the header now, so each locator names which one.
 const picker = (page) => page.locator('[data-theme-control] .ac-dropdown');
 const jump = (page) => page.locator('[data-jump-control] .ac-dropdown');
 
@@ -37,7 +37,7 @@ test('every tab title leads with the site name', async ({ page }) => {
   await expect(page).toHaveTitle('The A11Y Way · WCAG 2.2 AA Development Guide');
 });
 
-test('the header theme picker is the library Dropdown and applies a theme', async ({ page }) => {
+test('the header theme picker is the library Custom Select and applies a theme', async ({ page }) => {
   await page.goto('components/disclosure/');
 
   const toggle = picker(page).locator('.ac-dropdown__toggle');
@@ -92,7 +92,7 @@ test('the choice survives a reload and the trigger shows it', async ({ page }) =
   await page.reload();
   // The ordering hazard: the server rendered SITE_THEME as selected, theme-init
   // sets data-theme from localStorage, and the header script has to push that
-  // into the Dropdown whichever of the two scripts ran first. The trigger must
+  // into the Custom Select whichever of the two scripts ran first. The trigger must
   // not lag.
   await expect(picker(page).locator('.ac-dropdown__toggle')).toHaveAccessibleName(
     /Theme.*Midnight Arcade/s,
@@ -133,7 +133,7 @@ test('arrowing through the components picker does not navigate', async ({ page }
   await page.goto('components/disclosure/');
 
   // SC 3.2.2, and the whole reason navigating on the change event is allowed
-  // here: the Dropdown commits only on a click or Enter. A bare native select
+  // here: the Custom Select commits only on a click or Enter. A bare native select
   // fires on every arrow key on Windows, which is what this used to guard with a
   // Go button instead.
   const toggle = jump(page).locator('.ac-dropdown__toggle');

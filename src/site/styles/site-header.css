@@ -57,7 +57,7 @@
 
    Loaded after site.css by BaseLayout. Order is not relied on, though: every rule
    that overrides a library default does it by specificity (.console
-   .ac-dropdown__toggle beats .ac-dropdown__toggle), because the Dropdown's own
+   .ac-dropdown__toggle beats .ac-dropdown__toggle), because the Custom Select's own
    stylesheet is a plain <link> whose position Astro does not guarantee.
    ============================================================================= */
 
@@ -74,7 +74,7 @@
      device: the SC 2.5.8 floor is 24px, so this has half again as much, and a
      single number is what lets --header-h above stay one measured value rather
      than a matrix of them. Where a finger really needs 44px is the open list,
-     and the Dropdown already gives it that through its own --ac-target. */
+     and the Custom Select already gives it that through its own --ac-target. */
   --console-h: 36px;
 }
 
@@ -251,10 +251,10 @@
 
 /* --- Console -----------------------------------------------------------------
    The shared shell both pickers wear. It keeps the border, glow and focus ring;
-   the Dropdown trigger inside it goes flat and contributes only its text and
+   the Custom Select trigger inside it goes flat and contributes only its text and
    caret. One custom property is the whole difference between the two.
 
-   A <div>, not a <label>: once the Dropdown enhances the select the real control
+   A <div>, not a <label>: once the Custom Select enhances the select the real control
    is a <button>, which a wrapping label would neither name nor focus. Each
    console's cap does that job through aria-labelledby instead. */
 
@@ -367,8 +367,8 @@
   border-right: 1px solid color-mix(in srgb, var(--console-accent) 35%, var(--border));
 }
 
-/* --- The Dropdown inside a console --------------------------------------------
-   Nothing here reaches into the Dropdown's behavior; it is all surface. The
+/* --- The Custom Select inside a console --------------------------------------------
+   Nothing here reaches into the Custom Select's behavior; it is all surface. The
    two-class selectors also mean this wins over the component's own defaults
    whichever order the two stylesheets land in. */
 
@@ -433,7 +433,7 @@
    after those went, because this is now the only palette readout in the header
    and at 7px a strip reads as one smudge of color where four dots read as four
    accents. Scoped to the header: the library keeps its strip everywhere else,
-   which is what the Dropdown page demonstrates. */
+   which is what the Custom Select page demonstrates. */
 .console--theme .ac-dropdown__swatch {
   gap: 5px;
   border: 0;

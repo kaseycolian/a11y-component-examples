@@ -121,12 +121,12 @@ component, treat the above as intent, not measurement.
 | Cost | one element | a few hundred lines to maintain |
 
 What you give up is the appearance of the *open* list. You cannot style the popup — no icons in rows,
-no color swatches, no second line of text. That is the whole reason [Dropdown](../dropdown/) exists,
+no color swatches, no second line of text. That is the whole reason [Custom Select](../dropdown/) exists,
 and it is the only reason to reach for it.
 
 ## `multiple` is left native on purpose
 
-This is the one case where a styled listbox is a downgrade, which is why [Dropdown](../dropdown/)
+This is the one case where a styled listbox is a downgrade, which is why [Custom Select](../dropdown/)
 refuses to enhance it. The keyboard model is genuinely different, browsers already implement it, and
 the four modifier rows in the table above are what a replacement would have to rebuild.
 
@@ -161,5 +161,5 @@ kinder — see [Fieldset](../fieldset-group/).
 
 ## Related
 
-[Dropdown](../dropdown/) is the styled-rows version, and says plainly what it costs.
+[Custom Select](../dropdown/) is the styled-rows version, and says plainly what it costs.
 [Form Field](../field/) is the canonical home for `.ac-field*`, repeated here so this file stands alone.

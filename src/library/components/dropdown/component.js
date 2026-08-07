@@ -1,5 +1,5 @@
 /* ===========================================================================
-   DROPDOWN / LISTBOX
+   CUSTOM SELECT
 
    WHAT TO COPY
      [CORE]        every example. Open and close, positioning, roving focus,

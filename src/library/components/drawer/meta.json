@@ -9,7 +9,7 @@
   "wcag": ["1.4.13", "2.1.1", "2.1.2", "2.4.3", "2.5.8", "4.1.2"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Same behavior on a phone and on a desktop — that is what separates it from the Dropdown, which anchors to its trigger at every width. Open one and press Tab repeatedly: in the first three, focus cannot leave.",
+  "demoNote": "Same behavior on a phone and on a desktop — that is what separates it from the Custom Select, which anchors to its trigger at every width. Open one and press Tab repeatedly: in the first three, focus cannot leave.",
   "contract": {
     "useWhen": "A panel from a screen edge. The whole component is the focus management.",
     "root": [".ac-drawer"],

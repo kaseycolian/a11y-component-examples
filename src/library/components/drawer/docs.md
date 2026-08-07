@@ -140,6 +140,6 @@ useEffect(() => {
 
 ## Related
 
-[Dropdown](../dropdown/) anchors to its trigger at every viewport width, on purpose. If you want a
+[Custom Select](../dropdown/) anchors to its trigger at every viewport width, on purpose. If you want a
 select that becomes a sheet on a phone, that is this component opened from the same button — two
 behaviors kept as two components, rather than one component with two keyboard stories.

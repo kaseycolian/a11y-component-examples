@@ -17,7 +17,7 @@
    standalone, in a theme-service app, and in an app that sets --ac-*.
    scripts/check-tokens.mjs enforces it.
 
-   .ac-field* is canonical here. Dropdown carries its own copy so it stands
+   .ac-field* is canonical here. Custom Select carries its own copy so it stands
    alone — change one, change both. .ac-input / .ac-textarea / .ac-group /
    .ac-choice are provisional; text-input, textarea and fieldset-group will own
    them.

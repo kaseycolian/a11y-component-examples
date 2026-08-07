@@ -162,7 +162,7 @@ test('multiple is left native, sized, and reports every selection', async ({ pag
   // Without `size` a multiple select is a four-row box that reads as a bug.
   await expect(select).toHaveAttribute('size', '5');
   // A listbox, not a combobox: the role changes with `multiple`, and so does the
-  // keyboard model -- which is why the Dropdown refuses to enhance it.
+  // keyboard model -- which is why the Custom Select refuses to enhance it.
   await expect(page.getByRole('listbox', { name: 'Notify me about' })).toBeVisible();
 
   expect(await select.evaluate((el) => Array.from(el.selectedOptions).map((o) => o.value))).toEqual([
