@@ -64,7 +64,7 @@ three on the surface, for the same reason. Example 2 has all three cases side by
 
 The ring on the `<pre>` is inset (`outline-offset: -3px`), because the surface clips it — an outline
 at a positive offset on a child of an overflow container is cut off on the edge it matters most on.
-[Focus Ring](../focus-ring/) owns that variant.
+[Focus Indicator](../focus-ring/) owns that variant.
 
 `white-space: pre-wrap` is not the fix. Code that wraps wherever the box happens to end reads as
 different code, and a screen reader gets no signal that the break was not the author's.

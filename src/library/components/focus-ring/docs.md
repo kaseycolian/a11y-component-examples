@@ -1,15 +1,21 @@
 ## Before you copy
 
-Your framework or design system almost certainly has a focus style already. Use it, and check it
-against the two questions below, because the version people hand-roll usually fails one of them:
-**can you see it on every surface it lands on**, and **is it still there in forced colors**. There is
-no ARIA here and no JavaScript. This is enough for a person or an agent to start from.
+These files are a working reference, not a package. Move the markup into your own templates and the
+state into your own code. What has to survive that move is the ARIA below, the keyboard behavior, and
+where focus goes — those are the parts that make the component accessible, and the parts that are
+usually dropped.
 
-Each example is separately copyable: the HTML sections are numbered, and the CSS sections say which
-examples need them. The modifiers are complete on their own — put `ac-focus-ring--inset` on an
-element, not `ac-focus-ring ac-focus-ring--inset`.
+If your design system already has a focus style, check it against two questions: **can you see it on
+every surface it lands on**, and **is it still there in forced colors**. Those are the two the
+hand-rolled version usually fails.
 
-## The whole thing
+Every example on this page is numbered and separately copyable. The CSS sections name which examples
+need them. The modifiers are complete on their own — put `ac-focus-ring--inset` on an element, not
+`ac-focus-ring ac-focus-ring--inset`.
+
+## Required markup
+
+One class. There is no ARIA here, and nothing about a focus indicator is announced.
 
 ```css
 .ac-focus-ring:focus-visible {
@@ -20,16 +26,51 @@ element, not `ac-focus-ring ac-focus-ring--inset`.
 
 | Declaration | Why it is there |
 | --- | --- |
-| `:focus-visible` | the browser's judgement about when an indicator is wanted, which beats yours — see below |
-| `3px` | a hairline against a busy surface is not an indicator; **SC 2.4.13** (AAA) puts numbers on this |
-| `solid` | a dashed or dotted ring loses most of its perimeter, and most of its contrast with it |
-| `outline-offset: 2px` | separates the ring from the element's own border, so it reads as a state and not as a heavier edge |
+| `:focus-visible` | The browser's judgement about when an indicator is wanted, which beats yours — see below. |
+| `3px` | A hairline against a busy surface is not an indicator. **SC 2.4.13** (AAA) puts numbers on this. |
+| `solid` | A dashed or dotted ring loses most of its perimeter, and most of its contrast with it. |
+| `outline-offset: 2px` | Separates the ring from the element's own border, so it reads as a state and not as a heavier edge. |
 
 No `border-radius`: a modern browser's outline already follows the element's, so a pill gets a pill.
 No transition either — an indicator that fades in is an indicator that is not there yet, and the
 person is already deciding whether they pressed the right key.
 
-## `:focus-visible` is the default and `:focus` is the exception
+### The modifiers
+
+| Variant | Offset | Use it when |
+| --- | --- | --- |
+| `.ac-focus-ring` | `2px` | The default. |
+| `.ac-focus-ring--always` | `2px`, on `:focus` | The control only exists once focused — a skip link, and close to nothing else. |
+| `.ac-focus-ring--flush` | `0` | The ring would overlap the next control in a tight row, or spill past the edge of the viewport. |
+| `.ac-focus-ring--inset` | `-3px` | An ancestor has `overflow: hidden`, or the element sits flush against one. |
+| `.ac-focus-ring--two-tone` | `3px` + a shadow | The surface behind it is not one you control. |
+
+`--inset` costs 3px of the element's own area, so the element has to be big enough to spare it.
+`--flush` reads as a heavier border rather than as a change of state, so treat it as a last resort
+rather than a style choice.
+
+## Keyboard
+
+| Key | What it does |
+| --- | --- |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> | Moves focus, and `:focus-visible` matches. A mouse press moves focus too, and it does not. |
+
+**Keys deliberately not bound.** All of them. This is a paint rule, not a widget, and every failure on
+this page is invisible unless you press <kbd>Tab</kbd>.
+
+## States
+
+| State | Signaled by | Never signaled by |
+| --- | --- | --- |
+| focus-visible | A 3px solid outline at 2px offset, in the theme's focus color. | A background tint. That is color alone (SC 1.4.1) and forced colors replaces it outright. |
+| focus | Nothing, by default. `--always` is the opt-in for the one case that needs it. | — |
+| forced colors | The same outline, redrawn in `CanvasText`. | `box-shadow`, which forced colors drops entirely. |
+
+Nothing here is announced, and that is the point — the focus indicator is the sighted keyboard user's
+half of the information a screen reader gets from the focused element's name and role. A component can
+pass every ARIA check on this site and still be unusable by someone who navigates by Tab and can see.
+
+### `:focus-visible` is the default and `:focus` is the exception
 
 `:focus` matches every time an element takes focus, a mouse click included. `:focus-visible` matches
 only when the browser judges that the person needs telling: a Tab, an arrow key, or **any** focus on a
@@ -47,20 +88,13 @@ exactly as specific as `.your-class:focus`, so whichever loads later wins. This 
 global, which is why `--always` in `component.css` carries a second, doubled selector. If a `:focus`
 rule of yours mysteriously does nothing, this is usually why.
 
-## Offset, and the ring an ancestor eats
+## Screen reader behavior
 
-An outline is paint like any other, and an ancestor with `overflow: hidden` clips it. No error,
-nothing to see — it looks right until someone Tabs there. Example 2 has both halves live.
+Nothing. A focus indicator has no accessible name, no role and no announcement, by design.
 
-| Variant | Offset | Use it when |
-| --- | --- | --- |
-| `.ac-focus-ring` | `2px` | the default |
-| `.ac-focus-ring--flush` | `0` | the ring would overlap the next control in a tight row, or spill past the edge of the viewport |
-| `.ac-focus-ring--inset` | `-3px` | an ancestor has `overflow: hidden`, or the element sits flush against one |
-
-`--inset` costs 3px of the element's own area, so the element has to be big enough to spare it.
-`--flush` reads as a heavier border rather than as a change of state, so treat it as a last resort
-rather than a style choice.
+The corollary is the useful part: **none of the failures on this page can be found with a screen
+reader**, or with axe, or with any other automated tool. All of them will report that the button is
+fine. Press <kbd>Tab</kbd>.
 
 ## The two-tone ring
 
@@ -88,25 +122,7 @@ outright, so the tone that has to survive is the one drawn as an outline.
 This is **SC 2.4.13 Focus Appearance**, which is **AAA** and therefore not required at AA. It is two
 declarations.
 
-## What `outline: none` costs
-
-Example 4 is three buttons, live, and nothing in the markup separates them.
-
-| Written as | What it does | Verdict |
-| --- | --- | --- |
-| `outline: none` alone | focus becomes untraceable | **SC 2.4.7 Focus Visible** failure |
-| `outline: none` + a background tint | looks handled; it is color alone, and forced colors replaces the tint outright | **SC 1.4.1 Use of Color** failure |
-| `outline: none` + a `box-shadow` ring | a real alternative — follows `border-radius`, layers | fine, with the forced-colors block below |
-
-The middle one is worth slowing down for, because it is what gets written when somebody is *trying*.
-The button visibly changes, so it feels like a replacement. It is not: the change is a difference of
-two colors, invisible to anyone who cannot separate those two colors, and nowhere near the 3:1
-contrast change **SC 1.4.11** asks of a non-text indicator.
-
-The third is the legitimate use of `outline: none`, and it is why this component's forced-colors block
-gives it a real outline back.
-
-## Forced colors
+### Forced colors
 
 Windows High Contrast replaces every color you set with the user's own palette and drops `box-shadow`,
 background images and `color-mix` entirely. That takes the two-tone ring's inner tone, the tint in
@@ -143,27 +159,35 @@ It goes on the **focusable element**, not on the bar. Example 5 has the same lis
 without it. This library applies the same fix at page scale: `site.css` sets `scroll-margin-top` on
 anything with an `id`, clearing the sticky site header.
 
-## Screen reader behavior
+## Common mistakes
 
-Nothing here is announced, and that is the point — the focus ring is the sighted keyboard user's half
-of the information a screen reader gets from the focused element's name and role. A component can pass
-every ARIA check on this site and still be unusable by someone who navigates by Tab and can see.
-
-The corollary is that **none of these failures can be found with a screen reader**, or with axe, or
-with any other automated tool: all of them will report that the button is fine. Press Tab.
-
-## Watch for
-
+- **`outline: none` with no replacement.** SC 2.4.7, and the most common accessibility defect there
+  is. Example 4 has it live.
+- **`outline: none` plus a background tint.** It looks handled, because the button visibly changes.
+  The change is a difference of two colors — SC 1.4.1 — and nowhere near the 3:1 contrast change
+  **SC 1.4.11** asks of a non-text indicator. Forced colors then replaces the tint outright.
 - **`outline: none` in a CSS reset.** Hand-rolled resets and old framework forks do this, and it
-  removes the ring from an entire application at once.
+  removes the indicator from an entire application at once.
 - **`:focus` where you meant `:focus-visible`**, which leaves a ring on every button a mouse user
   clicks — and is the reason people reach for `outline: none` in the first place.
+- **`overflow: hidden` anywhere above a focusable element.** Carousels, cards with rounded corners,
+  anything with a scroll shadow. The ring is painted outside the box and clipped away, with no error.
+  Use `--inset`.
+- **`border-radius` in a focus rule.** An outline already follows the element's own.
+- **A ring built from the element's border.** A ghost button has no border at rest, so there is
+  nothing to thicken.
 - **A ring on a container that delegates to a child.** If a wrapper takes focus and the child is what
   is visible, the ring is drawn around the wrapper and may be nowhere near the thing being operated.
-- **`overflow: hidden` anywhere above a focusable element.** Carousels, cards with rounded corners,
-  anything with a scroll shadow. Use `--inset`.
 - **A ring that only contrasts with your one design surface.** Check it against the darkest and
   lightest things in the app, and over an image.
-- **Testing with a mouse.** Every failure on this page is invisible to a pointer.
+- **A sticky bar with no `scroll-margin-top` on what it can cover.** SC 2.4.11, and it only shows up
+  moving backwards.
 - **`:focus-within` as a substitute.** It marks an ancestor, not the focused element, so it cannot say
   *which* control is live. It is a layout tool.
+- **Testing with a mouse.** Every failure on this page is invisible to a pointer.
+
+## Related
+
+- [Skip Link](../skip-link/) — the one component that draws on `:focus` instead, and why.
+- [Button](../button/) — the ring in its ordinary setting.
+- [Effects](../effects/) — the surfaces the two-tone ring exists for.

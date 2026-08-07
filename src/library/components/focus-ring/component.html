@@ -1,12 +1,12 @@
 <!-- ===========================================================================
-     FOCUS RING — the indicator that says where the keyboard is
+     FOCUS INDICATOR — the one thing that says where the keyboard is
 
      WHAT TO COPY
        One class and four modifiers. Take the [CORE] section of component.css
        and every focusable thing you put the class on has a ring; take a
        modifier only where the default cannot work. There is no JavaScript.
 
-     THE CONTRACT
+     REQUIRED MARKUP
        class="ac-focus-ring"            3px accent outline, 2px offset, drawn on
                                         :focus-visible
        class="ac-focus-ring--always"    drawn on :focus, so it survives a click
@@ -25,230 +25,249 @@
        writes it. Example 4 has it live: three buttons, and nothing in the markup
        says which one you can still follow with the keyboard.
 
-     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the section
+     headings, the grid, and the per-example headings. Never copy it.
      =========================================================================== -->
 
-<div class="ac-demo-grid">
-  <!-- ======================================================================
-       EXAMPLE 1 · :focus-visible is the default, :focus is the exception
-       CSS [CORE] + [ALWAYS].
+<div class="ac-demo-section">
+  <h3 class="ac-demo-section__title">Correct examples</h3>
+  <p class="ac-demo-section__note">
+    Tab through these rather than reading them. They are the three decisions the indicator asks you to
+    make: when it is drawn, how far out it sits, and whether it can survive the surface behind it.
+  </p>
 
-       :focus matches every time an element takes focus, a mouse click included.
-       :focus-visible matches only when the browser judges that an indicator is
-       wanted — a Tab, an arrow key, or any focus at all on a text field,
-       because someone typing needs to see where the caret went.
+  <div class="ac-demo-grid">
+    <!-- ======================================================================
+         EXAMPLE 1 · :focus-visible is the default, :focus is the exception
+         CSS [CORE] + [ALWAYS].
 
-       That judgement is the browser's, it accounts for input methods we have
-       not thought of, and it is right far more often than a hand-written rule
-       is. So the library defaults to :focus-visible everywhere.
+         :focus matches every time an element takes focus, a mouse click
+         included. :focus-visible matches only when the browser judges that an
+         indicator is wanted — a Tab, an arrow key, or any focus at all on a text
+         field, because someone typing needs to see where the caret went.
 
-       The exception is a control whose whole job is to appear on focus: a skip
-       link. There, a focus that fails to match :focus-visible leaves the link
-       focused and invisible, and nothing on screen says so. --always is for
-       that case and no other.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">1 &middot; <code>:focus-visible</code> vs <code>:focus</code></h3>
+         That judgement is the browser's, it accounts for input methods we have
+         not thought of, and it is right far more often than a hand-written rule
+         is. So the library defaults to :focus-visible everywhere.
 
-    <div class="ac-fr-row">
-      <button class="ac-fr-btn ac-focus-ring" type="button">Tab to me</button>
-      <button class="ac-fr-btn ac-focus-ring--always" type="button">Click me</button>
+         The exception is a control whose whole job is to appear on focus: a skip
+         link. There, a focus that fails to match :focus-visible leaves the link
+         focused and invisible, and nothing on screen says so. --always is for
+         that case and no other.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">1 &middot; <code>:focus-visible</code> vs <code>:focus</code></h4>
+
+      <div class="ac-fr-row">
+        <button class="ac-fr-btn ac-focus-ring" type="button">Tab to me</button>
+        <button class="ac-fr-btn ac-focus-ring--always" type="button">Click me</button>
+      </div>
+
+      <label class="ac-fr-label" for="fr-name">
+        Full name
+        <input class="ac-fr-input ac-focus-ring" id="fr-name" type="text" value="Jordan Lee" />
+      </label>
+
+      <p class="ac-demo__legend" id="fr-note-1">
+        Click each button. The first keeps no ring &mdash; you know where you
+        clicked, because you clicked it. The second keeps one whatever you used to
+        get there. Now <kbd>Tab</kbd> through all three: every one of them rings.
+        The text field rings on a click too, because <code>:focus-visible</code>
+        already knows a caret needs a home.
+      </p>
     </div>
 
-    <label class="ac-fr-label" for="fr-set">
-      Set length
-      <input class="ac-fr-input ac-focus-ring" id="fr-set" type="text" value="99 minutes" />
-    </label>
+    <!-- ======================================================================
+         EXAMPLE 2 · Offset, and the ring an ancestor eats
+         CSS [CORE] + [OFFSET].
 
-    <p class="ac-demo__legend" id="fr-note-1">
-      Click each button. The first keeps no ring &mdash; you know where you
-      clicked, because you clicked it. The second keeps one whatever you used to
-      get there. Now <kbd>Tab</kbd> through all three: every one of them rings.
-      The text field rings on a click too, because <code>:focus-visible</code>
-      already knows a caret needs a home.
-    </p>
+         outline-offset moves the ring out from the border box. At 0 it sits
+         against the element's own edge and reads as a thicker border rather than
+         as a change of state; 2px is the library default and is enough to
+         separate the two.
+
+         An outline is paint like any other: an ancestor with overflow: hidden
+         clips it. The third button is inside one and its ring is simply gone — no
+         error, no warning, and it looks right until someone Tabs to it. --inset
+         draws the ring inside the element instead, which is also what you want
+         for anything flush against the edge of the viewport.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">2 &middot; Offset, and the clipped ring</h4>
+
+      <div class="ac-fr-row">
+        <button class="ac-fr-btn ac-focus-ring--flush" type="button">Offset 0</button>
+        <button class="ac-fr-btn ac-focus-ring" type="button">Offset 2px</button>
+      </div>
+
+      <div class="ac-fr-clip">
+        <button class="ac-fr-btn ac-focus-ring" type="button">Clipped</button>
+        <button class="ac-fr-btn ac-focus-ring--inset" type="button">Inset</button>
+      </div>
+
+      <p class="ac-demo__legend" id="fr-note-2">
+        <kbd>Tab</kbd> through the four. The first reads as a heavier border
+        rather than as a change of state. The last two sit in a box with
+        <code>overflow: hidden</code>: the third&rsquo;s ring is painted outside
+        that box and clipped away, and the fourth draws its ring inside itself, so
+        there is nothing to clip.
+      </p>
+    </div>
+
+    <!-- ======================================================================
+         EXAMPLE 3 · The ring that survives any background
+         CSS [CORE] + [TWO-TONE], plus the [MOCK] swatches.
+
+         One accent ring is fine when you know what is behind it. On a page where
+         the same button appears over a photo, a light card and a dark footer, an
+         accent that contrasts with one of them contrasts with neither of the
+         others, and the ring vanishes exactly where nobody was looking.
+
+         The two-tone ring is two adjacent rings of opposite lightness. Whatever
+         is behind them, one of the two contrasts with it. This is what SC 2.4.13
+         Focus Appearance asks for — AAA, so not required at AA, but it is cheap,
+         and it is the difference between a ring that works and a ring that works
+         on your machine.
+
+         Forced colors is why the two tones are an outline and a box-shadow in
+         that order rather than two shadows: Windows High Contrast drops
+         box-shadow entirely. What survives has to be the outline, and it has to
+         become a system color. [FORCED] does that.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">3 &middot; The two-tone ring</h4>
+
+      <div class="ac-fr-swatches">
+        <div class="ac-fr-swatch ac-fr-swatch--dark">
+          <button class="ac-fr-btn ac-focus-ring" type="button">One tone</button>
+          <button class="ac-fr-btn ac-focus-ring--two-tone" type="button">Two tone</button>
+        </div>
+        <div class="ac-fr-swatch ac-fr-swatch--light">
+          <button class="ac-fr-btn ac-focus-ring" type="button">One tone</button>
+          <button class="ac-fr-btn ac-focus-ring--two-tone" type="button">Two tone</button>
+        </div>
+        <div class="ac-fr-swatch ac-fr-swatch--accent">
+          <button class="ac-fr-btn ac-focus-ring" type="button">One tone</button>
+          <button class="ac-fr-btn ac-focus-ring--two-tone" type="button">Two tone</button>
+        </div>
+      </div>
+
+      <p class="ac-demo__legend" id="fr-note-3">
+        Three backgrounds, the same two buttons on each. <kbd>Tab</kbd> down the
+        left column and then the right: the accent ring is a different amount of
+        visible on each row, and the two-tone one is not. Then change the theme in
+        the header and do it again &mdash; the accent moves with the theme, and
+        one of the two tones still has something to contrast with.
+      </p>
+    </div>
   </div>
+</div>
 
-  <!-- ======================================================================
-       EXAMPLE 2 · Offset, and the ring an ancestor eats
-       CSS [CORE] + [OFFSET].
+<div class="ac-demo-section ac-demo-section--mistakes">
+  <h3 class="ac-demo-section__title">Common mistakes</h3>
+  <p class="ac-demo-section__note">
+    Both are live and wrong on purpose, and neither can be found with a screen reader or an automated
+    check. Press <kbd>Tab</kbd>.
+  </p>
 
-       outline-offset moves the ring out from the border box. At 0 it sits
-       against the element's own edge and reads as a thicker border rather than
-       as a change of state; 2px is the library default and is enough to
-       separate the two.
+  <div class="ac-demo-grid">
+    <!-- ======================================================================
+         EXAMPLE 4 · outline: none — broken on purpose, and live
+         CSS [CORE] + [BROKEN].
 
-       An outline is paint like any other: an ancestor with overflow: hidden
-       clips it. The third button is inside one and its ring is simply gone — no
-       error, no warning, and it looks right until someone Tabs to it. --inset
-       draws the ring inside the element instead, which is also what you want
-       for anything flush against the edge of the viewport.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">2 &middot; Offset, and the clipped ring</h3>
+         All three of these remove the outline. The first replaces it with
+         nothing, the second with a change of color, the third with a real ring
+         built from box-shadow.
 
-    <div class="ac-fr-row">
-      <button class="ac-fr-btn ac-focus-ring--flush" type="button">Offset 0</button>
-      <button class="ac-fr-btn ac-focus-ring" type="button">Offset 2px</button>
-    </div>
+         The second is the one worth slowing down for. It looks handled: the
+         button visibly changes. But the change is color alone, which is SC 1.4.1
+         Use of Color, and under Windows High Contrast the tint is replaced
+         outright, so there is nothing left at all.
 
-    <div class="ac-fr-clip">
-      <button class="ac-fr-btn ac-focus-ring" type="button">Clipped</button>
-      <button class="ac-fr-btn ac-focus-ring--inset" type="button">Inset</button>
-    </div>
+         The third is the legitimate use of `outline: none`. box-shadow follows
+         border-radius, can be layered, and is not clipped by an ancestor's
+         border-radius the way an outline's corners can look wrong — it just is
+         not free either, because forced colors drops it too.
 
-    <p class="ac-demo__legend" id="fr-note-2">
-      <kbd>Tab</kbd> through the four. The first reads as a heavier border
-      rather than as a change of state. The last two sit in a box with
-      <code>overflow: hidden</code>: the third&rsquo;s ring is painted outside
-      that box and clipped away, and the fourth draws its ring inside itself, so
-      there is nothing to clip.
-    </p>
-  </div>
+         ac-fr-broken-* exists so that copying one is obviously a mistake.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">4 &middot; <code>outline: none</code>, live</h4>
 
-  <!-- ======================================================================
-       EXAMPLE 3 · The ring that survives any background
-       CSS [CORE] + [TWO-TONE], plus the [MOCK] swatches.
-
-       One accent ring is fine when you know what is behind it. On a page where
-       the same button appears over a photo, a light card and a dark footer, an
-       accent that contrasts with one of them contrasts with neither of the
-       others, and the ring vanishes exactly where nobody was looking.
-
-       The two-tone ring is two adjacent rings of opposite lightness. Whatever
-       is behind them, one of the two contrasts with it. This is what SC 2.4.13
-       Focus Appearance asks for — AAA, so not required at AA, but it is cheap,
-       and it is the difference between a ring that works and a ring that works
-       on your machine.
-
-       Forced colors is why the two tones are an outline and a box-shadow in
-       that order rather than two shadows: Windows High Contrast drops
-       box-shadow entirely. What survives has to be the outline, and it has to
-       become a system color. [FORCED] does that.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">3 &middot; The two-tone ring</h3>
-
-    <div class="ac-fr-swatches">
-      <div class="ac-fr-swatch ac-fr-swatch--dark">
-        <button class="ac-fr-btn ac-focus-ring" type="button">One tone</button>
-        <button class="ac-fr-btn ac-focus-ring--two-tone" type="button">Two tone</button>
-      </div>
-      <div class="ac-fr-swatch ac-fr-swatch--light">
-        <button class="ac-fr-btn ac-focus-ring" type="button">One tone</button>
-        <button class="ac-fr-btn ac-focus-ring--two-tone" type="button">Two tone</button>
-      </div>
-      <div class="ac-fr-swatch ac-fr-swatch--accent">
-        <button class="ac-fr-btn ac-focus-ring" type="button">One tone</button>
-        <button class="ac-fr-btn ac-focus-ring--two-tone" type="button">Two tone</button>
-      </div>
-    </div>
-
-    <p class="ac-demo__legend" id="fr-note-3">
-      Three backgrounds, the same two buttons on each. <kbd>Tab</kbd> down the
-      left column and then the right: the accent ring is a different amount of
-      visible on each row, and the two-tone one is not. Then change the theme in
-      the header and do it again &mdash; the accent moves with the theme, and
-      one of the two tones still has something to contrast with.
-    </p>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 4 · outline: none — broken on purpose, and live
-       CSS [CORE] + [BROKEN].
-
-       All three of these remove the outline. The first replaces it with
-       nothing, the second with a change of color, the third with a real ring
-       built from box-shadow.
-
-       The second is the one worth slowing down for. It looks handled: the
-       button visibly changes. But the change is color alone, which is SC 1.4.1
-       Use of Color, and under Windows High Contrast the tint is replaced
-       outright, so there is nothing left at all.
-
-       The third is the legitimate use of `outline: none`. box-shadow follows
-       border-radius, can be layered, and is not clipped by an ancestor's
-       border-radius the way an outline's corners can look wrong — it just is
-       not free either, because forced colors drops it too.
-
-       ac-fr-broken-* exists so that copying one is obviously a mistake.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">4 &middot; <code>outline: none</code>, live</h3>
-
-    <div class="ac-fr-row">
-      <button class="ac-fr-btn ac-fr-broken-none" type="button"
-              data-ac-demo-broken="focus-visible">Nothing</button>
-      <button class="ac-fr-btn ac-fr-broken-tint" type="button"
-              data-ac-demo-broken="focus-visible">Tint only</button>
-      <button class="ac-fr-btn ac-fr-shadow" type="button">Shadow ring</button>
-    </div>
-
-    <ol class="ac-fr-key">
-      <li><code>outline: none</code>, no replacement &mdash; <strong>focus is untraceable</strong></li>
-      <li>replaced by a background tint &mdash; <strong>color alone</strong>, and forced colors take it</li>
-      <li>replaced by a <code>box-shadow</code> ring &mdash; works, until forced colors</li>
-    </ol>
-
-    <p class="ac-demo__legend" id="fr-note-4">
-      <kbd>Tab</kbd> across the three and try to say out loud where the focus
-      is. Nothing in the markup separates them: the first is a
-      <strong>SC 2.4.7</strong> failure and the second a
-      <strong>SC 1.4.1</strong> one.
-    </p>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 5 · A ring nobody can see is not an indicator — SC 2.4.11
-       CSS [CORE] + [OBSCURED], plus the [MOCK] frames.
-
-       New in WCAG 2.2: when an element takes focus, author content must not
-       hide it entirely. A sticky bar is how this gets broken, because the
-       browser scrolls a focused element only just into view. Moving *backwards*
-       through a list is where it bites: the target is above the scrollport, so
-       the browser lines its top edge up with the scrollport's top edge — which
-       is exactly where the sticky bar is parked.
-
-       scroll-margin-top is the whole fix. It makes the browser treat the
-       element as taller than it is while scrolling it into view, so it comes to
-       rest below the bar instead of behind it. One declaration, and it goes on
-       the focusable element rather than on the bar.
-
-       A page's own sticky header is the same problem at page scale: this
-       library sets scroll-margin-top globally on anything with an id for
-       exactly this reason.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">5 &middot; Focus not obscured</h3>
-
-    <div class="ac-fr-pair">
-      <div class="ac-fr-scroll">
-        <p class="ac-fr-sticky">Setlist &mdash; broken</p>
-        <button class="ac-fr-track ac-focus-ring" type="button">Longview</button>
-        <button class="ac-fr-track ac-focus-ring" type="button">Basket Case</button>
-        <button class="ac-fr-track ac-focus-ring" type="button">Linoleum</button>
-        <button class="ac-fr-track ac-focus-ring" type="button">Nausea</button>
-        <button class="ac-fr-track ac-focus-ring" type="button">Bob</button>
-        <button class="ac-fr-track ac-focus-ring" type="button">Salt in the Wound</button>
+      <div class="ac-fr-row">
+        <button class="ac-fr-btn ac-fr-broken-none" type="button"
+                data-ac-demo-broken="focus-visible">Nothing</button>
+        <button class="ac-fr-btn ac-fr-broken-tint" type="button"
+                data-ac-demo-broken="focus-visible">Tint only</button>
+        <button class="ac-fr-btn ac-fr-shadow" type="button">Shadow ring</button>
       </div>
 
-      <div class="ac-fr-scroll">
-        <p class="ac-fr-sticky">Setlist &mdash; fixed</p>
-        <button class="ac-fr-track ac-focus-ring ac-fr-cleared" type="button">Longview</button>
-        <button class="ac-fr-track ac-focus-ring ac-fr-cleared" type="button">Basket Case</button>
-        <button class="ac-fr-track ac-focus-ring ac-fr-cleared" type="button">Linoleum</button>
-        <button class="ac-fr-track ac-focus-ring ac-fr-cleared" type="button">Nausea</button>
-        <button class="ac-fr-track ac-focus-ring ac-fr-cleared" type="button">Bob</button>
-        <button class="ac-fr-track ac-focus-ring ac-fr-cleared" type="button">Salt in the Wound</button>
-      </div>
+      <ol class="ac-fr-key">
+        <li><code>outline: none</code>, no replacement &mdash; <strong>focus is untraceable</strong></li>
+        <li>replaced by a background tint &mdash; <strong>color alone</strong>, and forced colors take it</li>
+        <li>replaced by a <code>box-shadow</code> ring &mdash; works, until forced colors</li>
+      </ol>
+
+      <p class="ac-demo__legend" id="fr-note-4">
+        <kbd>Tab</kbd> across the three and try to say out loud where the focus
+        is. Nothing in the markup separates them: the first is a
+        <strong>SC 2.4.7</strong> failure and the second a
+        <strong>SC 1.4.1</strong> one.
+      </p>
     </div>
 
-    <p class="ac-demo__legend" id="fr-note-5">
-      Two scrolling lists, one sticky bar each. <kbd>Tab</kbd> to the bottom of
-      the left one and then <kbd>Shift</kbd> + <kbd>Tab</kbd> back up: the
-      focused track slides under the bar. Do the same on the right and it stops
-      below it. The difference is one <code>scroll-margin-top</code> on the
-      buttons. The buttons do nothing else &mdash; they are here to take focus.
-    </p>
+    <!-- ======================================================================
+         EXAMPLE 5 · A ring nobody can see is not an indicator — SC 2.4.11
+         CSS [CORE] + [OBSCURED], plus the [MOCK] frames.
+
+         New in WCAG 2.2: when an element takes focus, author content must not
+         hide it entirely. A sticky bar is how this gets broken, because the
+         browser scrolls a focused element only just into view. Moving *backwards*
+         through a list is where it bites: the target is above the scrollport, so
+         the browser lines its top edge up with the scrollport's top edge — which
+         is exactly where the sticky bar is parked.
+
+         scroll-margin-top is the whole fix. It makes the browser treat the
+         element as taller than it is while scrolling it into view, so it comes to
+         rest below the bar instead of behind it. One declaration, and it goes on
+         the focusable element rather than on the bar.
+
+         A page's own sticky header is the same problem at page scale: this
+         library sets scroll-margin-top globally on anything with an id for
+         exactly this reason.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">5 &middot; Focus not obscured</h4>
+
+      <div class="ac-fr-pair">
+        <div class="ac-fr-scroll">
+          <p class="ac-fr-sticky">Orders &mdash; broken</p>
+          <button class="ac-fr-item ac-focus-ring" type="button">Order 462</button>
+          <button class="ac-fr-item ac-focus-ring" type="button">Order 463</button>
+          <button class="ac-fr-item ac-focus-ring" type="button">Order 464</button>
+          <button class="ac-fr-item ac-focus-ring" type="button">Order 465</button>
+          <button class="ac-fr-item ac-focus-ring" type="button">Order 466</button>
+          <button class="ac-fr-item ac-focus-ring" type="button">Order 467</button>
+        </div>
+
+        <div class="ac-fr-scroll">
+          <p class="ac-fr-sticky">Orders &mdash; fixed</p>
+          <button class="ac-fr-item ac-focus-ring ac-fr-cleared" type="button">Order 462</button>
+          <button class="ac-fr-item ac-focus-ring ac-fr-cleared" type="button">Order 463</button>
+          <button class="ac-fr-item ac-focus-ring ac-fr-cleared" type="button">Order 464</button>
+          <button class="ac-fr-item ac-focus-ring ac-fr-cleared" type="button">Order 465</button>
+          <button class="ac-fr-item ac-focus-ring ac-fr-cleared" type="button">Order 466</button>
+          <button class="ac-fr-item ac-focus-ring ac-fr-cleared" type="button">Order 467</button>
+        </div>
+      </div>
+
+      <p class="ac-demo__legend" id="fr-note-5">
+        Two scrolling lists, one sticky bar each. <kbd>Tab</kbd> to the bottom of
+        the left one and then <kbd>Shift</kbd> + <kbd>Tab</kbd> back up: the
+        focused row slides under the bar. Do the same on the right and it stops
+        below it. The difference is one <code>scroll-margin-top</code> on the
+        buttons. The buttons do nothing else &mdash; they are here to take focus.
+      </p>
+    </div>
   </div>
 </div>

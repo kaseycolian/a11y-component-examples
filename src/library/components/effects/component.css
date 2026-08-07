@@ -38,7 +38,7 @@
    The UA one is not enough. On the auto-focusable box Chromium computes
    `rgb(16, 16, 16) auto 1px` — a 1px black hairline, which on a dark theme is
    an indicator you cannot see (SC 2.4.7). This is the library's standard ring,
-   the one Focus Ring documents.
+   the one Focus Indicator documents.
 
    :focus-visible rather than :focus, so a click into the region to scroll it
    does not draw a ring at somebody who is using a mouse. */

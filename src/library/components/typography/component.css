@@ -131,7 +131,7 @@
    rather than becoming part of the letterforms. text-decoration-thickness in
    `em` grows with the text instead of staying a hairline at h1 size.
 
-   No focus rule here: the ring is the Focus Ring component's job and the
+   No focus rule here: the ring is the Focus Indicator component's job and the
    library ships it globally. */
 .ac-t-link {
   /* 80% toward --text: the raw accent is drawn for a dark page and fails

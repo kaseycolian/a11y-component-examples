@@ -40,7 +40,7 @@
 
   /* --- Focus -------------------------------------------------------------- */
   --ac-focus: var(--focus-ring, #3ceaff);
-  /* The two tones of the background-independent ring (see the Focus Ring
+  /* The two tones of the background-independent ring (see the Focus Indicator
      component). They are the theme's text and background colors because those
      are the one pair it already guarantees contrast with each other, so the
      ring inverts by itself when the theme does. */

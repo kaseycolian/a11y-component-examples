@@ -95,7 +95,7 @@ test('--always survives the site-wide :focus:not(:focus-visible) reset', async (
 });
 
 test('a text field rings on a click, because a caret needs a home', async ({ page }) => {
-  const input = demo(page).getByLabel('Set length');
+  const input = demo(page).getByLabel('Full name');
 
   await input.click();
   await expect(input).toBeFocused();
@@ -224,7 +224,7 @@ test('the box-shadow replacement is a real ring', async ({ page }) => {
  *  focused track came to rest relative to that frame's sticky bar. */
 async function focusUpwards(page, frameIndex) {
   const frame = demo(page).locator('.ac-fr-scroll').nth(frameIndex);
-  await frame.locator('.ac-fr-track').last().focus();
+  await frame.locator('.ac-fr-item').last().focus();
   // Backwards is the direction that breaks it: the target is above the
   // scrollport, so the browser lines its top edge up with the scrollport's.
   for (let i = 0; i < 4; i++) await page.keyboard.press('Shift+Tab');
@@ -243,7 +243,7 @@ async function focusUpwards(page, frameIndex) {
 test('without scroll-margin-top the sticky bar covers the focused track', async ({ page }) => {
   const { label, top, barBottom } = await focusUpwards(page, 0);
 
-  expect(label).toBe('Basket Case');
+  expect(label).toBe('Order 463');
   // Its top edge is above the bottom of the bar, so part of it -- and part of
   // its ring -- is behind the bar. This is the SC 2.4.11 failure.
   expect(top).toBeLessThan(barBottom);
@@ -252,7 +252,7 @@ test('without scroll-margin-top the sticky bar covers the focused track', async 
 test('scroll-margin-top brings the focused track to rest below the bar', async ({ page }) => {
   const { label, top, barBottom } = await focusUpwards(page, 1);
 
-  expect(label).toBe('Basket Case');
+  expect(label).toBe('Order 463');
   // Same list, same keys, one declaration different.
   expect(top).toBeGreaterThanOrEqual(barBottom);
 });
@@ -345,8 +345,10 @@ test('what motion there is goes to zero under data-motion="off"', async ({ page 
 
 test('every focusable thing on the page is a real target', async ({ page }) => {
   // SC 2.5.8 asks for 24x24.
-  const small = await demo(page).evaluate((grid) =>
-    [...grid.querySelectorAll('button, input')]
+  // Queried from the document rather than through demo(), which now matches two
+  // grids -- the correct examples and the mistakes.
+  const small = await page.evaluate(() =>
+    [...document.querySelectorAll('.ac-demo-grid button, .ac-demo-grid input')]
       .map((el) => {
         const r = el.getBoundingClientRect();
         return { name: el.textContent.trim() || el.id, w: r.width, h: r.height };

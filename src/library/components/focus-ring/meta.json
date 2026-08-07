@@ -1,22 +1,22 @@
 {
   "slug": "focus-ring",
-  "name": "Focus Ring",
+  "name": "Focus Indicator",
   "group": "foundations",
   "order": 30,
-  "summary": "The one indicator that says where the keyboard is — why the library draws it on :focus-visible, what the offset is for, the two-tone version that survives any background, and what `outline: none` actually costs.",
+  "summary": "A focus indicator is the one thing that says where the keyboard is. Use it on everything focusable, drawn on :focus-visible so a mouse click does not leave a ring behind. It is paint like any other, so an ancestor with overflow: hidden can clip it away with no error and nothing to see.",
   "tags": ["focus-ring", "focus-visible", "outline", "outline-offset", "scroll-margin-top", "forced-colors", "no-js"],
   "apg": null,
   "wcag": ["1.4.1", "1.4.11", "2.4.7", "2.4.11", "2.4.13"],
   "status": "stable",
   "files": ["html", "css"],
-  "demoNote": "No JavaScript on this page, and it is meant to be Tabbed through rather than read. Example 4 is broken on purpose and live: three buttons, and only one of them can be followed with a keyboard.",
+  "demoNote": "No JavaScript on this page, and it is meant to be Tabbed through rather than read. Under Common mistakes, three buttons: only one of them can be followed with a keyboard, and nothing in the markup says which.",
   "contract": {
     "useWhen": "The visible focus indicator, and what clips or hides one by accident.",
     "root": [".ac-focus-ring"],
     "keyboard": [
       [
         "Tab",
-        ":focus-visible matches this; :focus also matches a mouse press"
+        "native: :focus-visible matches this; :focus also matches a mouse press"
       ]
     ],
     "states": [

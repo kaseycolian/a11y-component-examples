@@ -73,7 +73,7 @@
     },
     {
       "slug": "focus-ring",
-      "name": "Focus Ring",
+      "name": "Focus Indicator",
       "group": "foundations",
       "useWhen": "The visible focus indicator, and what clips or hides one by accident.",
       "tags": ["focus-ring", "focus-visible", "outline", "outline-offset", "scroll-margin-top", "forced-colors", "no-js"],
@@ -82,7 +82,7 @@
       "files": ["html", "css"],
       "status": "stable",
       "hasContract": true,
-      "_summaryRev": "a176c3ba"
+      "_summaryRev": "aa5f7924"
     },
     {
       "slug": "live-region",

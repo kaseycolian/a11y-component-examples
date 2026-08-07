@@ -12,17 +12,16 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 
 ## START HERE
 
-**Phase 0 is done. Components 1–15 are done. Next up is row 16, `focus-ring`, which is also a
-rename → Focus Indicator.**
+**Phase 0 is done. Components 1–16 are done. Next up is row 17, `live-region`.**
 
-Last updated 2026-08-06. This note is part of the `visually-hidden` commit. The repo was left green:
+Last updated 2026-08-06. This note is part of the `focus-ring` commit. The repo was left green:
 
 ```
 check:tokens                      34 files clean
 check:agents                      42 surfaces match their sources
 npm run build                     35 pages
-playwright --project=chromium     visually-hidden 17 · agent-surfaces 117
-                                  a11y -g visually-hidden 30
+playwright --project=chromium     focus-ring 22 · agent-surfaces 117 · a11y -g focus-ring 35
+                                  prose-surface + typography + effects 69
 ```
 
 The whole suite was last run in full at row 6: 1205 passed, 10.9 min.
@@ -38,9 +37,7 @@ Read these three things before touching anything, in this order:
 3. **The row you are about to do**, in [The roster](#the-roster). The notes on rows 1–6 record what
    actually bit, and they are the reason this file is worth reading rather than skimming.
 
-Then follow [The procedure](#the-procedure) for `focus-ring`, exactly. It is a **rename**, so also
-follow the rename rules: `grep -rn "Focus Ring" src/ docs/` afterwards, and check whether any of those
-references also names an example number.
+Then follow [The procedure](#the-procedure) for `live-region`, exactly.
 
 ### What the last session learned, in one place
 
@@ -305,7 +302,7 @@ paths do not move.
 | `dropdown` | Dropdown / Listbox | **Custom Select** | [ ] |
 | `effects` | Effects | **Background Effects** | [ ] |
 | `fieldset-group` | Fieldset Group | **Fieldset** | [x] |
-| `focus-ring` | Focus Ring | **Focus Indicator** | [ ] |
+| `focus-ring` | Focus Ring | **Focus Indicator** | [x] |
 | `jump-nav` | Jump Nav | **In-Page Navigation** | [ ] |
 | `motion-preferences` | Motion Preferences | **Reduced Motion** | [ ] |
 | `notice` | Notice | **Alert** | [ ] |
@@ -334,6 +331,10 @@ grep -rn "<Old Display Name>" src/ docs/
 
 Two of those eleven also named an example *number*, which the renumber had moved. A prose reference to
 "X's example 5" has to be re-checked against X's new numbering, not just renamed.
+
+**Most references are not links.** `focus-ring` had five and only one was a `docs.md` link — the rest
+were source comments in three other components and in `tokens.css`. Grep the display name across
+`src/` and `docs/`, never just the `../slug/` link form.
 
 Group names, in `src/site/lib/groups.mjs`:
 
@@ -460,8 +461,8 @@ bound" note, and a `summary` in the new voice.
 | 13 | `fieldset-group` | [x] | **Renamed → Fieldset.** Six references, in four other components: two `component.css` header comments and four `docs.md` links. `field/docs.md` already said `[Fieldset]`, having anticipated the rename. None named an example number. New content: delivery instructions, pickup time, invoice options, payment methods, tax settings + refund policy. **Demoting the demo titles to `h4` made example 3's `.ac-group__heading` a sibling of its own example title** — it is now `h5`, which is correct for this page and is why the docs say the level comes from your outline, not the component. `contract.keyboard` gained an arrows row: the docs table already listed them. |
 | 14 | `skip-link` | [x] | CSS-only. **First two-section page since `chip-toggle`** — example 5 is genuinely broken, so it moved into *Common mistakes* with no renumbering, since it was already last. It carries no `data-ac-demo-broken`, and correctly: neither failure is an axe violation or a `focus-visible`/`target-size` one, so there is nothing for the gate to assert. The `.ac-skip-lineup` mock class became `.ac-skip-people` — demo vocabulary had reached a class name, the way it reached a string in `checkbox`. |
 | 15 | `visually-hidden` | [x] | Two sections, no renumber: 1–3 are the three jobs the class does, 4–5 exist to show failures, so they moved as-is with all four `data-ac-demo-broken` markers untouched. **The split broke a test that nothing else had touched**: the spec's `demo()` helper is `page.locator('.ac-demo-grid')`, and one test called `.evaluate()` straight on it — two grids, strict-mode failure. Chained uses were fine. `contract.keyboard` did not exist and now does, one `native:` Tab row, because the mandatory Keyboard table needs something to agree with. |
-| 16 | `focus-ring` | [ ] | **NEXT.** rename → Focus Indicator. 2 broken markers. |
-| 17 | `live-region` | [ ] | |
+| 16 | `focus-ring` | [x] | **Renamed → Focus Indicator.** Five references, and **only one was a docs link** — the other four are source comments in `effects`, `prose-surface`, `typography` and `tokens.css`. The class prefix stays `.ac-focus-ring`: this is a display-name rename, not a slug one. Two sections, no renumber (1–3 correct, 4–5 the failures; 5 is broken-then-fixed side by side, the icon-button shape). `.ac-fr-track` → `.ac-fr-item`, and the spec's `demo(page).evaluate()` hit the two-grid strict-mode trap the last row recorded. |
+| 17 | `live-region` | [ ] | **NEXT.** |
 | 18 | `typography` | [ ] | 2 broken markers; one is a contrast ratio that must stay broken. |
 | 19 | `motion-preferences` | [ ] | rename → Reduced Motion. |
 | 20 | `effects` | [ ] | rename → Background Effects. |

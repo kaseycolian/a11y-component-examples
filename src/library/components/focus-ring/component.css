@@ -179,7 +179,7 @@
 }
 
 .ac-fr-btn,
-.ac-fr-track {
+.ac-fr-item {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -202,7 +202,7 @@
 }
 
 .ac-fr-btn:hover,
-.ac-fr-track:hover {
+.ac-fr-item:hover {
   border-color: var(--ac-focus, var(--focus-ring, #3ceaff));
 }
 
@@ -320,7 +320,7 @@
   color: var(--ac-text, var(--text, #f3ecff));
 }
 
-.ac-fr-track {
+.ac-fr-item {
   flex: none;
   justify-content: flex-start;
 }
@@ -359,7 +359,7 @@
   }
 
   .ac-fr-btn,
-  .ac-fr-track,
+  .ac-fr-item,
   .ac-fr-input {
     border-color: ButtonBorder;
     background: ButtonFace;
@@ -367,7 +367,7 @@
   }
 
   .ac-fr-btn:hover,
-  .ac-fr-track:hover {
+  .ac-fr-item:hover {
     border-color: Highlight;
   }
 

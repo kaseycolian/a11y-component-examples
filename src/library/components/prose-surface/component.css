@@ -176,7 +176,7 @@
   outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
   /* Inset, because the surface clips it: an outline at a positive offset on a
      child of an overflow container is cut off on the edge it matters most on.
-     Focus Ring owns the --inset variant. */
+     Focus Indicator owns the --inset variant. */
   outline-offset: -3px;
 }
 
