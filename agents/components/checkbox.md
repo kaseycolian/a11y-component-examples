@@ -2,7 +2,7 @@
 
 # Checkbox
 
-A native checkbox, kept focusable under whatever you draw over it.
+An independent yes or no, or a set where any combination is allowed.
 
 In `library/components/checkbox/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
@@ -16,8 +16,8 @@ In `library/components/checkbox/` — copy `component.{html,css,js}`, read `docs
 
 ## Keyboard
 
-- `Space` — toggles
-- `Tab` — one stop per box — unlike radios, the arrows do nothing
+- `Tab` — native: one stop per box — unlike radios, the arrows do nothing
+- `Space` — native: toggles the focused box
 
 **States:** checked, indeterminate, disabled, invalid
 

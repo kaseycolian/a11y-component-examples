@@ -6,7 +6,7 @@
        matching sections of component.css, and of component.js for example 3.
        Copy the file whole for the library-grade version.
 
-     THE CONTRACT
+     REQUIRED MARKUP
        input[type=checkbox]  ->  id
        label[for]            ->  that id, wrapping enough text to be a target
        a set of them         ->  <fieldset> + <legend>, same as a radio group
@@ -23,173 +23,186 @@
      does nothing at all; `el.indeterminate = true` is the only way, which is why
      example 3 is the one place this component needs a script.
 
-     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     There is no Common mistakes section on this page: every example here is
+     correct markup. The mistakes are written up in docs.md instead.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the section
+     heading, the grid, and the per-example headings. Never copy it.
      =========================================================================== -->
 
-<div class="ac-demo-grid">
-  <!-- ======================================================================
-       EXAMPLE 1 · One checkbox
-       CSS [CORE]. No JavaScript.
+<div class="ac-demo-section">
+  <h3 class="ac-demo-section__title">Correct examples</h3>
+  <p class="ac-demo-section__note">
+    All five are markup you can copy. Only example 3 needs the script, and only because the mixed
+    state has no attribute to write.
+  </p>
 
-       No fieldset, no legend: a single checkbox is named by its own label. The
-       label wraps the whole sentence, so the sentence is the target.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">1 &middot; One checkbox</h3>
+  <div class="ac-demo-grid">
+    <!-- ======================================================================
+         EXAMPLE 1 · One checkbox
+         CSS [CORE]. No JavaScript.
 
-    <label class="ac-choice" for="ac-cb-list">
-      <input class="ac-choice__input" type="checkbox" id="ac-cb-list" name="mailing" />
-      <span class="ac-choice__text">Add me to the mailing list</span>
-    </label>
-  </div>
+         No fieldset, no legend: a single checkbox is named by its own label. The
+         label wraps the whole sentence, so the sentence is the target.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">1 &middot; One checkbox</h4>
 
-  <!-- ======================================================================
-       EXAMPLE 2 · A set of them
-       CSS [GROUP] + [CORE] + [DISABLED]. No JavaScript.
-
-       A fieldset and legend, exactly as for radios — the difference is the
-       keyboard: Tab reaches every box, and there are no arrow keys, because any
-       combination is allowed.
-
-       The disabled option keeps its reason in its label, since a disabled
-       control cannot explain itself.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">2 &middot; A set of them</h3>
-
-    <fieldset class="ac-group">
-      <legend class="ac-group__legend">Rider</legend>
-      <div class="ac-group__body">
-        <label class="ac-choice" for="ac-cb-water">
-          <input class="ac-choice__input" type="checkbox" id="ac-cb-water"
-                 name="ac-cb-rider" value="water" checked />
-          <span class="ac-choice__text">Water, 24 bottles</span>
-        </label>
-        <label class="ac-choice" for="ac-cb-towels">
-          <input class="ac-choice__input" type="checkbox" id="ac-cb-towels"
-                 name="ac-cb-rider" value="towels" />
-          <span class="ac-choice__text">Towels</span>
-        </label>
-        <label class="ac-choice" for="ac-cb-parking">
-          <input class="ac-choice__input" type="checkbox" id="ac-cb-parking"
-                 name="ac-cb-rider" value="parking" disabled />
-          <span class="ac-choice__text">Parking for two vans &mdash; street only at this venue</span>
-        </label>
-      </div>
-    </fieldset>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 3 · Select all, and the mixed state
-       CSS [GROUP] + [CORE] + [MIXED]. JS [CORE] + [MIXED].
-
-       The parent is a normal checkbox whose `indeterminate` property is set when
-       some but not all children are checked. Screen readers announce that as
-       "mixed", which is the state ARIA calls aria-checked="mixed".
-
-       Do **not** put aria-checked on a native checkbox. The browser already
-       exposes checked and mixed from the element itself, and a hand-written
-       aria-checked can only disagree with it.
-
-       The count beside the legend is announced through a polite role="status", so
-       it is heard once things settle rather than on every click.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">3 &middot; Select all (mixed state)</h3>
-
-    <fieldset class="ac-group" data-ac-checkbox>
-      <legend class="ac-group__legend">Stage plot</legend>
-      <div class="ac-group__body">
-        <label class="ac-choice ac-choice--all" for="ac-cb-all">
-          <input class="ac-choice__input" type="checkbox" id="ac-cb-all" data-ac-check-all />
-          <span class="ac-choice__text">All inputs</span>
-        </label>
-
-        <label class="ac-choice" for="ac-cb-vox">
-          <input class="ac-choice__input" type="checkbox" id="ac-cb-vox"
-                 name="ac-cb-plot" value="vox" data-ac-check-item checked />
-          <span class="ac-choice__text">Vocals, 2 mics</span>
-        </label>
-        <label class="ac-choice" for="ac-cb-gtr">
-          <input class="ac-choice__input" type="checkbox" id="ac-cb-gtr"
-                 name="ac-cb-plot" value="gtr" data-ac-check-item />
-          <span class="ac-choice__text">Guitar cabs, 2 lines</span>
-        </label>
-        <label class="ac-choice" for="ac-cb-bass">
-          <input class="ac-choice__input" type="checkbox" id="ac-cb-bass"
-                 name="ac-cb-plot" value="bass" data-ac-check-item />
-          <span class="ac-choice__text">Bass, DI</span>
-        </label>
-        <label class="ac-choice" for="ac-cb-drums">
-          <input class="ac-choice__input" type="checkbox" id="ac-cb-drums"
-                 name="ac-cb-plot" value="drums" data-ac-check-item />
-          <span class="ac-choice__text">Drums, 4 mics</span>
-        </label>
-      </div>
-
-      <p class="ac-group__count" data-ac-check-count aria-hidden="true"></p>
-      <!-- Present and empty from the start: a live region inserted along with its
-           text has no change for a screen reader to notice. -->
-      <p class="ac-group__status" role="status" data-ac-check-status></p>
-    </fieldset>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 4 · Required, and invalid
-       CSS [CORE] + [INVALID]. No JavaScript.
-
-       A single required checkbox is the one case where `required` means "this
-       exact box must be checked", so the error can sit on the control itself.
-       Server-rendered here, which is the case that has to work with no script.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">4 &middot; Required and invalid</h3>
-
-    <div class="ac-choice-field">
-      <label class="ac-choice ac-choice--invalid" for="ac-cb-terms">
-        <input class="ac-choice__input" type="checkbox" id="ac-cb-terms" name="terms" required
-               aria-invalid="true" aria-describedby="ac-cb-terms-error" />
-        <span class="ac-choice__text">I have read the load-in and curfew terms</span>
+      <label class="ac-choice" for="ac-cb-list">
+        <input class="ac-choice__input" type="checkbox" id="ac-cb-list" name="mailing" />
+        <span class="ac-choice__text">Add me to the mailing list</span>
       </label>
-      <p class="ac-group__error" id="ac-cb-terms-error" role="alert">
-        The venue will not confirm the date without this.
-      </p>
     </div>
-  </div>
 
-  <!-- ======================================================================
-       EXAMPLE 5 · Drawn from scratch, still native underneath
-       CSS [CORE] + [CUSTOM]. No JavaScript.
+    <!-- ======================================================================
+         EXAMPLE 2 · A set in a fieldset
+         CSS [GROUP] + [CORE] + [DISABLED]. No JavaScript.
 
-       The input stays in the DOM and in the tab order — `opacity: 0` over the
-       drawn box, never `display: none` or `visibility: hidden`, either of which
-       removes it from the accessibility tree and takes the keyboard with it.
+         A fieldset and legend, exactly as for radios — the difference is the
+         keyboard: Tab reaches every box, and there are no arrow keys, because
+         any combination is allowed.
 
-       The tick and the dash are both drawn from the box's own borders, so the
-       three states (off, on, mixed) never need an image.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">5 &middot; Drawn from scratch</h3>
+         The disabled option keeps its reason in its label, since a disabled
+         control cannot explain itself.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">2 &middot; A set in a fieldset</h4>
 
-    <div class="ac-group__body">
-      <label class="ac-choice ac-choice--card" for="ac-cb-drawn-on">
-        <input class="ac-choice__input ac-choice__input--drawn" type="checkbox"
-               id="ac-cb-drawn-on" name="ac-cb-drawn" value="on" checked />
-        <span class="ac-choice__box" aria-hidden="true"></span>
-        <span class="ac-choice__text">Checked</span>
-      </label>
-      <label class="ac-choice ac-choice--card" for="ac-cb-drawn-off">
-        <input class="ac-choice__input ac-choice__input--drawn" type="checkbox"
-               id="ac-cb-drawn-off" name="ac-cb-drawn" value="off" />
-        <span class="ac-choice__box" aria-hidden="true"></span>
-        <span class="ac-choice__text">Unchecked</span>
-      </label>
-      <label class="ac-choice ac-choice--card" for="ac-cb-drawn-off-2">
-        <input class="ac-choice__input ac-choice__input--drawn" type="checkbox"
-               id="ac-cb-drawn-off-2" name="ac-cb-drawn" value="disabled" disabled />
-        <span class="ac-choice__box" aria-hidden="true"></span>
-        <span class="ac-choice__text">Unavailable</span>
-      </label>
+      <fieldset class="ac-group">
+        <legend class="ac-group__legend">Columns to export</legend>
+        <div class="ac-group__body">
+          <label class="ac-choice" for="ac-cb-order">
+            <input class="ac-choice__input" type="checkbox" id="ac-cb-order"
+                   name="ac-cb-columns" value="order" checked />
+            <span class="ac-choice__text">Order</span>
+          </label>
+          <label class="ac-choice" for="ac-cb-customer">
+            <input class="ac-choice__input" type="checkbox" id="ac-cb-customer"
+                   name="ac-cb-columns" value="customer" />
+            <span class="ac-choice__text">Customer</span>
+          </label>
+          <label class="ac-choice" for="ac-cb-total">
+            <input class="ac-choice__input" type="checkbox" id="ac-cb-total"
+                   name="ac-cb-columns" value="total" disabled />
+            <span class="ac-choice__text">Total &mdash; not available on your plan</span>
+          </label>
+        </div>
+      </fieldset>
+    </div>
+
+    <!-- ======================================================================
+         EXAMPLE 3 · Select all, and the mixed state
+         CSS [GROUP] + [CORE] + [MIXED]. JS [CORE] + [MIXED].
+
+         The parent is a normal checkbox whose `indeterminate` property is set
+         when some but not all children are checked. Screen readers announce that
+         as "mixed", which is the state ARIA calls aria-checked="mixed".
+
+         Do **not** put aria-checked on a native checkbox. The browser already
+         exposes checked and mixed from the element itself, and a hand-written
+         aria-checked can only disagree with it.
+
+         The count beside the legend is announced through a polite role="status",
+         so it is heard once things settle rather than on every click.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">3 &middot; Select all (mixed state)</h4>
+
+      <fieldset class="ac-group" data-ac-checkbox>
+        <legend class="ac-group__legend">Email notifications</legend>
+        <div class="ac-group__body">
+          <label class="ac-choice ac-choice--all" for="ac-cb-all">
+            <input class="ac-choice__input" type="checkbox" id="ac-cb-all" data-ac-check-all />
+            <span class="ac-choice__text">All notifications</span>
+          </label>
+
+          <label class="ac-choice" for="ac-cb-shipped">
+            <input class="ac-choice__input" type="checkbox" id="ac-cb-shipped"
+                   name="ac-cb-notify" value="shipped" data-ac-check-item checked />
+            <span class="ac-choice__text">Order shipped</span>
+          </label>
+          <label class="ac-choice" for="ac-cb-failed">
+            <input class="ac-choice__input" type="checkbox" id="ac-cb-failed"
+                   name="ac-cb-notify" value="failed" data-ac-check-item />
+            <span class="ac-choice__text">Payment failed</span>
+          </label>
+          <label class="ac-choice" for="ac-cb-summary">
+            <input class="ac-choice__input" type="checkbox" id="ac-cb-summary"
+                   name="ac-cb-notify" value="summary" data-ac-check-item />
+            <span class="ac-choice__text">Weekly summary</span>
+          </label>
+          <label class="ac-choice" for="ac-cb-teammate">
+            <input class="ac-choice__input" type="checkbox" id="ac-cb-teammate"
+                   name="ac-cb-notify" value="teammate" data-ac-check-item />
+            <span class="ac-choice__text">New teammate</span>
+          </label>
+        </div>
+
+        <p class="ac-group__count" data-ac-check-count aria-hidden="true"></p>
+        <!-- Present and empty from the start: a live region inserted along with
+             its text has no change for a screen reader to notice. -->
+        <p class="ac-group__status" role="status" data-ac-check-status></p>
+      </fieldset>
+    </div>
+
+    <!-- ======================================================================
+         EXAMPLE 4 · Required, and invalid
+         CSS [CORE] + [INVALID]. No JavaScript.
+
+         A single required checkbox is the one case where `required` means "this
+         exact box must be checked", so the error can sit on the control itself.
+         Server-rendered here, which is the case that has to work with no script.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">4 &middot; Required and invalid</h4>
+
+      <div class="ac-choice-field">
+        <label class="ac-choice ac-choice--invalid" for="ac-cb-terms">
+          <input class="ac-choice__input" type="checkbox" id="ac-cb-terms" name="terms" required
+                 aria-invalid="true" aria-describedby="ac-cb-terms-error" />
+          <span class="ac-choice__text">I have read the refund and cancellation terms</span>
+        </label>
+        <p class="ac-group__error" id="ac-cb-terms-error" role="alert">
+          The order cannot be placed without this.
+        </p>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         EXAMPLE 5 · Drawn from scratch, still native underneath
+         CSS [CORE] + [CUSTOM]. No JavaScript.
+
+         The input stays in the DOM and in the tab order — `opacity: 0` over the
+         drawn box, never `display: none` or `visibility: hidden`, either of
+         which removes it from the accessibility tree and takes the keyboard with
+         it.
+
+         The tick and the dash are both drawn from the box's own borders, so the
+         three states (off, on, mixed) never need an image.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">5 &middot; Drawn from scratch</h4>
+
+      <div class="ac-group__body">
+        <label class="ac-choice ac-choice--card" for="ac-cb-drawn-on">
+          <input class="ac-choice__input ac-choice__input--drawn" type="checkbox"
+                 id="ac-cb-drawn-on" name="ac-cb-drawn" value="on" checked />
+          <span class="ac-choice__box" aria-hidden="true"></span>
+          <span class="ac-choice__text">Checked</span>
+        </label>
+        <label class="ac-choice ac-choice--card" for="ac-cb-drawn-off">
+          <input class="ac-choice__input ac-choice__input--drawn" type="checkbox"
+                 id="ac-cb-drawn-off" name="ac-cb-drawn" value="off" />
+          <span class="ac-choice__box" aria-hidden="true"></span>
+          <span class="ac-choice__text">Unchecked</span>
+        </label>
+        <label class="ac-choice ac-choice--card" for="ac-cb-drawn-off-2">
+          <input class="ac-choice__input ac-choice__input--drawn" type="checkbox"
+                 id="ac-cb-drawn-off-2" name="ac-cb-drawn" value="disabled" disabled />
+          <span class="ac-choice__box" aria-hidden="true"></span>
+          <span class="ac-choice__text">Unavailable</span>
+        </label>
+      </div>
     </div>
   </div>
 </div>

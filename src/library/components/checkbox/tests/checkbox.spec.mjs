@@ -41,32 +41,32 @@ test('Space toggles, and toggles back', async ({ page }) => {
   await expect(box).not.toBeChecked();
 });
 
-/* --- example 2 · a set of them -------------------------------------------- */
+/* --- example 2 · a set in a fieldset -------------------------------------------- */
 
 test('a set is a fieldset with a legend for its name', async ({ page }) => {
-  await expect(page.getByRole('group', { name: 'Rider' })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Columns to export' })).toBeVisible();
 });
 
 test('every checkbox is its own tab stop, and arrows do nothing', async ({ page }) => {
-  const water = page.locator('#ac-cb-water');
+  const order = page.locator('#ac-cb-order');
 
-  await water.focus();
+  await order.focus();
   await page.keyboard.press('Tab');
   // Unlike radios: any combination is allowed, so there is no "one of" for the
   // arrow keys to move between. A checkbox group that traps Tab is the bug.
-  await expect(page.locator('#ac-cb-towels')).toBeFocused();
+  await expect(page.locator('#ac-cb-customer')).toBeFocused();
 
   await page.keyboard.press('ArrowDown');
-  await expect(page.locator('#ac-cb-towels')).toBeFocused();
-  await expect(page.locator('#ac-cb-towels')).not.toBeChecked();
+  await expect(page.locator('#ac-cb-customer')).toBeFocused();
+  await expect(page.locator('#ac-cb-customer')).not.toBeChecked();
 });
 
 test('a disabled option keeps its reason in its label', async ({ page }) => {
-  const parking = page.locator('#ac-cb-parking');
+  const total = page.locator('#ac-cb-total');
 
-  await expect(parking).toBeDisabled();
+  await expect(total).toBeDisabled();
   // A disabled control cannot explain itself, so the label does.
-  await expect(parking).toHaveAccessibleName(/street only/);
+  await expect(total).toHaveAccessibleName(/not available on your plan/);
 });
 
 /* --- example 3 · the mixed state ------------------------------------------ */
@@ -91,7 +91,7 @@ test('no hand-written aria-checked competes with the native state', async ({ pag
 test('checking every child resolves the parent to checked', async ({ page }) => {
   const all = page.locator('#ac-cb-all');
 
-  for (const id of ['ac-cb-gtr', 'ac-cb-bass', 'ac-cb-drums']) {
+  for (const id of ['ac-cb-failed', 'ac-cb-summary', 'ac-cb-teammate']) {
     await page.locator(`label[for="${id}"]`).click();
   }
 
@@ -102,7 +102,7 @@ test('checking every child resolves the parent to checked', async ({ page }) => 
 test('clearing every child resolves the parent to unchecked', async ({ page }) => {
   const all = page.locator('#ac-cb-all');
 
-  await page.locator('label[for="ac-cb-vox"]').click();
+  await page.locator('label[for="ac-cb-shipped"]').click();
 
   await expect(all).not.toBeChecked();
   // Cleared explicitly: indeterminate survives a change to `checked` otherwise.
@@ -137,8 +137,8 @@ test('the count is announced through a polite live region, not the visible text'
   await expect(count).toHaveAttribute('aria-hidden', 'true');
   await expect(count).toHaveText('1 of 4 selected');
 
-  await page.locator('label[for="ac-cb-gtr"]').click();
-  await expect(status).toHaveText('2 of 4 inputs selected.');
+  await page.locator('label[for="ac-cb-failed"]').click();
+  await expect(status).toHaveText('2 of 4 selected.');
 });
 
 /* --- example 4 · required and invalid ------------------------------------- */
@@ -148,7 +148,7 @@ test('a required checkbox is invalid until checked, and says why', async ({ page
 
   await expect(terms).toHaveAttribute('required', '');
   await expect(terms).toHaveAttribute('aria-invalid', 'true');
-  await expect(terms).toHaveAccessibleDescription(/will not confirm/);
+  await expect(terms).toHaveAccessibleDescription(/cannot be placed/);
   await expect(page.locator('#ac-cb-terms-error')).toHaveAttribute('role', 'alert');
   expect(await terms.evaluate((el) => el.checkValidity())).toBe(false);
 });
@@ -219,7 +219,7 @@ test('createCheckbox is idempotent and destroy undoes its wiring', async ({ page
     const same = window.AC.createCheckbox(root) === root._acCheckbox;
     const state = root._acCheckbox.state();
 
-    document.querySelector('#ac-cb-gtr').checked = true;
+    document.querySelector('#ac-cb-failed').checked = true;
     root._acCheckbox.refresh();
     const afterRefresh = root._acCheckbox.state().checked;
 

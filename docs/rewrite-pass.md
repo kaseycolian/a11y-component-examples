@@ -12,15 +12,15 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 
 ## START HERE
 
-**Phase 0 is done. Components 1–10 are done. Next up is row 11, `checkbox`.**
+**Phase 0 is done. Components 1–11 are done. Next up is row 12, `switch`.**
 
-Last updated 2026-08-06. This note is part of the `radio-group` commit. The repo was left green:
+Last updated 2026-08-06. This note is part of the `checkbox` commit. The repo was left green:
 
 ```
 check:tokens                      34 files clean
 check:agents                      42 surfaces match their sources
 npm run build                     35 pages
-playwright --project=chromium     radio-group 18 · agent-surfaces 117 · a11y -g radio-group 31
+playwright --project=chromium     checkbox 22 · agent-surfaces 117 · a11y -g checkbox 40
 ```
 
 The whole suite was last run in full at row 6: 1205 passed, 10.9 min.
@@ -36,7 +36,7 @@ Read these three things before touching anything, in this order:
 3. **The row you are about to do**, in [The roster](#the-roster). The notes on rows 1–6 record what
    actually bit, and they are the reason this file is worth reading rather than skimming.
 
-Then follow [The procedure](#the-procedure) for `checkbox`, exactly.
+Then follow [The procedure](#the-procedure) for `switch`, exactly.
 
 ### What the last session learned, in one place
 
@@ -60,6 +60,9 @@ Then follow [The procedure](#the-procedure) for `checkbox`, exactly.
   <kbd>Space</kbd> went into `input-group`'s contract and <kbd>Enter</kbd> into `textarea`'s rather
   than being documented off-contract, where nothing would keep the two in step. Watch the Tier 2
   budget when doing it wholesale: nine rows took `native-select` from 0.9 KB to 1.6 KB of 1.8 KB.
+- **Check `component.js` for demo vocabulary, not just comments.** `checkbox` announced "2 of 4
+  *inputs* selected" from a hardcoded string — the demo's audio inputs, shipped in every copy of the
+  component. Step 4 says "change no behavior", and a user-visible string is copy, not behavior.
 - **Rewriting demo content can invalidate a test's premise, not just its strings.** `native-select`
   asserted type-ahead by pressing `g` for an option valued `gilman` — but type-ahead matches option
   **text**, and the replacement options had no `g` word. A green suite after a content swap is not
@@ -436,8 +439,8 @@ bound" note, and a `summary` in the new voice.
 | 8 | `textarea` | [x] | Single section, no renumber. `contract.keyboard` gained <kbd>Enter</kbd> (`native:`) so the Keyboard table could say the thing that separates a textarea from an input — it inserts a line break rather than submitting. Five component-specific sections against a cap of two: *resize* became a `###` under Required markup, *Read-only is not disabled* a `###` under States (as in `text-input`), *No maxlength* a `###` inside the counter section. Spec: two demo strings and one section comment. |
 | 9 | `native-select` | [x] | CSS-only, single section, no renumber. The whole demo domain was a band tour, so **every id changed** (`ac-ns-venue` → `ac-ns-country`, `-tour` → `-assignee`, `-slot` → `-window`, `-label` → `-org`, `-merch` → `-speed`, `-riders` → `-notify`) and the spec moved with it: 12 selectors, 6 names, 4 option values, 2 regexes. **Type-ahead asserts on option *text*, not value** — the old test pressed `g` for `gilman`; the new options made that a no-match, so it presses `u` for `United Kingdom` and expects `gb`. `contract.keyboard` went from one vague row to nine `native:` rows, including the four `multiple`-only modifiers, which took the Tier 2 surface from 0.9 KB to **1.6 KB against the 1.8 KB budget** — the second-tightest after `dropdown`. |
 | 10 | `radio-group` | [x] | CSS-only, single section, no renumber. Every id and every `name` changed with the content (refund method, invoice delivery, plan, pickup location + billing cycle, send updates), so the spec took 24 id rewrites plus 4 assertions on demo text. `contract.keyboard` went to four `native:` rows — <kbd>Space</kbd> and the left/right arrows were real native behavior the old two-row contract never named. `docs.md` had ten `##` sections: four became `###` under Required markup, two under States, and *Targets* collapsed into a table row plus a Common mistakes bullet. |
-| 11 | `checkbox` | [ ] | **NEXT.** Shares `.ac-choice` with `radio-group`, which is now rewritten — match its wording. |
-| 12 | `switch` | [ ] | 4 examples. |
+| 11 | `checkbox` | [x] | Single section, no renumber. **The one row so far where demo vocabulary had leaked into library code**: `component.js` announced "2 of 4 **inputs** selected" — audio inputs, from the stage-plot demo — in a string every copy of the component ships. It is now "2 of 4 selected", and the spec's exact-match assertion moved with it. New content: columns to export, email notifications, refund terms. `docs.md`'s radio-group comparison table became a `###` under Keyboard, *Required* a `###` under Required markup, *Select all* a `###` under Indeterminate. |
+| 12 | `switch` | [ ] | **NEXT.** 4 examples. |
 | 13 | `fieldset-group` | [ ] | rename → Fieldset. |
 | 14 | `skip-link` | [ ] | CSS-only. |
 | 15 | `visually-hidden` | [ ] | 4 broken markers. |

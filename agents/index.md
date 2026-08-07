@@ -29,7 +29,7 @@ Pick one, then read `agents/components/<slug>.md` — not this file twice.
 - **textarea** — A multi-line field that keeps its resize handle, with a counter that announces on a pause.
 - **native-select** — One choice from a list of text options, and the better default on a phone.
 - **radio-group** — One answer out of a few, where the arrows both move and choose.
-- **checkbox** — A native checkbox, kept focusable under whatever you draw over it.
+- **checkbox** — An independent yes or no, or a set where any combination is allowed.
 - **switch** — An on/off that applies immediately, with the thumb as the second cue.
 - **fieldset-group** — Related controls under one question, named by a legend.
 

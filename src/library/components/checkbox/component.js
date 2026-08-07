@@ -64,7 +64,7 @@
       if (count) count.textContent = on + ' of ' + items.length + ' selected';
       // The live region says the same thing, and gets it once the DOM settles
       // rather than on every keystroke of a Space-held key.
-      if (status) status.textContent = on + ' of ' + items.length + ' inputs selected.';
+      if (status) status.textContent = on + ' of ' + items.length + ' selected.';
 
       if (typeof settings.onChange === 'function') settings.onChange(on);
     }
