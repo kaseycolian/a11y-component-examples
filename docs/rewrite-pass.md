@@ -12,15 +12,15 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 
 ## START HERE
 
-**Phase 0 is done. Components 1–9 are done. Next up is row 10, `radio-group`.**
+**Phase 0 is done. Components 1–10 are done. Next up is row 11, `checkbox`.**
 
-Last updated 2026-08-06. This note is part of the `native-select` commit. The repo was left green:
+Last updated 2026-08-06. This note is part of the `radio-group` commit. The repo was left green:
 
 ```
 check:tokens                      34 files clean
 check:agents                      42 surfaces match their sources
 npm run build                     35 pages
-playwright --project=chromium     native-select 17 · agent-surfaces 117 · a11y -g native-select 30
+playwright --project=chromium     radio-group 18 · agent-surfaces 117 · a11y -g radio-group 31
 ```
 
 The whole suite was last run in full at row 6: 1205 passed, 10.9 min.
@@ -36,7 +36,7 @@ Read these three things before touching anything, in this order:
 3. **The row you are about to do**, in [The roster](#the-roster). The notes on rows 1–6 record what
    actually bit, and they are the reason this file is worth reading rather than skimming.
 
-Then follow [The procedure](#the-procedure) for `radio-group`, exactly.
+Then follow [The procedure](#the-procedure) for `checkbox`, exactly.
 
 ### What the last session learned, in one place
 
@@ -435,8 +435,8 @@ bound" note, and a `summary` in the new voice.
 | 7 | `input-group` | [x] | Single section — all five examples are correct markup. No renumber. Three demo strings were asserted **exactly** by the spec and had to move with it: the fake key, the password value (`Password462`) and the search label (`Search orders`). `contract.keyboard` gained <kbd>Enter</kbd> and <kbd>Space</kbd>, both `native:`, so the mandatory Keyboard table could account for form submit and button activation. `docs.md` had five component-specific sections against a cap of two: affixes became a `###` under Required markup, invalid a `###` under States, and reveal + copy were folded into one *The two scripted addons* section with a `###` each. |
 | 8 | `textarea` | [x] | Single section, no renumber. `contract.keyboard` gained <kbd>Enter</kbd> (`native:`) so the Keyboard table could say the thing that separates a textarea from an input — it inserts a line break rather than submitting. Five component-specific sections against a cap of two: *resize* became a `###` under Required markup, *Read-only is not disabled* a `###` under States (as in `text-input`), *No maxlength* a `###` inside the counter section. Spec: two demo strings and one section comment. |
 | 9 | `native-select` | [x] | CSS-only, single section, no renumber. The whole demo domain was a band tour, so **every id changed** (`ac-ns-venue` → `ac-ns-country`, `-tour` → `-assignee`, `-slot` → `-window`, `-label` → `-org`, `-merch` → `-speed`, `-riders` → `-notify`) and the spec moved with it: 12 selectors, 6 names, 4 option values, 2 regexes. **Type-ahead asserts on option *text*, not value** — the old test pressed `g` for `gilman`; the new options made that a no-match, so it presses `u` for `United Kingdom` and expects `gb`. `contract.keyboard` went from one vague row to nine `native:` rows, including the four `multiple`-only modifiers, which took the Tier 2 surface from 0.9 KB to **1.6 KB against the 1.8 KB budget** — the second-tightest after `dropdown`. |
-| 10 | `radio-group` | [ ] | **NEXT.** CSS-only. |
-| 11 | `checkbox` | [ ] | |
+| 10 | `radio-group` | [x] | CSS-only, single section, no renumber. Every id and every `name` changed with the content (refund method, invoice delivery, plan, pickup location + billing cycle, send updates), so the spec took 24 id rewrites plus 4 assertions on demo text. `contract.keyboard` went to four `native:` rows — <kbd>Space</kbd> and the left/right arrows were real native behavior the old two-row contract never named. `docs.md` had ten `##` sections: four became `###` under Required markup, two under States, and *Targets* collapsed into a table row plus a Common mistakes bullet. |
+| 11 | `checkbox` | [ ] | **NEXT.** Shares `.ac-choice` with `radio-group`, which is now rewritten — match its wording. |
 | 12 | `switch` | [ ] | 4 examples. |
 | 13 | `fieldset-group` | [ ] | rename → Fieldset. |
 | 14 | `skip-link` | [ ] | CSS-only. |

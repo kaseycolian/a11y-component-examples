@@ -3,13 +3,13 @@
   "name": "Radio Group",
   "group": "forms-inputs",
   "order": 60,
-  "summary": "A fieldset, a legend, and native radios sharing one name — which is what makes Tab treat them as a single stop and the arrow keys move between them. No role=\"radiogroup\", and no JavaScript.",
+  "summary": "A radio group is a fieldset, a legend, and native radios that share one name. Use it for one answer out of a few, where all the options should be visible at once. The shared name is what makes it a group: one tab stop for the set, and arrow keys that move and choose in one action.",
   "tags": ["radio", "fieldset", "legend", "no-js", "keyboard", "required"],
   "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/radio/",
   "wcag": ["1.3.1", "1.4.1", "2.1.1", "2.4.7", "2.5.8", "3.3.1", "3.3.2", "4.1.2"],
   "status": "stable",
   "files": ["html", "css"],
-  "demoNote": "Tab into any group and press the arrow keys: they move and select in one action, and Tab leaves the whole group as one stop. All of that comes from the shared name attribute — there is no script on this page.",
+  "demoNote": "Tab into any group and press the arrow keys: they move and select in one action, and Tab then leaves the whole group as a single stop. None of it is scripted.",
   "contract": {
     "useWhen": "One answer out of a few, where the arrows both move and choose.",
     "root": [".ac-choice", ".ac-group"],
@@ -27,12 +27,20 @@
     },
     "keyboard": [
       [
-        "ArrowUp / ArrowDown",
-        "move and select in one step, unlike a checkbox"
+        "Tab",
+        "native: one stop for the whole group, at the checked option"
       ],
       [
-        "Tab",
-        "one stop for the whole group"
+        "Space",
+        "native: selects the focused option"
+      ],
+      [
+        "ArrowDown / ArrowRight",
+        "native: next option, and selects it — moving is choosing"
+      ],
+      [
+        "ArrowUp / ArrowLeft",
+        "native: previous option, and selects it. Both wrap"
       ]
     ],
     "states": [

@@ -16,8 +16,10 @@ In `library/components/radio-group/` — copy `component.{html,css}`, read `docs
 
 ## Keyboard
 
-- `ArrowUp / ArrowDown` — move and select in one step, unlike a checkbox
-- `Tab` — one stop for the whole group
+- `Tab` — native: one stop for the whole group, at the checked option
+- `Space` — native: selects the focused option
+- `ArrowDown / ArrowRight` — native: next option, and selects it — moving is choosing
+- `ArrowUp / ArrowLeft` — native: previous option, and selects it. Both wrap
 
 **States:** checked, invalid — aria-invalid=true on each input, set only while the error shows, disabled
 

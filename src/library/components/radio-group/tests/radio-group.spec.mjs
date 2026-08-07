@@ -18,10 +18,10 @@ test('the page ships no JavaScript for this component', async ({ page }) => {
   expect(scripts).toEqual([]);
 });
 
-/* --- example 1 · the baseline --------------------------------------------- */
+/* --- example 1 · baseline group -------------------------------------------- */
 
 test('the legend is the group name, and there is no invented role', async ({ page }) => {
-  const group = page.getByRole('group', { name: 'Pressing format' });
+  const group = page.getByRole('group', { name: 'Refund method' });
   await expect(group).toBeVisible();
 
   // A fieldset with a legend already is a radio group. role="radiogroup" on top
@@ -34,11 +34,11 @@ test('the legend is the group name, and there is no invented role', async ({ pag
   // And the name comes from a real <legend>, first child of the fieldset.
   expect(
     await group.evaluate((el) => el.firstElementChild.tagName + '|' + el.firstElementChild.textContent.trim()),
-  ).toBe('LEGEND|Pressing format');
+  ).toBe('LEGEND|Refund method');
 });
 
 test('every radio in a group shares one name, or it is not a group', async ({ page }) => {
-  const names = await page.locator('#ac-rg-fmt-7, #ac-rg-fmt-12, #ac-rg-fmt-tape').evaluateAll(
+  const names = await page.locator('#ac-rg-refund-card, #ac-rg-refund-credit, #ac-rg-refund-bank').evaluateAll(
     (els) => els.map((el) => el.name),
   );
   expect(new Set(names).size).toBe(1);
@@ -47,33 +47,33 @@ test('every radio in a group shares one name, or it is not a group', async ({ pa
 test('nothing is checked to start with', async ({ page }) => {
   // A pre-checked default is an answer the user did not give.
   const checked = await page
-    .locator('input[name="ac-rg-format"]')
+    .locator('input[name="ac-rg-refund"]')
     .evaluateAll((els) => els.filter((el) => el.checked).length);
   expect(checked).toBe(0);
 });
 
 test('the whole group is one tab stop', async ({ page }) => {
-  await page.locator('#ac-rg-fmt-7').focus();
+  await page.locator('#ac-rg-refund-card').focus();
   await page.keyboard.press('ArrowDown');
-  await expect(page.locator('#ac-rg-fmt-12')).toBeFocused();
+  await expect(page.locator('#ac-rg-refund-credit')).toBeFocused();
 
   // Tab leaves the group entirely rather than walking the remaining options.
   await page.keyboard.press('Tab');
   const stillInside = await page.evaluate(
-    () => document.activeElement.name === 'ac-rg-format',
+    () => document.activeElement.name === 'ac-rg-refund',
   );
   expect(stillInside).toBe(false);
 });
 
 test('arrows move and select in one action, and wrap', async ({ page }) => {
-  const first = page.locator('#ac-rg-fmt-7');
-  const last = page.locator('#ac-rg-fmt-tape');
+  const first = page.locator('#ac-rg-refund-card');
+  const last = page.locator('#ac-rg-refund-bank');
 
   await first.focus();
   await page.keyboard.press('ArrowDown');
   // Native radio behavior: moving *is* choosing. This is the whole reason not to
   // reimplement it.
-  await expect(page.locator('#ac-rg-fmt-12')).toBeChecked();
+  await expect(page.locator('#ac-rg-refund-credit')).toBeChecked();
 
   await page.keyboard.press('ArrowDown');
   await expect(last).toBeChecked();
@@ -85,7 +85,7 @@ test('arrows move and select in one action, and wrap', async ({ page }) => {
 });
 
 test('the label row is the target, not just the dot', async ({ page }) => {
-  const row = page.locator('label[for="ac-rg-fmt-tape"]');
+  const row = page.locator('label[for="ac-rg-refund-bank"]');
   const box = await row.boundingBox();
 
   // A 1rem circle is a 16px target and fails SC 2.5.8 on its own.
@@ -94,13 +94,13 @@ test('the label row is the target, not just the dot', async ({ page }) => {
 
   // Clicking the text checks the radio, which is what a real <label for> buys.
   await row.click();
-  await expect(page.locator('#ac-rg-fmt-tape')).toBeChecked();
+  await expect(page.locator('#ac-rg-refund-bank')).toBeChecked();
 });
 
 /* --- example 2 · required and invalid ------------------------------------- */
 
 test('the error is described by every radio, not only by the fieldset', async ({ page }) => {
-  const radios = page.locator('input[name="ac-rg-guest"]');
+  const radios = page.locator('input[name="ac-rg-invoice"]');
   const count = await radios.count();
   expect(count).toBe(3);
 
@@ -112,12 +112,12 @@ test('the error is described by every radio, not only by the fieldset', async ({
     await expect(radios.nth(i)).toHaveAttribute('required', '');
   }
 
-  await expect(page.locator('#ac-rg-guest-error')).toHaveAttribute('role', 'alert');
+  await expect(page.locator('#ac-rg-invoice-error')).toHaveAttribute('role', 'alert');
 });
 
 test('an unanswered required group is invalid to the browser too', async ({ page }) => {
   const valid = await page
-    .locator('#ac-rg-guest-open')
+    .locator('#ac-rg-invoice-email')
     .evaluate((el) => el.checkValidity());
   expect(valid).toBe(false);
 });
@@ -126,11 +126,11 @@ test('invalid is not signaled by color alone', async ({ page }) => {
   const [invalid, plain] = await Promise.all([
     page.locator('.ac-group--invalid').evaluate((el) => parseFloat(getComputedStyle(el).borderTopWidth)),
     page
-      .getByRole('group', { name: 'Pressing format' })
+      .getByRole('group', { name: 'Refund method' })
       .evaluate((el) => parseFloat(getComputedStyle(el).borderTopWidth)),
   ]);
   expect(invalid).toBeGreaterThan(plain);
-  await expect(page.locator('#ac-rg-guest-error')).not.toHaveText('');
+  await expect(page.locator('#ac-rg-invoice-error')).not.toHaveText('');
 });
 
 /* --- example 3 · per-option text ------------------------------------------ */
@@ -138,25 +138,27 @@ test('invalid is not signaled by color alone', async ({ page }) => {
 test('a per-option note is part of that radio accessible name', async ({ page }) => {
   // Inside the label, so it is read in one go and cannot be skipped the way a
   // separate description can.
-  await expect(page.locator('#ac-rg-pay-door')).toHaveAccessibleName(/Door deal[\s\S]*99%/);
-  await expect(page.locator('#ac-rg-pay-flat')).toHaveAccessibleName(/Guarantee[\s\S]*462/);
+  await expect(page.locator('#ac-rg-plan-growth')).toHaveAccessibleName(/Growth[\s\S]*462 orders/);
+  await expect(page.locator('#ac-rg-plan-enterprise')).toHaveAccessibleName(
+    /Enterprise[\s\S]*named contact/,
+  );
 });
 
 /* --- example 4 · unavailable and locked ----------------------------------- */
 
 test('a disabled radio stays in the group, with its reason in the label', async ({ page }) => {
-  const taken = page.locator('#ac-rg-merch-bar');
+  const taken = page.locator('#ac-rg-pickup-dock');
 
   await expect(taken).toBeDisabled();
   // Kept rather than removed, so the user learns the option exists -- and a
   // disabled control cannot explain itself, so the label does.
-  await expect(taken).toHaveAccessibleName(/taken by support/);
+  await expect(taken).toHaveAccessibleName(/closed this week/);
 });
 
 test('a disabled fieldset disables every control inside it and keeps its legend', async ({
   page,
 }) => {
-  const group = page.getByRole('group', { name: 'Load-in window' });
+  const group = page.getByRole('group', { name: 'Billing cycle' });
 
   // :disabled, not el.disabled -- the IDL property only reflects the control's
   // own attribute, while the fieldset's disabling is inherited. Same distinction
@@ -173,7 +175,7 @@ test('a disabled fieldset disables every control inside it and keeps its legend'
 /* --- example 5 · drawn from scratch --------------------------------------- */
 
 test('the drawn control keeps a real, focusable input underneath', async ({ page }) => {
-  const input = page.locator('#ac-rg-enc-read');
+  const input = page.locator('#ac-rg-freq-daily');
 
   const styles = await input.evaluate((el) => {
     const s = getComputedStyle(el);
@@ -186,24 +188,24 @@ test('the drawn control keeps a real, focusable input underneath', async ({ page
   expect(styles.display).not.toBe('none');
   expect(styles.visibility).toBe('visible');
 
-  await page.locator('#ac-rg-enc-yes').focus();
+  await page.locator('#ac-rg-freq-all').focus();
   await page.keyboard.press('ArrowDown');
   await expect(input).toBeChecked();
   await expect(input).toBeFocused();
 });
 
 test('the drawn dot is decoration, so it adds nothing to the name', async ({ page }) => {
-  await expect(page.locator('#ac-rg-enc-yes')).toHaveAccessibleName('Planned');
+  await expect(page.locator('#ac-rg-freq-all')).toHaveAccessibleName('Every change');
   await expect(page.locator('.ac-choice__dot').first()).toHaveAttribute('aria-hidden', 'true');
 });
 
 test('the focus ring appears on the drawn control, since the input is transparent', async ({
   page,
 }) => {
-  await page.locator('#ac-rg-enc-yes').focus();
+  await page.locator('#ac-rg-freq-all').focus();
   // Keyboard focus, so :focus-visible applies.
   const outline = await page
-    .locator('label[for="ac-rg-enc-yes"] .ac-choice__dot')
+    .locator('label[for="ac-rg-freq-all"] .ac-choice__dot')
     .evaluate((el) => parseFloat(getComputedStyle(el).outlineWidth));
   expect(outline).toBeGreaterThanOrEqual(3);
 });
