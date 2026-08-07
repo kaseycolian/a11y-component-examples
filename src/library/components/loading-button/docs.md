@@ -65,12 +65,14 @@ outright, with nothing that brings it back.
 
 ## Screen reader behavior
 
-Not yet tested against a screen reader. What the markup asks for: "Save changes, button" on the way
-in, then "Saving…" from the status region, then "Changes saved." The name is the same at all three
-points.
+Expected: "Save changes, button" on the way in, then "Saving…" from the status region, then "Changes
+saved." The name is the same at all three points.
 
 `aria-busy` announcements vary, and that variance is the argument for the region rather than against
 the attribute — it is still what a scripted check and any future assistive technology will read.
+
+**Not yet verified against real assistive technology.** Until `docs/at-support.md` has a row for this
+component, treat the above as intent, not measurement.
 
 ## Never `disabled` while loading
 

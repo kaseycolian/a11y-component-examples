@@ -14,7 +14,7 @@ export const GROUPS = [
     id: 'foundations',
     name: 'General Concepts',
     summary:
-      'The base behaviors every other component depends on: focus indicators, screen reader announcements, motion preferences, type, and hiding content correctly.',
+      'The base behaviors every other component depends on: focus indicators, screen reader announcements, motion preferences, text styles, and hiding content correctly.',
   },
   {
     id: 'buttons-actions',
@@ -31,17 +31,18 @@ export const GROUPS = [
     id: 'overlays-disclosure',
     name: 'Overlays & Disclosure',
     summary:
-      'Content that appears on demand. Each one has to move focus into the new content and put it back when the content closes.',
+      'Content that appears on demand. Each one has to move focus into it on open and put focus back where it started on close.',
   },
   {
     id: 'navigation',
     name: 'Navigation',
-    summary: 'Moving between views and between sections of one page, without losing the keyboard.',
+    summary:
+      'Moving between views, and between sections of one page, with every destination reachable by keyboard.',
   },
   {
     id: 'feedback-status',
     name: 'Feedback & Status',
-    summary: 'Reporting what happened, in a way a screen reader reads out and not only an eye sees.',
+    summary: 'Reporting what happened. The result has to be announced, not only drawn.',
   },
   {
     id: 'data-display',

@@ -1,13 +1,15 @@
 # The copy and structure pass
 
-A library-wide rewrite of every human-facing string, one component at a time. Started 2026-08-03.
+A library-wide rewrite of every human-facing string, one component at a time. Started 2026-08-03,
+finished 2026-08-07.
 
-**This file is the tracker.** It survives across sessions. Open it first.
+**This file is the record, and the style rules are still live.** Open it before writing any
+human-facing string, and before touching a component or a site page whose copy it covers.
 
-**All 33 component rows are done.** What is left is [Phase 3](#phase-3--the-site-after-all-33), the
-site's own copy — that section is the brief, and it is self-contained. [The roster](#the-roster) and
-[The procedure](#the-procedure) are history now: read a roster row when you touch that component
-again, because each one records what actually bit.
+**The pass is finished.** All 33 component rows, and [Phase 3](#phase-3--the-site-after-all-33), the
+site's own copy. The whole file is a record now: read a roster row before you touch that component
+again, and read [Phase 3](#phase-3--the-site-after-all-33) before you touch anything in `src/site/`,
+because each one says what actually bit.
 
 Everything here is about *writing and structure*. Component behavior does not change. `CLAUDE.md` is still
 the contributing contract for code, and `docs/BUILD-STATUS.md` is still the build log.
@@ -16,28 +18,35 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 
 ## START HERE
 
-**Phase 0 is done. All 33 components are done. Next up is [Phase 3](#phase-3--the-site-after-all-33),
-the site's own copy.**
+**Phase 0, all 33 components and [Phase 3](#phase-3--the-site-after-all-33) are done. The pass is
+complete, and nothing in this file is waiting to be picked up.**
 
-Last updated 2026-08-07, after row 33 — the last component row. The repo was left green:
+**What is next is not in this file.** `docs/BUILD-STATUS.md` is the active document again, and its
+START HERE has it: **batch F, `app-page-to-markdown`** — the last component and the only one in
+`compositions` — and then filling `docs/at-support.md`'s matrix, which is the only remaining work
+that code cannot do. Batch F is the first component written *after* this pass, so it is written to
+the finished standard rather than swept in later; [the style rules](#the-style-rules) and
+[the demo vocabulary](#the-demo-vocabulary) are what it needs from here, and nothing else is.
+
+Last updated 2026-08-07, after Phase 3 — the site's own copy, and the last item of the pass. The repo
+was left green:
 
 ```
 check:tokens                      34 files clean
 check:agents                      42 surfaces match their sources
 npm run build                     35 pages
-npx playwright test --project=chromium prose-surface              31 passed
-npx playwright test --project=chromium agent-surfaces            117 passed
-npx playwright test --project=chromium a11y -g "prose-surface|typography|result-panel"
-                                                                 121 passed
+npx playwright test --project=chromium                          1220 passed, exit 0
+npx playwright test --project=chromium site-home site-header site-nav site-footer
+                                                                  46 passed
 ```
 
-The full suite was re-run at row 33: **1220 passed**, exit 0 — unchanged since row 21, because rows
-22 to 33 added no tests. It is the honest baseline: if something is red before you have touched
-anything, it is not your change.
+**1220 is unchanged since row 21**, because rows 22 to 33 and Phase 3 added no tests. It is the honest
+baseline: if something is red before you have touched anything, it is not your change.
 
 **A row that touches `src/site/` makes the whole suite the check, not the slug.** Row 22 changed
-`site.css` and needed it; rows 23 to 33 touched only their own folders and did not. **Phase 3 is
-entirely `src/site/`,** so every item in it is in row 22's position: run the whole suite, not a slug.
+`site.css` and needed it; rows 23 to 33 touched only their own folders and did not. Phase 3 was mostly
+`src/site/` and was run that way. The rule outlives the pass: anything in `src/site/` is in row 22's
+position.
 
 **A full run can flake, so re-run before you conclude anything.** One at row 19 reported *4 failed,
 1202 passed*; the identical tree at row 20 came back 1206/1206. Nothing was fixed in between. Four
@@ -46,9 +55,9 @@ signature, not a regression — confirm with a second run before you go hunting.
 a file you keep**: the row-19 log was truncated to its last seven lines, which cost the failing names
 and made the question unanswerable.
 
-**To do Phase 3, read two things:** [The style rules](#the-style-rules), which still govern every
-word, and [Phase 3](#phase-3--the-site-after-all-33) itself. Nothing else in this file is required —
-it is the record of how the 33 got here.
+**[The style rules](#the-style-rules) outlive the pass.** They govern every human-facing string in the
+repo, not only the ones this pass rewrote — read them before writing a new component's `summary`, a
+demo note, or anything on a site page. The rest of this file is the record of how the work got here.
 
 **To touch a component again**, read its roster row first, then `button`'s four files
 (`src/library/components/button/{meta.json,component.html,docs.md,tests/button.spec.mjs}`) as the
@@ -62,12 +71,12 @@ one holds only the shared gate and the site-shell specs.
 
 Every component page now has the same shape: `## Before you copy` with the verbatim template, the
 canonical `docs.md` heading order, `<h4>` example titles under one or two `<h3>` section headings,
-and demo content from [the shared vocabulary](#the-demo-vocabulary). The
-[sweeps](#checking-the-rows-already-done) that check that run over all 33 and return nothing.
+demo content from [the shared vocabulary](#the-demo-vocabulary), and — since Phase 3 — the same
+closing sentence about assistive technology on all but the two components that have nothing to
+announce. The [sweeps](#checking-the-rows-already-done) that check all of that come clean.
 
 `docs/BUILD-STATUS.md` is **not** the active work — all 33 components are built, and its "START HERE"
 was written mid-build. It is still the place for the build history and **Gotchas already solved**.
-This file is the one that says what to do next.
 
 ### What the finished rows learned, in one place
 
@@ -248,6 +257,19 @@ starting; every one of these cost a debugging detour the first time.
   and claims that never fired. `disclosure`'s example 4 needed no marker and example 7 needed one.
   The one thing worth knowing up front: axe skips a bad `aria-controls` on a collapsed control, so an
   example built to fail that rule has to ship **expanded**.
+- **An overstatement is almost never alone — read its neighbors before you tick the item.** Phase 3
+  was sent to fix one promise on the home page, and the promise beside it made the same move in a
+  quieter register: *"every drag has a single-pointer alternative"*, over a library where nothing
+  drags and no `meta.json` claims SC 2.5.7. Both were written in the same sitting by someone reaching
+  for a fourth thing to claim, which is what makes proximity the place to look. The general form: **a
+  copy defect found in one item of a list is a defect of the list**, and reading the rest costs a
+  minute.
+- **A note in this file can go stale the same way copy does.** The Phase 3 brief said the three
+  `PEEK_FILES` excerpts *"still match `field/component.html` exactly"*, verified the same day. They do
+  not, and were never meant to — all three are condensed composites, which is what `(excerpt)` and
+  `note={false}` are for. Nothing was broken by it, but a later row acting on that line would have
+  "fixed" a drift that was the design. Verify a claim you are about to act on even when this file says
+  it was checked.
 
 ---
 
@@ -675,41 +697,53 @@ Verified: `check:tokens` 34 files clean · `check:agents` 42 surfaces match · `
 
 ## Phase 3 — the site, after all 33
 
-**This is the active work.** All 33 component rows are done; what is left is the site's own copy.
-Every file below is in `src/site/` or `docs/agents/`, so **the check is the whole suite, not a
-slug** — the same position row 22 was in. [The procedure](#the-procedure) is written for a component
-and does not apply here; [the style rules](#the-style-rules) do.
+**Done, 2026-08-07.** All 33 component rows plus the site's own copy. Every file below is in
+`src/site/`, `docs/agents/` or a `docs.md`, so **the check was the whole suite, not a slug** — the
+same position row 22 was in. [The procedure](#the-procedure) is written for a component and did not
+apply; [the style rules](#the-style-rules) did.
 
-**Off limits: the brand name, the tagline, `SiteHeader.astro`, `SiteFooter.astro`.** `hero__copy` may
-gain content, but nothing currently in it is removed or edited.
+**Off limits, and untouched: the brand name, the tagline, `SiteHeader.astro`, `SiteFooter.astro`, and
+everything already in `hero__copy`.**
 
-### The one that is not a style edit
+### The one that was not a style edit
 
-`src/site/pages/index.astro`'s first promise reads:
+`src/site/pages/index.astro`'s first promise read:
 
 > **Every screen reader that matters** — Built and checked against NVDA, JAWS, VoiceOver on macOS and
 > iOS, and TalkBack on Android.
 
-**Nothing has been checked against any of them.** `docs/at-support.md` is the project's own record and
+**Nothing had been checked against any of them.** `docs/at-support.md` is the project's own record and
 every cell in it is `—`, under a heading that says *"Untested is written as untested. An empty cell
-never means 'probably fine'. Overstating coverage is worse than admitting a gap."* Twenty-three
-component pages now carry *"Not yet verified against real assistive technology"* directly.
+never means 'probably fine'. Overstating coverage is worse than admitting a gap."*
 
-So this is an accuracy fix, not a rewrite, and it is the first thing to do. What the library can
-honestly promise is that the patterns are built to the APG and the ARIA each one needs is asserted
-against the real accessibility tree by 1220 tests — which is a different and defensible claim. Do not
-weaken it into vagueness; say the true thing plainly.
+What the library can honestly promise is the tree assertion, which is narrower and testable. The
+promise now reads:
+
+> **Checked against the accessibility tree** — Every pattern follows the WAI-ARIA APG, and the roles,
+> names, and states it relies on are asserted against the real browser accessibility tree by the test
+> suite. Screen reader passes have not been run yet, and every component page says so.
+
+No test count in it. The number moves whenever a spec is added, and copy that has to be edited on a
+test run is copy that will go stale — the same reason `CLAUDE.md` forbids counting the components.
+
+**A second promise was the same overstatement, and it was not on the list.** Promise 2 ended *"every
+drag has a single-pointer alternative"*. Nothing in the library drags and no `meta.json` claims SC
+2.5.7, so the sentence advertises coverage of a pattern that does not exist here: vacuously true, read
+as a claim. It is now the two things that *are* enforced — every key in `contract.keyboard` is pressed
+by a test (agent-surfaces §3), and the 24×24 floor the shared gate measures on every page. **Read the
+promises you were not sent to fix**: the listed one was the loud version of a habit the block had.
 
 ### The files
 
-| | file | what |
+| | file | what happened |
 | --- | --- | --- |
-| [ ] | `src/site/pages/index.astro` | the four `promises` — **promise 1 is the accuracy fix above**. Also the two `<h2>`s (`What every component here does`, `Browse by group`). **Not** `hero__copy`. |
-| [ ] | `src/site/pages/index.astro` | `PEEK_FILES` — three excerpt strings. **Verified 2026-08-07: they still match `field/component.html` exactly.** If you edit either side, re-check both. |
-| [ ] | `src/site/pages/components/index.astro` | the `<p class="lede">` under `<h1>All Components</h1>`, and the eight group summaries it renders from `src/site/lib/groups.mjs` |
-| [ ] | `src/site/pages/components/[slug].astro` | `<h2 class="panel__title">Live example</h2>` |
-| [ ] | `src/site/components/CodePanel.astro` | review only — its strings were already direct at Phase 0 |
-| [ ] | `docs/agents/*.src.md` | review only, and **byte-capped**; see below |
+| [x] | `src/site/pages/index.astro` | promises 1 and 2 rewritten for accuracy (above); 4 tightened — *"sensible fallbacks"* and a semicolon out, the standalone default at the end of the chain named. 3 was already right and is unchanged. The two `<h2>`s were reviewed and **kept**: `What every component here does` and `Browse by group` are both already the plainest form. A source comment above `promises` records why 1 and 2 moved, so a later pass does not "restore" them. |
+| [x] | `src/site/pages/index.astro` | `PEEK_FILES` — reviewed, unchanged. Their content is already the shared vocabulary (`Work email`, `jordan.lee@example.com`). **The old note here was wrong and is corrected:** all three tabs are *condensed composites*, not contiguous slices. The HTML tab merges example 2's hint with example 3's server error and renames the ids (`ac-demo-email` → `email`); the JS tab inlines `control.getAttribute('aria-describedby')` where the real file reads `originalDescribedBy`. That is what `(excerpt)` and `note={false}` are for, and the surrounding comment already says the whole file lives on the component page. Do not "fix" them into verbatim slices without deciding that first. |
+| [x] | `src/site/pages/components/index.astro` | the lede lost *"each one is accessible before it is anything else"* — an aphorism, and the one sentence on the page whose subject was a concept. It now names the three things a component page actually shows. |
+| [x] | `src/site/lib/groups.mjs` | four of eight summaries. `foundations` *type* → *text styles*; `overlays-disclosure` said *content* three times; `navigation`'s *"without losing the keyboard"* and `feedback-status`'s *"not only an eye sees"* were both metaphor. `buttons-actions`, `forms-inputs`, `data-display` and `compositions` were already right. **These render into `agents/index.json`, so `npm run agents` is not optional** — but not into `agents/index.md`, which takes the group *name* only, so no budget moved. |
+| [x] | `src/site/pages/components/[slug].astro` | reviewed, **kept**. `Live example` is a documented anchor: `CLAUDE.md`, this file, `site.css` and `typography/component.html` all spell out the `h1` → `h2 Live example` → `h3` → `h4` chain, so the string is load-bearing in four places and reads as a section label whether the page holds one example or seven. |
+| [x] | `src/site/components/CodePanel.astro` | reviewed, unchanged, as scoped. **One finding left open:** the clipboard-failure label is `Press Ctrl+C`, which is wrong on a Mac. The announced status beside it already says *"Control or Command plus C"*, so only the sighted path is affected, and only when the Clipboard API throws. Left alone because this component renders on all 35 pages and the row said review only — worth a line of its own if anyone touches the panel. |
+| [x] | `docs/agents/*.src.md` | reviewed, unchanged. They make no AT-coverage claim at all — a grep for `NVDA\|JAWS\|VoiceOver\|TalkBack` over `docs/agents/` returns two lines, both about how a control is announced rather than about what this project has verified. Nothing to fix, and 10 bytes of headroom in which to fix it. |
 
 ### The byte budgets, measured 2026-08-07
 
@@ -727,25 +761,60 @@ raising a budget needs a reason recorded.
 **`agents/testing.md` has ten bytes.** Row 21 spent nearly all of it and paid for that item by
 tightening two others. One added sentence there fails the build, so budget a cut with every addition.
 
-### A loose end worth closing while you are here
+### The loose end, closed
 
-The 33 `docs.md` files do not phrase their AT status the same way. Twenty-three use the house
-closing; seven say *"Not yet tested against a screen reader"* in their own words; `focus-ring` and
-`typography` correctly say there is nothing to announce; and **`modal`, `live-region` and
-`motion-preferences` state AT behavior as fact with no disclaimer at all** — *"NVDA and JAWS announce
-the dialog's name on entry"* — which is the same overstatement as promise 1, one page down. Settle on
-one phrasing and apply it.
+The 33 `docs.md` files did not phrase their AT status the same way. **They do now: 31 of 33 close
+with the house sentence**, verbatim.
 
-### Done means
-
-```sh
-npm run check:tokens && npm run check:agents && npm run build
-npx playwright test --project=chromium          # the whole suite: this is src/site/
+```markdown
+**Not yet verified against real assistive technology.** Until `docs/at-support.md` has a row for this
+component, treat the above as intent, not measurement.
 ```
 
-Plus the sweeps in [Checking the rows already done](#checking-the-rows-already-done), which now cover
-all 33 components and come clean. The baseline is **1220 passed**; Phase 3 adds no components, so a
-different number means a test was added or lost, not that a component changed.
+Twenty-three already had it. Eight were changed, which is 31 — the brief here said *seven* were
+phrased in their own words and there were five, so its 23 + 7 + 2 + 3 came to 12 more components than
+exist. Counted rather than trusted; nothing was missed.
+
+- **Five said it in their own words** and said it *first* — `button`, `icon-button`,
+  `loading-button`, `chip-toggle`, `effects` all opened *"Not yet tested against a screen reader. What
+  the markup asks for: …"*. The house shape puts the expectation first under `Expected:` and the
+  disclaimer last, so each one was inverted rather than reworded. `effects` keeps its own second
+  sentence, absorbed into the closing the way `data-table` and `prose-surface` absorb theirs.
+- **Three stated AT behavior as fact**, which is promise 1's overstatement one page down.
+  `modal`'s per-AT bullets and `live-region`'s variance paragraphs are real platform knowledge and
+  were kept, under `Expected:` and the closing. `motion-preferences` also asserted *"NVDA and
+  VoiceOver both read it"* — that clause is gone, and the reason it was making (visible text rather
+  than a `title`) stays, because the reason is the part worth having.
+
+**The two exceptions are correct and must stay exceptions.** `focus-ring` answers *"Nothing. A focus
+indicator has no accessible name, no role and no announcement, by design"*, and `typography` says the
+classes are visual and a reader hears the elements underneath. A component with nothing to announce
+has nothing to disclaim, and bolting the sentence on would make it say the opposite of the section
+above it. The sweep below counts 31, not 33, deliberately.
+
+### What it was checked with
+
+```sh
+npm run check:tokens     34 files clean
+npm run agents           42 surfaces written   # groups.mjs feeds agents/index.json
+npm run check:agents     42 surfaces match their sources
+npm run build            35 pages
+npx playwright test --project=chromium         1220 passed, exit 0, first run, no flake
+```
+
+Then a rebuild and `site-home site-header site-nav site-footer` — 46 passed — because the last copy
+edit landed after the full run's `webServer` had already built. **The `webServer` command is `npm run
+build && npm run preview`**, so a run pins the bytes it started with; editing during a run and reading
+the result at the end is how you get a green suite for a tree that no longer exists.
+
+Every sweep in [Checking the rows already done](#checking-the-rows-already-done) comes clean, over all
+33, plus the new AT-closing pair. `1220` was the baseline before Phase 3 and after it: no test was
+added or lost.
+
+**One warning is noise, and it looked like a finding.** `npm run build` printed eight `[glob-loader]
+Duplicate id` lines naming exactly the eight `docs.md` files edited in this phase — which reads as a
+real collision until you rebuild. The content loader warns when it re-reads a file whose mtime moved
+against a warm `.astro` cache; a second build is silent. Rebuild before investigating one.
 
 ---
 
@@ -793,6 +862,11 @@ for d in $DONE; do
   k=$(grep -c "^## Keyboard$" $f); r=$(grep -c "^## Required markup$" $f); b=$(grep -c "^## Before you copy$" $f)
   [ "$k$r$b" = "111" ] || echo "$d: Keyboard=$k Required=$r Before=$b"
 done
+
+# The AT closing, one phrasing (Phase 3). 31, not 33: focus-ring and typography
+# have nothing to announce and correctly carry none -- see The loose end, closed.
+grep -rl "Not yet verified against real assistive technology" src/library/components/*/docs.md | wc -l
+grep -rn "Not yet tested against a screen reader" src/library/   # nothing
 
 # Applied renames, across the whole repo rather than the finished rows -- an old
 # display name can come back in any component's prose. Add each new one as you

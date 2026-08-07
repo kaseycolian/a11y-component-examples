@@ -1,11 +1,10 @@
 # Build status
 
-> **All 33 components are built and their copy pass is finished, and this file is not the active
-> work.** What is left is Phase 3 of the copy pass — the site's own copy — and its tracker is
-> **`docs/rewrite-pass.md`**; open that one first. Come back here for the build history, the
-> infrastructure decisions and **Gotchas already solved**, which are all still current. Everything
-> below was written while the components were being built, so read it as a log rather than as
-> instructions about what to do next.
+> **The copy pass is finished — all 33 components and the site's own copy — so this file is the
+> active one again.** Its record is `docs/rewrite-pass.md`, which also holds the **style rules every
+> human-facing string still has to follow**: read those before writing a `summary`, a demo note or
+> anything on a page, and nothing else in that file is required. What is left of the build is
+> **[START HERE](#start-here--33-of-34-components-are-built-batch-f-is-the-last-one) below.**
 
 **Resume point.** `CLAUDE.md` (auto-loaded) has the conventions. This file has progress and the
 ordered next steps. `component-specs.md` has the pre-decided ARIA contract for every remaining
@@ -18,14 +17,14 @@ Read in this order and nothing else is needed to start: **START HERE** for the n
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-08-01 (**`dropdown` was rebuilt as authored markup** — no hidden `<select>`, the
-ARIA contract is in `component.html`, and both header pickers moved with it; see its roster row and
-Infrastructure. **The agent layer is complete — all eight phases**, see item 5. Playwright webkit is
-still not installed; the `summary` voice changed on 2026-07-28, see item 0a)
+Last updated: 2026-08-07 (**the copy pass finished** — all 33 components plus the site's own copy, so
+items 0a, 0b and 1 below are done and `docs/rewrite-pass.md` is their record. Playwright webkit is
+still not installed, so run `npx playwright test --project=chromium`. The full suite is **1220
+passed**.)
 
 ---
 
-## START HERE — every component group except `compositions` is complete, and the gate is in. Do batch F next.
+## START HERE — 33 of 34 components are built. Batch F is the last one.
 
 The shared a11y gate is `tests/shared/a11y.spec.mjs`: ten checks against all 33 components, 330
 tests, and `.github/workflows/ci.yml` runs it. It went in before batch F for the reason recorded
@@ -60,6 +59,15 @@ is hand-editable; edit a file in `docs/agents/` or a `meta.json`, then run `npm 
 **If you edit a component, its contract is part of the edit.** `CLAUDE.md` > **Component folder shape**
 has the table of which change obliges which field. Batch F is the next work.
 
+**Batch F is the first component written after the copy pass, so it is written to the finished
+standard rather than swept into it later.** That means: `docs/rewrite-pass.md`'s **style rules**
+before the first string; the canonical `docs.md` heading order with `## Keyboard` mandatory; two
+`ac-demo-section` blocks, correct examples first, `<h4>` example titles, examples numbered
+continuously; demo content from the shared vocabulary; and the house closing under
+`## Screen reader behavior`, verbatim, unless the component genuinely has nothing to announce. The
+scaffolder already emits the right shapes — `npm run new:component -- app-page-to-markdown --group
+compositions --name "…"`. Doing this up front is cheap; the pass took 33 rows because it was not.
+
 **This file is a build log and only that.** It is where progress, the roster checklist, the ordered next
 steps and the repo-local gotchas live. It is never where a component's behavior is looked up — that is
 `agents/components/<slug>.md` and the component's own files, for contributors as much as for agents.
@@ -73,8 +81,14 @@ build it out of those rather than from scratch. The gate now covers each new com
 folder exists, so a batch F page that ships an accent as text, or a target under 24px, is red before
 it is reviewed.
 
-**Then** item 3 (docs) and item 4 (deploy), plus the two copy sweeps 0a and 0b, which can land any
-time and pair naturally with each other.
+**Then** item 3 (docs) and item 4 (deploy). The two copy sweeps 0a and 0b are **done** — the copy
+pass absorbed them, see `docs/rewrite-pass.md`.
+
+**Step 2 — `docs/at-support.md`'s matrix**, item 3. It is the one piece of remaining work that code
+cannot do: every cell is still `—`, and the home page and 31 component pages now say so in as many
+words. Filling even one row turns a disclaimer into a measurement. It needs a real screen reader
+rather than a keyboard, so it is not blocked on anything in the repo — only on sitting down with NVDA.
+`at-support.md` has the walkthrough and the four questions.
 
 Two standing caveats for every step above. The header is two rows tall, so a demo that scrolls an
 anchor into view clears `--header-h`, not 4.5rem. And a component page that ships a live failure
@@ -366,7 +380,7 @@ exempts the `Page` suffix from the contract's `api`.
 
 ---
 
-## Component roster — 33 / 35
+## Component roster — 33 / 34
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -909,7 +923,7 @@ exempts the `Page` suffix from the contract's `api`.
 
 ## Remaining non-component work
 
-### 0a. Rewrite every `meta.json` `summary` in the new voice
+### 0a. ~~Rewrite every `meta.json` `summary` in the new voice~~ — **done, all 33, see `docs/rewrite-pass.md`**
 
 **New rule, from the user, 2026-07-28.** The `summary` renders as the lede at the top of the
 component page, on the index card, and as the page `<meta description>`. Every one written so far is
@@ -925,7 +939,7 @@ it pairs naturally with the on-page copy cut in 0b below since both are read at 
 
 Cheap to do — one field per component, no tests touch it.
 
-### 0b. Cut the on-page copy back — every component built before 2026-07-28
+### 0b. ~~Cut the on-page copy back~~ — **done, all 33, see `docs/rewrite-pass.md`**
 
 **New rule, from the user, 2026-07-28.** The text that *renders on a component page* — the
 `ac-demo__title`s, the `__note` paragraphs, captions, verdicts, readout labels — has to be short and
@@ -952,11 +966,14 @@ Also settled while writing `loading-button`: the demo grid stacks its cases at e
 actually produces, so **never write "the left one" / "the right-hand readout"** in demo copy. Name
 the case (`spinner only`, `keeps its name`) instead.
 
-### 1. Retrofit everything built before the copyability conventions
+### 1. ~~Retrofit everything built before the copyability conventions~~ — **done, see `docs/rewrite-pass.md`**
 
 `CLAUDE.md` gained a **Writing style** and a **Copyability** section after `dropdown`, `disclosure`
 and the site pages were written. Those three predate it and do not follow it. `field` is the
 reference implementation — copy its shape.
+
+All three were retrofitted by the copy pass, `disclosure` as its largest single row. The three
+sections below are kept because they record *why* each rule exists, which the pass did not restate.
 
 Each retrofit target needs:
 

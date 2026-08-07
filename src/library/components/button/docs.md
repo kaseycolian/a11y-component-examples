@@ -72,15 +72,17 @@ press survives untouched, because `translate` and `scale` are not colors.
 
 ## Screen reader behavior
 
-Not yet tested against a screen reader. What the markup asks for: "Solid, button" from the text
-content; "Publish project, button, unavailable" plus the described reason for the `aria-disabled`
-one; "View pricing, link" for the anchor; and nothing at all for the `<div>`, which is not in the
-accessibility tree as a control and cannot be reached.
+Expected: "Solid, button" from the text content; "Publish project, button, unavailable" plus the
+described reason for the `aria-disabled` one; "View pricing, link" for the anchor; and nothing at all
+for the `<div>`, which is not in the accessibility tree as a control and cannot be reached.
 
 Announcements for the unavailable state vary by assistive technology and verbosity setting. NVDA and
 JAWS commonly say "unavailable"; VoiceOver says "dimmed". Both `disabled` and `aria-disabled` produce
 it, which is the point — the difference is not what they say, it is whether the reader ever gets
 there to hear it.
+
+**Not yet verified against real assistive technology.** Until `docs/at-support.md` has a row for this
+component, treat the above as intent, not measurement.
 
 ## `type` is not optional
 

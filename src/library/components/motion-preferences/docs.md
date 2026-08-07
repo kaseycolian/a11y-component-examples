@@ -85,10 +85,10 @@ does not move anything.
 
 ## Screen reader behavior
 
-The switch announces as a checkbox: "Reduce motion on this page, checkbox, checked". When the OS
-already asks for reduced motion it adds the description — "Your system already asks for reduced
-motion, so animation stays off" — and NVDA and VoiceOver both read it, because the note is visible
-text rather than a `title`.
+Expected: the switch announces as a checkbox, "Reduce motion on this page, checkbox, checked". When
+the OS already asks for reduced motion it adds the description, "Your system already asks for reduced
+motion, so animation stays off". The description is read because the note is visible text rather than
+a `title`.
 
 The readout table is deliberately **not** a live region. Three rows re-announced on every change
 would bury the one sentence under it, which is a polite `role="status"` and carries the outcome
@@ -96,6 +96,9 @@ rather than repeating the state the checkbox already announced.
 
 The ticker is not a live region either. `aria-live` on content that advances on a timer makes the
 page unusable — SC 4.1.3 is about status changes the reader caused, not content moving on its own.
+
+**Not yet verified against real assistive technology.** Until `docs/at-support.md` has a row for this
+component, treat the above as intent, not measurement.
 
 ## The asymmetry
 

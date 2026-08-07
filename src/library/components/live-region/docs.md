@@ -86,6 +86,9 @@ live region the only way to learn something.
 Nothing here can be evaluated by looking at it, and none of it can be caught by axe. Turn on a screen
 reader.
 
+**Not yet verified against real assistive technology.** Until `docs/at-support.md` has a row for this
+component, treat the above as intent, not measurement.
+
 ## Why a region stays silent
 
 Every failure below leaves the correct text in the DOM. That is what makes them expensive: the element

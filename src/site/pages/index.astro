@@ -90,14 +90,24 @@ function write(message) {
   },
 ];
 
+/*
+  Claims, so each one has to be a thing the repo can show. The first used to
+  read "Every screen reader that matters -- built and checked against NVDA,
+  JAWS, VoiceOver ... and TalkBack", and none of that had happened: every cell
+  in docs/at-support.md is still "—", and every component page says as much.
+  What is true is the tree assertion, which is a narrower claim and a testable
+  one. The second used to end "every drag has a single-pointer alternative",
+  which reads as coverage of a pattern the library does not ship -- no
+  component claims SC 2.5.7 and none of them drags.
+*/
 const promises = [
   {
-    title: 'Every screen reader that matters',
-    body: 'Built and checked against NVDA, JAWS, VoiceOver on macOS and iOS, and TalkBack on Android. Where a pattern behaves differently in one of them, the component page says so rather than pretending otherwise.',
+    title: 'Checked against the accessibility tree',
+    body: 'Every pattern follows the WAI-ARIA APG, and the roles, names, and states it relies on are asserted against the real browser accessibility tree by the test suite. Screen reader passes have not been run yet, and every component page says so.',
   },
   {
     title: 'Keyboard first, touch too',
-    body: 'Full WAI-ARIA APG keyboard maps: arrows, Home, End, Escape, type-ahead. Targets are at least 24×24px, and every drag has a single-pointer alternative.',
+    body: 'Every key a component binds is listed on its page and pressed by a test: arrows, Home, End, Escape, type-ahead. Targets are at least 24×24px, and visible label text is part of the accessible name.',
   },
   {
     title: 'Copy, do not integrate',
@@ -105,7 +115,7 @@ const promises = [
   },
   {
     title: 'Themeable from the start',
-    body: 'Colors, radii, and durations come from CSS custom properties with sensible fallbacks. Pasted into a bare app it just works; pasted into a themed one it adopts the theme.',
+    body: 'Colors, radii, and durations are CSS custom properties, each ending in a standalone default. Pasted into a bare app a component styles itself, and pasted into a themed one it follows the theme.',
   },
 ];
 ---

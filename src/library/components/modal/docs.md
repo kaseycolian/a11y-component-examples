@@ -89,6 +89,8 @@ carry the meaning either way.
 
 ## Screen reader behavior
 
+Expected:
+
 - **NVDA and JAWS** announce the dialog's name on entry, then read from the focus point. Focusing the
   dialog element reads the whole body; focusing a control reads the name, the description, then that
   control.
@@ -97,6 +99,9 @@ carry the meaning either way.
 - **TalkBack** treats the modal as the whole screen, which is why the visible close button is not
   optional.
 - **All four** say nothing at all when the dialog closes. See point 3 below.
+
+**Not yet verified against real assistive technology.** Until `docs/at-support.md` has a row for this
+component, treat the above as intent, not measurement.
 
 ## What `showModal()` gives you
 

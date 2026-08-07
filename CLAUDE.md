@@ -18,15 +18,15 @@ The two contracts share one thing: **where a component's behavior comes from.** 
 ordered next steps, and the gotchas already solved. It is a build log and nothing else: never the place
 to look up how a component behaves.
 
-**The library-wide copy and structure pass has finished all 33 components.** Every component page now
-has the same shape, the same voice and the same demo vocabulary. `docs/rewrite-pass.md` is the tracker:
-read its **style rules** before touching any human-facing string, and its roster row for a component
-before changing that component's writing. What is left of the pass is Phase 3, the site's own copy.
+**The library-wide copy and structure pass is finished** — all 33 components, and the site's own copy.
+Every component page has the same shape, the same voice and the same demo vocabulary.
+`docs/rewrite-pass.md` is the record: read its **style rules** before touching any human-facing
+string, and its roster row for a component before changing that component's writing.
 
 | Need | File |
 | --- | --- |
 | What's done, what's next | `docs/BUILD-STATUS.md` |
-| The writing style every human-facing string follows, and what is left of the copy pass | `docs/rewrite-pass.md` |
+| The writing style every human-facing string follows | `docs/rewrite-pass.md` |
 | The ARIA contract + keyboard map for a **built** component | `agents/components/<slug>.md` — generated from its `meta.json` and asserted against the shipped markup |
 | The up-front design decisions behind one, and its CSS gotchas | `docs/component-specs.md` (read one entry, not the file) |
 | What a component assumes about the page it lands in | `agents/conventions.md` — the reasoning behind **Non-negotiable conventions** below |

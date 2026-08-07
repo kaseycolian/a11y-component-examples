@@ -123,13 +123,15 @@ Three things are still yours to do, and the `[FORCED]` block in `component.css` 
 
 ## Screen reader behavior
 
-Not yet tested against a screen reader. What the markup asks for: nothing at all from `fx-grid`,
-`fx-bar-top`, `fx-bar-bottom` and `fx-pulse`, none of which put an element in the accessibility tree;
-"Recent orders, region" on landing in the named scroll region in example 4; and, in the unnamed one,
-the list contents with no announcement of what was entered or that it scrolls.
+Expected: nothing at all from `fx-grid`, `fx-bar-top`, `fx-bar-bottom` and `fx-pulse`, none of which
+put an element in the accessibility tree; "Recent orders, region" on landing in the named scroll
+region in example 4; and, in the unnamed one, the list contents with no announcement of what was
+entered or that it scrolls.
 
-The spec asserts the first and third of those against the real accessibility tree — the backdrop
-panel's whole subtree is its one paragraph, and the unnamed scroller has neither a role nor a name.
+**Not yet verified against real assistive technology.** The first and third of those *are* asserted
+against Chromium's accessibility tree by the spec — the backdrop panel's whole subtree is its one
+paragraph, and the unnamed scroller has neither a role nor a name. Until `docs/at-support.md` has a
+row for this component, the announcements above are intent rather than measurement.
 
 ## Contrast on a gradient — SC 1.4.3
 

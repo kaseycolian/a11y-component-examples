@@ -81,9 +81,12 @@ it is a border on `currentColor`.
 
 ## Screen reader behavior
 
-Not yet tested against a screen reader. What the markup asks for: entering example 1's group,
-*"Filter orders, group"*, then *"Shipped, toggle button, not pressed"*; after a press, *"pressed"*,
-and the status line reads the new count. The name is the same at both points.
+Expected: entering example 1's group, *"Filter orders, group"*, then *"Shipped, toggle button, not
+pressed"*; after a press, *"pressed"*, and the status line reads the new count. The name is the same
+at both points.
+
+**Not yet verified against real assistive technology.** Until `docs/at-support.md` has a row for this
+component, treat the above as intent, not measurement.
 
 ## The tick cannot be a character
 

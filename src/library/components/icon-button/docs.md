@@ -66,14 +66,16 @@ color the button was just given.
 
 ## Screen reader behavior
 
-Not yet tested against a screen reader. What the markup asks for: "Play, button" for example 1's
-first control; the same name for all three of example 2's; and — for example 3 — "button" alone,
-twice, with nothing to distinguish the two failing controls from each other or from anything else on
-the page.
+Expected: "Play, button" for example 1's first control; the same name for all three of example 2's;
+and — for example 3 — "button" alone, twice, with nothing to distinguish the two failing controls
+from each other or from anything else on the page.
 
 `title` announcements vary. With no other source, NVDA and JAWS commonly read it as the name, and
 some verbosity settings read it as a description *after* the role. That variance is part of the
 argument against it.
+
+**Not yet verified against real assistive technology.** Until `docs/at-support.md` has a row for this
+component, treat the above as intent, not measurement.
 
 ## `aria-label`, or clipped real text?
 
