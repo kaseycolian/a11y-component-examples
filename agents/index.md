@@ -12,7 +12,7 @@ Pick one, then read `agents/components/<slug>.md` — not this file twice.
 - **live-region** — Announcing a change without moving focus, in a region that was already there.
 - **typography** — Visual text classes that carry no semantics at all.
 - **motion-preferences** — One motion token: a page can add the restriction, never override the OS.
-- **effects** — Background decoration, and the two accessibility rules its own file lacks.
+- **effects** — Background decoration, and the accessibility rules that come with it.
 
 ## Buttons & Actions
 

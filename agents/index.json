@@ -125,16 +125,16 @@
     },
     {
       "slug": "effects",
-      "name": "Effects",
+      "name": "Background Effects",
       "group": "foundations",
-      "useWhen": "Background decoration, and the two accessibility rules its own file lacks.",
+      "useWhen": "Background decoration, and the accessibility rules that come with it.",
       "tags": ["effects", "theme-service", "decoration", "gradient", "contrast", "stacking-context", "isolation", "scrollbar", "forced-colors", "motion", "no-js"],
       "wcag": ["1.4.3", "1.4.11", "2.1.1", "2.2.2", "2.4.7", "4.1.2"],
       "apg": null,
       "files": ["html", "css"],
       "status": "stable",
       "hasContract": true,
-      "_summaryRev": "e92973bc"
+      "_summaryRev": "31999c68"
     },
     {
       "slug": "button",

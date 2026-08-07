@@ -226,6 +226,6 @@ useEffect(() => {
 
 ## Related
 
-- [Effects](../effects/) — the decorative animations this gate switches off.
+- [Background Effects](../effects/) — the decorative animations this gate switches off.
 - [Switch](../switch/) — the control in example 2, and where its markup is canonical.
 - [Focus Indicator](../focus-ring/) — the one thing on the page that is never animated.

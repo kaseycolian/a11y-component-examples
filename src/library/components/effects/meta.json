@@ -1,9 +1,9 @@
 {
   "slug": "effects",
-  "name": "Effects",
+  "name": "Background Effects",
   "group": "foundations",
   "order": 70,
-  "summary": "The theme's decoration — a grid backdrop, two gradient bars, a recolored scrollbar and a slow pulse — and the four obligations that arrive the moment text, a control or a loop lands on one of them.",
+  "summary": "Background effects are decoration: a grid backdrop, two gradient bars, a recolored scrollbar and a slow pulse. Use them to give a surface texture without adding an element or a role. Text on a gradient still needs 4.5:1 at its worst point, and a recolored scrollbar is still a control.",
   "tags": [
     "effects",
     "theme-service",
@@ -21,9 +21,9 @@
   "wcag": ["1.4.3", "1.4.11", "2.1.1", "2.2.2", "2.4.7", "4.1.2"],
   "status": "stable",
   "files": ["html", "css"],
-  "demoNote": "The one page here whose subject is not a component this library owns: these five classes ship in theme-service's effects.css. No JavaScript. Examples 2 and 3 are broken on purpose and live, and example 5 is about the header's Reduce motion toggle.",
+  "demoNote": "Switch themes in the header and watch example 3's failing bar change its verdict. Turn on Reduce motion and both swatches in example 5 stop.",
   "contract": {
-    "useWhen": "Background decoration, and the two accessibility rules its own file lacks.",
+    "useWhen": "Background decoration, and the accessibility rules that come with it.",
     "root": [".ac-fx-scroller"],
     "aria": {
       "a scroll container": [
@@ -35,7 +35,15 @@
     "keyboard": [
       [
         "Tab",
-        "a scrolling box is a stop, so it needs a role, a name and a ring"
+        "moves onto the scroll region, which is a tab stop whether or not you gave it one"
+      ],
+      [
+        "ArrowDown / ArrowUp",
+        "native: scroll the focused region by a line"
+      ],
+      [
+        "Home / End",
+        "native: jump to the top or the bottom of the focused region"
       ]
     ],
     "failureModes": [

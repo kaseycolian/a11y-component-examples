@@ -1,5 +1,5 @@
 <!-- ===========================================================================
-     EFFECTS — the theme's decoration, and what decoration still owes the reader
+     BACKGROUND EFFECTS — decoration, and what decoration still owes the reader
 
      THIS PAGE IS NOT ABOUT A COMPONENT THIS LIBRARY OWNS.
        fx-grid, fx-bar-top, fx-bar-bottom, fx-scroll and fx-pulse are
@@ -15,244 +15,261 @@
        have, and both are accessibility rules. Everything else on this page is
        either wrong on purpose or page furniture.
 
-     THE FIVE CLASSES
+     REQUIRED MARKUP
        fx-grid                     a crossing-lines backdrop, on a ::before
        fx-bar-top / fx-bar-bottom  mirrored gradient bars for a header/footer
        fx-scroll                   a gradient scrollbar thumb
        fx-pulse                    a slow brightness loop, motion-gated
 
      THE ONE THING TO TAKE AWAY
-       Decoration is free until something sits on it. A gradient behind text has
-       a contrast ratio at every point across it and you owe the worst one. A
-       recolored scrollbar is a recolored control. A loop that never ends needs a
-       way to stop. All three are on this page, measured rather than asserted.
+       Decoration adds nothing to the accessibility tree, which is correct. What
+       sits on top of it still owes three things: 4.5:1 at a gradient's worst
+       point, a name and a focus ring on a recolored scrollbar, and a way to
+       stop a loop that never ends. This page measures all three.
 
      fx-* is theme-service's. ac-fx-* is this page's own scaffolding, and so is
      ac-demo-* / ac-demo__*. Never copy either.
      =========================================================================== -->
 
-<div class="ac-demo-grid">
-  <!-- ======================================================================
-       EXAMPLE 1 · The backdrop
-       effects.css. CSS [MOCK] for the panel around it.
+<div class="ac-demo-section">
+  <h3 class="ac-demo-section__title">Correct example</h3>
+  <p class="ac-demo-section__note">
+    One effect used the way it is meant to be used. The backdrop is invisible to
+    the accessibility tree, and the text on top of it still clears contrast.
+  </p>
 
-       fx-grid is two 1px gradients tiled at 32px, painted on a ::before that is
-       pointer-events: none and z-index: -1. It adds no element, no text and no
-       role — a screen reader cannot tell it is there, which is correct: it says
-       nothing, so it should announce nothing.
+  <div class="ac-demo-grid">
+    <!-- ====================================================================
+         EXAMPLE 1 · Grid backdrop behind text
+         effects.css. CSS [MOCK] for the panel around it.
 
-       The obligation starts at the text. Body copy on this panel is 16.79:1
-       against the surface and 15.72:1 where it crosses a grid line, so the
-       shipped recipe spends about one point of headroom. That is a decision made
-       three times over — 1px lines, a 10% color-mix, and a 0.4 opacity — and
-       each of the three is a knob a theme can turn.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">1 &middot; The backdrop</h3>
+         fx-grid is two 1px gradients tiled at 32px, painted on a ::before that
+         is pointer-events: none and z-index: -1. It adds no element, no text
+         and no role — a screen reader cannot tell it is there, which is
+         correct: it says nothing, so it should announce nothing.
 
-    <div class="ac-fx-panel fx-grid">
-      <p class="ac-fx-prose">
-        The Empty Bottle had 99 people in it and a PA held together with gaffer
-        tape, and the recording that came out of it is still the one people
-        argue about.
+         The obligation starts at the text. Body copy on this panel is 16.79:1
+         against the surface and 15.72:1 where it crosses a grid line, so the
+         shipped recipe spends about one point of headroom. That is a decision
+         made three times over — 1px lines, a 10% color-mix, and a 0.4 opacity
+         — and each of the three is a knob a theme can turn.
+         ==================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">1 &middot; Grid backdrop behind text</h4>
+
+      <div class="ac-fx-panel fx-grid">
+        <p class="ac-fx-prose">
+          Order 462 shipped on Tuesday. Jordan Lee was notified the same
+          afternoon, and Invoice 99 is still pending.
+        </p>
+      </div>
+
+      <p class="ac-demo__legend">
+        The backdrop adds no element and no role, so a screen reader cannot tell
+        it is there. The text on top is what has to clear contrast:
+        <strong>16.79:1</strong> against the surface, <strong>15.72:1</strong>
+        over a grid line.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="ac-demo-section ac-demo-section--mistakes">
+  <h3 class="ac-demo-section__title">Common mistakes</h3>
+  <p class="ac-demo-section__note">
+    Four failures, live rather than described. Three of them are invisible to
+    axe, and the fourth passes in the light theme.
+  </p>
+
+  <div class="ac-demo-grid">
+    <!-- ====================================================================
+         EXAMPLE 2 · Backdrop with no stacking context
+         CSS [BROKEN] + [MOCK].
+
+         Both panels carry fx-grid, so both get their ::before from the same
+         rule in effects.css — same inset, same background-image, same opacity,
+         same z-index: -1. The second one adds one declaration: isolation: auto.
+
+         A z-index: -1 pseudo-element is painted in the negative layer of the
+         nearest ancestor stacking context. If its own host is not one, "behind
+         the host" means behind the host's own background too, and an opaque
+         panel swallows it. isolation: isolate makes the host a stacking
+         context, so the backdrop is trapped inside it — which is why that line
+         is in effects.css next to position: relative.
+
+         This is the failure mode of retyping a recipe instead of copying it.
+         Nothing errors, the element inspector shows a correct pseudo-element
+         with the right background-image, and the page is simply missing its
+         backdrop. The spec asserts that both computed ::before styles match, so
+         the difference really is the one line.
+         ==================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">2 &middot; Backdrop with no stacking context</h4>
+
+      <div class="ac-fx-pair">
+        <div class="ac-fx-panel fx-grid">
+          <p class="ac-fx-note"><code>isolation: isolate</code></p>
+        </div>
+        <div class="ac-fx-panel fx-grid ac-fx-broken-grid">
+          <p class="ac-fx-note"><code>isolation: auto</code></p>
+        </div>
+      </div>
+
+      <p class="ac-demo__legend">
+        Both panels get the same <code>::before</code> from the same rule. The
+        second one drops <code>isolation: isolate</code>, so its backdrop paints
+        behind the panel's own background and never shows &mdash; in any theme,
+        at any width, with nothing invalid for a tool to report.
       </p>
     </div>
 
-    <p class="ac-demo__legend">
-      Decorative and invisible to the accessibility tree, which is what
-      decoration should be. The number that matters is the text on top of it:
-      <strong>16.79:1</strong> against the surface, <strong>15.72:1</strong>
-      over a grid line.
-    </p>
-  </div>
+    <!-- ====================================================================
+         EXAMPLE 3 · Gradient bar with the tint turned up — SC 1.4.3
+         effects.css + CSS [BROKEN] + [MOCK].
 
-  <!-- ======================================================================
-       EXAMPLE 2 · The stacking context — broken on purpose, live
-       CSS [BROKEN] + [MOCK].
+         fx-bar-top and fx-bar-bottom are mirrored diagonal gradients, meant for
+         a page header and footer. Text on either has to clear 4.5:1 against
+         every point it can land on, and the endpoints are not the answer: both
+         bars are 16.79:1 at their ends and drop to 11.35:1 and 10:1 at the 55%
+         stop.
 
-       Both panels carry fx-grid, so both get their ::before from the same rule
-       in effects.css — same inset, same background-image, same opacity, same
-       z-index: -1. The second one adds one declaration: isolation: auto.
+         The fourth bar is the same recipe with the tint turned up, which is the
+         edit somebody makes on a Friday to give the header more presence.
+         16.79:1 at the ends still, and 2.18:1 in the middle.
 
-       A z-index: -1 pseudo-element is painted in the negative layer of the
-       nearest ancestor stacking context. If its own host is not one, "behind the
-       host" means behind the host's own background too, and an opaque panel
-       swallows it. isolation: isolate makes the host a stacking context, so the
-       backdrop is trapped inside it — which is why that line is in effects.css
-       next to position: relative.
+         And it passes in the light theme, at 6.27:1. One declaration, two
+         themes, opposite verdicts — so switch the theme in the header and watch
+         this example change its mind.
+         ==================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">3 &middot; Gradient bar with the tint turned up</h4>
 
-       This is the failure mode of retyping a recipe instead of copying it.
-       Nothing errors, the element inspector shows a correct pseudo-element with
-       the right background-image, and the page is simply missing its backdrop.
-       The spec asserts that both computed ::before styles match, so the
-       difference really is the one line.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">2 &middot; The stacking context</h3>
-
-    <div class="ac-fx-pair">
-      <div class="ac-fx-panel fx-grid">
-        <p class="ac-fx-note"><code>isolation: isolate</code></p>
+      <div class="ac-fx-frame">
+        <p class="ac-fx-bar fx-bar-top">Billing</p>
+        <p class="ac-fx-body">Order 462 shipped on Tuesday. Invoice 99 is still pending.</p>
+        <p class="ac-fx-bar fx-bar-bottom">Invoice 99 &middot; Jordan Lee</p>
       </div>
-      <div class="ac-fx-panel fx-grid ac-fx-broken-grid">
-        <p class="ac-fx-note"><code>isolation: auto</code></p>
+
+      <p class="ac-fx-bar ac-fx-broken-bar">Billing, with the tint turned up</p>
+
+      <ol class="ac-fx-key">
+        <li><code>fx-bar-top</code> &mdash; 16.79:1 at the ends, <strong>11.35:1</strong> at 55%</li>
+        <li><code>fx-bar-bottom</code> &mdash; 16.79:1 at the ends, <strong>10:1</strong> at 55%</li>
+        <li>
+          the same gradient at 70% accent &mdash; 16.79:1 at the ends and
+          <strong>2.18:1</strong> in the middle, where 4.5:1 is the floor
+        </li>
+      </ol>
+
+      <p class="ac-demo__legend">
+        A 135&deg; gradient runs corner to corner, so all three bars are
+        <strong>16.79:1</strong> at two corners nobody puts text in. That is the
+        number a color picker lands on. Sample the stops instead.
+      </p>
+    </div>
+
+    <!-- ====================================================================
+         EXAMPLE 4 · Scroll region with no name or role
+         effects.css + CSS [PATCH] + [MOCK].
+
+         Two identical scroll regions. The second has three attributes the first
+         does not, and they are the difference between a scroll region somebody
+         can reach and one they cannot.
+
+         Chromium 151 gives a scrollable box a tab stop on its own, with no
+         tabindex — so the first region is reachable here and announces as
+         nothing, because it has no role and no name. Safari does not do this at
+         all. tabindex="0" plus role="region" plus a name is the version that
+         works in both and says what it is when you land on it (SC 2.1.1,
+         4.1.2).
+
+         The focus ring is the [PATCH]. The UA outline on the auto-focusable box
+         computes to rgb(16, 16, 16) — black, on a dark theme, at 1px
+         (SC 2.4.7).
+         ==================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">4 &middot; Scroll region with no name or role</h4>
+
+      <div class="ac-fx-scroller fx-scroll" data-ac-demo-broken="scrollable-region-focusable">
+        <p class="ac-fx-note">No name, no role</p>
+        <ul class="ac-fx-list">
+          <li>Order 462 &mdash; Shipped</li>
+          <li>Order 461 &mdash; Pending</li>
+          <li>Order 460 &mdash; Failed</li>
+          <li>Invoice 99 &mdash; Paid</li>
+          <li>Invoice 98 &mdash; Draft</li>
+          <li>Order 459 &mdash; Shipped</li>
+        </ul>
       </div>
-    </div>
 
-    <p class="ac-demo__legend">
-      Same pseudo-element, same declarations, one line apart. The second
-      backdrop is painted behind its own panel and you will never see it, in any
-      theme, at any width &mdash; and no tool will tell you, because nothing
-      about it is invalid.
-    </p>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 3 · A gradient has a contrast ratio at every point — SC 1.4.3
-       effects.css + CSS [BROKEN] + [MOCK].
-
-       fx-bar-top and fx-bar-bottom are mirrored diagonal gradients, meant for a
-       page header and footer. Text on either has to clear 4.5:1 against every
-       point it can land on, and the endpoints are not the answer: both bars are
-       16.79:1 at their ends and drop to 11.35:1 and 10:1 at the 55% stop.
-
-       The fourth bar is the same recipe with the tint turned up, which is the
-       edit somebody makes on a Friday to give the header more presence. 16.79:1
-       at the ends still, and 2.18:1 in the middle.
-
-       And it passes in the light theme, at 6.27:1. One declaration, two themes,
-       opposite verdicts — so switch the theme in the header and watch this
-       example change its mind.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">3 &middot; Text on a gradient</h3>
-
-    <div class="ac-fx-frame">
-      <p class="ac-fx-bar fx-bar-top">Something to Write Home About</p>
-      <p class="ac-fx-body">Side two, four songs, recorded in 99 hours.</p>
-      <p class="ac-fx-bar fx-bar-bottom">462 pressed, none of them numbered</p>
-    </div>
-
-    <p class="ac-fx-bar ac-fx-broken-bar">Tint turned up, contrast gone</p>
-
-    <ol class="ac-fx-key">
-      <li><code>fx-bar-top</code> &mdash; 16.79:1 at the ends, <strong>11.35:1</strong> at 55%</li>
-      <li><code>fx-bar-bottom</code> &mdash; 16.79:1 at the ends, <strong>10:1</strong> at 55%</li>
-      <li>
-        the same gradient at 70% accent &mdash; 16.79:1 at the ends and
-        <strong>2.18:1</strong> in the middle, where 4.5:1 is the floor
-      </li>
-    </ol>
-
-    <p class="ac-demo__legend">
-      A 135&deg; gradient runs corner to corner, so the failing bar is
-      <strong>16.79:1</strong> at two corners nobody puts text in. That is the
-      number a color picker lands on and the reason this ships. Sample the
-      stops, not the corners.
-    </p>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 4 · A restyled scrollbar is a restyled control
-       effects.css + CSS [PATCH] + [MOCK].
-
-       Two identical scroll regions. The second has three attributes the first
-       does not, and they are the difference between a scroll region somebody
-       can reach and one they cannot.
-
-       Chromium 151 gives a scrollable box a tab stop on its own, with no
-       tabindex — so the first region is reachable here and announces as
-       nothing, because it has no role and no name. Safari does not do this at
-       all. tabindex="0" plus role="region" plus a name is the version that
-       works in both and says what it is when you land on it (SC 2.1.1, 4.1.2).
-
-       The focus ring is the [PATCH]. The UA outline on the auto-focusable box
-       computes to rgb(16, 16, 16) — black, on a dark theme, at 1px (SC 2.4.7).
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">4 &middot; A scrollbar is a control</h3>
-
-    <div class="ac-fx-scroller fx-scroll" data-ac-demo-broken="scrollable-region-focusable">
-      <p class="ac-fx-note">No name, no role</p>
-      <ul class="ac-fx-list">
-        <li>Cat&rsquo;s Cradle, doors at eight</li>
-        <li>Bakesale, side one</li>
-        <li>Frame &amp; Canvas</li>
-        <li>Clarity, all of it</li>
-        <li>Emergency &amp; I</li>
-        <li>462 miles to the next one</li>
-      </ul>
-    </div>
-
-    <div
-      class="ac-fx-scroller fx-scroll"
-      tabindex="0"
-      role="region"
-      aria-label="Set list, second night"
-    >
-      <p class="ac-fx-note"><code>tabindex="0" role="region" aria-label</code></p>
-      <ul class="ac-fx-list">
-        <li>Cat&rsquo;s Cradle, doors at eight</li>
-        <li>Bakesale, side one</li>
-        <li>Frame &amp; Canvas</li>
-        <li>Clarity, all of it</li>
-        <li>Emergency &amp; I</li>
-        <li>462 miles to the next one</li>
-      </ul>
-    </div>
-
-    <p class="ac-demo__legend">
-      Tab into both. The first announces its contents with no idea what it is;
-      the second says &ldquo;Set list, second night, region&rdquo; first. The
-      gradient thumb is <strong>5.2:1</strong> against its track at the dimmest
-      point in the gradient, where a control needs 3:1
-      (<strong>SC 1.4.11</strong>).
-    </p>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 5 · Two gates, and one cannot see the element it is on
-       effects.css + CSS [MOCK].
-
-       Both boxes carry data-motion="off" on themselves. One is still pulsing.
-
-       effects.css ships both gates. [data-motion="off"] { --motion: 0 } matches
-       the element with the attribute, and a custom property is inherited from
-       there. [data-motion="off"] .fx-pulse is a descendant selector and needs
-       the attribute on an ancestor. So the left box resolves --motion to 0 and
-       keeps animating anyway, because the rule that would stop it is looking
-       one level up.
-
-       Neither is a bug: an app sets data-motion on <html>, where both forms
-       work. It matters the moment you scope the attribute to a subtree — which
-       a component that is its own motion scope does by definition.
-
-       Use the header's Reduce motion toggle — it writes the attribute on
-       <html>, so it stops both. That toggle is also this page's SC 2.2.2
-       mechanism: fx-pulse loops forever, and anything that runs past five
-       seconds needs a way to stop it. Reduced Motion is the page that
-       argues all of this.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">5 &middot; Two gates, different reach</h3>
-
-    <div class="ac-fx-pair">
-      <div class="ac-fx-swatch fx-pulse" data-motion="off">
-        <p class="ac-fx-note"><code>fx-pulse</code></p>
+      <div
+        class="ac-fx-scroller fx-scroll"
+        tabindex="0"
+        role="region"
+        aria-label="Recent orders"
+      >
+        <p class="ac-fx-note"><code>tabindex="0" role="region" aria-label</code></p>
+        <ul class="ac-fx-list">
+          <li>Order 462 &mdash; Shipped</li>
+          <li>Order 461 &mdash; Pending</li>
+          <li>Order 460 &mdash; Failed</li>
+          <li>Invoice 99 &mdash; Paid</li>
+          <li>Invoice 98 &mdash; Draft</li>
+          <li>Order 459 &mdash; Shipped</li>
+        </ul>
       </div>
-      <div class="ac-fx-swatch ac-fx-pulse-token" data-motion="off">
-        <p class="ac-fx-note"><code>calc(var(--ac-motion) * 1.8s)</code></p>
-      </div>
+
+      <p class="ac-demo__legend">
+        Tab into both. The first announces its contents and nothing about
+        itself; the second says &ldquo;Recent orders, region&rdquo; first. The
+        gradient thumb is <strong>5.2:1</strong> against its track at its
+        dimmest point, where a control needs 3:1 (<strong>SC 1.4.11</strong>).
+      </p>
     </div>
 
-    <p class="ac-demo__legend">
-      The attribute is on both boxes, and both resolve <code>--motion</code> to
-      <code>0</code>. The left box keeps going anyway, because the rule that
-      stops <code>fx-pulse</code> is looking for an ancestor.
-      <strong>Reduce motion</strong> in the header sets the same
-      attribute on <code>&lt;html&gt;</code> and stops both &mdash; and an
-      operating system asking for reduced motion stops both too, because that
-      rule targets the element directly.
-    </p>
+    <!-- ====================================================================
+         EXAMPLE 5 · Motion gated by a descendant selector
+         effects.css + CSS [MOCK].
+
+         Both boxes carry data-motion="off" on themselves. One is still pulsing.
+
+         effects.css ships both gates. [data-motion="off"] { --motion: 0 }
+         matches the element with the attribute, and a custom property is
+         inherited from there. [data-motion="off"] .fx-pulse is a descendant
+         selector and needs the attribute on an ancestor. So the left box
+         resolves --motion to 0 and keeps animating anyway, because the rule
+         that would stop it is looking one level up.
+
+         Neither rule is wrong in effects.css: an app sets data-motion on <html>,
+         where both forms work. It fails the moment you scope the attribute to a
+         subtree — which a component that is its own motion scope does by
+         definition. Gate through the token and it cannot happen.
+
+         Use the header's Reduce motion toggle — it writes the attribute on
+         <html>, so it stops both. That toggle is also this page's SC 2.2.2
+         mechanism: fx-pulse loops forever, and anything that runs past five
+         seconds needs a way to stop it. Reduced Motion is the page that argues
+         all of this.
+         ==================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">5 &middot; Motion gated by a descendant selector</h4>
+
+      <div class="ac-fx-pair">
+        <div class="ac-fx-swatch fx-pulse" data-motion="off">
+          <p class="ac-fx-note"><code>fx-pulse</code></p>
+        </div>
+        <div class="ac-fx-swatch ac-fx-pulse-token" data-motion="off">
+          <p class="ac-fx-note"><code>calc(var(--ac-motion) * 1.8s)</code></p>
+        </div>
+      </div>
+
+      <p class="ac-demo__legend">
+        Both boxes carry <code>data-motion="off"</code> and both resolve
+        <code>--motion</code> to <code>0</code>. The left one keeps animating,
+        because the rule that stops <code>fx-pulse</code> looks for the
+        attribute on an ancestor. <strong>Reduce motion</strong> in the header
+        sets it on <code>&lt;html&gt;</code> and stops both.
+      </p>
+    </div>
   </div>
 </div>

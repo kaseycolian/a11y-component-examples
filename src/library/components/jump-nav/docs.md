@@ -202,4 +202,4 @@ reviewer checks.
 - **Two navs and one name.** A landmark menu shows *navigation, navigation*, and there is nothing on
   screen to notice it with.
 - **A nav that scrolls sideways.** A scroll container is a tab stop with no role and no name in
-  Chromium — [Effects](../effects/) has that finding. Let the list stack instead.
+  Chromium — [Background Effects](../effects/) has that finding. Let the list stack instead.

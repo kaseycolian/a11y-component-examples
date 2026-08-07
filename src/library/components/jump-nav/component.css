@@ -170,8 +170,8 @@
 
 /* The scrolling stand-in for your page. It is a scroll container, so Chromium
    hands it a tab stop with no role, no name and a 1px near-black UA outline —
-   hence tabindex="0", role="region", a label, and a ring of its own. Effects
-   owns that finding; your page needs none of it. */
+   hence tabindex="0", role="region", a label, and a ring of its own.
+   Background Effects owns that finding; your page needs none of it. */
 .ac-jn-doc {
   box-sizing: border-box;
   width: 100%;

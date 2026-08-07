@@ -113,8 +113,8 @@ matches the hidden native element and trips strict mode.
 
 ## Self-containment, and why the duplication is deliberate
 
-Components do not share modules. The dropdown inlines its own `.ac-field` styles even though a
-Field component will own the canonical version.
+Components do not share modules. The dropdown inlines its own `.ac-field` styles even though the
+Form Field component will own the canonical version.
 
 This is not an oversight. The library's promise is that copying three files into a bare app works
 with nothing else. A shared `core/` module would break that the first time someone copied a

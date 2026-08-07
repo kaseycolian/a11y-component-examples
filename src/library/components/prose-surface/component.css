@@ -34,8 +34,8 @@
      tabindex="0"      Chromium gives a scroll container a tab stop with no
                        role, no name and a 1px near-black UA ring; Safari gives
                        it no stop at all, so the surface cannot be scrolled by
-                       keyboard (SC 2.1.1). Effects owns that finding and Data
-                       Table owns this wrapper's shape.
+                       keyboard (SC 2.1.1). Background Effects owns that
+                       finding and Data Table owns this wrapper's shape.
      role="region"     so the stop announces as something.
      aria-labelledby   pointing at the surface's own first heading, so the name
                        is written once.

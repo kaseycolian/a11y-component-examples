@@ -84,7 +84,8 @@ The three attributes are one decision. Chromium gives any scroll container a tab
 no name and a 1px near-black UA ring; Safari gives it no stop at all, so a keyboard user cannot
 scroll the table (SC 2.1.1). `tabindex="0"` makes the stop reliable, `role="region"` makes it
 announce, and `aria-labelledby` pointing at the caption's `id` writes the name once for both.
-[Effects](../effects/) owns that finding, and example 4 has the bare wrapper beside this one.
+[Background Effects](../effects/) owns that finding, and example 4 has the bare wrapper beside this
+one.
 
 The wrapper needs `min-width: 0`. A scroll container's automatic minimum size is its content's, so
 without it the wrapper grows to the table's width and takes the page sideways at 320px instead of

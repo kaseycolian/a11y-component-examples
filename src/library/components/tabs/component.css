@@ -38,8 +38,8 @@
 }
 
 /* Wraps rather than scrolls. A strip that scrolls sideways needs tabindex="0",
-   role="region" and a name of its own, or it is a silent tab stop — Effects
-   has that finding. Wrapping needs none of it and survives 320px.
+   role="region" and a name of its own, or it is a silent tab stop — Background
+   Effects has that finding. Wrapping needs none of it and survives 320px.
 
    Nothing here draws a rail across the whole strip, and that is why it can
    wrap: a rail belongs to one row, so a six-tab strip on a phone would leave

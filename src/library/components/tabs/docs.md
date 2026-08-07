@@ -210,4 +210,4 @@ field, a playing video. Render them all and toggle `hidden`.
 - **`aria-controls` pointing at an id that does not exist.** Nothing on screen changes and nothing
   reports it.
 - **A tab strip that scrolls sideways.** A scroll container is a tab stop with no role and no name in
-  Chromium — [Effects](../effects/) has that finding. Let the strip wrap instead.
+  Chromium — [Background Effects](../effects/) has that finding. Let the strip wrap instead.

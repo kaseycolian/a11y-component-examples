@@ -1,5 +1,11 @@
 # Build status
 
+> **All 33 components are built, and this file is no longer the active work.** The current job is the
+> library-wide copy and structure pass, and its tracker is **`docs/rewrite-pass.md`** — open that one
+> first. Come back here for the build history, the infrastructure decisions and **Gotchas already
+> solved**, which are all still current. Everything below was written while the components were being
+> built, so read it as a log rather than as instructions about what to do next.
+
 **Resume point.** `CLAUDE.md` (auto-loaded) has the conventions. This file has progress and the
 ordered next steps. `component-specs.md` has the pre-decided ARIA contract for every remaining
 component — read the one entry you need, not the whole file.
@@ -306,10 +312,12 @@ but predates the conventions, so take its logic and not its layout. See item 1 u
   individually and `brand/` is not one. Before this the `<link rel="icon">` pointed at a
   `favicon.svg` that **did not exist**, so every page served a 404 for its icon. Provenance is
   recorded in `src/site/theme/THEME-SERVICE.md`; re-copy all four on a theme-service update.
-- **Home hero** — two columns from 68rem up, prose left at its own measure, a real `Field` markup
+- **Home hero** — two columns from 68rem up, prose left at its own measure, a real Form Field markup
   excerpt right (`tabindex="0"` + `role="group"`, because it scrolls sideways). No component counts
-  anywhere: see the **Writing style** rules in `CLAUDE.md` — never count, and demo content is 90s punk
-  song/album references with `462` and `99` as the arbitrary numbers.
+  anywhere: see the **Writing style** rules in `CLAUDE.md` — never count. Demo content was 90s punk
+  song/album references when this was written; the copy pass replaced it with one generic business
+  app, and `docs/rewrite-pass.md` holds the vocabulary table. `462` and `99` are still the arbitrary
+  numbers.
 - **Sidebar (`ComponentNav`)** — the column from 901px up, `display: none` below it. Stacked, the
   full roster sat between the header and the page the visitor asked for; the header picker is the
   same list, grouped the same way, and it is already on screen. Nothing else navigates, so any change

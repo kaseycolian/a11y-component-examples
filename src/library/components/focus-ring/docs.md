@@ -190,4 +190,4 @@ anything with an `id`, clearing the sticky site header.
 
 - [Skip Link](../skip-link/) — the one component that draws on `:focus` instead, and why.
 - [Button](../button/) — the ring in its ordinary setting.
-- [Effects](../effects/) — the surfaces the two-tone ring exists for.
+- [Background Effects](../effects/) — the surfaces the two-tone ring exists for.

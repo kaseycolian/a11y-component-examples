@@ -13,7 +13,9 @@ test.beforeEach(async ({ page }) => {
 // the accessibility tree, or on a contrast ratio measured live.
 //
 // Locators are scoped to `.ac-demo-grid`: the code panel below the demo repeats
-// every class name on this page as source text.
+// every class name on this page as source text. There are two grids -- correct
+// examples and mistakes -- so this matches twice, which is fine to chain from
+// and never safe to act on directly.
 const demo = (page) => page.locator('.ac-demo-grid');
 
 /** WCAG 2.x contrast ratio between two colors, each `[r, g, b]`. */
@@ -122,7 +124,10 @@ test('text on the backdrop clears 4.5:1 over the surface and over a grid line', 
 /* --- example 2 · the stacking context --------------------------------------- */
 
 test('the two grid panels differ by isolation and by nothing else', async ({ page }) => {
-  const good = demo(page).locator('.fx-grid:not(.ac-fx-broken-grid)').nth(1);
+  // Anchored on the pair wrapper rather than by position: example 1 also has an
+  // .fx-grid panel, and picking example 2's by index across two grids is a
+  // selection any later split can silently move.
+  const good = demo(page).locator('.ac-fx-pair .fx-grid:not(.ac-fx-broken-grid)');
   const broken = demo(page).locator('.ac-fx-broken-grid');
 
   // The failure is paint order, so the whole point is that the pseudo-elements
@@ -185,13 +190,13 @@ test('both scroll regions really scroll, and only one of them has a name', async
 
   // SC 4.1.2. The first is a plain div: reachable in Chromium and announced as
   // nothing, which is the failure example 4 exists to show.
-  await expect(demo(page).getByRole('region', { name: 'Set list, second night' })).toHaveCount(1);
+  await expect(demo(page).getByRole('region', { name: 'Recent orders' })).toHaveCount(1);
   await expect(regions.first()).not.toHaveAttribute('role', /.+/);
   await expect(regions.first()).not.toHaveAttribute('aria-label', /.+/);
 });
 
 test('the named region is keyboard reachable and scrolls from the keyboard', async ({ page }) => {
-  const named = demo(page).getByRole('region', { name: 'Set list, second night' });
+  const named = demo(page).getByRole('region', { name: 'Recent orders' });
 
   await named.focus();
   await expect(named).toBeFocused();
@@ -203,7 +208,7 @@ test('the named region is keyboard reachable and scrolls from the keyboard', asy
 });
 
 test('a focused scroll region gets a real ring, not the 1px UA hairline', async ({ page }) => {
-  const named = demo(page).getByRole('region', { name: 'Set list, second night' });
+  const named = demo(page).getByRole('region', { name: 'Recent orders' });
 
   // Reached by keyboard, because the rule is :focus-visible -- a click into the
   // region to scroll it must not draw a ring at a mouse user.
@@ -248,9 +253,13 @@ test('the scrollbar thumb clears 3:1 against its track', async ({ page }) => {
 test('the token gate stops the element that sets the attribute; the selector gate does not', async ({
   page,
 }) => {
-  const state = await demo(page).evaluate((grid) => {
+  // page.evaluate, not demo(page).evaluate: the page has two .ac-demo-grid
+  // elements and acting on the locator directly is a strict-mode failure. Both
+  // selectors below are unique in the document -- the code panel repeats the
+  // class names as source text, never as elements.
+  const state = await page.evaluate(() => {
     const read = (sel) => {
-      const el = grid.querySelector(sel);
+      const el = document.querySelector(sel);
       const s = getComputedStyle(el);
       return {
         // --ac-motion, not --motion: tokens.css is an optional layer the site
@@ -364,7 +373,7 @@ test.describe('in forced colors', () => {
       });
 
     expect(await read(demo(page).locator('.ac-fx-broken-grid'))).toBe(
-      await read(demo(page).locator('.fx-grid:not(.ac-fx-broken-grid)').nth(1)),
+      await read(demo(page).locator('.ac-fx-pair .fx-grid:not(.ac-fx-broken-grid)')),
     );
   });
 

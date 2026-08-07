@@ -113,7 +113,7 @@
      tabindex="0"   Chromium gives a scroll container a tab stop with no role,
                     no name and a 1px near-black UA ring; Safari gives it no
                     stop at all, so the table cannot be scrolled by keyboard
-                    (SC 2.1.1). Effects owns that finding.
+                    (SC 2.1.1). Background Effects owns that finding.
      role="region"  so the stop announces as something.
      a name         aria-labelledby pointing at the caption's id, so the name
                     is written once and the region and the table agree. */
