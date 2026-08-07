@@ -15,9 +15,9 @@ In `library/components/switch/` — copy `component.{html,css,js}`, read `docs.m
 
 ## Keyboard
 
-- `Space` — toggles
-- `Tab` — one stop — the drawn track is not focusable
-- `Enter` — submits the form, as on any checkbox. It does not toggle
+- `Tab` — native: one stop per switch — the drawn track is not focusable
+- `Enter` — native: submits the form if there is one. It never toggles
+- `Space` — native: toggles the focused switch
 
 **States:** on, off, disabled
 

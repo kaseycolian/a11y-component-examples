@@ -290,7 +290,7 @@
       "files": ["html", "css", "js"],
       "status": "stable",
       "hasContract": true,
-      "_summaryRev": "5d980491"
+      "_summaryRev": "0a33a78d"
     },
     {
       "slug": "fieldset-group",

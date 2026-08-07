@@ -10,65 +10,65 @@ test.beforeEach(async ({ page }) => {
 // confirmation stays out of the accessible name, and that aria-disabled is
 // actually enforced. That is where most of these go.
 
-/* --- example 1 · the baseline --------------------------------------------- */
+/* --- example 1 · baseline switch --------------------------------------------- */
 
 test('a set of switches is a fieldset named by its legend', async ({ page }) => {
-  await expect(page.getByRole('group', { name: 'Monitoring' })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Workspace defaults' })).toBeVisible();
 });
 
 test('the switch is a real checkbox named by the thing it switches', async ({ page }) => {
-  const lights = page.getByRole('checkbox', { name: 'Stage lights' });
+  const archive = page.getByRole('checkbox', { name: 'Auto-archive orders' });
 
-  await expect(lights).toBeChecked();
-  // Not "Turn stage lights on": state is what checked/unchecked is for, and a
+  await expect(archive).toBeChecked();
+  // Not "Turn on auto-archiving": state is what checked/unchecked is for, and a
   // label that restates it announces the state twice.
-  await expect(lights).toHaveAccessibleName('Stage lights');
+  await expect(archive).toHaveAccessibleName('Auto-archive orders');
 });
 
 test('the track and thumb are decoration, so they add nothing to the name', async ({ page }) => {
   await expect(page.locator('.ac-switch__track').first()).toHaveAttribute('aria-hidden', 'true');
-  await expect(page.getByRole('checkbox', { name: 'Smoke machine' })).toHaveAccessibleName(
-    'Smoke machine',
+  await expect(page.getByRole('checkbox', { name: 'Require refund approval' })).toHaveAccessibleName(
+    'Require refund approval',
   );
 });
 
 test('Space toggles, and toggles back', async ({ page }) => {
-  const smoke = page.locator('#ac-sw-smoke');
+  const approval = page.locator('#ac-sw-approval');
 
-  await smoke.focus();
+  await approval.focus();
   await page.keyboard.press('Space');
-  await expect(smoke).toBeChecked();
+  await expect(approval).toBeChecked();
   await page.keyboard.press('Space');
-  await expect(smoke).not.toBeChecked();
+  await expect(approval).not.toBeChecked();
 });
 
 test('Enter does nothing, which is the native behavior', async ({ page }) => {
-  const smoke = page.locator('#ac-sw-smoke');
+  const approval = page.locator('#ac-sw-approval');
 
-  await smoke.focus();
+  await approval.focus();
   await page.keyboard.press('Enter');
-  await expect(smoke).not.toBeChecked();
+  await expect(approval).not.toBeChecked();
 });
 
 test('every switch is its own tab stop', async ({ page }) => {
-  await page.locator('#ac-sw-lights').focus();
+  await page.locator('#ac-sw-archive').focus();
   await page.keyboard.press('Tab');
-  await expect(page.locator('#ac-sw-smoke')).toBeFocused();
+  await expect(page.locator('#ac-sw-approval')).toBeFocused();
 });
 
 test('the label text is part of the target, and the row clears 44px', async ({ page }) => {
-  const row = page.locator('label[for="ac-sw-smoke"]');
+  const row = page.locator('label[for="ac-sw-approval"]');
   const box = await row.boundingBox();
 
   // A 1.35rem pill is a 22px-tall target and fails SC 2.5.8 on its own.
   expect(box.height).toBeGreaterThanOrEqual(44);
 
   await row.click();
-  await expect(page.locator('#ac-sw-smoke')).toBeChecked();
+  await expect(page.locator('#ac-sw-approval')).toBeChecked();
 });
 
 test('the real input stays in the accessibility tree under the paint', async ({ page }) => {
-  const input = page.locator('#ac-sw-smoke');
+  const input = page.locator('#ac-sw-approval');
 
   const styles = await input.evaluate((el) => {
     const s = getComputedStyle(el);
@@ -83,16 +83,16 @@ test('the real input stays in the accessibility tree under the paint', async ({ 
 });
 
 test('the focus ring appears on the track, since the input is transparent', async ({ page }) => {
-  await page.locator('#ac-sw-smoke').focus();
+  await page.locator('#ac-sw-approval').focus();
 
   const outline = await page
-    .locator('label[for="ac-sw-smoke"] .ac-switch__track')
+    .locator('label[for="ac-sw-approval"] .ac-switch__track')
     .evaluate((el) => parseFloat(getComputedStyle(el).outlineWidth));
   expect(outline).toBeGreaterThanOrEqual(3);
 });
 
 test('state is signaled by the thumb position as well as the fill', async ({ page }) => {
-  const thumb = page.locator('label[for="ac-sw-smoke"] .ac-switch__thumb');
+  const thumb = page.locator('label[for="ac-sw-approval"] .ac-switch__thumb');
   const read = () =>
     thumb.evaluate((el) => {
       const s = getComputedStyle(el);
@@ -100,8 +100,8 @@ test('state is signaled by the thumb position as well as the fill', async ({ pag
     });
 
   const off = await read();
-  await page.locator('label[for="ac-sw-smoke"]').click();
-  await expect(page.locator('#ac-sw-smoke')).toBeChecked();
+  await page.locator('label[for="ac-sw-approval"]').click();
+  await expect(page.locator('#ac-sw-approval')).toBeChecked();
 
   // Poll: the thumb slides, so a read taken immediately would catch it mid-way.
   await expect.poll(async () => (await read()).x).toBeGreaterThan(off.x + 8);
@@ -134,26 +134,26 @@ test('flipping it announces the state without renaming the control', async ({ pa
   const notify = page.locator('#ac-sw-notify');
   const status = page.locator('[data-ac-switch-status]');
 
-  await expect(status).toHaveText('Door alerts off.');
-  await expect(notify).toHaveAccessibleName('Door alerts');
+  await expect(status).toHaveText('Order alerts off.');
+  await expect(notify).toHaveAccessibleName('Order alerts');
 
   await notify.focus();
   await page.keyboard.press('Space');
 
-  await expect(status).toHaveText(/Door alerts on/);
+  await expect(status).toHaveText(/Order alerts on/);
   // The name is unchanged: renaming the control someone just operated means the
   // next thing they hear is a different control.
-  await expect(notify).toHaveAccessibleName('Door alerts');
+  await expect(notify).toHaveAccessibleName('Order alerts');
 });
 
 test('the visible line mirrors the status and is hidden from screen readers', async ({ page }) => {
   const note = page.locator('[data-ac-switch-note]');
 
   await expect(note).toHaveAttribute('aria-hidden', 'true');
-  await expect(note).toHaveText('Door alerts off.');
+  await expect(note).toHaveText('Order alerts off.');
 
   await page.locator('label[for="ac-sw-notify"]').click();
-  await expect(note).toHaveText(/Door alerts on/);
+  await expect(note).toHaveText(/Order alerts on/);
   // Same words in both places, announced once.
   await expect(page.locator('[data-ac-switch-status]')).toHaveText(await note.textContent());
 });
@@ -173,15 +173,15 @@ test('toggling moves no focus and navigates nowhere', async ({ page }) => {
 /* --- example 3 · role="switch" -------------------------------------------- */
 
 test('the role variant is exposed as a switch, still driven by checked', async ({ page }) => {
-  const stream = page.getByRole('switch', { name: 'Stream the set' });
+  const statusPage = page.getByRole('switch', { name: 'Public status page' });
 
-  await expect(stream).toBeVisible();
-  await expect(stream).toBeChecked();
+  await expect(statusPage).toBeVisible();
+  await expect(statusPage).toBeChecked();
 
-  await stream.focus();
+  await statusPage.focus();
   await page.keyboard.press('Space');
   // The browser keeps every checkbox behavior; only the announced role changes.
-  await expect(stream).not.toBeChecked();
+  await expect(statusPage).not.toBeChecked();
 });
 
 test('no hand-written aria-checked competes with the native state', async ({ page }) => {
@@ -199,7 +199,7 @@ test('an aria-disabled switch is still focusable and still explains itself', asy
   // aria-disabled as unactionable -- correct for a test runner, and exactly the
   // behavior this example is asserting.)
   expect(await locked.evaluate((el) => el.disabled)).toBe(false);
-  await expect(locked).toHaveAccessibleDescription(/venue sets this/);
+  await expect(locked).toHaveAccessibleDescription(/plan requires this/);
 
   await locked.focus();
   await expect(locked).toBeFocused();
@@ -262,7 +262,7 @@ test('createSwitch is idempotent, set() announces, and destroy undoes its wiring
 
   expect(result.same).toBe(true);
   expect(result.afterSet.state).toBe(true);
-  expect(result.afterSet.said).toMatch(/Door alerts on/);
+  expect(result.afterSet.said).toMatch(/Order alerts on/);
   expect(result.emptied).toBe('');
   expect(result.gone).toBe(true);
 });

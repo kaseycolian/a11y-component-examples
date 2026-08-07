@@ -3,13 +3,13 @@
   "name": "Switch",
   "group": "forms-inputs",
   "order": 80,
-  "summary": "A checkbox that takes effect the moment you flip it — drawn as a track and a thumb, so state reads from position as well as color, with the role=\"switch\" variant alongside it.",
+  "summary": "A switch is a checkbox that takes effect the moment it is flipped. Use it for a setting that applies immediately, never for one that waits for a Save button. It is drawn as a track and a thumb so the state reads from position as well as color, because color alone is not a cue.",
   "tags": ["switch", "toggle", "checkbox", "role-switch", "aria-disabled", "live-region"],
   "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/switch/",
   "wcag": ["1.3.1", "1.4.1", "1.4.11", "2.1.1", "2.4.7", "2.5.8", "3.2.2", "4.1.2", "4.1.3"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Flip example 2 and the confirmation arrives politely, without renaming the control. Example 4's locked switch still takes focus and still says why — that is the difference between aria-disabled and disabled.",
+  "demoNote": "Flip Order alerts and the confirmation arrives politely, without renaming the control. Tab to the locked Audit logging switch: it still takes focus and still says why, which is what aria-disabled buys over disabled.",
   "contract": {
     "useWhen": "An on/off that applies immediately, with the thumb as the second cue.",
     "root": [".ac-switch"],
@@ -24,16 +24,16 @@
     },
     "keyboard": [
       [
-        "Space",
-        "toggles"
-      ],
-      [
         "Tab",
-        "one stop — the drawn track is not focusable"
+        "native: one stop per switch — the drawn track is not focusable"
       ],
       [
         "Enter",
-        "submits the form, as on any checkbox. It does not toggle"
+        "native: submits the form if there is one. It never toggles"
+      ],
+      [
+        "Space",
+        "native: toggles the focused switch"
       ]
     ],
     "states": [
