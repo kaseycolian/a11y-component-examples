@@ -31,15 +31,24 @@ baseline — if something is red before you have touched anything, it is not you
 
 Read these three things before touching anything, in this order:
 
-1. **This file**, top to bottom. It is ~250 lines and it is the whole contract.
+1. **This file**, top to bottom. It is the whole contract.
 2. **`button`'s four files** — `src/library/components/button/{meta.json,component.html,docs.md}` and
    `tests/button.spec.mjs`. It is the worked example of every rule below.
-3. **The row you are about to do**, in [The roster](#the-roster). The notes on rows 1–6 record what
-   actually bit, and they are the reason this file is worth reading rather than skimming.
+3. **The row you are about to do**, in [The roster](#the-roster). Every finished row records what
+   actually bit, and that is the reason this file is worth reading rather than skimming.
 
 Then follow [The procedure](#the-procedure) for `live-region`, exactly.
 
-### What the last session learned, in one place
+**Where the pass stands.** 16 of 33 components done, in roster order — there is no reordering, so the
+next unticked row is always the next job. Four of the twelve renames are applied — `chip-toggle`,
+`field`, `fieldset-group`, `focus-ring`. The other eight happen in their own rows, and
+[Naming decisions](#naming-decisions) is the ledger. Phase 3 (the site's own copy) is untouched and
+stays that way until all 33 are done.
+
+### What the finished rows learned, in one place
+
+Roughly in the order they were learned, each naming the row that taught it. Read it once before
+starting; every one of these cost a debugging detour the first time.
 
 - **Three shapes exist, not one.** Most components split into *Correct examples* + *Common mistakes*
   (`button`, `icon-button`, `chip-toggle`). One correct example means a singular heading, *Correct
@@ -48,8 +57,10 @@ Then follow [The procedure](#the-procedure) for `live-region`, exactly.
 - **Renumbering is the expensive part.** It ripples into `[SECTION] example N` markers in the CSS and
   JS, the order of the blocks in those files, the spec's section comments and block order, and any
   *other* component's prose that names an example number. `chip-toggle` is the worked example.
-- **A rename is 10–15 files, not one.** `grep -rn "<Old Display Name>" src/ docs/` after every one, and
-  look for the name wrapped across two lines of a comment — that is what escaped the first pass twice.
+- **A rename is 10–15 files, not one, and most references are not links.** `grep -rn "<Old Display
+  Name>" src/ docs/` after every one — `focus-ring` had five references and only one was a `docs.md`
+  link; the rest were source comments in three other components and in `tokens.css`. Look for the
+  name wrapped across two lines of a comment, which is what escaped the first pass twice.
 - **The `docs.md` component-specific cap is two sections.** When a component has more, place them
   rather than delete them: `text-input`'s *Read-only is not disabled* became a `###` under States.
   `input-group` had five and needed all three moves — one `###` under Required markup, one under
@@ -73,9 +84,11 @@ Then follow [The procedure](#the-procedure) for `live-region`, exactly.
   invisible to axe — an unfocusable link and a target that never takes focus are not violations — so
   the marker would be a lie the gate then asserts. Move the example into *Common mistakes* and leave
   its markup alone. The marker is for failures the gate can actually see.
-- **Check `component.js` and class names for demo vocabulary, not just comments.** `checkbox` announced "2 of 4
-  *inputs* selected" from a hardcoded string — the demo's audio inputs, shipped in every copy of the
-  component. Step 4 says "change no behavior", and a user-visible string is copy, not behavior.
+- **Check `component.js` and class names for demo vocabulary, not just comments.** `checkbox`
+  announced "2 of 4 *inputs* selected" from a hardcoded string — the demo's audio inputs, shipped in
+  every copy of the component. Step 4 says "change no behavior", and a user-visible string is copy,
+  not behavior. `skip-link`'s `.ac-skip-lineup` and `focus-ring`'s `.ac-fr-track` were the same leak
+  in a class name.
 - **Rewriting demo content can invalidate a test's premise, not just its strings.** `native-select`
   asserted type-ahead by pressing `g` for an option valued `gilman` — but type-ahead matches option
   **text**, and the replacement options had no `g` word. A green suite after a content swap is not
@@ -284,9 +297,16 @@ grep -riEc "setlist|merch|zine|distro|matinee|salad days|ruby soho|gilman|bakesa
   src/library/components/*/component.html | grep -v ":0"
 ```
 
-As of 2026-08-06 the heaviest are `tabs` (24 hits), `data-table` (16), `modal` (13), `jump-nav` (11),
-`fieldset-group` and `prose-surface` (9 each), `native-select` (8) and `radio-group` (7). Everything
-else is five or fewer. The finished rows are gone from this list.
+Re-counted 2026-08-06, after row 16. Every remaining row, heaviest first:
+
+```
+tabs 24 · data-table 16 · modal 13 · jump-nav 11 · prose-surface 9 · result-panel 5 · notice 4
+typography 3 · motion-preferences 2 · effects 2 · tooltip 1 · status-text 1 · live-region 1 · badge 1
+```
+
+`disclosure`, `dropdown` and `drawer` return nothing, but that is not the same as being light —
+`disclosure` is a full retrofit and `dropdown` is 433 lines. The count measures punk vocabulary only,
+not the size of the row. Finished rows are gone from the list.
 
 ---
 
@@ -462,7 +482,7 @@ bound" note, and a `summary` in the new voice.
 | 14 | `skip-link` | [x] | CSS-only. **First two-section page since `chip-toggle`** — example 5 is genuinely broken, so it moved into *Common mistakes* with no renumbering, since it was already last. It carries no `data-ac-demo-broken`, and correctly: neither failure is an axe violation or a `focus-visible`/`target-size` one, so there is nothing for the gate to assert. The `.ac-skip-lineup` mock class became `.ac-skip-people` — demo vocabulary had reached a class name, the way it reached a string in `checkbox`. |
 | 15 | `visually-hidden` | [x] | Two sections, no renumber: 1–3 are the three jobs the class does, 4–5 exist to show failures, so they moved as-is with all four `data-ac-demo-broken` markers untouched. **The split broke a test that nothing else had touched**: the spec's `demo()` helper is `page.locator('.ac-demo-grid')`, and one test called `.evaluate()` straight on it — two grids, strict-mode failure. Chained uses were fine. `contract.keyboard` did not exist and now does, one `native:` Tab row, because the mandatory Keyboard table needs something to agree with. |
 | 16 | `focus-ring` | [x] | **Renamed → Focus Indicator.** Five references, and **only one was a docs link** — the other four are source comments in `effects`, `prose-surface`, `typography` and `tokens.css`. The class prefix stays `.ac-focus-ring`: this is a display-name rename, not a slug one. Two sections, no renumber (1–3 correct, 4–5 the failures; 5 is broken-then-fixed side by side, the icon-button shape). `.ac-fr-track` → `.ac-fr-item`, and the spec's `demo(page).evaluate()` hit the two-grid strict-mode trap the last row recorded. |
-| 17 | `live-region` | [ ] | **NEXT.** |
+| 17 | `live-region` | [ ] | **NEXT.** Scanned, not started. 5 examples, HTML+CSS+JS, **0 `data-ac-demo-broken`** — decide one section or two by reading example 3 (*Three silences*) and 5 (*Repeats*), which discuss failures but may not ship one. `docs.md` has **seven** component-specific `##` against a cap of two, the heaviest yet: *The whole thing*, *Assertive is not "important"*, *An announcer*, *The three silences*, *The same message twice*, *Throttling*, *Where the region goes*. Its spec has the `demo = page.locator('.ac-demo-grid')` helper — check for `.evaluate()` on it before splitting. One punk string: `data-ac-announce="Setlist saved."` in `component.html:58`. |
 | 18 | `typography` | [ ] | 2 broken markers; one is a contrast ratio that must stay broken. |
 | 19 | `motion-preferences` | [ ] | rename → Reduced Motion. |
 | 20 | `effects` | [ ] | rename → Background Effects. |
@@ -528,6 +548,28 @@ Display names are settled first, deliberately. When a slug is ready to move, the
 9. a redirect from the old URL, or accept the break
 
 Steps 5 and 6 fail late. One slug per commit.
+
+---
+
+## Checking the rows already done
+
+The sweeps in [Final verification](#final-verification) only come clean after all 33, because the
+unfinished rows still hold everything they are supposed to. Mid-pass, run them **scoped to the
+finished rows** — that catches a regression in work already signed off, which is the only thing that
+can quietly rot while the pass runs:
+
+```sh
+DONE="button icon-button loading-button chip-toggle field text-input input-group textarea \
+native-select radio-group checkbox switch fieldset-group skip-link visually-hidden focus-ring"
+P=""; for d in $DONE; do P="$P src/library/components/$d"; done
+
+grep -riE "setlist|merch|zine|olympia|berkeley|gilman|bakesale" $P
+grep -rn "## The contract\|## One sentence\|## What to watch for\|## Watch for" $P
+grep -rn 'h3 class="ac-demo__title"' $P
+grep -rn "| Key | Action |\|| Key | Result |" $P
+```
+
+All four return nothing as of row 16. Add each new row to `DONE` as you tick it.
 
 ---
 
