@@ -1,27 +1,83 @@
 ## Before you copy
 
-Your framework has a `<Badge>` already and you should use it. **The decisions on this page are the
-same either way** — they are about what is inside the badge and what it is attached to, not about
-how it is rendered. Take the markup and the CSS, keep the contract, and let your framework own the
-count. This is enough for a person or an agent to start from.
+These files are a working reference, not a package. Move the markup into your own templates and the
+state into your own code. What has to survive that move is the ARIA below, the keyboard behavior, and
+where focus goes — those are the parts that make the component accessible, and the parts that are
+usually dropped.
 
-Each example is separately copyable: the HTML sections are numbered, and the CSS and JS sections say
-which examples need them.
+Every example on this page is numbered and separately copyable. The CSS and JS sections name which
+examples need them.
 
-## One sentence
+## Required markup
 
 The digits are a drawing of the count. The words beside them are the count.
 
-## The contract
-
-| Piece | What it is | Why |
+| Piece | What it is | What it does |
 | --- | --- | --- |
-| `.ac-badge` | the pill | one accent custom property; the tone changes nothing else |
-| `.ac-badge__num` | `aria-hidden="true"`, the digits | may be abbreviated, may be empty, is never read |
-| `.ac-badge__name` | clipped real text — `3 unread messages` | this is the badge |
-| nesting | inside the control the badge counts | its words join that control's accessible name |
-| `.ac-badge--dot` | no digits at all | the words are the only thing left, so they are not optional |
-| the live region | on the area, never on the badge | a badge is usually inside a control |
+| `.ac-badge` | the pill | One accent custom property; the tone changes nothing else. |
+| `.ac-badge__num` | `aria-hidden="true"`, the digits | May be abbreviated, may be empty, is never read. |
+| `.ac-badge__name` | clipped real text — `3 unread messages` | This is the badge. |
+| nesting | inside the control the badge counts | Its words join that control's accessible name. |
+| `.ac-badge--dot` | no digits at all | The words are the only thing left, so they are not optional. |
+| the live region | on the area, never on the badge | A badge is usually inside a control. |
+
+Real clipped text rather than an `aria-label`, for [Icon Button](../icon-button/)'s reasons: an
+attribute cannot be found by find-in-page, is skipped by most translation tools, and cannot be
+un-clipped at a breakpoint. There is a fourth reason here that is the badge's own — **text composes
+into the name of an ancestor and an attribute does not.** That is what makes nesting work.
+
+## Keyboard
+
+| Key | What it does |
+| --- | --- |
+| <kbd>Tab</kbd> | Reaches the control the badge is nested in, never the badge itself. |
+
+**Keys deliberately not bound.** All of them. A badge is not a control: there is nothing to operate
+and nothing to focus. The control it is attached to is what a keyboard reaches, and the badge is part
+of that control's name.
+
+`pointer-events: none` on `.ac-badge--corner`, so the badge cannot swallow a click aimed at the
+button underneath it.
+
+## States
+
+| State | Signaled by | Never signaled by |
+| --- | --- | --- |
+| tone (`--green`, `--blue`) | The words, then the accent. | The accent alone (SC 1.4.1). |
+| `--solid` | A filled pill, and the same words. | — |
+| `--dot` | The clipped words, which are all it has. | The dot itself, which is shape and color only. |
+| zero | The badge is gone. | A badge drawn with a `0` in it. |
+
+Under `forced-colors: active` the tinted fill and every accent collapse into `Canvas` and
+`CanvasText`, so the tones stop being told apart. Nothing puts the difference back, because nothing
+can — the words never depended on it. `--solid` and `--dot` are reversed so a filled badge is still
+filled.
+
+### When there is no number to read
+
+Three badges in example 4 have nothing readable in the digits, and each fails differently if you
+treat the digits as the content:
+
+- **`99+`** is a shortening of the drawing. The words stay long: `99 or more unread messages`. The
+  `+` is punctuation and announces as one.
+- **A dot** has no number at all — it is pure color and shape, which [Alert](../notice/) has the
+  argument about. What is badge-specific is that there is no digit to fall back on, so the clipped
+  words are the entire component. A dot without them announces nothing.
+- **Zero** is not a badge. It is removed rather than drawn empty, and the words go with it, because a
+  hidden element is out of the accessibility tree.
+
+`.ac-badge[hidden] { display: none }` is declared explicitly and it is load-bearing. `display:
+inline-flex` on the badge is an author declaration and the UA's `[hidden]` rule is not, so without
+that line the zero badge stays on screen — [Tooltip](../tooltip/) hit the same thing.
+
+## Screen reader behavior
+
+Expected: example 1's first button reads as *"Inbox 3 unread messages, button"*; its list rows read
+as *"Project 462 · Billing migration, New"*. Example 5's specimen announces one sentence per message
+and the badge itself announces nothing.
+
+**Not yet verified against real assistive technology.** Until `docs/at-support.md` has a row for this
+component, treat the above as intent, not measurement.
 
 ## The number needs a subject
 
@@ -40,11 +96,6 @@ Example 2 has four badges that all show `3`, with the announced text printed und
 
 The third one is the one that ships. Someone adds the clipped subject, does not hide the digits, and
 the count is announced twice — it reads as a stutter rather than as a bug, so nobody files it.
-
-Real clipped text rather than an `aria-label`, for [Icon Button](../icon-button/)'s reasons: an
-attribute cannot be found by find-in-page, is skipped by most translation tools, and cannot be
-un-clipped at a breakpoint. There is a fourth reason here that is the badge's own — **text composes
-into the name of an ancestor and an attribute does not.** That is what makes nesting work.
 
 ## Attach it, do not merely place it
 
@@ -71,24 +122,7 @@ The cost of nesting is that the control is renamed whenever the count changes �
 the right trade: the name is what a reader arriving at the button needs, and there is no other way
 to attach a badge to a control without inventing a relationship ARIA does not have.
 
-## When there is no number to read
-
-Three badges in example 4 have nothing readable in the digits, and each fails differently if you
-treat the digits as the content:
-
-- **`99+`** is a shortening of the drawing. The words stay long: `99 or more unread messages`. The
-  `+` is punctuation and announces as one.
-- **A dot** has no number at all — it is pure color and shape, which [Alert](../notice/) has the
-  argument about. What is badge-specific is that there is no digit to fall back on, so the clipped
-  words are the entire component. A dot without them announces nothing.
-- **Zero** is not a badge. It is removed rather than drawn empty, and the words go with it, because a
-  hidden element is out of the accessibility tree.
-
-`.ac-badge[hidden] { display: none }` is declared explicitly and it is load-bearing. `display:
-inline-flex` on the badge is an author declaration and the UA's `[hidden]` rule is not, so without
-that line the zero badge stays on screen — [Tooltip](../tooltip/) hit the same thing.
-
-## When the count changes
+### When the count changes
 
 [Status Label](../status-text/) has the argument about which element carries the live role, and it is
 sharper here: a corner badge is *inside a button*, so `role="status"` on it puts a live region inside
@@ -112,33 +146,6 @@ when a reader arrives at it, which is the opposite of what the attribute was add
 The specimen's button *is* renamed by every message, and that is fine. A name change is what the
 next reader to arrive is given, not something the current one is told; the region is what tells them.
 Do not try to fix the rename by taking the count out of the name.
-
-## States
-
-| State | Signaled by | Not by |
-| --- | --- | --- |
-| tone (`--green`, `--blue`) | the words, then the accent | never the accent alone |
-| `--solid` | a filled pill, and the same words | — |
-| zero | the badge is gone | never a badge drawn with a `0` in it |
-
-Under `forced-colors: active` the tinted fill and every accent collapse into `Canvas` and
-`CanvasText`, so the tones stop being told apart. Nothing puts the difference back, because nothing
-can — the words never depended on it. `--solid` and `--dot` are reversed so a filled badge is still
-filled.
-
-## Keyboard
-
-A badge is not a control. There is nothing to operate and nothing to focus — the control it is
-attached to is what a keyboard reaches, and the badge is part of its name.
-
-`pointer-events: none` on `.ac-badge--corner` so the badge cannot swallow a click aimed at the
-button underneath it.
-
-## Screen reader behavior
-
-Not yet tested against a screen reader. What the markup asks for: example 1's first button reads as
-*"Inbox 3 unread messages, button"*; its list rows read as *"Zine 462 · the VFW hall issue, New"*.
-Example 5's specimen announces one sentence per message and the badge itself announces nothing.
 
 ## API
 
@@ -180,14 +187,24 @@ The part that does not survive the port is the region's lifetime: a `role="statu
 the same moment as the sentence inside it was never being watched. Render the region unconditionally
 and let only its contents be conditional.
 
-## What to watch for
+## Common mistakes
 
-- **A badge holding only digits.** It announces a number and nothing else.
+- **A badge holding only digits.** It announces a number and nothing else. Example 2.
 - **`aria-hidden` on the whole badge.** The over-correction: the count is not named, it is deleted.
-- **The subject added, the digits left visible.** The count is announced twice.
+  Example 2.
+- **The subject added, the digits left visible.** The count is announced twice. Example 2.
 - **A badge positioned over a control instead of inside it.** The control's name never mentions it.
+  Example 3.
 - **`role="status"` on the badge.** A live region inside a button: it interrupts with a fragment,
-  and the count vanishes from the button's name.
-- **`99+` in the words.** Abbreviate the drawing, spell out the sentence.
-- **A dot with no clipped text.** It announces nothing at all.
-- **A badge drawn with `0` in it.** Remove it instead.
+  and the count vanishes from the button's name. Example 5.
+- **`99+` in the words.** Abbreviate the drawing, spell out the sentence. Example 4.
+- **A dot with no clipped text.** It announces nothing at all. Example 4.
+- **A badge drawn with `0` in it.** Remove it instead. Example 4.
+
+## Related
+
+- [Status Label](../status-text/) — a word rather than a number, with the same argument about which
+  element carries the live role.
+- [Icon Button](../icon-button/) — where the clipped-text-over-`aria-label` reasoning lives, and the
+  control a badge is most often pinned to.
+- [Live Region](../live-region/) — the clear-then-write recipe example 5's region uses.

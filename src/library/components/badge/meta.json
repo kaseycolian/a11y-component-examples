@@ -18,7 +18,7 @@
   "wcag": ["1.3.1", "1.4.1", "1.4.11", "4.1.2", "4.1.3"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Examples 2 to 5 are live. Example 2 prints what four identical-looking badges are read out as; example 3 puts the same badge inside a button and beside it and prints the button's name; example 4 has the badges with no number to read; example 5 counts messages in and logs what a screen reader was handed each time.",
+  "demoNote": "Everything under Common mistakes is live, and every readout prints what the badge is actually read out as. On screen the failing badges and the correct ones are identical.",
   "contract": {
     "useWhen": "A count on a control, where the digits are not the thing being announced.",
     "root": [".ac-badge"],
@@ -27,6 +27,18 @@
         "aria-hidden=true"
       ]
     },
+    "keyboard": [
+      [
+        "Tab",
+        "native: reaches the control the badge is nested in, never the badge itself"
+      ]
+    ],
+    "states": [
+      "tone",
+      "solid",
+      "dot",
+      "zero — the badge is removed, never drawn with a 0 in it"
+    ],
     "failureModes": [
       "the digits are the whole badge, so its name is a bare number",
       "aria-hidden on the badge, which deletes the count instead of naming it",

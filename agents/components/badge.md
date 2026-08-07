@@ -12,6 +12,12 @@ In `library/components/badge/` — copy `component.{html,css,js}`, read `docs.md
 
 - **the digits** — `aria-hidden=true`
 
+## Keyboard
+
+- `Tab` — native: reaches the control the badge is nested in, never the badge itself
+
+**States:** tone, solid, dot, zero — the badge is removed, never drawn with a 0 in it
+
 ## Goes wrong when
 
 - the digits are the whole badge, so its name is a bare number
