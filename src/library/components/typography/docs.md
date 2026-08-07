@@ -237,6 +237,6 @@ does not wrap. Without it, one long word scrolls the whole page sideways.
 
 ## Related
 
-- [Prose Surface](../prose-surface/) — the same scale applied to a block of authored markup.
+- [Rich Text Content](../prose-surface/) — the same scale applied to a block of authored markup.
 - [Focus Indicator](../focus-ring/) — the ring on the links here, which this component does not draw.
 - [Visually Hidden](../visually-hidden/) — text that is read but not drawn, the opposite trade.

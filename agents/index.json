@@ -463,7 +463,7 @@
     },
     {
       "slug": "prose-surface",
-      "name": "Prose Surface",
+      "name": "Rich Text Content",
       "group": "data-display",
       "useWhen": "A scrolling box of prose, named from the heading inside it.",
       "tags": ["prose", "long-form", "scroll-region", "blockquote", "figcaption", "pre", "separator", "cms", "forced-colors"],
@@ -472,7 +472,7 @@
       "files": ["html", "css"],
       "status": "stable",
       "hasContract": true,
-      "_summaryRev": "c128d7dc"
+      "_summaryRev": "bab05b5e"
     }
   ]
 }

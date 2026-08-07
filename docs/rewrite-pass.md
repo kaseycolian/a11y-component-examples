@@ -12,25 +12,28 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 
 ## START HERE
 
-**Phase 0 is done. Components 1–32 are done. Next up is row 33, `prose-surface` — the last one.**
+**Phase 0 is done. All 33 components are done. Next up is [Phase 3](#phase-3--the-site-after-all-33),
+the site's own copy.**
 
-Last updated 2026-08-07, after row 32. The repo was left green:
+Last updated 2026-08-07, after row 33 — the last component row. The repo was left green:
 
 ```
 check:tokens                      34 files clean
 check:agents                      42 surfaces match their sources
 npm run build                     35 pages
-npx playwright test --project=chromium data-table                 21 passed
+npx playwright test --project=chromium prose-surface              31 passed
 npx playwright test --project=chromium agent-surfaces            117 passed
-npx playwright test --project=chromium a11y -g data-table         34 passed
+npx playwright test --project=chromium a11y -g "prose-surface|typography|result-panel"
+                                                                 121 passed
 ```
 
-The full suite was re-run at row 32: **1220 passed**, exit 0 — unchanged since row 21, because rows
-22 to 32 added no tests. It is the honest baseline: if something is red before you have touched
+The full suite was re-run at row 33: **1220 passed**, exit 0 — unchanged since row 21, because rows
+22 to 33 added no tests. It is the honest baseline: if something is red before you have touched
 anything, it is not your change.
 
 **A row that touches `src/site/` makes the whole suite the check, not the slug.** Row 22 changed
-`site.css` and needed it; rows 23 to 32 touched only their own folders and did not.
+`site.css` and needed it; rows 23 to 33 touched only their own folders and did not. **Phase 3 is
+entirely `src/site/`,** so every item in it is in row 22's position: run the whole suite, not a slug.
 
 **A full run can flake, so re-run before you conclude anything.** One at row 19 reported *4 failed,
 1202 passed*; the identical tree at row 20 came back 1206/1206. Nothing was fixed in between. Four
@@ -39,25 +42,28 @@ signature, not a regression — confirm with a second run before you go hunting.
 a file you keep**: the row-19 log was truncated to its last seven lines, which cost the failing names
 and made the question unanswerable.
 
-Read these three things before touching anything, in this order:
+Read these two things before touching anything, in this order:
 
-1. **This file**, top to bottom. It is the whole contract.
+1. **This file**, top to bottom. It is the whole contract, and
+   [What the finished rows learned](#what-the-finished-rows-learned-in-one-place) is the part that
+   cost something.
 2. **`button`'s four files** — `src/library/components/button/{meta.json,component.html,docs.md,tests/button.spec.mjs}`.
    It is the worked example of every rule below. **A spec lives inside its component's folder**, not in
    the repo-root `tests/` — that one holds only the shared gate and the site-shell specs, and looking
    for `tests/<slug>.spec.mjs` there finds nothing.
-3. **The row you are about to do**, in [The roster](#the-roster). Every finished row records what
-   actually bit, and that is the reason this file is worth reading rather than skimming.
 
-Then follow [The procedure](#the-procedure) for `prose-surface`, exactly. It is the last row, and
-the last rename; after it, Phase 3 opens.
+Then do [Phase 3](#phase-3--the-site-after-all-33). It is five files of site copy, not a component,
+so [The procedure](#the-procedure) does not apply to it — the [style rules](#the-style-rules) do.
 
-**Where the pass stands.** 32 of 33 components done, in roster order — there is no reordering, so the
-next unticked row is always the next job. Eleven of the twelve renames are applied — `chip-toggle`,
-`dropdown`, `effects`, `field`, `fieldset-group`, `focus-ring`, `jump-nav`, `motion-preferences`,
-`notice`, `result-panel`, `status-text`. The last one, `prose-surface` → Rich Text Content, happens in
-its own row, and [Naming decisions](#naming-decisions) is the ledger. Phase 3 (the site's own copy)
-is untouched and stays that way until all 33 are done.
+**Where the pass stands.** All 33 components are done, and **all twelve renames are applied** —
+`chip-toggle`, `dropdown`, `effects`, `field`, `fieldset-group`, `focus-ring`, `jump-nav`,
+`motion-preferences`, `notice`, `prose-surface`, `result-panel`, `status-text`.
+[Naming decisions](#naming-decisions) is the ledger and every row in it is ticked.
+
+Every component page now has the same shape: `## Before you copy` with the verbatim template, the
+canonical `docs.md` heading order, `<h4>` example titles under one or two `<h3>` section headings,
+and demo content from [the shared vocabulary](#the-demo-vocabulary). The
+[sweeps](#checking-the-rows-already-done) that check that run over all 33 and return nothing.
 
 `docs/BUILD-STATUS.md` is **not** the active work — all 33 components are built, and its "START HERE"
 was written mid-build. It is still the place for the build history and **Gotchas already solved**.
@@ -158,6 +164,11 @@ starting; every one of these cost a debugging detour the first time.
   `showModal()` leaves to the author. Retitling them made the page argue something the old `summary`
   did not, and the old `contract.useWhen` then agreed with neither. **Reread `useWhen` against the new
   titles, not only against the new summary** — `check:agents` fires its receipt on the summary alone.
+- **Run the slug's spec immediately after a content sweep, before reading anything.** `prose-surface`
+  ended with one red test: a `toHaveText(/99 cents/)` against a sentence the sweep had already
+  replaced. The string grep that drove the sweep had found three other places and missed this one,
+  because the assertion sits in a different test and reads `ariaSnapshot` output rather than the
+  element. A grep over the spec finds strings; only running it finds the ones that are computed.
 - **A section that is the canonical one under another name gets merged, not demoted.** `data-table`
   had `## What a screen reader does with it` *and* `## Screen reader behavior`, and the first was the
   better half of the second. Merging them freed a component-specific slot without losing a sentence.
@@ -468,7 +479,7 @@ paths do not move.
 | `jump-nav` | Jump Nav | **In-Page Navigation** | [x] |
 | `motion-preferences` | Motion Preferences | **Reduced Motion** | [x] |
 | `notice` | Notice | **Alert** | [x] |
-| `prose-surface` | Prose Surface | **Rich Text Content** | [ ] |
+| `prose-surface` | Prose Surface | **Rich Text Content** | [x] |
 | `result-panel` | Result Panel | **Copyable Result** | [x] |
 | `status-text` | Status Text | **Status Label** | [x] |
 
@@ -643,7 +654,7 @@ bound" note, and a `summary` in the new voice.
 | 30 | `badge` | [x] | No rename. **The split was the closest call of the pass, and a third tiebreaker settled it.** Example 4 is *Badges with no number in them*: an abbreviation, a bare dot, a named dot and a zero — three correct answers and one live failure, so it reads as a correct-examples entry. `contract.failureModes` does not list the bare dot, which by the `effects` rule would put it in *Correct examples* and cost a renumber of 4→2, 2→3, 3→4, plus a JS block move. What decided it the other way is **the component's own file header**: *"Examples 2 to 5 are the four ways a number this small goes wrong, live."* The page had already classified itself. So the `typography` shape for the fifth row running, and nothing renumbered. **`contract.keyboard` and `contract.states` both did not exist and now do** — a `native:` <kbd>Tab</kbd> row saying the badge is never the tab stop, and four states the CSS already draws. Content was one line: *Zine 462 · the VFW hall issue* and *Thread · Storm Windows test pressing* → *Project 462 · Billing migration* and *Thread · Invoice 99 dispute*; the spec asserted neither. All six example titles were rewritten — every one of them argued (*Three is not a name*, *Attached, or merely nearby*, *When the digits stop counting*), which is this component's whole voice and exactly what the rule is against. `docs.md` had four component-specific `##` against a cap of two: *When there is no number to read* became a `###` under States and *When the count changes* a `###` under *Attach it, do not merely place it*; that one and *The number needs a subject* stayed. `## Related` is new. |
 | 31 | `result-panel` | [x] | **Renamed → Copyable Result.** Three references, the smallest ripple of the eleven, and both non-`meta.json` ones are in `prose-surface` — the two components that share the min-content finding. `.ac-result` and `AC.createResultPanel` keep their spelling. **The `typography` shape for the sixth row running**, confirmed by the file header the way `badge`'s was: *"Examples 2 to 5 are the four ways a panel made of other components goes wrong."* No renumber. Content was one URL repeated six times plus three query fragments: the whole demo was a punk gig link, and the fake key inside it was `sk_test_99RubySohoLinoleumStormWindows462` → `sk_test_462abcdefg99abcdefg462abcdefg`, the documented shape. **The key is the one string on this page that has to be got right the first time** — see [The demo vocabulary](#the-demo-vocabulary); `abcdefg` is deliberately not hex, which is what keeps GitHub's push protection out of it. `contract.keyboard` gained a `native:` <kbd>Enter</kbd> / <kbd>Space</kbd> row. `docs.md`: the `\| Key \| Where \| Does \|` table was the last one in the library for the second time — `tabs` cleared the others at row 26 and this one was missed by that sweep because it lives under a different heading order. Four component-specific `##` against a cap of two: *The copy button* became a `###` under Required markup and *The empty panel* a `###` under States; *What this component owns* and *The value has to be able to break* stayed. `## Related` is new, and `## Keyboard` had to be moved back above `## States` after the section shuffle. |
 | 32 | `data-table` | [x] | CSS-only, no rename, and the **`typography` shape for the seventh row running** — confirmed by the file header again: *"Examples 2 to 5 are the four ways a table loses the relationships it was built for."* No renumber, and no CSS section marker moved. The content sweep was the heaviest of the pass by volume: a merch table became a stock table, so `Merch table, second night` / `Ruby pressing` / `Clear pressing` / `Tour shirt` / `Zine` / `Thursday`–`Saturday` / `Made` / `Left` → `Stock by item` / `Standing desk` / `Office chair` / `Monitor stand` / `Desk lamp` / `Jan`–`Mar` / `Ordered` / `In stock`, across 8 captions, 6 column headers and 20 spec assertions. **`Left` was the trap**: it is a column name, a `data-label`, a readout value and part of the composed string `Left: 37`, so the replacement list is ordered longest-first and `>Left<` is matched with its angle brackets rather than bare. `docs.md` had five component-specific `##` against a cap of two: *`scope` when the browser could guess* and *A wide table scrolls, it does not restack* became `###` under Required markup, and **`## What a screen reader does with it` merged into `## Screen reader behavior`** rather than being demoted — it was the canonical section under another name. *The caption is the name* and *The card restyle* stayed. There is no `## API` and no `## Using it in a framework`, correctly: the canonical order marks both JS-only and this component has none. |
-| 33 | `prose-surface` | [ ] | **NEXT, and last.** rename → Rich Text Content. heavy punk content. |
+| 33 | `prose-surface` | [x] | **Renamed → Rich Text Content**, the twelfth and last: three references, two of them outside `meta.json`. `.ac-prose` keeps its spelling. CSS-only, no renumber, and the **`typography` shape for the eighth row running** — the file header settles it again. The content is the whole point of this component, so the sweep was a rewrite rather than a substitution: a punk zine article became a help-centre article about exporting a report, and every readout string moved with it. **Sixth and last stranded-heading row, and the deepest**: the surfaces ship their own `<h4>`/`<h5>` headings *by design* — the file header explains that the component takes whatever level the host page left — so demoting the demo titles to `<h4>` pushed the surface headings to `<h5>` and `<h6>`. The spec asserts both levels in an `ariaSnapshot`, so it moved with them, and the file header's own sentence about which level they start at had to be rewritten. **The one test failure of the row was an assertion on a sentence I had already replaced** — `toHaveText(/99 cents/)` against text that now reads *the row cap is 10,000*. It was in a different test from the three the string grep found, because it asserts on `ariaSnapshot` output rather than on the element. Run the slug's spec after a content sweep before anything else; it is faster than reading. `docs.md` had five component-specific `##` against a cap of two: *A `<pre>` needs its own overflow* and *The attribution is not the quotation* became `###` under Required markup, and *Bullets and rules that are only drawn* a `###` under *Style by element*; that one and *Scrolling, and when not to* stayed. The `\| Key \| Where \| Does \|` table is gone — the third and genuinely last one. |
 
 ### Phase 0 — the contract and the tracker
 
@@ -699,14 +710,14 @@ Steps 5 and 6 fail late. One slug per commit.
 ## Checking the rows already done
 
 The sweeps in [Final verification](#final-verification) only come clean after all 33, because the
-unfinished rows still hold everything they are supposed to. Mid-pass, run them **scoped to the
-finished rows** — that catches a regression in work already signed off, which is the only thing that
-can quietly rot while the pass runs:
+unfinished rows still hold everything they are supposed to. **All 33 are now done, so the two are the
+same sweep** — `$P` is every component — and both come clean. Keep running them anyway: they are what
+catches a regression in work already signed off, which is the only thing that can quietly rot.
 
 ```sh
 DONE="button icon-button loading-button chip-toggle field text-input input-group textarea \
 native-select radio-group checkbox switch fieldset-group skip-link visually-hidden focus-ring \
-live-region typography motion-preferences effects disclosure dropdown modal drawer tooltip tabs jump-nav notice status-text badge result-panel data-table"
+live-region typography motion-preferences effects disclosure dropdown modal drawer tooltip tabs jump-nav notice status-text badge result-panel data-table prose-surface"
 P=""; for d in $DONE; do P="$P src/library/components/$d"; done
 ls -d $P | wc -l          # must equal the number of finished rows, or every grep below is vacuous
 
@@ -725,10 +736,10 @@ done
 # Applied renames, across the whole repo rather than the finished rows -- an old
 # display name can come back in any component's prose. Add each new one as you
 # apply it, and drop the slug's own folder from the [ ] rows still to come.
-grep -rn "Chip Toggle\|Dropdown / Listbox\|Fieldset Group\|Focus Ring\|Jump Nav\|Motion Preferences\|Result Panel\|Status Text" src/ docs/
+grep -rn "Chip Toggle\|Dropdown / Listbox\|Fieldset Group\|Focus Ring\|Jump Nav\|Motion Preferences\|Prose Surface\|Result Panel\|Status Text" src/ docs/
 ```
 
-All five return nothing as of row 32 — and **check the sanity of `$P` before believing that**, because
+All five return nothing as of row 33, over all 33 components — and **check the sanity of `$P` before believing that**, because
 every one of them is a grep over a path list and a wrong `DONE` or a failed `cd` makes all five pass
 vacuously. `ls -d $P | wc -l` should print the number of finished rows. The rename sweep below returns
 only its own rows in

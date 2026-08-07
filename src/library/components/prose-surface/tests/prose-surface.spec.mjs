@@ -32,10 +32,10 @@ test('the surface is a named region, and the name is its own first heading', asy
   const surface = page.locator('#ps1');
   await expect(surface).toHaveAttribute('role', 'region');
   await expect(surface).toHaveAttribute('tabindex', '0');
-  await expect(surface).toHaveAccessibleName('Notes from the basement');
+  await expect(surface).toHaveAccessibleName('Exporting a report');
 
   // Written once: the name comes from the heading that is already on screen.
-  await expect(page.locator('#ps1-h')).toHaveText('Notes from the basement');
+  await expect(page.locator('#ps1-h')).toHaveText('Exporting a report');
 });
 
 test('the surface scrolls vertically and never sideways', async ({ page }) => {
@@ -57,13 +57,13 @@ test('the surface shows a ring when it takes focus', async ({ page }) => {
 test('the specimen carries the whole flow, with the structure intact', async ({ page }) => {
   const snapshot = await page.locator('#ps1').ariaSnapshot();
 
-  expect(snapshot).toContain('region "Notes from the basement"');
-  expect(snapshot).toContain('heading "Notes from the basement" [level=4]');
-  expect(snapshot).toContain('heading "Doors at nine" [level=5]');
+  expect(snapshot).toContain('region "Exporting a report"');
+  expect(snapshot).toContain('heading "Exporting a report" [level=5]');
+  expect(snapshot).toContain('heading "What is included" [level=6]');
   expect(snapshot).toContain('blockquote');
   expect(snapshot).toContain('listitem');
   expect(snapshot).toContain('separator');
-  expect(snapshot).toContain('region "Setlist query, sample"');
+  expect(snapshot).toContain('region "Export request, sample"');
 });
 
 test('a host page h1-h6 rule cannot leak into a surface heading', async ({ page }) => {
@@ -124,7 +124,7 @@ test('the scrolling <pre> is a stop whether or not anyone asked for one', async 
 
   await expect(readout(page, 'code-stop-bare')).toHaveText('0');
   await expect(readout(page, 'code-stop-scroll')).toHaveText(/no role, no name/);
-  await expect(readout(page, 'code-stop-named')).toHaveText(/Setlist query, region/);
+  await expect(readout(page, 'code-stop-named')).toHaveText(/Export request, region/);
 });
 
 test('only the named <pre> announces as anything', async ({ page }) => {
@@ -134,7 +134,7 @@ test('only the named <pre> announces as anything', async ({ page }) => {
 
   const named = page.locator('#ps2c-pre');
   await expect(named).toHaveAttribute('role', 'region');
-  await expect(named).toHaveAccessibleName('Setlist query');
+  await expect(named).toHaveAccessibleName('Export request');
 });
 
 test("the named <pre>'s ring is inset, so the surface cannot clip it", async ({ page }) => {
@@ -160,10 +160,10 @@ test('the code never wraps, in any of the three', async ({ page }) => {
 test('the attribution inside the blockquote is part of the quotation', async ({ page }) => {
   const snapshot = await page.locator('#ps3a').ariaSnapshot();
   expect(snapshot).toContain('blockquote');
-  expect(snapshot).toContain('Ruby, on the door');
+  expect(snapshot).toContain('Priya Patel, Billing');
 
   await expect(readout(page, 'quote-role-inside')).toHaveText('blockquote');
-  await expect(readout(page, 'quote-end-inside')).toHaveText(/Ruby, on the door/);
+  await expect(readout(page, 'quote-end-inside')).toHaveText(/Priya Patel, Billing/);
 });
 
 test('a div with a bar quotes nothing', async ({ page }) => {
@@ -196,10 +196,10 @@ test('all three quotes are the same shape on screen', async ({ page }) => {
 test('the figure keeps the attribution out of the quotation', async ({ page }) => {
   const quote = await page.locator('#ps3c').ariaSnapshot();
   expect(quote).toContain('blockquote');
-  expect(quote).not.toContain('Ruby, on the door');
+  expect(quote).not.toContain('Priya Patel, Billing');
 
   // The figcaption is the figure's name, and it sits beside the quote.
-  await expect(page.locator('#ps3c-fig')).toHaveAccessibleName('Ruby, on the door');
+  await expect(page.locator('#ps3c-fig')).toHaveAccessibleName('Priya Patel, Billing');
 
   await expect(readout(page, 'quote-role-figure')).toHaveText('blockquote');
   await expect(readout(page, 'quote-end-figure')).toHaveText(/in the morning\.$/);
@@ -264,9 +264,9 @@ test('both boxes hold the same overflow, and only one can be read to the end', a
 });
 
 test('the clipped text is still announced, which is what makes it a bug', async ({ page }) => {
-  await expect(page.locator('#ps5a-last')).toHaveText(/99 cents/);
+  await expect(page.locator('#ps5a-last')).toHaveText(/row cap is 10,000/);
   const snapshot = await page.locator('#ps5a').ariaSnapshot();
-  expect(snapshot).toContain('99 cents');
+  expect(snapshot).toContain('row cap is 10,000');
 
   await expect(readout(page, 'box-tree-clip')).toHaveText('yes');
   await expect(readout(page, 'box-tree-scroll')).toHaveText('yes');

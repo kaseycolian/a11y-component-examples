@@ -408,7 +408,7 @@ test('every tab stop on the demo has an accessible name', async ({ page }) => {
   // The clamp in example 2 uses `overflow: clip` because clip makes no scroll
   // container at all. `hidden` would make one only script can scroll, which
   // silently scrolls a focused descendant into view. (It does not add a tab stop
-  // -- corrected while building Prose Surface, which measures it.)
+  // -- corrected while building Rich Text Content, which measures it.)
   const grid = page.locator('.ac-demo-grid');
   await grid.locator('[data-ac-rp-run]').focus();
 
