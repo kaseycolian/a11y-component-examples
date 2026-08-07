@@ -10,55 +10,55 @@ test.beforeEach(async ({ page }) => {
 // two fieldset quirks are handled, that a group error reaches the control the
 // person is standing on, and that only one of the two locks cascades.
 
-/* --- example 1 · the baseline --------------------------------------------- */
+/* --- example 1 · baseline group --------------------------------------------- */
 
 test('the legend names the group', async ({ page }) => {
-  await expect(page.getByRole('group', { name: 'Rider', exact: true })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Delivery instructions', exact: true })).toBeVisible();
 });
 
 test('the legend is the first child, or it names nothing', async ({ page }) => {
   const tag = await page
-    .getByRole('group', { name: 'Rider', exact: true })
+    .getByRole('group', { name: 'Delivery instructions', exact: true })
     .evaluate((el) => el.firstElementChild.tagName);
   expect(tag).toBe('LEGEND');
 });
 
 test('each control keeps its own name and its own tab stop', async ({ page }) => {
-  const towels = page.getByRole('checkbox', { name: 'Two clean towels' });
+  const signature = page.getByRole('checkbox', { name: 'Signature required' });
 
-  // The legend is the subject, not part of the name: "Rider Two clean towels"
-  // would be read on every box.
-  await expect(towels).toHaveAccessibleName('Two clean towels');
+  // The legend is the subject, not part of the name: "Delivery instructions
+  // Signature required" would be read on every box.
+  await expect(signature).toHaveAccessibleName('Signature required');
 
-  await page.locator('#ac-fg-water').focus();
+  await page.locator('#ac-fg-desk').focus();
   await page.keyboard.press('Tab');
-  await expect(towels).toBeFocused();
+  await expect(signature).toBeFocused();
 });
 
 test('the row is the target, and it clears 44px', async ({ page }) => {
-  const row = page.locator('label[for="ac-fg-towels"]');
+  const row = page.locator('label[for="ac-fg-signature"]');
   const box = await row.boundingBox();
 
   // A 1.15rem square is an 18px target and fails SC 2.5.8 on its own.
   expect(box.height).toBeGreaterThanOrEqual(44);
 
   await row.click();
-  await expect(page.locator('#ac-fg-towels')).toBeChecked();
+  await expect(page.locator('#ac-fg-signature')).toBeChecked();
 });
 
 test('Space toggles, since the group adds no keys of its own', async ({ page }) => {
-  const towels = page.locator('#ac-fg-towels');
+  const signature = page.locator('#ac-fg-signature');
 
-  await towels.focus();
+  await signature.focus();
   await page.keyboard.press('Space');
-  await expect(towels).toBeChecked();
+  await expect(signature).toBeChecked();
 });
 
 /* --- the two fieldset quirks ---------------------------------------------- */
 
 test('the fieldset is allowed to shrink', async ({ page }) => {
   const min = await page
-    .getByRole('group', { name: 'Rider', exact: true })
+    .getByRole('group', { name: 'Delivery instructions', exact: true })
     .evaluate((el) => getComputedStyle(el).minInlineSize);
 
   // A fieldset defaults to min-content, which is the one box on a page that
@@ -67,7 +67,7 @@ test('the fieldset is allowed to shrink', async ({ page }) => {
 });
 
 test('the layout is on the body div, not on the fieldset', async ({ page }) => {
-  const group = page.getByRole('group', { name: 'Rider', exact: true });
+  const group = page.getByRole('group', { name: 'Delivery instructions', exact: true });
 
   // A <legend> cannot be a flex item, and older Safari will not make a fieldset
   // a flex container at all.
@@ -80,10 +80,10 @@ test('the layout is on the body div, not on the fieldset', async ({ page }) => {
 /* --- example 2 · one answer, several inputs -------------------------------- */
 
 test('parts of one answer share the question and keep their own labels', async ({ page }) => {
-  const group = page.getByRole('group', { name: 'Doors open' });
+  const group = page.getByRole('group', { name: 'Pickup time' });
 
   await expect(group).toBeVisible();
-  await expect(page.getByRole('textbox', { name: 'Hour' })).toHaveValue('19');
+  await expect(page.getByRole('textbox', { name: 'Hour' })).toHaveValue('09');
   await expect(page.getByRole('textbox', { name: 'Minute' })).toHaveValue('30');
 });
 
@@ -92,20 +92,20 @@ test('the separator is decoration and is not announced', async ({ page }) => {
 });
 
 test('the group hint describes the group', async ({ page }) => {
-  await expect(page.getByRole('group', { name: 'Doors open' })).toHaveAccessibleDescription(
-    /Curfew is 23:00/,
+  await expect(page.getByRole('group', { name: 'Pickup time' })).toHaveAccessibleDescription(
+    /closes at 17:00/,
   );
 });
 
 /* --- example 3 · role="group" named by a heading --------------------------- */
 
 test('a role="group" is named by the heading it points at', async ({ page }) => {
-  const group = page.getByRole('group', { name: 'Technical rider' });
+  const group = page.getByRole('group', { name: 'Invoice options' });
 
   await expect(group).toBeVisible();
   // The point of the variant: the name is a real heading, so it lands in the
   // heading list a screen reader user navigates a long form with.
-  await expect(page.getByRole('heading', { name: 'Technical rider' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Invoice options' })).toBeVisible();
 });
 
 /* --- example 4 · pick at least one ---------------------------------------- */
@@ -120,28 +120,28 @@ test('the error region exists, empty, before it has anything to say', async ({ p
 });
 
 test('nothing is invalid before the group has been touched', async ({ page }) => {
-  await expect(page.locator('#ac-fg-singles')).not.toHaveAttribute('aria-invalid', 'true');
+  await expect(page.locator('#ac-fg-pay-card')).not.toHaveAttribute('aria-invalid', 'true');
   await expect(page.locator('.ac-group--invalid')).toHaveCount(0);
 });
 
 test('emptying the group is reported, and the message reaches every control', async ({ page }) => {
-  const singles = page.locator('#ac-fg-singles');
+  const card = page.locator('#ac-fg-pay-card');
   const error = page.locator('[data-ac-group-error]');
 
-  await singles.uncheck();
+  await card.uncheck();
 
   await expect(error).toHaveText(/Pick at least one/);
-  await expect(singles).toHaveAttribute('aria-invalid', 'true');
+  await expect(card).toHaveAttribute('aria-invalid', 'true');
 
   // Every checkbox, not just the fieldset: a fieldset's own description is read
   // inconsistently, and never again once focus is on the third box.
-  for (const id of ['ac-fg-singles', 'ac-fg-tapes', 'ac-fg-shirts', 'ac-fg-zines']) {
+  for (const id of ['ac-fg-pay-card', 'ac-fg-pay-bank', 'ac-fg-pay-invoice', 'ac-fg-pay-credit']) {
     await expect(page.locator(`#${id}`)).toHaveAccessibleDescription(/Pick at least one/);
   }
 });
 
 test('the group is not signaled as invalid by color alone', async ({ page }) => {
-  await page.locator('#ac-fg-singles').uncheck();
+  await page.locator('#ac-fg-pay-card').uncheck();
 
   const group = page.locator('.ac-group--invalid');
   const width = await group.evaluate((el) => parseFloat(getComputedStyle(el).borderTopWidth));
@@ -154,13 +154,13 @@ test('the group is not signaled as invalid by color alone', async ({ page }) => 
 });
 
 test('answering the question clears the error and the invalid state', async ({ page }) => {
-  const singles = page.locator('#ac-fg-singles');
+  const card = page.locator('#ac-fg-pay-card');
 
-  await singles.uncheck();
-  await page.locator('#ac-fg-zines').check();
+  await card.uncheck();
+  await page.locator('#ac-fg-pay-credit').check();
 
   await expect(page.locator('[data-ac-group-error]')).toHaveText('');
-  await expect(singles).not.toHaveAttribute('aria-invalid', 'true');
+  await expect(card).not.toHaveAttribute('aria-invalid', 'true');
   await expect(page.locator('.ac-group--invalid')).toHaveCount(0);
 });
 
@@ -183,51 +183,51 @@ test('validate(false) answers without touching the page', async ({ page }) => {
 /* --- example 5 · locked, two ways ----------------------------------------- */
 
 test('disabled on the fieldset cascades and takes the keyboard with it', async ({ page }) => {
-  const opener = page.locator('#ac-fg-opener');
+  const vat = page.locator('#ac-fg-vat');
 
-  await expect(opener).toBeDisabled();
+  await expect(vat).toBeDisabled();
 
   // The IDL property reflects only the input's own attribute, which is why this
   // has to be styled and tested on :disabled.
-  expect(await opener.evaluate((el) => el.disabled)).toBe(false);
+  expect(await vat.evaluate((el) => el.disabled)).toBe(false);
 
-  await page.locator('#ac-fg-strobe').focus();
+  await page.locator('#ac-fg-billing').focus();
   await page.keyboard.press('Tab');
-  await expect(opener).not.toBeFocused();
+  await expect(vat).not.toBeFocused();
 });
 
 test('a locked group keeps its legend readable', async ({ page }) => {
   // It is what tells someone what the locked group was for.
-  await expect(page.getByRole('group', { name: 'Support slots' })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Tax settings' })).toBeVisible();
 });
 
 test('aria-disabled cascades to nothing, so the controls carry it themselves', async ({ page }) => {
-  const plusone = page.locator('#ac-fg-plusone');
+  const partial = page.locator('#ac-fg-partial');
 
   await expect(page.locator('fieldset[aria-disabled="true"]')).toHaveCount(1);
-  await expect(plusone).toHaveAttribute('aria-disabled', 'true');
+  await expect(partial).toHaveAttribute('aria-disabled', 'true');
 
   // Still reachable, and still able to say why -- the whole reason to prefer it.
-  expect(await plusone.evaluate((el) => el.disabled)).toBe(false);
-  await expect(plusone).toHaveAccessibleDescription(/promoter locks this/);
+  expect(await partial.evaluate((el) => el.disabled)).toBe(false);
+  await expect(partial).toHaveAccessibleDescription(/Finance locks this/);
 
-  await plusone.focus();
-  await expect(plusone).toBeFocused();
+  await partial.focus();
+  await expect(partial).toBeFocused();
 });
 
 test('aria-disabled is enforced, by pointer and by Space', async ({ page }) => {
-  const plusone = page.locator('#ac-fg-plusone');
+  const partial = page.locator('#ac-fg-partial');
 
-  await expect(plusone).toBeChecked();
+  await expect(partial).toBeChecked();
 
   // force, because Playwright will not click through aria-disabled on its own --
   // it is still a real trusted click, which is what the guard has to survive.
-  await page.locator('label[for="ac-fg-plusone"]').click({ force: true });
-  await expect(plusone).toBeChecked();
+  await page.locator('label[for="ac-fg-partial"]').click({ force: true });
+  await expect(partial).toBeChecked();
 
-  await plusone.focus();
+  await partial.focus();
   await page.keyboard.press('Space');
-  await expect(plusone).toBeChecked();
+  await expect(partial).toBeChecked();
 });
 
 test('unavailable is not signaled by dimming alone', async ({ page }) => {

@@ -197,7 +197,7 @@ that is already mounted, and keep the `aria-disabled` click guard.
 
 ## Related
 
-`.ac-group` is canonical in [Fieldset Group](../fieldset-group/) and repeated here so this file stands
+`.ac-group` is canonical in [Fieldset](../fieldset-group/) and repeated here so this file stands
 alone — change one, change both.
 
 - [Checkbox](../checkbox/) — the same native input with the looser promise.

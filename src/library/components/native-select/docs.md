@@ -135,7 +135,7 @@ looks like a bug.
 
 Be honest about the ceiling, though: none of those modifiers are discoverable, and on touch a
 `multiple` select is close to unusable. For more than a handful of options, a group of checkboxes is
-kinder — see [Fieldset Group](../fieldset-group/).
+kinder — see [Fieldset](../fieldset-group/).
 
 ## Common mistakes
 

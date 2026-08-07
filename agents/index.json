@@ -294,7 +294,7 @@
     },
     {
       "slug": "fieldset-group",
-      "name": "Fieldset Group",
+      "name": "Fieldset",
       "group": "forms-inputs",
       "useWhen": "Related controls under one question, named by a legend.",
       "tags": ["fieldset", "legend", "group", "role-group", "validation", "aria-describedby", "disabled"],
@@ -303,7 +303,7 @@
       "files": ["html", "css", "js"],
       "status": "stable",
       "hasContract": true,
-      "_summaryRev": "8c971969"
+      "_summaryRev": "92e38e53"
     },
     {
       "slug": "disclosure",

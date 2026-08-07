@@ -12,16 +12,16 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 
 ## START HERE
 
-**Phase 0 is done. Components 1–12 are done. Next up is row 13, `fieldset-group`, which is also a
-rename → Fieldset.**
+**Phase 0 is done. Components 1–13 are done. Next up is row 14, `skip-link`.**
 
-Last updated 2026-08-06. This note is part of the `switch` commit. The repo was left green:
+Last updated 2026-08-06. This note is part of the `fieldset-group` commit. The repo was left green:
 
 ```
 check:tokens                      34 files clean
 check:agents                      42 surfaces match their sources
 npm run build                     35 pages
-playwright --project=chromium     switch 23 · agent-surfaces 117 · a11y -g switch 40
+playwright --project=chromium     fieldset-group 25 · agent-surfaces + site-header 140
+                                  a11y -g fieldset-group 38 · the four touched components 80
 ```
 
 The whole suite was last run in full at row 6: 1205 passed, 10.9 min.
@@ -37,9 +37,7 @@ Read these three things before touching anything, in this order:
 3. **The row you are about to do**, in [The roster](#the-roster). The notes on rows 1–6 record what
    actually bit, and they are the reason this file is worth reading rather than skimming.
 
-Then follow [The procedure](#the-procedure) for `fieldset-group`, exactly. It is a **rename**, so also
-follow the rename rules: `grep -rn "Fieldset Group" src/ docs/` afterwards, and check whether any of
-those references also names an example number.
+Then follow [The procedure](#the-procedure) for `skip-link`, exactly.
 
 ### What the last session learned, in one place
 
@@ -63,6 +61,10 @@ those references also names an example number.
   <kbd>Space</kbd> went into `input-group`'s contract and <kbd>Enter</kbd> into `textarea`'s rather
   than being documented off-contract, where nothing would keep the two in step. Watch the Tier 2
   budget when doing it wholesale: nine rows took `native-select` from 0.9 KB to 1.6 KB of 1.8 KB.
+- **Demoting the demo titles to `h4` can strand a heading the component itself ships.** Only
+  `fieldset-group` has one — example 3's `role="group"` is named by a real heading — and at `h4` it
+  became a sibling of its own example title rather than a child. `h5` is right on this page. axe's
+  `heading-order` does not catch it, because nothing is skipped.
 - **Check `component.js` for demo vocabulary, not just comments.** `checkbox` announced "2 of 4
   *inputs* selected" from a hardcoded string — the demo's audio inputs, shipped in every copy of the
   component. Step 4 says "change no behavior", and a user-visible string is copy, not behavior.
@@ -291,7 +293,7 @@ paths do not move.
 | `field` | Field | **Form Field** | [x] |
 | `dropdown` | Dropdown / Listbox | **Custom Select** | [ ] |
 | `effects` | Effects | **Background Effects** | [ ] |
-| `fieldset-group` | Fieldset Group | **Fieldset** | [ ] |
+| `fieldset-group` | Fieldset Group | **Fieldset** | [x] |
 | `focus-ring` | Focus Ring | **Focus Indicator** | [ ] |
 | `jump-nav` | Jump Nav | **In-Page Navigation** | [ ] |
 | `motion-preferences` | Motion Preferences | **Reduced Motion** | [ ] |
@@ -444,8 +446,8 @@ bound" note, and a `summary` in the new voice.
 | 10 | `radio-group` | [x] | CSS-only, single section, no renumber. Every id and every `name` changed with the content (refund method, invoice delivery, plan, pickup location + billing cycle, send updates), so the spec took 24 id rewrites plus 4 assertions on demo text. `contract.keyboard` went to four `native:` rows — <kbd>Space</kbd> and the left/right arrows were real native behavior the old two-row contract never named. `docs.md` had ten `##` sections: four became `###` under Required markup, two under States, and *Targets* collapsed into a table row plus a Common mistakes bullet. |
 | 11 | `checkbox` | [x] | Single section, no renumber. **The one row so far where demo vocabulary had leaked into library code**: `component.js` announced "2 of 4 **inputs** selected" — audio inputs, from the stage-plot demo — in a string every copy of the component ships. It is now "2 of 4 selected", and the spec's exact-match assertion moved with it. New content: columns to export, email notifications, refund terms. `docs.md`'s radio-group comparison table became a `###` under Keyboard, *Required* a `###` under Required markup, *Select all* a `###` under Indeterminate. |
 | 12 | `switch` | [x] | Single section, 4 examples, no renumber. Content: workspace defaults, order alerts, public status page, audit logging + beta features. The `docs.md` `Key \| Action` table was one of the three old shapes being eliminated. Six `##` sections placed: *Two cues* and *Unavailable, two ways* became `###` under States, *Labels* a `###` under Required markup, *Saying it out loud* a `###` under *A switch is a promise*; the two that stayed `##` are that one and *Checkbox or role=switch*. `contract.keyboard` gained the `native:` prefix on all three keys and its <kbd>Enter</kbd> effect was corrected — it said "submits the form", the docs said "nothing"; both now say it submits only if there is a form, and never toggles. |
-| 13 | `fieldset-group` | [ ] | **NEXT.** rename → Fieldset. |
-| 14 | `skip-link` | [ ] | CSS-only. |
+| 13 | `fieldset-group` | [x] | **Renamed → Fieldset.** Six references, in four other components: two `component.css` header comments and four `docs.md` links. `field/docs.md` already said `[Fieldset]`, having anticipated the rename. None named an example number. New content: delivery instructions, pickup time, invoice options, payment methods, tax settings + refund policy. **Demoting the demo titles to `h4` made example 3's `.ac-group__heading` a sibling of its own example title** — it is now `h5`, which is correct for this page and is why the docs say the level comes from your outline, not the component. `contract.keyboard` gained an arrows row: the docs table already listed them. |
+| 14 | `skip-link` | [ ] | **NEXT.** CSS-only. |
 | 15 | `visually-hidden` | [ ] | 4 broken markers. |
 | 16 | `focus-ring` | [ ] | rename → Focus Indicator. 2 broken markers. |
 | 17 | `live-region` | [ ] | |

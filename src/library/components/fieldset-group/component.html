@@ -1,12 +1,12 @@
 <!-- ===========================================================================
-     FIELDSET GROUP — a name for controls that only mean something together
+     FIELDSET — a name for controls that only mean something together
 
      WHAT TO COPY
        Any one example below is self-contained. Take its section plus the
        matching sections of component.css. Only examples 4 and 5 need JavaScript.
        Copy all three files whole for the library-grade version.
 
-     THE CONTRACT
+     REQUIRED MARKUP
        <fieldset class="ac-group">   the group
        <legend class="…__legend">    its accessible name — the first child, always
        <div class="…__body">         everything else, so the layout has a normal box
@@ -20,236 +20,250 @@
      layout goes on an inner box. `min-width: 0` on the fieldset is the other
      half of that story — see component.css.
 
-     ac-demo-* / ac-demo__* is scaffolding for this page only — the grid and the
-     per-example headings. Never copy it into your app.
+     There is no Common mistakes section on this page: every example here is
+     correct markup. The mistakes are written up in docs.md instead.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the section
+     heading, the grid, and the per-example headings. Never copy it.
      =========================================================================== -->
 
-<div class="ac-demo-grid">
-  <!-- ======================================================================
-       EXAMPLE 1 · The baseline
-       CSS [GROUP] + [CHOICE].
+<div class="ac-demo-section">
+  <h3 class="ac-demo-section__title">Correct examples</h3>
+  <p class="ac-demo-section__note">
+    All five are markup you can copy. The first three are the shapes a group comes in; the last two are
+    the rules HTML cannot express on its own — "pick at least one", and a group that is locked but still
+    has to explain itself.
+  </p>
 
-       Four checkboxes that answer one question. Without the legend a screen
-       reader user hears "Two clean towels, checkbox" with nothing to attach it
-       to; with it they hear "Rider, group" on the way in, and every answer has a
-       subject.
+  <div class="ac-demo-grid">
+    <!-- ======================================================================
+         EXAMPLE 1 · Baseline group
+         CSS [GROUP] + [CHOICE].
 
-       A single control needs no fieldset. Its own <label> is already its name,
-       and a group of one is noise.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">1 &middot; The baseline</h3>
+         Four checkboxes that answer one question. Without the legend a screen
+         reader user hears "Signature required, checkbox" with nothing to attach
+         it to; with it they hear "Delivery instructions, group" on the way in,
+         and every answer has a subject.
 
-    <fieldset class="ac-group">
-      <legend class="ac-group__legend">Rider</legend>
-      <div class="ac-group__body">
-        <label class="ac-choice" for="ac-fg-water">
-          <input class="ac-choice__input" type="checkbox" id="ac-fg-water"
-                 name="ac-fg-rider" value="water" checked />
-          <span class="ac-choice__text">Bottled water, room temperature</span>
-        </label>
-        <label class="ac-choice" for="ac-fg-towels">
-          <input class="ac-choice__input" type="checkbox" id="ac-fg-towels"
-                 name="ac-fg-rider" value="towels" />
-          <span class="ac-choice__text">Two clean towels</span>
-        </label>
-        <label class="ac-choice" for="ac-fg-food">
-          <input class="ac-choice__input" type="checkbox" id="ac-fg-food"
-                 name="ac-fg-rider" value="food" />
-          <span class="ac-choice__text">Vegan option for four</span>
-        </label>
-        <label class="ac-choice" for="ac-fg-van">
-          <input class="ac-choice__input" type="checkbox" id="ac-fg-van"
-                 name="ac-fg-rider" value="van" />
-          <span class="ac-choice__text">Parking for one van</span>
-        </label>
-      </div>
-      <p class="ac-group__hint">Anything the venue cannot do, they will call about.</p>
-    </fieldset>
-  </div>
+         A single control needs no fieldset. Its own <label> is already its name,
+         and a group of one is noise.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">1 &middot; Baseline group</h4>
 
-  <!-- ======================================================================
-       EXAMPLE 2 · One answer, several inputs
-       CSS [GROUP] + [ROW].
+      <fieldset class="ac-group">
+        <legend class="ac-group__legend">Delivery instructions</legend>
+        <div class="ac-group__body">
+          <label class="ac-choice" for="ac-fg-desk">
+            <input class="ac-choice__input" type="checkbox" id="ac-fg-desk"
+                   name="ac-fg-delivery" value="desk" checked />
+            <span class="ac-choice__text">Leave at the front desk</span>
+          </label>
+          <label class="ac-choice" for="ac-fg-signature">
+            <input class="ac-choice__input" type="checkbox" id="ac-fg-signature"
+                   name="ac-fg-delivery" value="signature" />
+            <span class="ac-choice__text">Signature required</span>
+          </label>
+          <label class="ac-choice" for="ac-fg-call">
+            <input class="ac-choice__input" type="checkbox" id="ac-fg-call"
+                   name="ac-fg-delivery" value="call" />
+            <span class="ac-choice__text">Call on arrival</span>
+          </label>
+          <label class="ac-choice" for="ac-fg-photo">
+            <input class="ac-choice__input" type="checkbox" id="ac-fg-photo"
+                   name="ac-fg-delivery" value="photo" />
+            <span class="ac-choice__text">Photo on delivery</span>
+          </label>
+        </div>
+        <p class="ac-group__hint">Anything the courier cannot do, they will call about.</p>
+      </fieldset>
+    </div>
 
-       This is the case a fieldset exists for and the one people skip. "Hour" and
-       "Minute" mean nothing apart: the legend carries the question, each input
-       keeps its own label, and the announcement is "Doors open, group … Hour,
-       edit" — the subject once, then the part.
+    <!-- ======================================================================
+         EXAMPLE 2 · One answer, several inputs
+         CSS [GROUP] + [ROW].
 
-       Do not fold the question into the labels ("Doors open hour"). It repeats on
-       every input and reads worse the more parts there are.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">2 &middot; One answer, several inputs</h3>
+         This is the case a fieldset exists for and the one people skip. "Hour"
+         and "Minute" mean nothing apart: the legend carries the question, each
+         input keeps its own label, and the announcement is "Pickup time, group …
+         Hour, edit" — the subject once, then the part.
 
-    <fieldset class="ac-group" aria-describedby="ac-fg-doors-hint">
-      <legend class="ac-group__legend">Doors open</legend>
-      <div class="ac-group__body ac-group__body--row">
-        <span class="ac-group__part">
-          <label class="ac-group__part-label" for="ac-fg-hour">Hour</label>
-          <input class="ac-group__input" type="text" id="ac-fg-hour" name="ac-fg-hour"
-                 inputmode="numeric" autocomplete="off" maxlength="2" value="19" />
-        </span>
-        <span class="ac-group__sep" aria-hidden="true">:</span>
-        <span class="ac-group__part">
-          <label class="ac-group__part-label" for="ac-fg-minute">Minute</label>
-          <input class="ac-group__input" type="text" id="ac-fg-minute" name="ac-fg-minute"
-                 inputmode="numeric" autocomplete="off" maxlength="2" value="30" />
-        </span>
-      </div>
-      <p class="ac-group__hint" id="ac-fg-doors-hint">
-        Curfew is 23:00, and the desk needs 30 minutes after that.
-      </p>
-    </fieldset>
-  </div>
+         Do not fold the question into the labels ("Pickup time hour"). It
+         repeats on every input and reads worse the more parts there are.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">2 &middot; One answer, several inputs</h4>
 
-  <!-- ======================================================================
-       EXAMPLE 3 · When the name has to be a heading
-       CSS [GROUP] + [HEADING] + [CHOICE].
+      <fieldset class="ac-group" aria-describedby="ac-fg-pickup-hint">
+        <legend class="ac-group__legend">Pickup time</legend>
+        <div class="ac-group__body ac-group__body--row">
+          <span class="ac-group__part">
+            <label class="ac-group__part-label" for="ac-fg-hour">Hour</label>
+            <input class="ac-group__input" type="text" id="ac-fg-hour" name="ac-fg-hour"
+                   inputmode="numeric" autocomplete="off" maxlength="2" value="09" />
+          </span>
+          <span class="ac-group__sep" aria-hidden="true">:</span>
+          <span class="ac-group__part">
+            <label class="ac-group__part-label" for="ac-fg-minute">Minute</label>
+            <input class="ac-group__input" type="text" id="ac-fg-minute" name="ac-fg-minute"
+                   inputmode="numeric" autocomplete="off" maxlength="2" value="30" />
+          </span>
+        </div>
+        <p class="ac-group__hint" id="ac-fg-pickup-hint">
+          The warehouse closes at 17:00, and the desk needs 30 minutes before that.
+        </p>
+      </fieldset>
+    </div>
 
-       A <legend> is not a heading. It is announced on the way into the group but
-       it never appears in the heading list a screen reader user navigates a long
-       form with. When a section is big enough that someone would want to jump
-       straight to it, name the group with a real heading instead:
+    <!-- ======================================================================
+         EXAMPLE 3 · When the name has to be a heading
+         CSS [GROUP] + [HEADING] + [CHOICE].
 
-         <div role="group" aria-labelledby="the-heading-id">
+         A <legend> is not a heading. It is announced on the way into the group
+         but it never appears in the heading list a screen reader user navigates
+         a long form with. When a section is big enough that someone would want
+         to jump straight to it, name the group with a real heading instead:
 
-       role="group" is the fieldset's semantics without the element, so it needs
-       aria-labelledby or aria-label — there is no legend to fall back on. It also
-       does not carry `disabled`; see example 5.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">3 &middot; When the name has to be a heading</h3>
+           <div role="group" aria-labelledby="the-heading-id">
 
-    <div class="ac-group" role="group" aria-labelledby="ac-fg-tech-name">
-      <h4 class="ac-group__heading" id="ac-fg-tech-name">Technical rider</h4>
-      <div class="ac-group__body">
-        <label class="ac-choice" for="ac-fg-monitors">
-          <input class="ac-choice__input" type="checkbox" id="ac-fg-monitors"
-                 name="ac-fg-tech" value="monitors" checked />
-          <span class="ac-choice__text">Four-channel monitor mix</span>
-        </label>
-        <label class="ac-choice" for="ac-fg-riser">
-          <input class="ac-choice__input" type="checkbox" id="ac-fg-riser"
-                 name="ac-fg-tech" value="riser" />
-          <span class="ac-choice__text">Amps on a riser</span>
-        </label>
-        <label class="ac-choice" for="ac-fg-strobe">
-          <input class="ac-choice__input" type="checkbox" id="ac-fg-strobe"
-                 name="ac-fg-tech" value="strobe" checked />
-          <span class="ac-choice__text">No strobes &mdash; someone on the crew cannot be near them</span>
-        </label>
+         role="group" is the fieldset's semantics without the element, so it
+         needs aria-labelledby or aria-label — there is no legend to fall back
+         on. It also does not carry `disabled`; see example 5.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">3 &middot; When the name has to be a heading</h4>
+
+      <!-- h5 because this demo page nests it under an h4 example title. Pick the
+           level from your own page's outline, not from this component. -->
+      <div class="ac-group" role="group" aria-labelledby="ac-fg-invoice-name">
+        <h5 class="ac-group__heading" id="ac-fg-invoice-name">Invoice options</h5>
+        <div class="ac-group__body">
+          <label class="ac-choice" for="ac-fg-itemized">
+            <input class="ac-choice__input" type="checkbox" id="ac-fg-itemized"
+                   name="ac-fg-invoice" value="itemized" checked />
+            <span class="ac-choice__text">Itemize every line</span>
+          </label>
+          <label class="ac-choice" for="ac-fg-pdf">
+            <input class="ac-choice__input" type="checkbox" id="ac-fg-pdf"
+                   name="ac-fg-invoice" value="pdf" />
+            <span class="ac-choice__text">Attach a PDF copy</span>
+          </label>
+          <label class="ac-choice" for="ac-fg-billing">
+            <input class="ac-choice__input" type="checkbox" id="ac-fg-billing"
+                   name="ac-fg-invoice" value="billing" checked />
+            <span class="ac-choice__text">Send to the billing contact, not the buyer</span>
+          </label>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- ======================================================================
-       EXAMPLE 4 · Pick at least one
-       CSS [GROUP] + [CHOICE] + [INVALID]. JS [CORE] + [VALIDATE].
+    <!-- ======================================================================
+         EXAMPLE 4 · Pick at least one
+         CSS [GROUP] + [CHOICE] + [INVALID]. JS [CORE] + [VALIDATE].
 
-       HTML cannot say this. `required` on a checkbox means *that box* must be
-       checked, so a group where any one of them will do has no markup for it and
-       needs a script. `data-ac-min="1"` is this component's version.
+         HTML cannot say this. `required` on a checkbox means *that box* must be
+         checked, so a group where any one of them will do has no markup for it
+         and needs a script. `data-ac-min="1"` is this component's version.
 
-       The error id lands on every checkbox's aria-describedby, not only on the
-       fieldset: a fieldset's own description is announced inconsistently, and
-       never again once focus is on the third box. Repeating it per input is the
-       version that always speaks. component.js does that wiring.
+         The error id lands on every checkbox's aria-describedby, not only on the
+         fieldset: a fieldset's own description is announced inconsistently, and
+         never again once focus is on the third box. Repeating it per input is
+         the version that always speaks. component.js does that wiring.
 
-       The error element is in the HTML from the start, empty, with role="alert" —
-       a live region inserted along with its text gives a screen reader no change
-       to notice.
+         The error element is in the HTML from the start, empty, with
+         role="alert" — a live region inserted along with its text gives a screen
+         reader no change to notice.
 
-       One box starts checked, so nothing is red before anyone has touched it.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">4 &middot; Pick at least one</h3>
+         One box starts checked, so nothing is red before anyone has touched it.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">4 &middot; Pick at least one</h4>
 
-    <fieldset class="ac-group" data-ac-fieldset-group data-ac-min="1"
-              data-ac-message="Pick at least one &mdash; the merch table is booked either way.">
-      <legend class="ac-group__legend">Merch we bring</legend>
-      <div class="ac-group__body">
-        <label class="ac-choice" for="ac-fg-singles">
-          <input class="ac-choice__input" type="checkbox" id="ac-fg-singles"
-                 name="ac-fg-merch" value="singles" checked />
-          <span class="ac-choice__text">7-inch singles</span>
-        </label>
-        <label class="ac-choice" for="ac-fg-tapes">
-          <input class="ac-choice__input" type="checkbox" id="ac-fg-tapes"
-                 name="ac-fg-merch" value="tapes" />
-          <span class="ac-choice__text">Cassettes</span>
-        </label>
-        <label class="ac-choice" for="ac-fg-shirts">
-          <input class="ac-choice__input" type="checkbox" id="ac-fg-shirts"
-                 name="ac-fg-merch" value="shirts" />
-          <span class="ac-choice__text">Long-sleeve shirts</span>
-        </label>
-        <label class="ac-choice" for="ac-fg-zines">
-          <input class="ac-choice__input" type="checkbox" id="ac-fg-zines"
-                 name="ac-fg-merch" value="zines" />
-          <span class="ac-choice__text">Zines</span>
-        </label>
-      </div>
-      <p class="ac-group__error" data-ac-group-error role="alert"></p>
-    </fieldset>
-  </div>
+      <fieldset class="ac-group" data-ac-fieldset-group data-ac-min="1"
+                data-ac-message="Pick at least one &mdash; customers need a way to pay.">
+        <legend class="ac-group__legend">Payment methods</legend>
+        <div class="ac-group__body">
+          <label class="ac-choice" for="ac-fg-pay-card">
+            <input class="ac-choice__input" type="checkbox" id="ac-fg-pay-card"
+                   name="ac-fg-payment" value="card" checked />
+            <span class="ac-choice__text">Card</span>
+          </label>
+          <label class="ac-choice" for="ac-fg-pay-bank">
+            <input class="ac-choice__input" type="checkbox" id="ac-fg-pay-bank"
+                   name="ac-fg-payment" value="bank" />
+            <span class="ac-choice__text">Bank transfer</span>
+          </label>
+          <label class="ac-choice" for="ac-fg-pay-invoice">
+            <input class="ac-choice__input" type="checkbox" id="ac-fg-pay-invoice"
+                   name="ac-fg-payment" value="invoice" />
+            <span class="ac-choice__text">Invoice, 30 days</span>
+          </label>
+          <label class="ac-choice" for="ac-fg-pay-credit">
+            <input class="ac-choice__input" type="checkbox" id="ac-fg-pay-credit"
+                   name="ac-fg-payment" value="credit" />
+            <span class="ac-choice__text">Store credit</span>
+          </label>
+        </div>
+        <p class="ac-group__error" data-ac-group-error role="alert"></p>
+      </fieldset>
+    </div>
 
-  <!-- ======================================================================
-       EXAMPLE 5 · Locked, two ways
-       CSS [GROUP] + [CHOICE] + [DISABLED]. JS [CORE] + [SOFT-DISABLED].
+    <!-- ======================================================================
+         EXAMPLE 5 · Locked, two ways
+         CSS [GROUP] + [CHOICE] + [DISABLED]. JS [CORE] + [SOFT-DISABLED].
 
-       `disabled` on a <fieldset> is the rare attribute that cascades: every
-       control inside is disabled, skipped by Tab and left out of the form data.
-       The legend stays readable, which is what tells someone what the locked
-       group was for. Note that `input.disabled` reads **false** for those inputs
-       — the property reflects only the input's own attribute — so test and style
-       on `:disabled`.
+         `disabled` on a <fieldset> is the rare attribute that cascades: every
+         control inside is disabled, skipped by Tab and left out of the form
+         data. The legend stays readable, which is what tells someone what the
+         locked group was for. Note that `input.disabled` reads **false** for
+         those inputs — the property reflects only the input's own attribute — so
+         test and style on `:disabled`.
 
-       `aria-disabled` cascades to nothing. It announces the group and leaves
-       every control inside fully operable, so the second group marks each input
-       as well and component.js prevents the clicks. That is the trade: the group
-       stays reachable, and it can finally say *why* it is locked.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">5 &middot; Locked, two ways</h3>
+         `aria-disabled` cascades to nothing. It announces the group and leaves
+         every control inside fully operable, so the second group marks each
+         input as well and component.js prevents the clicks. That is the trade:
+         the group stays reachable, and it can finally say *why* it is locked.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">5 &middot; Locked, two ways</h4>
 
-    <fieldset class="ac-group" disabled>
-      <legend class="ac-group__legend">Support slots</legend>
-      <div class="ac-group__body">
-        <label class="ac-choice" for="ac-fg-opener">
-          <input class="ac-choice__input" type="checkbox" id="ac-fg-opener"
-                 name="ac-fg-support" value="opener" checked />
-          <span class="ac-choice__text">Local opener</span>
-        </label>
-        <label class="ac-choice" for="ac-fg-second">
-          <input class="ac-choice__input" type="checkbox" id="ac-fg-second"
-                 name="ac-fg-support" value="second" />
-          <span class="ac-choice__text">Second support</span>
-        </label>
-      </div>
-    </fieldset>
+      <fieldset class="ac-group" disabled>
+        <legend class="ac-group__legend">Tax settings</legend>
+        <div class="ac-group__body">
+          <label class="ac-choice" for="ac-fg-vat">
+            <input class="ac-choice__input" type="checkbox" id="ac-fg-vat"
+                   name="ac-fg-tax" value="vat" checked />
+            <span class="ac-choice__text">Collect VAT</span>
+          </label>
+          <label class="ac-choice" for="ac-fg-reverse">
+            <input class="ac-choice__input" type="checkbox" id="ac-fg-reverse"
+                   name="ac-fg-tax" value="reverse" />
+            <span class="ac-choice__text">Reverse charge</span>
+          </label>
+        </div>
+      </fieldset>
 
-    <fieldset class="ac-group" aria-disabled="true" data-ac-fieldset-group
-              aria-describedby="ac-fg-guest-why">
-      <legend class="ac-group__legend">Guest list</legend>
-      <div class="ac-group__body">
-        <label class="ac-choice" for="ac-fg-plusone">
-          <input class="ac-choice__input" type="checkbox" id="ac-fg-plusone"
-                 name="ac-fg-guest" value="plusone" checked aria-disabled="true"
-                 aria-describedby="ac-fg-guest-why" />
-          <span class="ac-choice__text">Plus one per person</span>
-        </label>
-        <label class="ac-choice" for="ac-fg-photo">
-          <input class="ac-choice__input" type="checkbox" id="ac-fg-photo"
-                 name="ac-fg-guest" value="photo" aria-disabled="true"
-                 aria-describedby="ac-fg-guest-why" />
-          <span class="ac-choice__text">Photographer</span>
-        </label>
-      </div>
-      <p class="ac-group__hint" id="ac-fg-guest-why">
-        The promoter locks this 24 hours before doors. Call the office to change it.
-      </p>
-    </fieldset>
+      <fieldset class="ac-group" aria-disabled="true" data-ac-fieldset-group
+                aria-describedby="ac-fg-refund-why">
+        <legend class="ac-group__legend">Refund policy</legend>
+        <div class="ac-group__body">
+          <label class="ac-choice" for="ac-fg-partial">
+            <input class="ac-choice__input" type="checkbox" id="ac-fg-partial"
+                   name="ac-fg-refund" value="partial" checked aria-disabled="true"
+                   aria-describedby="ac-fg-refund-why" />
+            <span class="ac-choice__text">Allow partial refunds</span>
+          </label>
+          <label class="ac-choice" for="ac-fg-late">
+            <input class="ac-choice__input" type="checkbox" id="ac-fg-late"
+                   name="ac-fg-refund" value="late" aria-disabled="true"
+                   aria-describedby="ac-fg-refund-why" />
+            <span class="ac-choice__text">Allow refunds after 30 days</span>
+          </label>
+        </div>
+        <p class="ac-group__hint" id="ac-fg-refund-why">
+          Finance locks this at the end of each quarter. Contact them to change it.
+        </p>
+      </fieldset>
+    </div>
   </div>
 </div>

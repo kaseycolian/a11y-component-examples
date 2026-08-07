@@ -1,15 +1,15 @@
 {
   "slug": "fieldset-group",
-  "name": "Fieldset Group",
+  "name": "Fieldset",
   "group": "forms-inputs",
   "order": 100,
-  "summary": "A legend gives a set of controls the subject they are answers to — with the fieldset quirks that make people give up on it, the role=\"group\" alternative for when the name has to be a heading, and the \"pick at least one\" rule HTML has no way to express.",
+  "summary": "A fieldset is a set of controls under one question, named by its legend. Use it when the controls only mean something together: several answers to the same question, or the parts of one answer. The legend has to be the first child, and \"pick at least one\" is a rule HTML cannot express.",
   "tags": ["fieldset", "legend", "group", "role-group", "validation", "aria-describedby", "disabled"],
   "apg": "https://www.w3.org/WAI/tutorials/forms/grouping/",
   "wcag": ["1.3.1", "1.4.1", "1.4.10", "2.1.1", "2.4.6", "2.4.7", "2.5.8", "3.3.1", "3.3.2", "4.1.2", "4.1.3"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Uncheck everything in example 4 and the group says what is wrong — a rule `required` cannot express. Example 5 locks the same group twice: `disabled` cascades and takes the keyboard with it, `aria-disabled` cascades to nothing and keeps the reason reachable.",
+  "demoNote": "Uncheck everything under Payment methods and the group reports it — a rule `required` cannot express. The last example locks a group twice over: `disabled` cascades and takes the keyboard with it, `aria-disabled` cascades to nothing and keeps the reason reachable.",
   "contract": {
     "useWhen": "Related controls under one question, named by a legend.",
     "root": [".ac-group"],
@@ -28,11 +28,15 @@
     "keyboard": [
       [
         "Tab",
-        "one stop per control — a fieldset is not one stop"
+        "native: one stop per control — a fieldset is not one stop"
       ],
       [
         "Space",
-        "toggles a checkbox inside it"
+        "native: toggles a checkbox inside it"
+      ],
+      [
+        "ArrowUp / ArrowDown / ArrowLeft / ArrowRight",
+        "native: move and select inside a radio group, nothing for checkboxes"
       ]
     ],
     "states": [

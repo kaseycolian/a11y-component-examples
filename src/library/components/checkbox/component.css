@@ -22,7 +22,7 @@
    scripts/check-tokens.mjs enforces it.
    =========================================================================== */
 
-/* --- [GROUP] the fieldset shell — canonical in Fieldset Group -------------
+/* --- [GROUP] the fieldset shell — canonical in the Fieldset component -----
    min-width: 0 because a fieldset's default min-inline-size is min-content, so
    one long unbreakable child pushes the page sideways at 320px. The contents are
    wrapped in a <div> because a <legend> cannot be a flex item. */

@@ -190,7 +190,7 @@ If your framework owns the state, skip the factory and set the property in a ref
 ## Related
 
 `.ac-choice` is canonical in [Radio Group](../radio-group/) and `.ac-group` in
-[Fieldset Group](../fieldset-group/), both repeated here so this file stands alone — change one,
+[Fieldset](../fieldset-group/), both repeated here so this file stands alone — change one,
 change both.
 
 - [Switch](../switch/) — the same native input with a different visual and a stricter promise: it

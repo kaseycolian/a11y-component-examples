@@ -184,7 +184,7 @@ handling, and changes only the hue.
 
 ## Related
 
-`.ac-group` and `.ac-group__legend` are canonical in [Fieldset Group](../fieldset-group/); `.ac-choice`
+`.ac-group` and `.ac-group__legend` are canonical in [Fieldset](../fieldset-group/); `.ac-choice`
 is canonical here and reused by [Checkbox](../checkbox/). Repeated where needed so each file stands
 alone — change one, change both.
 
