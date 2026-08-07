@@ -2,7 +2,7 @@
 
 # Modal
 
-A native dialog over the page, and the ARIA you must not add to it.
+A native dialog over the page. showModal() traps focus; you decide where it lands.
 
 In `library/components/modal/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
@@ -15,9 +15,9 @@ In `library/components/modal/` — copy `component.{html,css,js}`, read `docs.md
 
 ## Keyboard
 
-- `Escape` — closes through the cancel event, so unsaved work can intercept it
 - `Tab` — cycles inside — showModal() makes the rest of the page inert
-- `Enter` — activates the focused button
+- `Enter` — activates the focused button, which is why the safe one is under it
+- `Escape` — closes through the cancel event, so unsaved work can intercept it
 
 **States:** open, closed
 

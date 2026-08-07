@@ -335,14 +335,14 @@
       "slug": "modal",
       "name": "Modal",
       "group": "overlays-disclosure",
-      "useWhen": "A native dialog over the page, and the ARIA you must not add to it.",
+      "useWhen": "A native dialog over the page. showModal() traps focus; you decide where it lands.",
       "tags": ["dialog", "modal", "alertdialog", "focus-trap", "top-layer", "scroll-lock", "live-region"],
       "wcag": ["1.3.1", "1.4.1", "1.4.10", "1.4.11", "2.1.1", "2.1.2", "2.4.3", "2.4.7", "2.5.8", "3.2.2", "4.1.2", "4.1.3"],
       "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/",
       "files": ["html", "css", "js"],
       "status": "stable",
       "hasContract": true,
-      "_summaryRev": "7b5d3172"
+      "_summaryRev": "52285adf"
     },
     {
       "slug": "drawer",

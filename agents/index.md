@@ -37,7 +37,7 @@ Pick one, then read `agents/components/<slug>.md` — not this file twice.
 
 - **disclosure** — A button that shows and hides the region right after it.
 - **dropdown** — A custom select, for when the native one cannot be styled the way you need. Needs JavaScript.
-- **modal** — A native dialog over the page, and the ARIA you must not add to it.
+- **modal** — A native dialog over the page. showModal() traps focus; you decide where it lands.
 - **drawer** — A panel from a screen edge. The whole component is the focus management.
 - **tooltip** — A description on hover and focus, plus the toggletip for touch.
 
