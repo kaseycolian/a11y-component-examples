@@ -6,7 +6,7 @@
    the site's own stylesheet, not this file.
 
      [TABS]    every example. The strip, the selected state, the panel.
-     [BROKEN]  example 2. Delete it. It fades panels out with opacity so the
+     [BROKEN]  example 3. Delete it. It fades panels out with opacity so the
                readout has something to catch.
      [NAV]     example 5. A row of links, which is the thing tabs are not.
                Delete it; Jump Nav owns that pattern.
@@ -150,7 +150,7 @@
   outline-offset: 2px;
 }
 
-/* --- [BROKEN] example 2 — delete this -------------------------------------
+/* --- [BROKEN] example 3 — delete this -------------------------------------
    Panels hidden with opacity so they can cross-fade. This is the shape a
    fade is usually built in, and opacity hides nothing: the faded panels keep
    their layout box, their place in the accessibility tree and every tab stop

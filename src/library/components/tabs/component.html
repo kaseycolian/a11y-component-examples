@@ -3,10 +3,10 @@
      takes the Tab key away from the strip
 
      WHAT TO COPY
-       Example 1 is the component. Examples 2 to 5 are the four ways a tab
-       strip goes wrong, live. Each names the CSS and JS sections it needs.
+       Examples 1 and 2 are the component. Examples 3 to 5 are mistakes, live,
+       and are not to be copied. Each names the CSS and JS sections it needs.
 
-     THE CONTRACT
+     REQUIRED MARKUP
        .ac-tabs         the widget. One tablist, one panel per tab.
        role="tablist"   carries the accessible name of the whole set.
        role="tab"       aria-selected, aria-controls. Only the selected tab is
@@ -14,432 +14,459 @@
        role="tabpanel"  aria-labelledby the tab, tabindex="0", and hidden when
                         it is not the selected one. `hidden`, not opacity.
 
-     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     Examples 3 to 5 each put the failing strip beside a correct one, because
+     the two are indistinguishable to look at and the readout is the only thing
+     that separates them.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the two section
+     headings, the grid, and the per-example headings. Never copy it.
      =========================================================================== -->
 
-<div class="ac-demo-grid" data-ac-tabs-page>
-  <!-- ======================================================================
-       EXAMPLE 1 · The specimen
-       CSS [TABS] + [PANEL]. JS [CORE].
-
-       Three tabs, three panels, automatic activation. Tab reaches the strip
-       once, the arrows move inside it, and one more Tab reaches the panel.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">1 &middot; The specimen</h3>
-
-    <div class="ac-tabs" data-ac-tabs>
-      <div class="ac-tabs__list" role="tablist" aria-label="Show notes">
-        <button class="ac-tabs__tab" type="button" role="tab" id="tabs1-tab-1"
-                aria-controls="tabs1-panel-1" aria-selected="true" tabindex="0">
-          Setlist
-        </button>
-        <button class="ac-tabs__tab" type="button" role="tab" id="tabs1-tab-2"
-                aria-controls="tabs1-panel-2" aria-selected="false" tabindex="-1">
-          Pressings
-        </button>
-        <button class="ac-tabs__tab" type="button" role="tab" id="tabs1-tab-3"
-                aria-controls="tabs1-panel-3" aria-selected="false" tabindex="-1">
-          The venue
-        </button>
-      </div>
-
-      <!-- tabindex="0" is in the markup, not added by the script: a widget
-           whose tab order changes the moment a script loads has two keyboard
-           maps. See docs.md. -->
-      <div class="ac-tabs__panel" role="tabpanel" id="tabs1-panel-1"
-           aria-labelledby="tabs1-tab-1" tabindex="0">
-        <p>Storm Windows &middot; Linoleum &middot; Ruby Soho &middot; the all-ages matinee, twice.</p>
-      </div>
-
-      <div class="ac-tabs__panel" role="tabpanel" id="tabs1-panel-2"
-           aria-labelledby="tabs1-tab-2" tabindex="0" hidden>
-        <p>462 on clear, 99 on ruby. The ruby ones went in a morning.</p>
-      </div>
-
-      <div class="ac-tabs__panel" role="tabpanel" id="tabs1-panel-3"
-           aria-labelledby="tabs1-tab-3" tabindex="0" hidden>
-        <p>Doors at seven. The all-ages room is up the back stairs.</p>
-      </div>
-    </div>
-
-    <p class="ac-tb__note">
-      Arrows move and select together, because the panels are already here and switching costs
-      nothing.
+<div data-ac-tabs-page>
+  <div class="ac-demo-section">
+    <h3 class="ac-demo-section__title">Correct examples</h3>
+    <p class="ac-demo-section__note">
+      This is the markup to copy. Tab reaches the strip once, the arrows move inside it, and one more
+      Tab reaches the panel.
     </p>
-  </div>
 
-  <!-- ======================================================================
-       EXAMPLE 2 · How many stops is a tab strip?
-       CSS [TABS] + [PANEL] + [BROKEN]. JS [CORE] + [FOCUS] + [STOPS] + [NAIVE].
+    <div class="ac-demo-grid">
+      <!-- ======================================================================
+           EXAMPLE 1 · Three tabs and three panels
+           CSS [TABS] + [PANEL]. JS [CORE].
 
-       The same three tabs three ways. The readout walks each one and prints
-       every stop the Tab key gets, in order.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">2 &middot; How many stops is a tab strip?</h3>
+           Automatic activation. Tab reaches the strip once, the arrows move
+           inside it, and one more Tab reaches the panel.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">1 &middot; Three tabs and three panels</h4>
 
-    <div class="ac-tb-panel" data-ac-tb-stops>
-      <div class="ac-tb-cases">
-        <div class="ac-tb-case">
-          <p class="ac-tb-case__label">no roving tabindex &mdash; broken on purpose</p>
-          <!-- BROKEN ON PURPOSE — every tab is in the tab order, so the strip
-               is as many stops as it has tabs. -->
-          <div class="ac-tabs" data-ac-tb-naive="roving" data-ac-tb-stop-case="roving">
-            <div class="ac-tabs__list" role="tablist" aria-label="Show notes, every tab a stop">
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs2a-tab-1"
-                      aria-controls="tabs2a-panel-1" aria-selected="true" tabindex="0">Setlist</button>
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs2a-tab-2"
-                      aria-controls="tabs2a-panel-2" aria-selected="false" tabindex="0">Pressings</button>
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs2a-tab-3"
-                      aria-controls="tabs2a-panel-3" aria-selected="false" tabindex="0">The venue</button>
-            </div>
-            <div class="ac-tabs__panel" role="tabpanel" id="tabs2a-panel-1"
-                 aria-labelledby="tabs2a-tab-1" tabindex="0">
-              <p><a href="#tabs2a-tab-1">sleeve notes</a></p>
-            </div>
-            <div class="ac-tabs__panel" role="tabpanel" id="tabs2a-panel-2"
-                 aria-labelledby="tabs2a-tab-2" tabindex="0" hidden>
-              <p><a href="#tabs2a-tab-2">test pressing</a></p>
-            </div>
-            <div class="ac-tabs__panel" role="tabpanel" id="tabs2a-panel-3"
-                 aria-labelledby="tabs2a-tab-3" tabindex="0" hidden>
-              <p><a href="#tabs2a-tab-3">back stairs</a></p>
-            </div>
+        <div class="ac-tabs" data-ac-tabs>
+          <div class="ac-tabs__list" role="tablist" aria-label="Project 462">
+            <button class="ac-tabs__tab" type="button" role="tab" id="tabs1-tab-1"
+                    aria-controls="tabs1-panel-1" aria-selected="true" tabindex="0">
+              Overview
+            </button>
+            <button class="ac-tabs__tab" type="button" role="tab" id="tabs1-tab-2"
+                    aria-controls="tabs1-panel-2" aria-selected="false" tabindex="-1">
+              Activity
+            </button>
+            <button class="ac-tabs__tab" type="button" role="tab" id="tabs1-tab-3"
+                    aria-controls="tabs1-panel-3" aria-selected="false" tabindex="-1">
+              Billing
+            </button>
+          </div>
+
+          <!-- tabindex="0" is in the markup, not added by the script: a widget
+               whose tab order changes the moment a script loads has two keyboard
+               maps. See docs.md. -->
+          <div class="ac-tabs__panel" role="tabpanel" id="tabs1-panel-1"
+               aria-labelledby="tabs1-tab-1" tabindex="0">
+            <p>Opened 7 March by Jordan Lee. Four open tasks, two of them due this week.</p>
+          </div>
+
+          <div class="ac-tabs__panel" role="tabpanel" id="tabs1-panel-2"
+               aria-labelledby="tabs1-tab-2" tabindex="0" hidden>
+            <p>Order 462 shipped on 12 March. Invoice 99 was paid the day before.</p>
+          </div>
+
+          <div class="ac-tabs__panel" role="tabpanel" id="tabs1-panel-3"
+               aria-labelledby="tabs1-tab-3" tabindex="0" hidden>
+            <p>Team plan, 12 seats. Renews on the 1st, to the card ending 4462.</p>
           </div>
         </div>
 
-        <div class="ac-tb-case">
-          <p class="ac-tb-case__label">panels faded out &mdash; broken on purpose</p>
-          <!-- BROKEN ON PURPOSE — the unselected panels are hidden with opacity
-               so they can cross-fade. Opacity hides nothing from the keyboard
-               or from the accessibility tree, so their links are still stops. -->
-          <div class="ac-tabs ac-tb-bad-fade" data-ac-tb-naive="opacity"
-               data-ac-tb-stop-case="opacity">
-            <div class="ac-tabs__list" role="tablist" aria-label="Show notes, faded panels">
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs2b-tab-1"
-                      aria-controls="tabs2b-panel-1" aria-selected="true" tabindex="0">Setlist</button>
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs2b-tab-2"
-                      aria-controls="tabs2b-panel-2" aria-selected="false" tabindex="-1">Pressings</button>
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs2b-tab-3"
-                      aria-controls="tabs2b-panel-3" aria-selected="false" tabindex="-1">The venue</button>
-            </div>
-            <div class="ac-tabs__panel ac-tb-bad-fade__panel" role="tabpanel" id="tabs2b-panel-1"
-                 aria-labelledby="tabs2b-tab-1" data-ac-tb-shown="true">
-              <p><a href="#tabs2b-tab-1">sleeve notes</a></p>
-            </div>
-            <div class="ac-tabs__panel ac-tb-bad-fade__panel" role="tabpanel" id="tabs2b-panel-2"
-                 aria-labelledby="tabs2b-tab-2">
-              <p><a href="#tabs2b-tab-2">test pressing</a></p>
-            </div>
-            <div class="ac-tabs__panel ac-tb-bad-fade__panel" role="tabpanel" id="tabs2b-panel-3"
-                 aria-labelledby="tabs2b-tab-3">
-              <p><a href="#tabs2b-tab-3">back stairs</a></p>
-            </div>
-          </div>
-        </div>
-
-        <div class="ac-tb-case">
-          <p class="ac-tb-case__label">the specimen</p>
-          <div class="ac-tabs" data-ac-tabs data-ac-tb-stop-case="good">
-            <div class="ac-tabs__list" role="tablist" aria-label="Show notes, roving">
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs2c-tab-1"
-                      aria-controls="tabs2c-panel-1" aria-selected="true" tabindex="0">Setlist</button>
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs2c-tab-2"
-                      aria-controls="tabs2c-panel-2" aria-selected="false" tabindex="-1">Pressings</button>
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs2c-tab-3"
-                      aria-controls="tabs2c-panel-3" aria-selected="false" tabindex="-1">The venue</button>
-            </div>
-            <div class="ac-tabs__panel" role="tabpanel" id="tabs2c-panel-1"
-                 aria-labelledby="tabs2c-tab-1" tabindex="0">
-              <p><a href="#tabs2c-tab-1">sleeve notes</a></p>
-            </div>
-            <div class="ac-tabs__panel" role="tabpanel" id="tabs2c-panel-2"
-                 aria-labelledby="tabs2c-tab-2" tabindex="0" hidden>
-              <p><a href="#tabs2c-tab-2">test pressing</a></p>
-            </div>
-            <div class="ac-tabs__panel" role="tabpanel" id="tabs2c-panel-3"
-                 aria-labelledby="tabs2c-tab-3" tabindex="0" hidden>
-              <p><a href="#tabs2c-tab-3">back stairs</a></p>
-            </div>
-          </div>
-        </div>
+        <p class="ac-tb__note">
+          Arrows move and select together, because the panels are already here and switching costs
+          nothing.
+        </p>
       </div>
 
-      <dl class="ac-tb-readout">
-        <div class="ac-tb-readout__row">
-          <dt>no roving tabindex</dt><dd><code data-ac-tb-out="stops-roving">&mdash;</code></dd>
-        </div>
-        <div class="ac-tb-readout__row">
-          <dt>panels faded out</dt><dd><code data-ac-tb-out="stops-opacity">&mdash;</code></dd>
-        </div>
-        <div class="ac-tb-readout__row">
-          <dt>the specimen</dt><dd><code data-ac-tb-out="stops-good">&mdash;</code></dd>
-        </div>
-      </dl>
+      <!-- ======================================================================
+           EXAMPLE 2 · Automatic and manual activation
+           CSS [TABS] + [PANEL]. JS [CORE] + [ACTIVATION].
 
-      <p class="ac-tb__note">
-        Every stop is read out of the browser by asking it to take focus, not guessed from a
-        selector. Two of the faded strip's stops cannot be seen.
-      </p>
+           Neither is broken. Manual activation is the right answer when a panel
+           costs a fetch and the wrong one when it does not.
+
+           Put focus on either strip's first tab and arrow across to the last.
+           The readout counts the panels activated on the way and what ended up
+           selected.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">2 &middot; Automatic and manual activation</h4>
+
+        <div class="ac-tb-panel" data-ac-tb-activation>
+          <div class="ac-tb-cases">
+            <div class="ac-tb-case">
+              <p class="ac-tb-case__label">automatic &mdash; the specimen</p>
+              <div class="ac-tabs" data-ac-tabs data-ac-tb-act-case="auto">
+                <div class="ac-tabs__list" role="tablist" aria-label="Automatic activation">
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs3a-tab-1"
+                          aria-controls="tabs3a-panel-1" aria-selected="true" tabindex="0">Overview</button>
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs3a-tab-2"
+                          aria-controls="tabs3a-panel-2" aria-selected="false" tabindex="-1">Activity</button>
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs3a-tab-3"
+                          aria-controls="tabs3a-panel-3" aria-selected="false" tabindex="-1">Billing</button>
+                </div>
+                <div class="ac-tabs__panel" role="tabpanel" id="tabs3a-panel-1"
+                     aria-labelledby="tabs3a-tab-1" tabindex="0"><p>Four open tasks.</p></div>
+                <div class="ac-tabs__panel" role="tabpanel" id="tabs3a-panel-2"
+                     aria-labelledby="tabs3a-tab-2" tabindex="0" hidden><p>Order 462 shipped.</p></div>
+                <div class="ac-tabs__panel" role="tabpanel" id="tabs3a-panel-3"
+                     aria-labelledby="tabs3a-tab-3" tabindex="0" hidden><p>Team plan, 12 seats.</p></div>
+              </div>
+            </div>
+
+            <div class="ac-tb-case">
+              <p class="ac-tb-case__label">manual &mdash; arrows move, Enter selects</p>
+              <div class="ac-tabs" data-ac-tabs data-ac-activation="manual" data-ac-tb-act-case="manual">
+                <div class="ac-tabs__list" role="tablist" aria-label="Manual activation">
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs3b-tab-1"
+                          aria-controls="tabs3b-panel-1" aria-selected="true" tabindex="0">Overview</button>
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs3b-tab-2"
+                          aria-controls="tabs3b-panel-2" aria-selected="false" tabindex="-1">Activity</button>
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs3b-tab-3"
+                          aria-controls="tabs3b-panel-3" aria-selected="false" tabindex="-1">Billing</button>
+                </div>
+                <div class="ac-tabs__panel" role="tabpanel" id="tabs3b-panel-1"
+                     aria-labelledby="tabs3b-tab-1" tabindex="0"><p>Four open tasks.</p></div>
+                <div class="ac-tabs__panel" role="tabpanel" id="tabs3b-panel-2"
+                     aria-labelledby="tabs3b-tab-2" tabindex="0" hidden><p>Order 462 shipped.</p></div>
+                <div class="ac-tabs__panel" role="tabpanel" id="tabs3b-panel-3"
+                     aria-labelledby="tabs3b-tab-3" tabindex="0" hidden><p>Team plan, 12 seats.</p></div>
+              </div>
+            </div>
+          </div>
+
+          <dl class="ac-tb-readout">
+            <div class="ac-tb-readout__row">
+              <dt>automatic &middot; panels activated</dt>
+              <dd><code data-ac-tb-out="act-auto-count">0</code></dd>
+            </div>
+            <div class="ac-tb-readout__row">
+              <dt>automatic &middot; focused / selected</dt>
+              <dd><code data-ac-tb-out="act-auto-pair">&mdash;</code></dd>
+            </div>
+            <div class="ac-tb-readout__row">
+              <dt>manual &middot; panels activated</dt>
+              <dd><code data-ac-tb-out="act-manual-count">0</code></dd>
+            </div>
+            <div class="ac-tb-readout__row">
+              <dt>manual &middot; focused / selected</dt>
+              <dd><code data-ac-tb-out="act-manual-pair">&mdash;</code></dd>
+            </div>
+          </dl>
+
+          <div class="ac-tb-controls">
+            <button class="ac-tb-btn" type="button" data-ac-tb-act-reset>Start over</button>
+          </div>
+
+          <p class="ac-tb__note">
+            Arrow from Overview to Billing in each. Automatic activation opens every panel on the
+            way; manual opens one, and costs a key nobody was told about.
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ======================================================================
-       EXAMPLE 3 · Automatic or manual activation
-       CSS [TABS] + [PANEL]. JS [CORE] + [ACTIVATION].
+  <div class="ac-demo-section ac-demo-section--mistakes">
+    <h3 class="ac-demo-section__title">Common mistakes</h3>
+    <p class="ac-demo-section__note">
+      These three are live and wrong on purpose, and each sits beside a correct strip because the two
+      are indistinguishable to look at. Every readout is measured by asking the browser, not guessed
+      from a selector.
+    </p>
 
-       Put focus on either strip's first tab and arrow across to the last. The
-       readout counts the panels activated on the way and what ended up
-       selected.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">3 &middot; Automatic or manual activation</h3>
+    <div class="ac-demo-grid">
+      <!-- ======================================================================
+           EXAMPLE 3 · Tab stops in three strips
+           CSS [TABS] + [PANEL] + [BROKEN]. JS [CORE] + [FOCUS] + [STOPS] + [NAIVE].
 
-    <div class="ac-tb-panel" data-ac-tb-activation>
-      <div class="ac-tb-cases">
-        <div class="ac-tb-case">
-          <p class="ac-tb-case__label">automatic &mdash; the specimen</p>
-          <div class="ac-tabs" data-ac-tabs data-ac-tb-act-case="auto">
-            <div class="ac-tabs__list" role="tablist" aria-label="Automatic activation">
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs3a-tab-1"
-                      aria-controls="tabs3a-panel-1" aria-selected="true" tabindex="0">Setlist</button>
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs3a-tab-2"
-                      aria-controls="tabs3a-panel-2" aria-selected="false" tabindex="-1">Pressings</button>
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs3a-tab-3"
-                      aria-controls="tabs3a-panel-3" aria-selected="false" tabindex="-1">The venue</button>
+           The same three tabs three ways. The readout walks each one and prints
+           every stop the Tab key gets, in order.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">3 &middot; Tab stops in three strips</h4>
+
+        <div class="ac-tb-panel" data-ac-tb-stops>
+          <div class="ac-tb-cases">
+            <div class="ac-tb-case">
+              <p class="ac-tb-case__label">no roving tabindex &mdash; broken on purpose</p>
+              <!-- BROKEN ON PURPOSE — every tab is in the tab order, so the strip
+                   is as many stops as it has tabs. -->
+              <div class="ac-tabs" data-ac-tb-naive="roving" data-ac-tb-stop-case="roving">
+                <div class="ac-tabs__list" role="tablist" aria-label="Project 462, every tab a stop">
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs2a-tab-1"
+                          aria-controls="tabs2a-panel-1" aria-selected="true" tabindex="0">Overview</button>
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs2a-tab-2"
+                          aria-controls="tabs2a-panel-2" aria-selected="false" tabindex="0">Activity</button>
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs2a-tab-3"
+                          aria-controls="tabs2a-panel-3" aria-selected="false" tabindex="0">Billing</button>
+                </div>
+                <div class="ac-tabs__panel" role="tabpanel" id="tabs2a-panel-1"
+                     aria-labelledby="tabs2a-tab-1" tabindex="0">
+                  <p><a href="#tabs2a-tab-1">Open tasks</a></p>
+                </div>
+                <div class="ac-tabs__panel" role="tabpanel" id="tabs2a-panel-2"
+                     aria-labelledby="tabs2a-tab-2" tabindex="0" hidden>
+                  <p><a href="#tabs2a-tab-2">Invoice 99</a></p>
+                </div>
+                <div class="ac-tabs__panel" role="tabpanel" id="tabs2a-panel-3"
+                     aria-labelledby="tabs2a-tab-3" tabindex="0" hidden>
+                  <p><a href="#tabs2a-tab-3">Billing history</a></p>
+                </div>
+              </div>
             </div>
-            <div class="ac-tabs__panel" role="tabpanel" id="tabs3a-panel-1"
-                 aria-labelledby="tabs3a-tab-1" tabindex="0"><p>Storm Windows, twice.</p></div>
-            <div class="ac-tabs__panel" role="tabpanel" id="tabs3a-panel-2"
-                 aria-labelledby="tabs3a-tab-2" tabindex="0" hidden><p>462 on clear.</p></div>
-            <div class="ac-tabs__panel" role="tabpanel" id="tabs3a-panel-3"
-                 aria-labelledby="tabs3a-tab-3" tabindex="0" hidden><p>Up the back stairs.</p></div>
-          </div>
-        </div>
 
-        <div class="ac-tb-case">
-          <p class="ac-tb-case__label">manual &mdash; arrows move, Enter selects</p>
-          <!-- Not broken. Manual activation is the right answer when a panel
-               costs a fetch and the wrong one when it does not. -->
-          <div class="ac-tabs" data-ac-tabs data-ac-activation="manual" data-ac-tb-act-case="manual">
-            <div class="ac-tabs__list" role="tablist" aria-label="Manual activation">
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs3b-tab-1"
-                      aria-controls="tabs3b-panel-1" aria-selected="true" tabindex="0">Setlist</button>
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs3b-tab-2"
-                      aria-controls="tabs3b-panel-2" aria-selected="false" tabindex="-1">Pressings</button>
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs3b-tab-3"
-                      aria-controls="tabs3b-panel-3" aria-selected="false" tabindex="-1">The venue</button>
+            <div class="ac-tb-case">
+              <p class="ac-tb-case__label">panels faded out &mdash; broken on purpose</p>
+              <!-- BROKEN ON PURPOSE — the unselected panels are hidden with opacity
+                   so they can cross-fade. Opacity hides nothing from the keyboard
+                   or from the accessibility tree, so their links are still stops. -->
+              <div class="ac-tabs ac-tb-bad-fade" data-ac-tb-naive="opacity"
+                   data-ac-tb-stop-case="opacity">
+                <div class="ac-tabs__list" role="tablist" aria-label="Project 462, faded panels">
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs2b-tab-1"
+                          aria-controls="tabs2b-panel-1" aria-selected="true" tabindex="0">Overview</button>
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs2b-tab-2"
+                          aria-controls="tabs2b-panel-2" aria-selected="false" tabindex="-1">Activity</button>
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs2b-tab-3"
+                          aria-controls="tabs2b-panel-3" aria-selected="false" tabindex="-1">Billing</button>
+                </div>
+                <div class="ac-tabs__panel ac-tb-bad-fade__panel" role="tabpanel" id="tabs2b-panel-1"
+                     aria-labelledby="tabs2b-tab-1" data-ac-tb-shown="true">
+                  <p><a href="#tabs2b-tab-1">Open tasks</a></p>
+                </div>
+                <div class="ac-tabs__panel ac-tb-bad-fade__panel" role="tabpanel" id="tabs2b-panel-2"
+                     aria-labelledby="tabs2b-tab-2">
+                  <p><a href="#tabs2b-tab-2">Invoice 99</a></p>
+                </div>
+                <div class="ac-tabs__panel ac-tb-bad-fade__panel" role="tabpanel" id="tabs2b-panel-3"
+                     aria-labelledby="tabs2b-tab-3">
+                  <p><a href="#tabs2b-tab-3">Billing history</a></p>
+                </div>
+              </div>
             </div>
-            <div class="ac-tabs__panel" role="tabpanel" id="tabs3b-panel-1"
-                 aria-labelledby="tabs3b-tab-1" tabindex="0"><p>Storm Windows, twice.</p></div>
-            <div class="ac-tabs__panel" role="tabpanel" id="tabs3b-panel-2"
-                 aria-labelledby="tabs3b-tab-2" tabindex="0" hidden><p>462 on clear.</p></div>
-            <div class="ac-tabs__panel" role="tabpanel" id="tabs3b-panel-3"
-                 aria-labelledby="tabs3b-tab-3" tabindex="0" hidden><p>Up the back stairs.</p></div>
+
+            <div class="ac-tb-case">
+              <p class="ac-tb-case__label">the specimen</p>
+              <div class="ac-tabs" data-ac-tabs data-ac-tb-stop-case="good">
+                <div class="ac-tabs__list" role="tablist" aria-label="Project 462, roving">
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs2c-tab-1"
+                          aria-controls="tabs2c-panel-1" aria-selected="true" tabindex="0">Overview</button>
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs2c-tab-2"
+                          aria-controls="tabs2c-panel-2" aria-selected="false" tabindex="-1">Activity</button>
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs2c-tab-3"
+                          aria-controls="tabs2c-panel-3" aria-selected="false" tabindex="-1">Billing</button>
+                </div>
+                <div class="ac-tabs__panel" role="tabpanel" id="tabs2c-panel-1"
+                     aria-labelledby="tabs2c-tab-1" tabindex="0">
+                  <p><a href="#tabs2c-tab-1">Open tasks</a></p>
+                </div>
+                <div class="ac-tabs__panel" role="tabpanel" id="tabs2c-panel-2"
+                     aria-labelledby="tabs2c-tab-2" tabindex="0" hidden>
+                  <p><a href="#tabs2c-tab-2">Invoice 99</a></p>
+                </div>
+                <div class="ac-tabs__panel" role="tabpanel" id="tabs2c-panel-3"
+                     aria-labelledby="tabs2c-tab-3" tabindex="0" hidden>
+                  <p><a href="#tabs2c-tab-3">Billing history</a></p>
+                </div>
+              </div>
+            </div>
           </div>
+
+          <dl class="ac-tb-readout">
+            <div class="ac-tb-readout__row">
+              <dt>no roving tabindex</dt><dd><code data-ac-tb-out="stops-roving">&mdash;</code></dd>
+            </div>
+            <div class="ac-tb-readout__row">
+              <dt>panels faded out</dt><dd><code data-ac-tb-out="stops-opacity">&mdash;</code></dd>
+            </div>
+            <div class="ac-tb-readout__row">
+              <dt>the specimen</dt><dd><code data-ac-tb-out="stops-good">&mdash;</code></dd>
+            </div>
+          </dl>
+
+          <p class="ac-tb__note">
+            Every stop is read out of the browser by asking it to take focus, not guessed from a
+            selector. Two of the faded strip's stops cannot be seen.
+          </p>
         </div>
       </div>
 
-      <dl class="ac-tb-readout">
-        <div class="ac-tb-readout__row">
-          <dt>automatic &middot; panels activated</dt>
-          <dd><code data-ac-tb-out="act-auto-count">0</code></dd>
-        </div>
-        <div class="ac-tb-readout__row">
-          <dt>automatic &middot; focused / selected</dt>
-          <dd><code data-ac-tb-out="act-auto-pair">&mdash;</code></dd>
-        </div>
-        <div class="ac-tb-readout__row">
-          <dt>manual &middot; panels activated</dt>
-          <dd><code data-ac-tb-out="act-manual-count">0</code></dd>
-        </div>
-        <div class="ac-tb-readout__row">
-          <dt>manual &middot; focused / selected</dt>
-          <dd><code data-ac-tb-out="act-manual-pair">&mdash;</code></dd>
-        </div>
-      </dl>
+      <!-- ======================================================================
+           EXAMPLE 4 · Where Tab lands after the strip
+           CSS [TABS] + [PANEL]. JS [CORE] + [FOCUS] + [STOPS].
 
-      <div class="ac-tb-controls">
-        <button class="ac-tb-btn" type="button" data-ac-tb-act-reset>Start over</button>
-      </div>
+           Three panels, one attribute apart. The readout names the next thing the
+           Tab key reaches after the selected tab.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">4 &middot; Where Tab lands after the strip</h4>
 
-      <p class="ac-tb__note">
-        Arrow from Setlist to The venue in each. Automatic activation opens every panel on the
-        way; manual opens one, and costs a key nobody was told about.
-      </p>
-    </div>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 4 · Where Tab lands after the strip
-       CSS [TABS] + [PANEL]. JS [CORE] + [FOCUS] + [STOPS].
-
-       Three panels, one attribute apart. The readout names the next thing the
-       Tab key reaches after the selected tab.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">4 &middot; Where Tab lands after the strip</h3>
-
-    <div class="ac-tb-panel" data-ac-tb-landing>
-      <div class="ac-tb-cases">
-        <div class="ac-tb-case">
-          <p class="ac-tb-case__label">text panel, no tabindex &mdash; broken on purpose</p>
-          <!-- BROKEN ON PURPOSE — nothing in the panel can hold focus, so Tab
-               steps over the whole thing and its name is never read. -->
-          <div class="ac-tabs" data-ac-tabs data-ac-tb-land-case="skipped">
-            <div class="ac-tabs__list" role="tablist" aria-label="Skipped panel">
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs4a-tab-1"
-                      aria-controls="tabs4a-panel-1" aria-selected="true" tabindex="0">Setlist</button>
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs4a-tab-2"
-                      aria-controls="tabs4a-panel-2" aria-selected="false" tabindex="-1">Pressings</button>
+        <div class="ac-tb-panel" data-ac-tb-landing>
+          <div class="ac-tb-cases">
+            <div class="ac-tb-case">
+              <p class="ac-tb-case__label">text panel, no tabindex &mdash; broken on purpose</p>
+              <!-- BROKEN ON PURPOSE — nothing in the panel can hold focus, so Tab
+                   steps over the whole thing and its name is never read. -->
+              <div class="ac-tabs" data-ac-tabs data-ac-tb-land-case="skipped">
+                <div class="ac-tabs__list" role="tablist" aria-label="Skipped panel">
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs4a-tab-1"
+                          aria-controls="tabs4a-panel-1" aria-selected="true" tabindex="0">Overview</button>
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs4a-tab-2"
+                          aria-controls="tabs4a-panel-2" aria-selected="false" tabindex="-1">Activity</button>
+                </div>
+                <div class="ac-tabs__panel" role="tabpanel" id="tabs4a-panel-1"
+                     aria-labelledby="tabs4a-tab-1">
+                  <p>Four open tasks, two of them due this week.</p>
+                </div>
+                <div class="ac-tabs__panel" role="tabpanel" id="tabs4a-panel-2"
+                     aria-labelledby="tabs4a-tab-2" hidden>
+                  <p>Order 462 shipped on 12 March.</p>
+                </div>
+              </div>
+              <button class="ac-tb-btn" type="button" data-ac-tb-after>Save changes</button>
             </div>
-            <div class="ac-tabs__panel" role="tabpanel" id="tabs4a-panel-1"
-                 aria-labelledby="tabs4a-tab-1">
-              <p>Storm Windows &middot; Linoleum &middot; Ruby Soho.</p>
+
+            <div class="ac-tb-case">
+              <p class="ac-tb-case__label">a link in the panel, no tabindex &mdash; broken on purpose</p>
+              <!-- BROKEN ON PURPOSE — the panel has focusable content, so the APG's
+                   conditional rule leaves it with no tabindex. Tab lands on the link
+                   and the panel is never named on the way past. -->
+              <div class="ac-tabs" data-ac-tabs data-ac-tb-land-case="link">
+                <div class="ac-tabs__list" role="tablist" aria-label="Panel with a link">
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs4b-tab-1"
+                          aria-controls="tabs4b-panel-1" aria-selected="true" tabindex="0">Overview</button>
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs4b-tab-2"
+                          aria-controls="tabs4b-panel-2" aria-selected="false" tabindex="-1">Activity</button>
+                </div>
+                <div class="ac-tabs__panel" role="tabpanel" id="tabs4b-panel-1"
+                     aria-labelledby="tabs4b-tab-1">
+                  <p>Four open tasks. <a href="#tabs4b-tab-1">Open tasks</a></p>
+                </div>
+                <div class="ac-tabs__panel" role="tabpanel" id="tabs4b-panel-2"
+                     aria-labelledby="tabs4b-tab-2" hidden>
+                  <p>Order 462 shipped. <a href="#tabs4b-tab-2">Invoice 99</a></p>
+                </div>
+              </div>
+              <button class="ac-tb-btn" type="button" data-ac-tb-after>Save changes</button>
             </div>
-            <div class="ac-tabs__panel" role="tabpanel" id="tabs4a-panel-2"
-                 aria-labelledby="tabs4a-tab-2" hidden>
-              <p>462 on clear, 99 on ruby.</p>
+
+            <div class="ac-tb-case">
+              <p class="ac-tb-case__label">the specimen</p>
+              <div class="ac-tabs" data-ac-tabs data-ac-tb-land-case="good">
+                <div class="ac-tabs__list" role="tablist" aria-label="Named panel">
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs4c-tab-1"
+                          aria-controls="tabs4c-panel-1" aria-selected="true" tabindex="0">Overview</button>
+                  <button class="ac-tabs__tab" type="button" role="tab" id="tabs4c-tab-2"
+                          aria-controls="tabs4c-panel-2" aria-selected="false" tabindex="-1">Activity</button>
+                </div>
+                <div class="ac-tabs__panel" role="tabpanel" id="tabs4c-panel-1"
+                     aria-labelledby="tabs4c-tab-1" tabindex="0">
+                  <p>Four open tasks. <a href="#tabs4c-tab-1">Open tasks</a></p>
+                </div>
+                <div class="ac-tabs__panel" role="tabpanel" id="tabs4c-panel-2"
+                     aria-labelledby="tabs4c-tab-2" tabindex="0" hidden>
+                  <p>Order 462 shipped. <a href="#tabs4c-tab-2">Invoice 99</a></p>
+                </div>
+              </div>
+              <button class="ac-tb-btn" type="button" data-ac-tb-after>Save changes</button>
             </div>
           </div>
-          <button class="ac-tb-btn" type="button" data-ac-tb-after>Buy a ticket</button>
-        </div>
 
-        <div class="ac-tb-case">
-          <p class="ac-tb-case__label">a link in the panel, no tabindex &mdash; broken on purpose</p>
-          <!-- BROKEN ON PURPOSE — the panel has focusable content, so the APG's
-               conditional rule leaves it with no tabindex. Tab lands on the link
-               and the panel is never named on the way past. -->
-          <div class="ac-tabs" data-ac-tabs data-ac-tb-land-case="link">
-            <div class="ac-tabs__list" role="tablist" aria-label="Panel with a link">
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs4b-tab-1"
-                      aria-controls="tabs4b-panel-1" aria-selected="true" tabindex="0">Setlist</button>
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs4b-tab-2"
-                      aria-controls="tabs4b-panel-2" aria-selected="false" tabindex="-1">Pressings</button>
+          <dl class="ac-tb-readout">
+            <div class="ac-tb-readout__row">
+              <dt>text panel &middot; next stop</dt>
+              <dd><code data-ac-tb-out="land-skipped">&mdash;</code></dd>
             </div>
-            <div class="ac-tabs__panel" role="tabpanel" id="tabs4b-panel-1"
-                 aria-labelledby="tabs4b-tab-1">
-              <p>Storm Windows, twice. <a href="#tabs4b-tab-1">sleeve notes</a></p>
+            <div class="ac-tb-readout__row">
+              <dt>link in the panel &middot; next stop</dt>
+              <dd><code data-ac-tb-out="land-link">&mdash;</code></dd>
             </div>
-            <div class="ac-tabs__panel" role="tabpanel" id="tabs4b-panel-2"
-                 aria-labelledby="tabs4b-tab-2" hidden>
-              <p>462 on clear. <a href="#tabs4b-tab-2">test pressing</a></p>
+            <div class="ac-tb-readout__row">
+              <dt>the specimen &middot; next stop</dt>
+              <dd><code data-ac-tb-out="land-good">&mdash;</code></dd>
             </div>
-          </div>
-          <button class="ac-tb-btn" type="button" data-ac-tb-after>Buy a ticket</button>
-        </div>
+          </dl>
 
-        <div class="ac-tb-case">
-          <p class="ac-tb-case__label">the specimen</p>
-          <div class="ac-tabs" data-ac-tabs data-ac-tb-land-case="good">
-            <div class="ac-tabs__list" role="tablist" aria-label="Named panel">
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs4c-tab-1"
-                      aria-controls="tabs4c-panel-1" aria-selected="true" tabindex="0">Setlist</button>
-              <button class="ac-tabs__tab" type="button" role="tab" id="tabs4c-tab-2"
-                      aria-controls="tabs4c-panel-2" aria-selected="false" tabindex="-1">Pressings</button>
-            </div>
-            <div class="ac-tabs__panel" role="tabpanel" id="tabs4c-panel-1"
-                 aria-labelledby="tabs4c-tab-1" tabindex="0">
-              <p>Storm Windows, twice. <a href="#tabs4c-tab-1">sleeve notes</a></p>
-            </div>
-            <div class="ac-tabs__panel" role="tabpanel" id="tabs4c-panel-2"
-                 aria-labelledby="tabs4c-tab-2" tabindex="0" hidden>
-              <p>462 on clear. <a href="#tabs4c-tab-2">test pressing</a></p>
-            </div>
-          </div>
-          <button class="ac-tb-btn" type="button" data-ac-tb-after>Buy a ticket</button>
+          <p class="ac-tb__note">
+            The panel is what the tab was for, so it is worth a stop of its own &mdash; arriving on it
+            is what reads its name. The middle case passes review and breaks when somebody deletes the
+            link.
+          </p>
         </div>
       </div>
 
-      <dl class="ac-tb-readout">
-        <div class="ac-tb-readout__row">
-          <dt>text panel &middot; next stop</dt>
-          <dd><code data-ac-tb-out="land-skipped">&mdash;</code></dd>
-        </div>
-        <div class="ac-tb-readout__row">
-          <dt>link in the panel &middot; next stop</dt>
-          <dd><code data-ac-tb-out="land-link">&mdash;</code></dd>
-        </div>
-        <div class="ac-tb-readout__row">
-          <dt>the specimen &middot; next stop</dt>
-          <dd><code data-ac-tb-out="land-good">&mdash;</code></dd>
-        </div>
-      </dl>
+      <!-- ======================================================================
+           EXAMPLE 5 · Links wearing role=tab
+           CSS [TABS] + [PANEL] + [NAV]. JS [CORE] + [CURRENT].
 
-      <p class="ac-tb__note">
-        The panel is what the tab was for, so it is worth a stop of its own &mdash; arriving on it
-        is what reads its name. The middle case passes review and breaks when somebody deletes the
-        link.
-      </p>
-    </div>
-  </div>
+           Two rows that look the same. Both move you around this page; only one
+           of them says so. Pick an item in each.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">5 &middot; Links wearing <code>role=tab</code></h4>
 
-  <!-- ======================================================================
-       EXAMPLE 5 · aria-selected or aria-current
-       CSS [TABS] + [PANEL] + [BROKEN]. JS [CORE] + [CURRENT].
+        <div class="ac-tb-panel" data-ac-tb-current>
+          <div class="ac-tb-cases">
+            <div class="ac-tb-case">
+              <p class="ac-tb-case__label">links wearing role=tab &mdash; broken on purpose</p>
+              <!-- BROKEN ON PURPOSE — these are links: they move you somewhere
+                   rather than swapping a panel. Wearing role="tab" they announce as
+                   part of a widget, and aria-controls names panels nobody built. -->
+              <div class="ac-tabs__list ac-tb-bad-nav" role="tablist" aria-label="Workspace, as tabs"
+                   data-ac-tb-cur-case="tabs">
+                <a class="ac-tabs__tab" role="tab" href="#tabs5-reports"
+                   aria-controls="tabs5-panel-reports" aria-selected="true" tabindex="0"
+                   data-ac-demo-broken="aria-valid-attr-value">Reports</a>
+                <a class="ac-tabs__tab" role="tab" href="#tabs5-invoices"
+                   aria-controls="tabs5-panel-invoices" aria-selected="false" tabindex="-1">Invoices</a>
+                <a class="ac-tabs__tab" role="tab" href="#tabs5-settings"
+                   aria-controls="tabs5-panel-settings" aria-selected="false" tabindex="-1">Settings</a>
+              </div>
+            </div>
 
-       Two rows that look the same. Both move you around this page; only one of
-       them says so. Pick an item in each.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">5 &middot; aria-selected or aria-current</h3>
-
-    <div class="ac-tb-panel" data-ac-tb-current>
-      <div class="ac-tb-cases">
-        <div class="ac-tb-case">
-          <p class="ac-tb-case__label">links wearing role=tab &mdash; broken on purpose</p>
-          <!-- BROKEN ON PURPOSE — these are links: they move you somewhere
-               rather than swapping a panel. Wearing role="tab" they announce as
-               part of a widget, and aria-controls names panels nobody built. -->
-          <div class="ac-tabs__list ac-tb-bad-nav" role="tablist" aria-label="Distro, as tabs"
-               data-ac-tb-cur-case="tabs">
-            <a class="ac-tabs__tab" role="tab" href="#tabs5-zines"
-               aria-controls="tabs5-panel-zines" aria-selected="true" tabindex="0"
-               data-ac-demo-broken="aria-valid-attr-value">Zines</a>
-            <a class="ac-tabs__tab" role="tab" href="#tabs5-distro"
-               aria-controls="tabs5-panel-distro" aria-selected="false" tabindex="-1">Distro</a>
-            <a class="ac-tabs__tab" role="tab" href="#tabs5-shows"
-               aria-controls="tabs5-panel-shows" aria-selected="false" tabindex="-1">Shows</a>
+            <div class="ac-tb-case">
+              <p class="ac-tb-case__label">the specimen</p>
+              <nav class="ac-tb-nav" aria-label="Workspace" data-ac-tb-cur-case="nav">
+                <a class="ac-tb-nav__link" href="#tabs5-reports" aria-current="location">Reports</a>
+                <a class="ac-tb-nav__link" href="#tabs5-invoices">Invoices</a>
+                <a class="ac-tb-nav__link" href="#tabs5-settings">Settings</a>
+              </nav>
+            </div>
           </div>
-        </div>
 
-        <div class="ac-tb-case">
-          <p class="ac-tb-case__label">the specimen</p>
-          <nav class="ac-tb-nav" aria-label="Distro" data-ac-tb-cur-case="nav">
-            <a class="ac-tb-nav__link" href="#tabs5-zines" aria-current="location">Zines</a>
-            <a class="ac-tb-nav__link" href="#tabs5-distro">Distro</a>
-            <a class="ac-tb-nav__link" href="#tabs5-shows">Shows</a>
-          </nav>
+          <div class="ac-tb-sections">
+            <p id="tabs5-reports" tabindex="-1">Reports &mdash; the last 30 days, exported as CSV.</p>
+            <p id="tabs5-invoices" tabindex="-1">Invoices &mdash; 462 issued, 99 of them unpaid.</p>
+            <p id="tabs5-settings" tabindex="-1">Settings &mdash; seats, billing contact and tax.</p>
+          </div>
+
+          <dl class="ac-tb-readout">
+            <div class="ac-tb-readout__row">
+              <dt>wearing role=tab &middot; active item</dt>
+              <dd><code data-ac-tb-out="cur-tabs">&mdash;</code></dd>
+            </div>
+            <div class="ac-tb-readout__row">
+              <dt>wearing role=tab &middot; aria-controls</dt>
+              <dd><code data-ac-tb-out="cur-tabs-controls">&mdash;</code></dd>
+            </div>
+            <div class="ac-tb-readout__row">
+              <dt>the specimen &middot; active item</dt>
+              <dd><code data-ac-tb-out="cur-nav">&mdash;</code></dd>
+            </div>
+          </dl>
+
+          <p class="ac-tb__note">
+            A tab owns a panel on this page and says so with <code>aria-selected</code>. A link takes
+            you somewhere and says so with <code>aria-current</code>. Both rows move you; only the
+            second one admits it.
+          </p>
         </div>
       </div>
-
-      <div class="ac-tb-sections">
-        <p id="tabs5-zines" tabindex="-1">Zines &mdash; 99 photocopied, folded on the floor.</p>
-        <p id="tabs5-distro" tabindex="-1">Distro &mdash; 462 sleeves, mailed on Thursdays.</p>
-        <p id="tabs5-shows" tabindex="-1">Shows &mdash; all-ages matinees, up the back stairs.</p>
-      </div>
-
-      <dl class="ac-tb-readout">
-        <div class="ac-tb-readout__row">
-          <dt>wearing role=tab &middot; active item</dt>
-          <dd><code data-ac-tb-out="cur-tabs">&mdash;</code></dd>
-        </div>
-        <div class="ac-tb-readout__row">
-          <dt>wearing role=tab &middot; aria-controls</dt>
-          <dd><code data-ac-tb-out="cur-tabs-controls">&mdash;</code></dd>
-        </div>
-        <div class="ac-tb-readout__row">
-          <dt>the specimen &middot; active item</dt>
-          <dd><code data-ac-tb-out="cur-nav">&mdash;</code></dd>
-        </div>
-      </dl>
-
-      <p class="ac-tb__note">
-        A tab owns a panel on this page and says so with <code>aria-selected</code>. A link takes
-        you somewhere and says so with <code>aria-current</code>. Both rows move you; only the
-        second one admits it.
-      </p>
     </div>
   </div>
 </div>

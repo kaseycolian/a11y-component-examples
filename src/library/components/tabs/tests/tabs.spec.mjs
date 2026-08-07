@@ -45,9 +45,9 @@ async function stopsIn(page, widgetSelector, firstId) {
 test('the tablist is named, and one of its tabs is selected', async ({ page }) => {
   const list = page.locator('#tabs1-tab-1').locator('xpath=..');
   await expect(list).toHaveAttribute('role', 'tablist');
-  await expect(list).toHaveAccessibleName('Show notes');
+  await expect(list).toHaveAccessibleName('Project 462');
 
-  const tabs = page.locator('.ac-tabs__list[aria-label="Show notes"] [role="tab"]');
+  const tabs = page.locator('.ac-tabs__list[aria-label="Project 462"] [role="tab"]');
   await expect(tabs).toHaveCount(3);
   await expect(page.locator('#tabs1-tab-1')).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('#tabs1-tab-2')).toHaveAttribute('aria-selected', 'false');
@@ -148,7 +148,7 @@ test('one Tab crosses the whole strip and lands on the panel', async ({ page }) 
   await expect(page.locator('#tabs1-panel-1')).toBeFocused();
 });
 
-/* --- example 2 · what the Tab key reaches -------------------------------- */
+/* --- example 3 · what the Tab key reaches -------------------------------- */
 
 test('the specimen is three stops, and the two failures are five and four', async ({ page }) => {
   const good = await stopsIn(page, '[data-ac-tb-stop-case="good"]', 'tabs2c-tab-1');
@@ -180,7 +180,7 @@ test('the readout agrees with what the Tab key actually did', async ({ page }) =
   await expect(page.locator('[data-ac-tb-out="stops-opacity"]')).toContainText('not visible');
 });
 
-/* --- example 3 · activation ---------------------------------------------- */
+/* --- example 2 · activation ---------------------------------------------- */
 
 test('automatic activation opens every panel on the way across', async ({ page }) => {
   await page.locator('#tabs3a-tab-1').focus();
@@ -188,7 +188,7 @@ test('automatic activation opens every panel on the way across', async ({ page }
   await page.keyboard.press('ArrowRight');
 
   await expect(page.locator('[data-ac-tb-out="act-auto-count"]')).toHaveText('2');
-  await expect(page.locator('[data-ac-tb-out="act-auto-pair"]')).toHaveText('The venue / The venue');
+  await expect(page.locator('[data-ac-tb-out="act-auto-pair"]')).toHaveText('Billing / Billing');
 });
 
 test('manual activation moves focus without selecting, and Enter selects', async ({ page }) => {
@@ -199,7 +199,7 @@ test('manual activation moves focus without selecting, and Enter selects', async
   await expect(page.locator('#tabs3b-tab-3')).toBeFocused();
   await expect(page.locator('#tabs3b-tab-1')).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('[data-ac-tb-out="act-manual-count"]')).toHaveText('0');
-  await expect(page.locator('[data-ac-tb-out="act-manual-pair"]')).toHaveText('The venue / Setlist');
+  await expect(page.locator('[data-ac-tb-out="act-manual-pair"]')).toHaveText('Billing / Overview');
 
   // The roving tabindex follows focus under manual activation, or Tab out and
   // back in returns to a tab the person had already left.
@@ -223,21 +223,21 @@ test('Space selects too, because a native button dispatches a click for both', a
 test('a panel with no tabindex is stepped over, and the specimen is arrived at', async ({ page }) => {
   await page.locator('#tabs4a-tab-1').focus();
   await page.keyboard.press('Tab');
-  expect((await active(page)).text).toBe('Buy a ticket');
+  expect((await active(page)).text).toBe('Save changes');
 
   // Focusable content in the panel is not the same thing as reaching the
   // panel: the name never gets read.
   await page.locator('#tabs4b-tab-1').focus();
   await page.keyboard.press('Tab');
-  expect((await active(page)).text).toBe('sleeve notes');
+  expect((await active(page)).text).toBe('Open tasks');
 
   await page.locator('#tabs4c-tab-1').focus();
   await page.keyboard.press('Tab');
   await expect(page.locator('#tabs4c-panel-1')).toBeFocused();
-  await expect(page.locator('#tabs4c-panel-1')).toHaveAccessibleName('Setlist');
+  await expect(page.locator('#tabs4c-panel-1')).toHaveAccessibleName('Overview');
 });
 
-/* --- example 5 · aria-selected or aria-current ---------------------------- */
+/* --- example 5 · links wearing role=tab ---------------------------- */
 
 test('the links wearing role=tab control panels that do not exist', async ({ page }) => {
   const item = page.locator('[data-ac-tb-cur-case="tabs"] [aria-selected="true"]');
@@ -251,7 +251,7 @@ test('the links wearing role=tab control panels that do not exist', async ({ pag
 test('the specimen is a nav whose active link says where you are', async ({ page }) => {
   const nav = page.locator('[data-ac-tb-cur-case="nav"]');
   await expect(nav).toHaveRole('navigation');
-  await expect(nav).toHaveAccessibleName('Distro');
+  await expect(nav).toHaveAccessibleName('Workspace');
 
   const current = nav.locator('[aria-current]');
   await expect(current).toHaveCount(1);
@@ -262,11 +262,11 @@ test('the specimen is a nav whose active link says where you are', async ({ page
 
 test('picking another link moves aria-current and leaves exactly one', async ({ page }) => {
   const nav = page.locator('[data-ac-tb-cur-case="nav"]');
-  await nav.getByText('Distro', { exact: true }).click();
+  await nav.getByText('Invoices', { exact: true }).click();
 
   await expect(nav.locator('[aria-current]')).toHaveCount(1);
-  await expect(nav.locator('[aria-current]')).toHaveText('Distro');
-  await expect(page.locator('[data-ac-tb-out="cur-nav"]')).toContainText('Distro');
+  await expect(nav.locator('[aria-current]')).toHaveText('Invoices');
+  await expect(page.locator('[data-ac-tb-out="cur-nav"]')).toContainText('Invoices');
 });
 
 /* --- the selected cue ---------------------------------------------------- */
@@ -303,7 +303,7 @@ test('selected is carried by more than color', async ({ page }) => {
 
 test('the selected cue is not generated content, so the tab is not renamed', async ({ page }) => {
   const tab = page.locator('#tabs1-tab-1');
-  await expect(tab).toHaveAccessibleName('Setlist');
+  await expect(tab).toHaveAccessibleName('Overview');
 
   const generated = await tab.evaluate((el) =>
     ['::before', '::after'].map((which) => getComputedStyle(el, which).content),

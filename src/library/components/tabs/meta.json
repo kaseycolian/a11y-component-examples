@@ -3,7 +3,7 @@
   "name": "Tabs",
   "group": "navigation",
   "order": 10,
-  "summary": "A row of buttons over a box of content is the easiest thing on a page to draw and one of the easiest to get wrong. The pattern hands the arrow keys a job the Tab key used to do, so the whole strip becomes one stop — and the panel underneath still has to be somewhere the keyboard can land.",
+  "summary": "Tabs are a strip of buttons over one box of content, with a single panel showing at a time. Use them to swap between views of the same thing without leaving the page. The strip is one Tab stop and the arrow keys move inside it, so the panel underneath has to be somewhere the keyboard can still land.",
   "tags": [
     "tabs",
     "tablist",
@@ -18,7 +18,7 @@
   "wcag": ["1.3.1", "1.4.1", "2.1.1", "2.4.3", "2.4.7", "2.5.8", "4.1.2"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Examples 2 to 5 are live. Example 2 asks the browser which elements it will really give focus to and prints every stop three strips have; example 3 counts the panels opened while arrowing across; example 4 names the next thing Tab reaches after the selected tab; example 5 puts a row of links wearing role=tab beside the same links in a nav.",
+  "demoNote": "Everything under Common mistakes is live, and each failing strip sits beside a correct one because the two are indistinguishable to look at. Every readout is measured by asking the browser which elements it will really give focus to.",
   "contract": {
     "useWhen": "Swap panels in place. Not for moving between pages; that is jump-nav.",
     "root": [".ac-tabs"],
@@ -41,6 +41,14 @@
     },
     "keyboard": [
       [
+        "Tab",
+        "one stop for the strip, then into the panel"
+      ],
+      [
+        "Enter / Space",
+        "native: selects the focused tab. Under automatic activation the arrow already did"
+      ],
+      [
         "ArrowLeft / ArrowRight",
         "move and select, since the panels are already in the DOM"
       ],
@@ -51,10 +59,6 @@
       [
         "Home / End",
         "first / last tab"
-      ],
-      [
-        "Tab",
-        "one stop for the strip, then into the panel"
       ]
     ],
     "states": [

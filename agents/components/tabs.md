@@ -16,10 +16,11 @@ In `library/components/tabs/` — copy `component.{html,css,js}`, read `docs.md`
 
 ## Keyboard
 
+- `Tab` — one stop for the strip, then into the panel
+- `Enter / Space` — native: selects the focused tab. Under automatic activation the arrow already did
 - `ArrowLeft / ArrowRight` — move and select, since the panels are already in the DOM
 - `ArrowUp / ArrowDown` — the same, and the only pair that moves, when the strip is vertical
 - `Home / End` — first / last tab
-- `Tab` — one stop for the strip, then into the panel
 
 **States:** selected, disabled, vertical — aria-orientation=vertical on the tablist, which swaps which arrows move
 

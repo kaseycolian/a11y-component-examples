@@ -5,10 +5,10 @@
      [CORE]       every example. The factory: pairing, roving tabindex, the
                   keyboard map, and the one event a host app needs.
      [FOCUS]      the page's own probe — whether the browser will really give
-                  an element focus. Examples 2 and 4 are built on it.
-     [STOPS]      examples 2 and 4. What the Tab key reaches, in order.
-     [NAIVE]      example 2. The two broken strips, wired by hand.
-     [ACTIVATION] example 3. Counting panels activated on the way across.
+                  an element focus. Examples 3 and 4 are built on it.
+     [STOPS]      examples 3 and 4. What the Tab key reaches, in order.
+     [NAIVE]      example 3. The two broken strips, wired by hand.
+     [ACTIVATION] example 2. Counting panels activated on the way across.
      [CURRENT]    example 5. Which attribute the active item is wearing.
      [AUTO-INIT]  delete if you construct instances yourself.
 
@@ -115,7 +115,7 @@
         tab.tabIndex = isOn ? 0 : -1;
         // `hidden`, never opacity and never a class that only moves it off
         // screen: an unselected panel has to leave the accessibility tree and
-        // take its tab stops with it. Example 2 is what the other way costs.
+        // take its tab stops with it. Example 3 is what the other way costs.
         if (panels[i]) panels[i].hidden = !isOn;
       });
 
@@ -236,6 +236,59 @@
       else el.removeAttribute('data-ac-tb-bad');
     }
 
+    /* === [ACTIVATION] =====================================================
+       Example 2. One counter per strip, fed by the component's own change
+       event, plus the pair of tabs the two modes can disagree about. The
+       focused tab is read off the roving tabindex rather than tracked: the
+       tab carrying tabindex="0" is by definition where Tab returns. */
+
+    var counts = { auto: 0, manual: 0 };
+
+    function refreshActivation(key) {
+      var widget = root.querySelector('[data-ac-tb-act-case="' + key + '"]');
+      if (!widget) return;
+
+      var current = widget.querySelector('[role="tab"][aria-selected="true"]');
+      var focused = widget.querySelector('[role="tab"][tabindex="0"]');
+
+      say('act-' + key + '-count', String(counts[key]));
+      say(
+        'act-' + key + '-pair',
+        (focused ? nameOf(focused) : '—') + ' / ' + (current ? nameOf(current) : '—'),
+      );
+    }
+
+    function wireActivation() {
+      ['auto', 'manual'].forEach(function (key) {
+        var widget = root.querySelector('[data-ac-tb-act-case="' + key + '"]');
+        if (!widget) return;
+
+        on(widget, 'ac:tabs:change', function () {
+          counts[key] += 1;
+          refreshActivation(key);
+        });
+        // The arrows move focus without selecting under manual activation, so
+        // the pair has to be re-read on plain movement as well.
+        on(widget, 'keyup', function () {
+          refreshActivation(key);
+        });
+        on(widget, 'focusin', function () {
+          refreshActivation(key);
+        });
+
+        refreshActivation(key);
+      });
+
+      on(root.querySelector('[data-ac-tb-act-reset]'), 'click', function () {
+        ['auto', 'manual'].forEach(function (key) {
+          var widget = root.querySelector('[data-ac-tb-act-case="' + key + '"]');
+          if (widget && widget._acTabs) widget._acTabs.select(0);
+          counts[key] = 0;
+          refreshActivation(key);
+        });
+      });
+    }
+
     /* === [FOCUS] =========================================================
        Whether the browser will give this element focus — asked, not guessed.
        A selector can only list the elements that are usually focusable, and
@@ -324,7 +377,7 @@
       return (nameOf(el) || 'no name') + ' (' + roleOf(el) + ')';
     }
 
-    /* Example 2. */
+    /* Example 3. */
     function refreshStops() {
       ['roving', 'opacity', 'good'].forEach(function (key) {
         var widget = root.querySelector('[data-ac-tb-stop-case="' + key + '"]');
@@ -357,7 +410,7 @@
     }
 
     /* === [NAIVE] ==========================================================
-       Example 2's two broken strips. The APG keyboard map is repeated here on
+       Example 3's two broken strips. The APG keyboard map is repeated here on
        purpose so that each strip has exactly one thing wrong with it: the
        first never roves the tabindex, the second hides its panels with
        opacity. Everything else about them is correct. */
@@ -404,58 +457,6 @@
       });
     }
 
-    /* === [ACTIVATION] =====================================================
-       Example 3. One counter per strip, fed by the component's own change
-       event, plus the pair of tabs the two modes can disagree about. The
-       focused tab is read off the roving tabindex rather than tracked: the
-       tab carrying tabindex="0" is by definition where Tab returns. */
-
-    var counts = { auto: 0, manual: 0 };
-
-    function refreshActivation(key) {
-      var widget = root.querySelector('[data-ac-tb-act-case="' + key + '"]');
-      if (!widget) return;
-
-      var current = widget.querySelector('[role="tab"][aria-selected="true"]');
-      var focused = widget.querySelector('[role="tab"][tabindex="0"]');
-
-      say('act-' + key + '-count', String(counts[key]));
-      say(
-        'act-' + key + '-pair',
-        (focused ? nameOf(focused) : '—') + ' / ' + (current ? nameOf(current) : '—'),
-      );
-    }
-
-    function wireActivation() {
-      ['auto', 'manual'].forEach(function (key) {
-        var widget = root.querySelector('[data-ac-tb-act-case="' + key + '"]');
-        if (!widget) return;
-
-        on(widget, 'ac:tabs:change', function () {
-          counts[key] += 1;
-          refreshActivation(key);
-        });
-        // The arrows move focus without selecting under manual activation, so
-        // the pair has to be re-read on plain movement as well.
-        on(widget, 'keyup', function () {
-          refreshActivation(key);
-        });
-        on(widget, 'focusin', function () {
-          refreshActivation(key);
-        });
-
-        refreshActivation(key);
-      });
-
-      on(root.querySelector('[data-ac-tb-act-reset]'), 'click', function () {
-        ['auto', 'manual'].forEach(function (key) {
-          var widget = root.querySelector('[data-ac-tb-act-case="' + key + '"]');
-          if (widget && widget._acTabs) widget._acTabs.select(0);
-          counts[key] = 0;
-          refreshActivation(key);
-        });
-      });
-    }
 
     /* === [CURRENT] ========================================================
        Example 5. Nothing here is measured; it is read straight off the two

@@ -12,25 +12,25 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 
 ## START HERE
 
-**Phase 0 is done. Components 1–25 are done. Next up is row 26, `tabs`.**
+**Phase 0 is done. Components 1–26 are done. Next up is row 27, `jump-nav`.**
 
-Last updated 2026-08-07, after row 25. The repo was left green:
+Last updated 2026-08-07, after row 26. The repo was left green:
 
 ```
 check:tokens                      34 files clean
 check:agents                      42 surfaces match their sources
 npm run build                     35 pages
-npx playwright test --project=chromium tooltip                    25 passed
+npx playwright test --project=chromium tabs                       29 passed
 npx playwright test --project=chromium agent-surfaces            117 passed
-npx playwright test --project=chromium a11y -g tooltip            38 passed
+npx playwright test --project=chromium a11y -g tabs               44 passed
 ```
 
-The full suite was re-run at row 25: **1220 passed**, exit 0 — unchanged since row 21, because rows
-22 to 25 added no tests. It is the honest baseline: if something is red before you have touched
+The full suite was re-run at row 26: **1220 passed**, exit 0 — unchanged since row 21, because rows
+22 to 26 added no tests. It is the honest baseline: if something is red before you have touched
 anything, it is not your change.
 
 **A row that touches `src/site/` makes the whole suite the check, not the slug.** Row 22 changed
-`site.css` and needed it; rows 23 to 25 touched only their own folders and did not.
+`site.css` and needed it; rows 23 to 26 touched only their own folders and did not.
 
 **A full run can flake, so re-run before you conclude anything.** One at row 19 reported *4 failed,
 1202 passed*; the identical tree at row 20 came back 1206/1206. Nothing was fixed in between. Four
@@ -49,9 +49,9 @@ Read these three things before touching anything, in this order:
 3. **The row you are about to do**, in [The roster](#the-roster). Every finished row records what
    actually bit, and that is the reason this file is worth reading rather than skimming.
 
-Then follow [The procedure](#the-procedure) for `tabs`, exactly.
+Then follow [The procedure](#the-procedure) for `jump-nav`, exactly.
 
-**Where the pass stands.** 25 of 33 components done, in roster order — there is no reordering, so the
+**Where the pass stands.** 26 of 33 components done, in roster order — there is no reordering, so the
 next unticked row is always the next job. Seven of the twelve renames are applied — `chip-toggle`,
 `dropdown`, `effects`, `field`, `fieldset-group`, `focus-ring`, `motion-preferences`. The other five happen in
 their own rows, and [Naming decisions](#naming-decisions) is the ledger. Phase 3 (the site's own copy)
@@ -156,6 +156,15 @@ starting; every one of these cost a debugging detour the first time.
   `showModal()` leaves to the author. Retitling them made the page argue something the old `summary`
   did not, and the old `contract.useWhen` then agreed with neither. **Reread `useWhen` against the new
   titles, not only against the new summary** — `check:agents` fires its receipt on the summary alone.
+- **A renumber can invert two section markers and leave the JS out of order.** `tabs` swapped examples
+  2 and 3, which put `[ACTIVATION]` (now example 2) after `[STOPS]` and `[NAIVE]` (now 3). Moving 52
+  lines fixed the reading order and was safe because every block is a hoisted function declaration
+  inside the factory — but **run `node --check` on the file afterwards**, which is the cheapest proof
+  the move did not straddle a brace.
+- **Check a repeated demo string's roles before a global swap.** `tabs` used `Distro` as both a link
+  label and a `<nav>`'s `aria-label`; replacing both with the new link text quietly renamed the
+  landmark, and the spec asserted the landmark name. One `toHaveAccessibleName` caught it. Grep each
+  string you are about to replace and look at *what it is* in each hit, not just how many there are.
 - **"Kept as a comparison" is a mistake wearing a different word.** `tooltip`'s example 3 was the
   native `title` attribute, introduced as a comparison rather than a failure — and it is a live
   instance of the first entry in its own `contract.failureModes`. Read a "comparison", a "for
@@ -590,8 +599,8 @@ bound" note, and a `summary` in the new voice.
 | 23 | `modal` | [x] | Single section, no renumber, no rename, and nothing to change in the CSS or JS — the whole row is `component.html`, `docs.md`, `meta.json` and the spec. **The example titles were the find:** all four were named for the *content* (`The baseline`, `A form in a modal`, `Long content`) when what actually separates them is where focus lands, which is the one thing `showModal()` leaves to you. They are `Focus on the dialog itself` / `Focus in the first field` / `Focus on the safe answer` / `Content longer than the screen` now, and the section note says so. The old `summary` and `contract.useWhen` disagreed about the hard part once the summary was rewritten — the summary said focus placement, `useWhen` said "the ARIA you must not add" — so `useWhen` moved with it; the ARIA point is still carried by two `failureModes`. Content: doors/setlist/door list/house rules → Order 462, Invite a teammate, Delete Project 462, Billing terms, with all four ids renamed and **23 strings in the spec**. **A trigger and a confirmation button cannot share a name prefix**: `Delete project` and `Delete Project 462` collide under `getByRole`'s default substring match, so the trigger locators need `exact: true`. `docs.md` had six component-specific `##` against a cap of two: *Sizing and zoom* became a `###` under Required markup, *Refusing to close* a `###` under Keyboard, *Dismissing by the backdrop* a `###` under *The four things it does not do*, and *Ask first whether it should be a modal* folded into a Common mistakes bullet. The two that stayed `##` are the two `CLAUDE.md` names as load-bearing: *What showModal() gives you* and *The four things it does not do*. `## States` is new. **The dialog's own `<h2>` stays `<h2>` under an `<h4>` example title** — not a stranded heading: a closed `<dialog>` is `display: none` so its heading is not in the tree, and an open one makes the rest of the page inert. The file header now says that, so a later row does not "fix" it. |
 | 24 | `drawer` | [x] | Single section, no renumber, no rename, no CSS or JS change — the same shape as `modal`, and the second row running where the whole job is `component.html`, `docs.md`, `meta.json` and the spec. **The demo content was explaining its own CSS**: example 3's ten paragraphs were "Section 6. The body is a flex item with `min-height: 0`…", which is a `docs.md` sentence sitting in rendered demo text. It is an Activity log for Project 462 now — real content, still ten paragraphs so the scroll is real — and the `Terms of service` title went with it, which also removed an overlap with `modal`'s new *Billing terms*. Renamed `ac-demo-long` → `ac-demo-activity` across the markup, the spec and example 2's nav list. `contract.keyboard` gained a `native:` <kbd>Enter</kbd> / <kbd>Space</kbd> row so the mandatory table could account for the trigger. `docs.md` had six component-specific `##` against a cap of two: *Edges* became a `###` under Required markup, and *Modal or not*, *Scroll lock* and *The slide is motion-gated* became `###` under the new `## States`; *The focus story* and *Top layer, and the backdrop's z-index* stayed `##`. `## Required markup`, `## States` and `## Screen reader behavior` are new, and the old *Before you copy* both hedged about frameworks and carried the "consider `<dialog>` first" argument — the hedge is gone and the argument moved to `## Related`, pointing at `modal`. **This file is the one with CRLF line endings**, which breaks a `\n`-anchored regex over the whole file; `split('\n')` still works because `trim()` eats the `\r`. |
 | 25 | `tooltip` | [x] | **First two-section split since `effects`, and the renumber came with it.** Example 3 was the native `title` attribute, kept "as a comparison" — but it is a live failure of exactly the first `contract.failureModes` entry (*hover only, which fails all three*), so it is a mistake, and mistakes go last: 1→1, 2→2, 4→3, 5→4, 3→5. That moved every example number in the CSS header and its four inline markers, the JS header and its two, and two spec section comments. **No block reordering**, because each section's *first* example still ascends: `[BUTTON]` is now 1 and 5, `[ICON]` 2, 3, 4. It carries no `data-ac-demo-broken` — none of `title`'s failures is an axe violation, a `focus-visible` one or a `target-size` one, the `skip-link` case. **A single-example section is a full-width grid track**, and `.ac-demo` is a stretch column, so example 5's bare button spanned the whole panel; wrapping it in the component's own `.ac-tooltip-host` (without `data-ac-tooltip`, which is what the factory looks for) puts it back to content width with no new CSS. Content: Advance the show / run sheet / load-out / set length / Berkeley curfew → Export report, Print invoice, What counts as a seat?, Seats with a 99-seat plan cap, Billing contact — 13 strings in the spec including a two-part `toHaveAccessibleDescription` regex. `contract.keyboard` gained a `native:` <kbd>Tab</kbd> row. `docs.md` had five component-specific `##` against a cap of two: *First, do you want one at all?* became a `###` under Required markup, *Positioning* a `###` under the new `## States`, and *Why `title` is not this* a `###` under Common mistakes; the two that stayed are *SC 1.4.13 is the whole component* (which `CLAUDE.md` names as load-bearing) and *Toggletip, and why it is a different component*, which is a second component in the same folder. |
-| 26 | `tabs` | [ ] | **NEXT.** |
-| 27 | `jump-nav` | [ ] | rename → In-Page Navigation. |
+| 26 | `tabs` | [x] | **The heaviest content sweep of the pass, and the first row to move a JS block.** Four of the five examples pair a failing strip with a correct one, so the split turned on which example is *not* a failure: `contract.failureModes` lists four, and automatic-vs-manual activation is not among them — its own comment already said *Not broken*. So examples 1 and 3 are correct, 2, 4 and 5 are mistakes, and mistakes go last: 1→1, 3→2, 2→3, 4→4, 5→5. **That inverted two `[SECTION]` markers, and `[ACTIVATION]` then read after `[STOPS]`/`[NAIVE]` in `component.js`** — 52 lines moved above `[FOCUS]` so the file reads in example order again, which is the `button` rule. Safe because every block is a hoisted function declaration inside the factory; `node --check` confirmed it. Content: Setlist / Pressings / The venue / Show notes / sleeve notes / Zines / Distro / Buy a ticket → Overview / Activity / Billing / Project 462 / Open tasks / Reports / Invoices / Save changes, across 24 markup strings and 10 in the spec. **One blanket replacement was wrong**: `'Distro'` was both a link label and the `<nav>`'s `aria-label`, and only the link became `Invoices` — the nav is `Workspace`. Check a repeated string's *roles* before a global swap. `contract.keyboard` gained a `native:` <kbd>Enter</kbd> / <kbd>Space</kbd> row and Tab moved to the front. `docs.md`: the `\| Key \| Where \| Does \|` table was the last of the three old shapes in the library; *One sentence* folded into the Required markup lede; five component-specific `##` against a cap of two — *aria-selected or aria-current* became a `###` under Required markup, *Hide the panel with `hidden`* a `###` under States, *The panel gets a Tab stop* a `###` under *Roving tabindex*; the two that stayed are *Roving tabindex* and *Automatic or manual activation*. `## Related` is new. |
+| 27 | `jump-nav` | [ ] | **NEXT.** rename → In-Page Navigation. |
 | 28 | `notice` | [ ] | rename → Alert. |
 | 29 | `status-text` | [ ] | rename → Status Label. |
 | 30 | `badge` | [ ] | |
@@ -660,7 +669,7 @@ can quietly rot while the pass runs:
 ```sh
 DONE="button icon-button loading-button chip-toggle field text-input input-group textarea \
 native-select radio-group checkbox switch fieldset-group skip-link visually-hidden focus-ring \
-live-region typography motion-preferences effects disclosure dropdown modal drawer tooltip"
+live-region typography motion-preferences effects disclosure dropdown modal drawer tooltip tabs"
 P=""; for d in $DONE; do P="$P src/library/components/$d"; done
 ls -d $P | wc -l          # must equal the number of finished rows, or every grep below is vacuous
 
@@ -682,7 +691,7 @@ done
 grep -rn "Chip Toggle\|Dropdown / Listbox\|Fieldset Group\|Focus Ring\|Motion Preferences" src/ docs/
 ```
 
-All five return nothing as of row 25 — and **check the sanity of `$P` before believing that**, because
+All five return nothing as of row 26 — and **check the sanity of `$P` before believing that**, because
 every one of them is a grep over a path list and a wrong `DONE` or a failed `cd` makes all five pass
 vacuously. `ls -d $P | wc -l` should print the number of finished rows. The rename sweep below returns
 only its own rows in
