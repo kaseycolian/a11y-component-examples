@@ -14,20 +14,19 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 
 **Phase 0 is done. Components 1–16 are done. Next up is row 17, `live-region`.**
 
-Last updated 2026-08-06. This note is part of the `focus-ring` commit. The repo was left green:
+Last updated 2026-08-06, after row 16. The repo was left green, and the **whole suite was re-run in
+full to verify it**:
 
 ```
 check:tokens                      34 files clean
 check:agents                      42 surfaces match their sources
 npm run build                     35 pages
-playwright --project=chromium     focus-ring 22 · agent-surfaces 117 · a11y -g focus-ring 35
-                                  prose-surface + typography + effects 69
+npx playwright test --project=chromium     1205 passed   (9.2 min, exit 0)
 ```
 
-The whole suite was last run in full at row 6: 1205 passed, 10.9 min.
-
-Re-run that last line before you start if you want to be sure nothing drifted. It is the honest
-baseline — if something is red before you have touched anything, it is not your change.
+Same 1205 as the last full run at row 6 — ten components rewritten since, and no test gained, lost or
+skipped. Re-run that last line before you start if you want to be sure nothing drifted. It is the
+honest baseline: if something is red before you have touched anything, it is not your change.
 
 Read these three things before touching anything, in this order:
 
