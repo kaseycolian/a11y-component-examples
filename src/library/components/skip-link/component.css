@@ -224,7 +224,7 @@
 }
 
 .ac-skip-nav a,
-.ac-skip-lineup a {
+.ac-skip-people a {
   display: inline-flex;
   align-items: center;
   min-height: var(--ac-target, 44px);
@@ -233,7 +233,7 @@
 }
 
 .ac-skip-nav a:focus-visible,
-.ac-skip-lineup a:focus-visible,
+.ac-skip-people a:focus-visible,
 .ac-skip-input:focus-visible {
   outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
   outline-offset: 2px;
@@ -267,7 +267,7 @@
   font-size: 0.9rem;
 }
 
-.ac-skip-lineup {
+.ac-skip-people {
   display: flex;
   flex-wrap: wrap;
   gap: 0.15rem 0.6rem;
@@ -318,7 +318,7 @@
   }
 
   .ac-skip-nav a,
-  .ac-skip-lineup a {
+  .ac-skip-people a {
     color: LinkText;
   }
 

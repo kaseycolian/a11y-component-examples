@@ -14,7 +14,7 @@ test.beforeEach(async ({ page }) => {
 // main content", and it is the first one in the document.
 const link1 = (page) => page.locator('a.ac-skip-link[href="#sl-main-1"]');
 
-/* --- example 1 · the baseline --------------------------------------------- */
+/* --- example 1 · baseline skip link ---------------------------------------- */
 
 test('it is a plain link to a fragment, with no ARIA at all', async ({ page }) => {
   const link = link1(page);
@@ -170,7 +170,7 @@ test('the visible modifier is never clipped and needs no focus', async ({ page }
 });
 
 test('a mid-page link can skip a block rather than jump to main', async ({ page }) => {
-  const link = page.getByRole('link', { name: 'Skip the lineup' });
+  const link = page.getByRole('link', { name: 'Skip the customer list' });
   const after = page.locator('#sl-after-4');
 
   // SC 2.4.1 is about blocks; "main content" is only the commonest one.
