@@ -2,8 +2,12 @@
 
 A library-wide rewrite of every human-facing string, one component at a time. Started 2026-08-03.
 
-**This file is the tracker.** It survives across sessions. Open it first, take the next unticked row in
-[The roster](#the-roster), follow [The procedure](#the-procedure), tick the row, commit.
+**This file is the tracker.** It survives across sessions. Open it first.
+
+**All 33 component rows are done.** What is left is [Phase 3](#phase-3--the-site-after-all-33), the
+site's own copy — that section is the brief, and it is self-contained. [The roster](#the-roster) and
+[The procedure](#the-procedure) are history now: read a roster row when you touch that component
+again, because each one records what actually bit.
 
 Everything here is about *writing and structure*. Component behavior does not change. `CLAUDE.md` is still
 the contributing contract for code, and `docs/BUILD-STATUS.md` is still the build log.
@@ -42,18 +46,14 @@ signature, not a regression — confirm with a second run before you go hunting.
 a file you keep**: the row-19 log was truncated to its last seven lines, which cost the failing names
 and made the question unanswerable.
 
-Read these two things before touching anything, in this order:
+**To do Phase 3, read two things:** [The style rules](#the-style-rules), which still govern every
+word, and [Phase 3](#phase-3--the-site-after-all-33) itself. Nothing else in this file is required —
+it is the record of how the 33 got here.
 
-1. **This file**, top to bottom. It is the whole contract, and
-   [What the finished rows learned](#what-the-finished-rows-learned-in-one-place) is the part that
-   cost something.
-2. **`button`'s four files** — `src/library/components/button/{meta.json,component.html,docs.md,tests/button.spec.mjs}`.
-   It is the worked example of every rule below. **A spec lives inside its component's folder**, not in
-   the repo-root `tests/` — that one holds only the shared gate and the site-shell specs, and looking
-   for `tests/<slug>.spec.mjs` there finds nothing.
-
-Then do [Phase 3](#phase-3--the-site-after-all-33). It is five files of site copy, not a component,
-so [The procedure](#the-procedure) does not apply to it — the [style rules](#the-style-rules) do.
+**To touch a component again**, read its roster row first, then `button`'s four files
+(`src/library/components/button/{meta.json,component.html,docs.md,tests/button.spec.mjs}`) as the
+worked example. **A spec lives inside its component's folder**, not in the repo-root `tests/` — that
+one holds only the shared gate and the site-shell specs.
 
 **Where the pass stands.** All 33 components are done, and **all twelve renames are applied** —
 `chip-toggle`, `dropdown`, `effects`, `field`, `fieldset-group`, `focus-ring`, `jump-nav`,
@@ -673,18 +673,79 @@ Landed before component 1, so a clean session cannot revert to the old voice.
 Verified: `check:tokens` 34 files clean · `check:agents` 42 surfaces match · `build` 35 pages ·
 `playwright --project=chromium site-header agent-surfaces` 140 passed.
 
-### Phase 3 — the site, after all 33
+## Phase 3 — the site, after all 33
 
-**Off limits: the brand name, the tagline, `SiteHeader.astro`, `SiteFooter.astro`.** `hero__copy` may gain
-content, but nothing currently in it is removed or edited.
+**This is the active work.** All 33 component rows are done; what is left is the site's own copy.
+Every file below is in `src/site/` or `docs/agents/`, so **the check is the whole suite, not a
+slug** — the same position row 22 was in. [The procedure](#the-procedure) is written for a component
+and does not apply here; [the style rules](#the-style-rules) do.
+
+**Off limits: the brand name, the tagline, `SiteHeader.astro`, `SiteFooter.astro`.** `hero__copy` may
+gain content, but nothing currently in it is removed or edited.
+
+### The one that is not a style edit
+
+`src/site/pages/index.astro`'s first promise reads:
+
+> **Every screen reader that matters** — Built and checked against NVDA, JAWS, VoiceOver on macOS and
+> iOS, and TalkBack on Android.
+
+**Nothing has been checked against any of them.** `docs/at-support.md` is the project's own record and
+every cell in it is `—`, under a heading that says *"Untested is written as untested. An empty cell
+never means 'probably fine'. Overstating coverage is worse than admitting a gap."* Twenty-three
+component pages now carry *"Not yet verified against real assistive technology"* directly.
+
+So this is an accuracy fix, not a rewrite, and it is the first thing to do. What the library can
+honestly promise is that the patterns are built to the APG and the ARIA each one needs is asserted
+against the real accessibility tree by 1220 tests — which is a different and defensible claim. Do not
+weaken it into vagueness; say the true thing plainly.
+
+### The files
 
 | | file | what |
 | --- | --- | --- |
-| [ ] | `src/site/pages/index.astro` | the four `promises`; the `PEEK_FILES` excerpt strings, which must match `field/component.html`; the two `<h2>`s. **Not** `hero__copy`. |
-| [ ] | `src/site/pages/components/index.astro` | the `<p class="lede">` under `<h1>All Components</h1>` |
-| [ ] | `src/site/pages/components/[slug].astro` | `<h2>Live example</h2>` |
-| [ ] | `src/site/components/CodePanel.astro` | review only — its strings are already direct |
-| [ ] | `docs/agents/*.src.md` | review only. Byte-capped: `llms.txt` has ~65 bytes of headroom, `AGENTS.md` ~124. |
+| [ ] | `src/site/pages/index.astro` | the four `promises` — **promise 1 is the accuracy fix above**. Also the two `<h2>`s (`What every component here does`, `Browse by group`). **Not** `hero__copy`. |
+| [ ] | `src/site/pages/index.astro` | `PEEK_FILES` — three excerpt strings. **Verified 2026-08-07: they still match `field/component.html` exactly.** If you edit either side, re-check both. |
+| [ ] | `src/site/pages/components/index.astro` | the `<p class="lede">` under `<h1>All Components</h1>`, and the eight group summaries it renders from `src/site/lib/groups.mjs` |
+| [ ] | `src/site/pages/components/[slug].astro` | `<h2 class="panel__title">Live example</h2>` |
+| [ ] | `src/site/components/CodePanel.astro` | review only — its strings were already direct at Phase 0 |
+| [ ] | `docs/agents/*.src.md` | review only, and **byte-capped**; see below |
+
+### The byte budgets, measured 2026-08-07
+
+The generator exits 1 and names the file when a surface goes over. Cutting prose is the intended fix;
+raising a budget needs a reason recorded.
+
+| surface | bytes | budget | headroom |
+| --- | --- | --- | --- |
+| `agents/testing.md` | 12278 | 12288 | **10** |
+| `agents/llms.txt` | 2495 | 2560 | 65 |
+| `AGENTS.md` | 2436 | 2560 | 124 |
+| `.claude/skills/a11y-library/SKILL.md` | 2918 | 3072 | 154 |
+| `agents/index.md` | 3347 | 3584 | 237 |
+
+**`agents/testing.md` has ten bytes.** Row 21 spent nearly all of it and paid for that item by
+tightening two others. One added sentence there fails the build, so budget a cut with every addition.
+
+### A loose end worth closing while you are here
+
+The 33 `docs.md` files do not phrase their AT status the same way. Twenty-three use the house
+closing; seven say *"Not yet tested against a screen reader"* in their own words; `focus-ring` and
+`typography` correctly say there is nothing to announce; and **`modal`, `live-region` and
+`motion-preferences` state AT behavior as fact with no disclaimer at all** — *"NVDA and JAWS announce
+the dialog's name on entry"* — which is the same overstatement as promise 1, one page down. Settle on
+one phrasing and apply it.
+
+### Done means
+
+```sh
+npm run check:tokens && npm run check:agents && npm run build
+npx playwright test --project=chromium          # the whole suite: this is src/site/
+```
+
+Plus the sweeps in [Checking the rows already done](#checking-the-rows-already-done), which now cover
+all 33 components and come clean. The baseline is **1220 passed**; Phase 3 adds no components, so a
+different number means a test was added or lost, not that a component changed.
 
 ---
 

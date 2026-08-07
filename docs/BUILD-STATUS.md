@@ -1,10 +1,11 @@
 # Build status
 
-> **All 33 components are built, and this file is no longer the active work.** The current job is the
-> library-wide copy and structure pass, and its tracker is **`docs/rewrite-pass.md`** — open that one
-> first. Come back here for the build history, the infrastructure decisions and **Gotchas already
-> solved**, which are all still current. Everything below was written while the components were being
-> built, so read it as a log rather than as instructions about what to do next.
+> **All 33 components are built and their copy pass is finished, and this file is not the active
+> work.** What is left is Phase 3 of the copy pass — the site's own copy — and its tracker is
+> **`docs/rewrite-pass.md`**; open that one first. Come back here for the build history, the
+> infrastructure decisions and **Gotchas already solved**, which are all still current. Everything
+> below was written while the components were being built, so read it as a log rather than as
+> instructions about what to do next.
 
 **Resume point.** `CLAUDE.md` (auto-loaded) has the conventions. This file has progress and the
 ordered next steps. `component-specs.md` has the pre-decided ARIA contract for every remaining
