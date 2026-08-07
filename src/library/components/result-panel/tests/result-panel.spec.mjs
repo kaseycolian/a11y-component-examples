@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 const PAGE = 'components/result-panel/';
 
 const URL_VALUE =
-  'https://matinee.example/all-ages/?set=storm-windows&pressing=99&t=sk_test_99RubySohoLinoleumStormWindows462';
+  'https://app.example.com/invite/?project=462&role=editor&t=sk_test_462abcdefg99abcdefg462abcdefg';
 
 test.beforeEach(async ({ page, context }) => {
   // The copy path is the subject of two examples, so it has to resolve the
@@ -259,13 +259,13 @@ test('start over clears the result and empties the log', async ({ page }) => {
 
 test('the renaming button changes the name under the reader', async ({ page }) => {
   const button = page.locator('[data-ac-rp-case="rename"] [data-ac-rp-copy]');
-  await expect(button).toHaveAccessibleName('Copy the src parameter');
+  await expect(button).toHaveAccessibleName('Copy the project parameter');
 
   await button.click();
 
-  await expect(button).toHaveAccessibleName('Copied the src parameter');
+  await expect(button).toHaveAccessibleName('Copied the project parameter');
   await expect(page.locator('[data-ac-rp-out="copy-rename"]')).toHaveText(
-    '"Copied the src parameter"',
+    '"Copied the project parameter"',
   );
   // No region on that panel, so the rename is all there was.
   await expect(page.locator('[data-ac-rp-case="rename"] .ac-result__status')).toHaveCount(0);
@@ -291,10 +291,10 @@ test('the specimen keeps its name and announces the outcome', async ({ page }) =
 
   await button.click();
 
-  await expect(button).toHaveAccessibleName('Copy the pressing parameter');
+  await expect(button).toHaveAccessibleName('Copy the expires parameter');
   await expect(panel.locator('.ac-result__status')).toHaveText('Copied to clipboard');
   await expect(page.locator('[data-ac-rp-out="copy-good"]')).toHaveText('"Copied to clipboard"');
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('?pressing=99');
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('?expires=24h');
 });
 
 test('all three copy buttons have distinct names', async ({ page }) => {
@@ -360,7 +360,7 @@ test('setResult writes every part in one call', async ({ page }) => {
   const result = await page.evaluate(() => {
     const panel = document.querySelector('[data-ac-rp-case="quiet"]');
     AC.setResult(panel, {
-      value: '?set=matinee',
+      value: '?role=editor',
       verdict: 'Failed',
       tone: 'err',
       count: 1,
@@ -382,7 +382,7 @@ test('setResult writes every part in one call', async ({ page }) => {
   });
 
   expect(result).toEqual({
-    value: '?set=matinee',
+    value: '?role=editor',
     verdictClass: 'ac-status ac-status--err',
     verdict: 'Failed',
     badge: '1 parameters',

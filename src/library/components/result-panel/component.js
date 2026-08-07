@@ -1,5 +1,5 @@
 /* ===========================================================================
-   RESULT PANEL
+   COPYABLE RESULT
 
    WHAT TO COPY
      [COPY]       examples 1, 4 and 5. The copy button. Lifted from Input
@@ -398,7 +398,7 @@
 
     var BUILT = {
       value:
-        'https://matinee.example/all-ages/?set=storm-windows&pressing=99&t=sk_test_99RubySohoLinoleumStormWindows462',
+        'https://app.example.com/invite/?project=462&role=editor&t=sk_test_462abcdefg99abcdefg462abcdefg',
       verdict: 'Ready',
       tone: 'ok',
       count: 3,

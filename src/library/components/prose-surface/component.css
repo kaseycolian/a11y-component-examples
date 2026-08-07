@@ -109,7 +109,7 @@
   margin: 0 0 0.9em;
   /* `anywhere`, not `break-word`: break-word wraps a long token and leaves the
      box's min-content width alone, so the surface still cannot reflow to 320px
-     (SC 1.4.10). Result Panel measured the difference. */
+     (SC 1.4.10). Copyable Result measured the difference. */
   overflow-wrap: anywhere;
 }
 

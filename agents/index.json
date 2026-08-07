@@ -437,7 +437,7 @@
     },
     {
       "slug": "result-panel",
-      "name": "Result Panel",
+      "name": "Copyable Result",
       "group": "feedback-status",
       "useWhen": "A computed value, with exactly one thing inside it that talks.",
       "tags": ["result", "copy", "clipboard", "live-region", "composition", "output", "reflow", "forced-colors"],
@@ -446,7 +446,7 @@
       "files": ["html", "css", "js"],
       "status": "stable",
       "hasContract": true,
-      "_summaryRev": "ec828245"
+      "_summaryRev": "bd583651"
     },
     {
       "slug": "data-table",

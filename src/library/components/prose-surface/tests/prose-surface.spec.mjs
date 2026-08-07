@@ -274,7 +274,7 @@ test('the clipped text is still announced, which is what makes it a bug', async 
 
 test('overflow: hidden buys no tab stop, so there is no route in at all', async ({ page }) => {
   // Chromium's free stop is given to a box a person could already scroll --
-  // auto and scroll, not hidden. Corrected here; Result Panel's clamp comment
+  // auto and scroll, not hidden. Corrected here; Copyable Result's clamp comment
   // used to say otherwise.
   const probe = (id) =>
     page.locator(id).evaluate((el) => {

@@ -1,32 +1,109 @@
 ## Before you copy
 
-Your framework has a card, a toast and a copy button already, and you should use them. **The
-decisions on this page are the same either way** — they are about which element carries the live
-role and how a long value is allowed to break, not about how any of it is rendered. This is enough
-for a person or an agent to start from.
+These files are a working reference, not a package. Move the markup into your own templates and the
+state into your own code. What has to survive that move is the ARIA below, the keyboard behavior, and
+where focus goes — those are the parts that make the component accessible, and the parts that are
+usually dropped.
 
-Each example is separately copyable: the HTML sections are numbered, and the CSS and JS sections say
-which examples need them.
+Every example on this page is numbered and separately copyable. The CSS and JS sections name which
+examples need them.
 
-## One sentence
+## Required markup
 
 The panel announces. Nothing inside it does.
 
-## The contract
-
-| Piece | What it is | Why |
+| Piece | What it is | What it does |
 | --- | --- | --- |
-| `.ac-result` | the panel | it owns the one live region inside it |
-| `.ac-result__value` | the value, monospace, wrapping | a `<code>`, deliberately not an `<output>` |
-| `.ac-result__status` | `role="status"`, in the markup, empty | the only thing on the panel that talks |
-| the verdict | a [Status Label](../status-text/) label with no live role | — |
+| `.ac-result` | the panel | It owns the one live region inside it. |
+| `.ac-result__value` | the value, monospace, wrapping | A `<code>`, deliberately not an `<output>`. |
+| `.ac-result__status` | `role="status"`, in the markup, empty | The only thing on the panel that talks. |
+| the verdict | a [Status Label](../status-text/) with no live role | — |
 | the count | a [Badge](../badge/) with no live role | — |
-| the reason | a [Alert](../notice/) with no live role | — |
-| the copy button | its name never changes | [Input Group](../input-group/)'s button, lifted |
+| the reason | an [Alert](../notice/) with no live role | — |
+| the copy button | its name never changes | [Input Group](../input-group/)'s button, lifted. |
+
+The class prefix is `.ac-result` and the factory is `AC.createResultPanel`. Both keep their
+spelling — this component's display name changed, its slug did not.
+
+### The copy button
+
+Lifted from [Input Group](../input-group/) unchanged, with its rules intact:
+
+- **The name never changes.** A button that renames itself to *Copied* renames the control under the
+  reader's finger, and the state is then carried by the same word that identifies it.
+- **The confirmation goes to the region.** A tick beside the button is `aria-hidden` and correct; the
+  failure is that it is the only cue there is.
+- **The region already exists and is empty.** A `role="status"` inserted along with its text gives a
+  screen reader nothing to notice changing.
+
+Example 4 has all three live, with each button's name after the press printed underneath.
+
+The name says which value — `aria-label="Copy share link"` on a button reading `Copy`. The visible
+word is contained in the accessible name (SC 2.5.3), and a screen with three of these needs the
+difference.
+
+## Keyboard
+
+| Key | What it does |
+| --- | --- |
+| <kbd>Tab</kbd> | Reaches the copy button. Nothing else in the panel is focusable. |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Copies from the focused button, and announces the outcome. |
+
+**Keys deliberately not bound.** All of them. Neither key above is this component's: a native
+`<button>` supplies both, and the value is a `<code>` rather than a control.
+
+A soft-disabled button is still reachable and still fires a click, so `component.js` calls
+`preventDefault()`. That covers <kbd>Enter</kbd> and <kbd>Space</kbd> at once, because a native
+button dispatches a click for both.
+
+The value is selectable text, so a person who does not want the button can still take it by hand.
+
+## States
+
+| State | Signaled by | Not by |
+| --- | --- | --- |
+| ready | the verdict word, then its accent | never the accent alone |
+| a count | the badge's clipped words | never the digits alone |
+| a caveat | the notice's prefix word | never the tint |
+| copied | the sentence in the region | never a renamed button, never a tick alone |
+| nothing yet | real text in the value slot, `aria-disabled` on the button | never an empty box |
+
+Under `forced-colors: active` the notice tint, the badge fill and all three accents collapse into
+`Canvas` and `CanvasText`. Nothing puts the difference back, because nothing can and the words never
+depended on it. The copy button is rebuilt from `ButtonFace` / `ButtonText`, and the unavailable one
+from `GrayText` plus a dashed border, because a control has to keep reading as a control.
+
+### The empty panel
+
+Before anything has been built there is a label, a button and nothing between them — and *nothing*
+is what a screen reader reads. Put the reason in the value slot as real text and point the button's
+`aria-describedby` at it:
+
+```html
+<code class="ac-result__value ac-result__value--empty" id="why">Nothing built yet. …</code>
+<button aria-disabled="true" aria-describedby="why" aria-label="Copy share link">Copy</button>
+```
+
+`aria-disabled` rather than `disabled`, for [Button](../button/)'s reason: the control keeps its
+place in the tab order, so the reason is reachable by the person it is for.
+
+**Pressing it announces nothing, deliberately.** The reason is a *description* — it is read on
+arrival, with the button. A live region reports what changed, and refusing to act is not a change,
+so announcing the reason on the press says the same sentence twice. Example 5 prints what the button
+reads as, which is the whole argument.
+
+## Screen reader behavior
+
+Expected: example 1's panel reads as *"Share link, 3 parameters, Ready"*, then the URL, then
+*"Copy share link, button"*, then the warning. Pressing the button announces one sentence and changes
+nothing else.
+
+**Not yet verified against real assistive technology.** Until `docs/at-support.md` has a row for this
+component, treat the above as intent, not measurement.
 
 ## What this component owns
 
-A result panel is other components in a box, and it is the first place in this library where three
+A copyable result is other components in a box, and it is the first place in this library where three
 of them meet. Each one documents when it should carry a live role, and each answer is right on its
 own:
 
@@ -80,76 +157,6 @@ The value is **not** a scroll region. Wrapping is what makes that possible, and 
 trouble: a scrollable box needs `tabindex="0"`, `role="region"` and a name, or it is a tab stop with
 nothing to say.
 
-## The copy button
-
-Lifted from [Input Group](../input-group/) unchanged, with its rules intact:
-
-- **The name never changes.** A button that renames itself to *Copied* renames the control under the
-  reader's finger, and the state is then carried by the same word that identifies it.
-- **The confirmation goes to the region.** A tick beside the button is `aria-hidden` and correct; the
-  failure is that it is the only cue there is.
-- **The region already exists and is empty.** A `role="status"` inserted along with its text gives a
-  screen reader nothing to notice changing.
-
-Example 4 has all three live, with each button's name after the press printed underneath.
-
-The name says which value — `aria-label="Copy share link"` on a button reading `Copy`. The visible
-word is contained in the accessible name (SC 2.5.3), and a screen with three of these needs the
-difference.
-
-## The empty panel
-
-Before anything has been built there is a label, a button and nothing between them — and *nothing*
-is what a screen reader reads. Put the reason in the value slot as real text and point the button's
-`aria-describedby` at it:
-
-```html
-<code class="ac-result__value ac-result__value--empty" id="why">Nothing built yet. …</code>
-<button aria-disabled="true" aria-describedby="why" aria-label="Copy share link">Copy</button>
-```
-
-`aria-disabled` rather than `disabled`, for [Button](../button/)'s reason: the control keeps its
-place in the tab order, so the reason is reachable by the person it is for.
-
-**Pressing it announces nothing, deliberately.** The reason is a *description* — it is read on
-arrival, with the button. A live region reports what changed, and refusing to act is not a change,
-so announcing the reason on the press says the same sentence twice. Example 5 prints what the button
-reads as, which is the whole argument.
-
-## States
-
-| State | Signaled by | Not by |
-| --- | --- | --- |
-| ready | the verdict word, then its accent | never the accent alone |
-| a count | the badge's clipped words | never the digits alone |
-| a caveat | the notice's prefix word | never the tint |
-| copied | the sentence in the region | never a renamed button, never a tick alone |
-| nothing yet | real text in the value slot, `aria-disabled` on the button | never an empty box |
-
-Under `forced-colors: active` the notice tint, the badge fill and all three accents collapse into
-`Canvas` and `CanvasText`. Nothing puts the difference back, because nothing can and the words never
-depended on it. The copy button is rebuilt from `ButtonFace` / `ButtonText`, and the unavailable one
-from `GrayText` plus a dashed border, because a control has to keep reading as a control.
-
-## Keyboard
-
-| Key | Where | Does |
-| --- | --- | --- |
-| <kbd>Tab</kbd> | the panel | reaches the copy button. Nothing else in the panel is focusable |
-| <kbd>Enter</kbd> / <kbd>Space</kbd> | copy button | copies, and announces the outcome |
-
-A soft-disabled button is still reachable and still fires a click, so `component.js` calls
-`preventDefault()`. That covers Enter and Space at once, because a native button dispatches a click
-for both.
-
-The value is selectable text, so a person who does not want the button can still take it by hand.
-
-## Screen reader behavior
-
-Not yet tested against a screen reader. What the markup asks for: example 1's panel reads as
-*"Share link, 3 parameters, Ready"*, then the URL, then *"Copy share link, button"*, then the
-warning. Pressing the button announces one sentence and changes nothing else.
-
 ## API
 
 ```js
@@ -198,7 +205,7 @@ The part that does not survive the port is the region's lifetime. `{copied && <p
 mounts the region and its text together, and a region a screen reader was not already watching cannot
 change. Render `.ac-result__status` unconditionally and let only its contents be conditional.
 
-## What to watch for
+## Common mistakes
 
 - **`<output>` for the value.** A live region nobody declared: the whole value is read out on every
   change.
@@ -212,4 +219,12 @@ change. Render `.ac-result__status` unconditionally and let only its contents be
 - **A `role="status"` rendered with its message already inside it.** Nothing changed, so nothing is
   read.
 - **An empty value slot.** A label, a button, and nothing in between.
-- **A copy button over an empty value.** It reports a successful copy of nothing.
+- **A copy button over an empty value.** It reports a successful copy of nothing. Example 5.
+
+## Related
+
+- [Input Group](../input-group/) — where the copy button and its rules come from.
+- [Alert](../notice/), [Status Label](../status-text/) and [Badge](../badge/) — the three components
+  this one composes, each with its own answer about live roles that this panel overrules.
+- [Rich Text Content](../prose-surface/) — the other place `overflow-wrap: anywhere` and min-content
+  decide whether a page can reflow.
