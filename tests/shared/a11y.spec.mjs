@@ -60,8 +60,8 @@ const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-
 /**
  * The component demo only -- the shell has its own spec and its own page.
  * `.demo` is the wrapper [slug].astro puts the component.html fragment in, so
- * it is there for every component including `disclosure`, which predates the
- * `.ac-demo-grid` convention and is still waiting on its retrofit.
+ * it is there for every component, whatever scaffolding the fragment itself
+ * uses.
  */
 const DEMO = '.demo';
 

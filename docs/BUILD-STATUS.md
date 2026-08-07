@@ -130,8 +130,10 @@ the argument for `data-ac-demo-broken` asserting rather than skipping, and it is
 ## The road to done
 
 The unticked rows in the roster below, plus four infrastructure items. Every remaining component has a spec entry
-in `component-specs.md` — `disclosure` is the only slug in the repo without one, and backfilling it is
-part of item 1 below. **Read the entry, do not redesign it.**
+in `component-specs.md` — `disclosure` is the only slug in the repo without one, and it is now built,
+so that entry stays absent on purpose: writing one after the fact would be inventing design decisions
+that were never taken. `agents/components/disclosure.md` and its `docs.md` are where its behavior
+lives. **Read the entry, do not redesign it.**
 
 Build in this order. The order is the dependency graph, not a preference.
 
@@ -185,10 +187,8 @@ Cross-batch notes that will otherwise be rediscovered:
 
 Then the four items under **Remaining non-component work**, in this order:
 
-1. **`disclosure` retrofit + spec backfill** — any time, and best as a session warm-up rather than
-   squeezed onto the end of one. It is the only component off-convention. The gate already covers it
-   (it selects `.demo`, the shell's wrapper, not `.ac-demo-grid`), so the retrofit is about the
-   copyability conventions only.
+1. ~~**`disclosure` retrofit + spec backfill.**~~ **Done, 2026-08-07**, as row 21 of the copy pass.
+   Every one of the 33 components now carries the copyability conventions and a spec of its own.
 2. ~~**The shared a11y gate (item 2).**~~ **Done, 2026-07-29.** Landed before batch F, and the bet
    paid — see "What the gate found".
 3. **Docs (item 3)** — now unblocked, and `wcag-mapping.md` has something real to be generated
@@ -232,15 +232,17 @@ npm run new:component -- <slug> --group <group-id> --name "Display Name"
 
 The **definition of done** is the checklist at the bottom of `component-specs.md`.
 
-**Reference implementations.** Every component below except `disclosure` follows the current
-copyability and writing-style conventions in `CLAUDE.md` — numbered example sections across all files,
-a copy map in each header, the framework caveat in `docs.md`. Copy the shape of `field` for a form
-component, `tooltip` for a hard-behavior one, `skip-link` or `typography` for a **CSS-only** one.
+**Reference implementations.** Every component below follows the current copyability and
+writing-style conventions in `CLAUDE.md` — numbered example sections across all files, a copy map in
+each header, the framework caveat in `docs.md`. Copy the shape of `field` for a form component,
+`tooltip` for a hard-behavior one, `skip-link` or `typography` for a **CSS-only** one.
 
 `dropdown` is the best reference for *hard behavior* (popover positioning, roving focus, type-ahead)
 and, since its 2026-08-01 rebuild, for **a component whose ARIA contract is authored rather than
-built** — the shape to copy when a widget needs a lot of markup. `disclosure` is the minimal factory
-but predates the conventions, so take its logic and not its layout. See item 1 under remaining work.
+built** — the shape to copy when a widget needs a lot of markup. `disclosure` is the minimal factory,
+and since its 2026-08-07 retrofit it is also the reference for **counter-examples the component's own
+factory would repair**: a second `create<Name>Page` factory in the same file drives them, and check 14
+exempts the `Page` suffix from the contract's `api`.
 
 ---
 
@@ -654,8 +656,14 @@ but predates the conventions, so take its logic and not its layout. See item 1 u
   rider" — role-name matching is substring, so `exact: true` where one name contains another.
 
 ### overlays-disclosure
-- [x] `disclosure` — works, but **predates the copyability + style conventions — retrofit (item 1)**.
-  Also still has **no spec** — backfill one.
+- [x] `disclosure` — **retrofitted 2026-08-07** at row 21 of the copy pass, and the spec written from
+  nothing: 14/14 in Chromium. Seven examples now, three correct and four mistakes, and the four are
+  the `contract.failureModes` list one for one. The wiring is the part worth knowing: `createDisclosure`
+  repairs three of the four counter-examples on sight — it writes `aria-expanded` onto the *trigger*,
+  writes `aria-controls` from the panel's real id, and hides with the `hidden` attribute — so the
+  mistakes are driven by a separate `createDisclosurePage` in the same file. Only example 7 carries
+  `data-ac-demo-broken`: axe accepts `aria-expanded` on a role-less `<div>`, and it skips a dangling
+  `aria-controls` on a *collapsed* control, so that example ships expanded.
 - [x] `dropdown` — **rebuilt 2026-08-01 as authored markup.** 24/24 tests in Chromium. The hidden
   `<select>` is gone and so is the 250-odd lines of JS that built the trigger, the panel, every row and
   every swatch at runtime: `component.html` now carries the whole ARIA contract, and `component.js`
@@ -712,7 +720,7 @@ but predates the conventions, so take its logic and not its layout. See item 1 u
   `[hidden] { display: none }` and pin the bubble open, so the guard is declared explicitly; and
   `display: contents` on the toggletip's live region would drop it from the accessibility tree.
 
-**`overlays-disclosure` is complete** apart from the `disclosure` retrofit in item 1.
+**`overlays-disclosure` is complete.**
 
 ### navigation
 - [x] `tabs` — done. 29/29 tests in Chromium. **The subject is the tab order**, and every readout on
@@ -962,7 +970,7 @@ Each retrofit target needs:
 | Target | Why it needs it |
 | --- | --- |
 | ~~`dropdown`~~ | **Done.** Also lost its bottom sheet to `drawer`. |
-| `disclosure` | Small, but same problem, and still has **no spec** — backfill that at the same time. |
+| ~~`disclosure`~~ | **Done 2026-08-07.** Retrofitted and given the spec it never had. |
 | ~~`src/site/pages/index.astro`~~ | **Done** with the header redesign below. |
 | ~~`src/site/pages/components/index.astro`~~ | **Done.** |
 

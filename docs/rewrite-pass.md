@@ -12,24 +12,25 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 
 ## START HERE
 
-**Phase 0 is done. Components 1–20 are done. Next up is row 21, `disclosure`.**
+**Phase 0 is done. Components 1–21 are done. Next up is row 22, `dropdown`.**
 
-Last updated 2026-08-07, after row 20. The repo was left green:
+Last updated 2026-08-07, after row 21. The repo was left green:
 
 ```
 check:tokens                      34 files clean
 check:agents                      42 surfaces match their sources
 npm run build                     35 pages
-npx playwright test --project=chromium effects                    16 passed
+npx playwright test --project=chromium disclosure                 14 passed
 npx playwright test --project=chromium agent-surfaces            117 passed
-npx playwright test --project=chromium a11y -g effects            29 passed
-npx playwright test --project=chromium data-table jump-nav tabs prose-surface  101 passed
+npx playwright test --project=chromium a11y -g disclosure         28 passed
 ```
 
-The **full** suite was re-run at row 20: **1206 passed** in 9.5 minutes, exit 0 — the number rows
-17–20 predicted, and the first clean full run since row 16. Row 20 added no tests, so the next one
-should read 1206 again. It is the honest baseline: if something is red before you have touched
-anything, it is not your change.
+`a11y -g disclosure` is 28 rather than 27 because the pattern also catches `tooltip`'s "the
+toggletip is not a disclosure". That is the grep, not a stray test.
+
+The **full** suite was re-run at row 21: **1220 passed** in 9.6 minutes, exit 0. Row 20's baseline was
+1206 and row 21 wrote `disclosure`'s spec from nothing, which is exactly the 14 new tests. It is the
+honest baseline: if something is red before you have touched anything, it is not your change.
 
 **A full run can flake, so re-run before you conclude anything.** One at row 19 reported *4 failed,
 1202 passed*; the identical tree at row 20 came back 1206/1206. Nothing was fixed in between. Four
@@ -48,9 +49,9 @@ Read these three things before touching anything, in this order:
 3. **The row you are about to do**, in [The roster](#the-roster). Every finished row records what
    actually bit, and that is the reason this file is worth reading rather than skimming.
 
-Then follow [The procedure](#the-procedure) for `disclosure`, exactly.
+Then follow [The procedure](#the-procedure) for `dropdown`, exactly.
 
-**Where the pass stands.** 20 of 33 components done, in roster order — there is no reordering, so the
+**Where the pass stands.** 21 of 33 components done, in roster order — there is no reordering, so the
 next unticked row is always the next job. Six of the twelve renames are applied — `chip-toggle`,
 `effects`, `field`, `fieldset-group`, `focus-ring`, `motion-preferences`. The other six happen in
 their own rows, and [Naming decisions](#naming-decisions) is the ledger. Phase 3 (the site's own copy)
@@ -143,6 +144,19 @@ starting; every one of these cost a debugging detour the first time.
   proof; reread what each assertion is actually claiming.
 - **Never let a fake credential look like real hex.** It cost a blocked push and a `filter-branch`.
   See [The demo vocabulary](#the-demo-vocabulary).
+- **A mistake the component's own factory would repair needs page wiring, not the factory.**
+  `disclosure`'s four counter-examples are all things `createDisclosure` fixes on sight — it writes
+  `aria-expanded` onto the trigger, writes `aria-controls` from the panel's real id, and uses the
+  `hidden` attribute — so three of the four would have silently become correct examples. They are
+  wired by a `createDisclosurePage` factory in the same file instead. Check 14 exempts the `Page`
+  suffix, which is what makes this legal rather than an undocumented public API.
+- **Ask axe rather than reasoning about it, and let the gate answer.** Whether `aria-expanded` on a
+  role-less `<div>` trips `aria-allowed-attr`, and whether a dangling `aria-controls` is a violation
+  or only an `incomplete`, both depend on axe internals that are quicker to run than to recall. Build
+  the example unmarked, run `a11y -g <slug>`, and read the two lists it prints — unclaimed violations
+  and claims that never fired. `disclosure`'s example 4 needed no marker and example 7 needed one.
+  The one thing worth knowing up front: axe skips a bad `aria-controls` on a collapsed control, so an
+  example built to fail that rule has to ship **expanded**.
 
 ---
 
@@ -352,9 +366,9 @@ tabs 24 · data-table 16 · modal 13 · jump-nav 11 · prose-surface 9 · result
 tooltip 1 · status-text 1 · badge 1
 ```
 
-`disclosure`, `dropdown` and `drawer` return nothing, but that is not the same as being light —
-`disclosure` is a full retrofit and `dropdown` is 433 lines. The count measures punk vocabulary only,
-not the size of the row. Finished rows are gone from the list.
+`dropdown` and `drawer` return nothing, but that is not the same as being light — `dropdown` is 433
+lines. The count measures punk vocabulary only, not the size of the row; `disclosure` scored zero and
+still took a full retrofit and a spec written from nothing. Finished rows are gone from the list.
 
 ---
 
@@ -494,11 +508,10 @@ COMPONENT: <slug>
   level fails the gate.
 - **agent-surfaces §12 sweeps ARIA outside broken examples only.** Adding `data-ac-demo-broken` to
   something that did not have it removes its ARIA from the sweep and can trip the vacuity guard.
-- **`disclosure` is a full retrofit, not a pass.** No `ac-demo` scaffolding at all, no `demoNote`, no
-  numbered examples, no `## Before you copy` — **and no spec.** It is the only one of the 33 with no
-  `tests/` folder, which nothing in the repo checks: agent-surfaces §3 only asserts that documented
-  keys are pressed, and a contract whose every key is `native:` gives it nothing to assert. Build the
-  examples *and* the spec from nothing, and budget four ordinary components.
+- **All 33 components now have a spec.** `disclosure` was the last one without, and nothing in the
+  repo checked for it: agent-surfaces §3 only asserts that *documented* keys are pressed, and a
+  contract whose every key is `native:` gives it nothing to assert. A new component scaffolded
+  without a spec would be just as invisible.
 - **Never round-trip a repo file through PowerShell.** `Get-Content -Raw` produces mojibake and
   `build-agent-surfaces.mjs` throws on it. Use the file tools.
 - **Node is not on the inherited PATH:** `$env:Path = "C:\nvm4w\nodejs;$env:Path"`.
@@ -538,8 +551,8 @@ bound" note, and a `summary` in the new voice.
 | 18 | `typography` | [x] | **The cheapest split so far, and the shape to look for: only example 1 is correct markup, so it is the lone *Correct example* and 2–5 are all mistakes — no renumbering at all, and not one section marker in the CSS moved.** Both `data-ac-demo-broken` markers were left untouched, including the `opacity: 0.4` one the CSS comment says to measure across every theme before changing. **Demoting the demo titles to `h4` stranded a heading**, the second component after `fieldset-group`: example 2's specimen was an `<h4 class="ac-t-h2">` chosen to match its depth, and at `h4` it became a sibling of its own example title. It is `h5` now, and the spec's `toBe('H4')` moved with it. axe does not catch this — nothing is skipped. The heading-list test found its example by `.nth(1)`; it now filters on `[data-ac-t-outline]`, so a later split cannot silently point it at a different example. Three `demo(page).evaluate()` traps. `docs.md` had nine `##` against a cap of two: *Muted text* and *A link is not a color* became `###` under States (both are that table's rows argued at length), *Forced colors* dissolved into a paragraph in each of them, and *rem*, *Text spacing* and *Reflow* merged into one *Text that survives being resized*. `## Keyboard`, `## States` and `## Related` are new. Content: Billing / Overview / Recent activity, Order 462, Invoice 99, `ORD-462-99`, Jordan Lee. |
 | 19 | `motion-preferences` | [x] | **Renamed → Reduced Motion.** Five references: three source comments and docs links in `effects`, `jump-nav` and `switch`, and **one in a vendored file** — `src/site/theme/THEME-SERVICE.md`, wrapped across two lines exactly as this file warns, and only a multiline grep found it. That file is safe to edit: its "Deliberate deviations" and "Motion behavior" sections are this repo's own record, not upstream boilerplate. None named an example number. Second row after `typography` where only the last example is a mistake, so **no renumber and no CSS marker moved**. `.ac-motion-scope` moved off the grid onto a wrapper `<div>` with `data-ac-motion`, since the spec's `SCOPE` locator has to stay singular. `.ac-motion-record` → `.ac-motion-disc`: the demo was a spinning vinyl record, and the vocabulary had reached the class name. **Third stranded heading** — example 4's two `.ac-motion-panel__title` were `h4` and are `h5` now; the spec never asserted their tag, so nothing failed and nothing would have. `contract.keyboard` went from one row to three, adding `native:` <kbd>Tab</kbd> and <kbd>Enter</kbd>; <kbd>Space</kbd> stays non-`native:` because the spec really presses it. `docs.md` had five component-specific `##` against a cap of two: *Reduced is not removed* became a `###` under States, *Persistence* and the no-third-state mechanism became `###` under *The asymmetry*, and *matchMedia* and *SC 2.2.2* became `###` under a renamed *What the gate does not cover*. `## Keyboard`, `## States` and `## Related` are new. Content: Syncing disc, an Order 462 / Invoice 99 activity ticker, `462 unread`. |
 | 20 | `effects` | [x] | **Renamed → Background Effects**, the joint-largest ripple of the twelve: 11 references in 7 components, only 5 of them `docs.md` links, and 4 of the 6 source comments needed re-wrapping because the name is 11 characters longer. **The split was the ambiguous one and `contract.failureModes` settled it** — example 5's "two motion gates with different reach" is listed there, and example 4 carries `data-ac-demo-broken`, so both are mistakes. That leaves example 1 alone in a singular *Correct example*, the `typography` shape: **no renumber, no CSS marker moved, no stranded heading** (the file ships no `<h3>`/`<h4>` but the five demo titles). Spec: the `demo(page).evaluate((grid) => …)` two-grid trap, and the two `.nth(1)` picks re-anchored on `.ac-fx-pair`. `aria-label="Set list, second night"` → `Recent orders`, asserted in three places. `docs.md` had six component-specific `##` against a cap of two: *fx-grid needs isolation* became a `###` under Required markup, *Motion* and *Forced colors* `###` under States, and the gradient and scrollbar sections stayed `##`. `## Keyboard`, `## States`, `## Screen reader behavior` and `## Related` are new, and the old *Before you copy* hedged about frameworks — deleted. `contract.keyboard` went from one row to three, adding `native:` arrows and Home/End for the scroll region. Content: Order 462 / Invoice 99 / Jordan Lee, a Billing frame, a Recent orders list of order and invoice statuses. |
-| 21 | `disclosure` | [ ] | **NEXT.** Scanned, not started. **Full retrofit, and bigger than the tracker has been saying: it is the only one of the 33 with no spec at all** — no `tests/` folder, no `disclosure.spec.mjs`. agent-surfaces §3 passes vacuously today because the single `contract.keyboard` row is `native:`, so nothing has ever flagged it. The row writes the spec from nothing *and* builds the demo scaffolding from nothing. Budget four ordinary components, not three. **The markup is three correct disclosures in an `.ac-disclosure-group`** — no `ac-demo` anything, no numbers, no titles, no `demoNote` in `meta.json`. **The content is documentation in costume:** the three panels answer questions *about the component* ("Does this work without JavaScript?", "Why not use `<details>`?", "Can one start open?"), so none of it survives — the answers already live in `docs.md`, and the examples need real content from the vocabulary table. Zero punk words, which is why the grep undercounts this row. **Fourth stranded-heading row and the worst:** three `<h3 class="ac-disclosure__heading">` go to `h5` under the `h4` titles, and the level is load-bearing here — `docs.md` tells the reader to match their own outline, so say why the demo picked `h5`. `docs.md` is missing `## Before you copy`, `## States`, `## Related`; `## How it works` is the `## Required markup` rename, `## Options` is `## API`, `## What to watch for` is `## Common mistakes`; the `\| Key \| Action \|` table is one of the three old shapes. **Keep the no-<kbd>Esc</kbd> reasoning** — it is the model for "Keys deliberately not bound". `contract.keyboard` needs a `native:` <kbd>Tab</kbd> row to match the table. `contract.states` is already `["expanded", "collapsed"]`. **For the split, the four `contract.failureModes` are the counter-example shortlist** — `aria-expanded` on the panel, `height:0` hiding, a `<div>` trigger, and `aria-controls` naming an id nobody built; the last two are axe-visible, so they can carry `data-ac-demo-broken`. Referenced by `modal` ×1 and `tooltip` ×4; no rename, so those are prose-safe. |
-| 22 | `dropdown` | [ ] | rename → Custom Select. **25 bytes of Tier 2 headroom.** 6 examples, 433 lines. |
+| 21 | `disclosure` | [x] | **The full retrofit, and the largest row so far: seven examples and a spec written from nothing.** The old page was three correct disclosures in an `.ac-disclosure-group` with no `ac-demo` anything, and its content was documentation in costume — the three panels answered questions *about the component*, so none of it survived. **The four `contract.failureModes` became examples 4 to 7 exactly**, which made the split trivial and the wiring the expensive part: `createDisclosure` repairs three of the four on sight, so all four are driven by a new `createDisclosurePage` in the same file (check 14 exempts the `Page` suffix). **Only one `data-ac-demo-broken` in the end, on example 7** — axe reads a role-less `<div aria-expanded>` as fine, and the dangling `aria-controls` only fails while the control is *expanded*, so example 7 ships open. Example 5 is the best failure on the page: `height: 0` on the panel, and the link inside it is still in the tab order, which the spec asks the browser rather than asserting. Fourth stranded-heading row — three `<h3 class="ac-disclosure__heading">` are `h5` now, and the spec asserts the tag on all three triggers. `contract.aria` gained `hidden` on the panel and `contract.keyboard` went from one row to three, adding `native:` <kbd>Tab</kbd> and a non-`native:` <kbd>Esc</kbd> whose effect is *nothing, deliberately* — the spec presses it and expects no change, which is how the "Keys deliberately not bound" reasoning got a test. `docs.md`: `## How it works` → `## Required markup`, `## Options` → `## API`, `## What to watch for` → `## Common mistakes`; `## Before you copy`, `## Keyboard`'s table shape, `## States` and `## Related` are new; the two component-specific sections are *Progressive enhancement* and *Disclosure or `<details>`*, the latter inheriting the argument the old demo panels were making. `.ac-disclosure-group` was dropped — stacking is a flex column with a gap and the CSS header says so. Referenced by `modal` ×1 and `tooltip` ×4; no rename, so those were prose-safe and untouched. Also fixed the stale note in `tests/shared/a11y.spec.mjs` that called this component the one still waiting on its retrofit. |
+| 22 | `dropdown` | [ ] | **NEXT.** rename → Custom Select. **25 bytes of Tier 2 headroom**, so the rename, a longer `useWhen` or an extra `keyboard` row has to be paid for elsewhere in the contract. 6 examples, 433 lines. |
 | 23 | `modal` | [ ] | 4 examples. |
 | 24 | `drawer` | [ ] | 4 examples. |
 | 25 | `tooltip` | [ ] | |
@@ -613,7 +626,7 @@ can quietly rot while the pass runs:
 ```sh
 DONE="button icon-button loading-button chip-toggle field text-input input-group textarea \
 native-select radio-group checkbox switch fieldset-group skip-link visually-hidden focus-ring \
-live-region typography motion-preferences effects"
+live-region typography motion-preferences effects disclosure"
 P=""; for d in $DONE; do P="$P src/library/components/$d"; done
 ls -d $P | wc -l          # must equal the number of finished rows, or every grep below is vacuous
 
@@ -635,7 +648,7 @@ done
 grep -rn "Chip Toggle\|Fieldset Group\|Focus Ring\|Motion Preferences" src/ docs/
 ```
 
-All five return nothing as of row 20 — and **check the sanity of `$P` before believing that**, because
+All five return nothing as of row 21 — and **check the sanity of `$P` before believing that**, because
 every one of them is a grep over a path list and a wrong `DONE` or a failed `cd` makes all five pass
 vacuously. `ls -d $P | wc -l` should print the number of finished rows. The rename sweep below returns
 only its own rows in

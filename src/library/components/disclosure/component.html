@@ -1,77 +1,379 @@
-<!--
-  Disclosure (show/hide)
+<!-- ===========================================================================
+     DISCLOSURE
 
-  The trigger is a real <button>, so Enter and Space work without a single line
-  of key handling. It lives inside a heading so screen-reader users can jump
-  between sections with their heading shortcuts -- change the level to match
-  where you put it on the page.
+     WHAT TO COPY
+       Examples 1 to 3 are the component. Examples 4 to 7 are mistakes, live,
+       and are not to be copied. Each example names the component.css and
+       component.js sections it needs.
 
-  `aria-expanded` on the trigger and `hidden` on the panel are the whole
-  contract. component.js generates the ids and keeps them in sync; if you would
-  rather write the ids yourself, set them here and the script will leave them
-  alone.
--->
-<div class="ac-disclosure-group">
-  <div class="ac-disclosure" data-ac-disclosure>
-    <h3 class="ac-disclosure__heading">
-      <button type="button" class="ac-disclosure__trigger">
-        <svg class="ac-disclosure__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-          <path d="M5 3.5 10.5 8 5 12.5" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-        <span>Does this work without JavaScript?</span>
-      </button>
-    </h3>
-    <div class="ac-disclosure__panel">
-      <div class="ac-disclosure__content">
-        <p>
-          Partly. The panel starts visible in the markup, so a reader with no scripting
-          still gets the content &mdash; it simply cannot be collapsed. The script adds
-          <code>hidden</code> on startup, which is why nothing flashes open on load.
-        </p>
+     REQUIRED MARKUP
+       .ac-disclosure            the wrapper. data-ac-disclosure on it is what
+                                 the auto-init block looks for.
+       data-ac-open              optional, on the wrapper. Starts it expanded.
+       .ac-disclosure__heading   optional <h2> to <h6> around the trigger.
+       .ac-disclosure__trigger   a real <button type="button">.
+       .ac-disclosure__panel     the region the trigger shows and hides.
+
+     component.js writes aria-expanded and aria-controls onto the trigger and
+     aria-labelledby onto the panel, and mints the ids they need. Set your own
+     ids instead and the script leaves them alone.
+
+     The heading level is a property of your page, not of the component. This
+     page runs h1, h2, h3, h4, so the disclosure headings here are h5.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the two section
+     headings, the grid, and the per-example headings. Never copy it into your app.
+     =========================================================================== -->
+
+<div data-ac-disclosure-page>
+  <div class="ac-demo-section">
+    <h3 class="ac-demo-section__title">Correct examples</h3>
+    <p class="ac-demo-section__note">
+      This is the markup to copy. One <code>&lt;button&gt;</code>, one panel, and
+      <code>aria-expanded</code> on the button. The panel is hidden with the
+      <code>hidden</code> attribute, so it leaves the accessibility tree and the tab order at the
+      same moment it leaves the screen.
+    </p>
+
+    <div class="ac-demo-grid">
+      <!-- ==================================================================
+           EXAMPLE 1 · Basic disclosure
+           CSS [CORE] + [CONTENT] + [FRAME]. JS [CORE] + [AUTO-INIT].
+
+           The trigger is a real <button>, which is the whole reason there is
+           no key handling in component.js. Enter and Space arrive with the
+           element, along with the tab stop, the role, and the accessible name
+           from its own text.
+
+           The panel is visible in the source and closed by the script during
+           initialization. Without JavaScript the content still reads, and
+           because the close happens before the first paint nothing flashes
+           open on load.
+           ================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">1 &middot; Basic disclosure</h4>
+
+        <div class="ac-disclosure-frame">
+          <div class="ac-disclosure" data-ac-disclosure>
+            <h5 class="ac-disclosure__heading">
+              <button type="button" class="ac-disclosure__trigger">
+                <svg class="ac-disclosure__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                  <path d="M5 3.5 10.5 8 5 12.5" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>Order 462</span>
+              </button>
+            </h5>
+            <div class="ac-disclosure__panel">
+              <div class="ac-disclosure__content">
+                <p>Shipped 12 March to Jordan Lee. Four items, total $248.00.</p>
+              </div>
+            </div>
+          </div>
+
+          <p class="ac-disclosure-note">
+            Two attributes carry the state: <code>aria-expanded</code> on the button and
+            <code>hidden</code> on the panel. The chevron is decoration.
+          </p>
+        </div>
+      </div>
+
+      <!-- ==================================================================
+           EXAMPLE 2 · Disclosure that starts open
+           CSS [CORE] + [CONTENT] + [FRAME]. JS [CORE] + [AUTO-INIT].
+
+           data-ac-open on the wrapper. The factory reads it once at startup
+           and sets aria-expanded to match, so the attribute and the panel can
+           never disagree about which state this began in.
+           ================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">2 &middot; Disclosure that starts open</h4>
+
+        <div class="ac-disclosure-frame">
+          <div class="ac-disclosure" data-ac-disclosure data-ac-open>
+            <h5 class="ac-disclosure__heading">
+              <button type="button" class="ac-disclosure__trigger">
+                <svg class="ac-disclosure__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                  <path d="M5 3.5 10.5 8 5 12.5" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>Delivery address</span>
+              </button>
+            </h5>
+            <div class="ac-disclosure__panel">
+              <div class="ac-disclosure__content">
+                <p>Jordan Lee, 19 Bridge Street, Manchester M1 4AF, United Kingdom.</p>
+              </div>
+            </div>
+          </div>
+
+          <p class="ac-disclosure-note">
+            <code>data-ac-open</code> on the wrapper. Open by default is a content decision, so it
+            belongs in the markup rather than in a script that runs later.
+          </p>
+        </div>
+      </div>
+
+      <!-- ==================================================================
+           EXAMPLE 3 · Trigger with no heading wrapper
+           CSS [CORE] + [CONTENT] + [FRAME]. JS [CORE] + [AUTO-INIT].
+
+           The heading wrapper is optional and it is not free: it puts the
+           trigger's label in the screen reader's heading list, which is what
+           you want for a section of the page and not for a control that
+           reveals two more lines of the paragraph above it.
+
+           Everything else is identical, because the semantics were never in
+           the heading — they are in the button and in aria-expanded.
+           ================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">3 &middot; Trigger with no heading wrapper</h4>
+
+        <div class="ac-disclosure-frame">
+          <p class="ac-disclosure-lede">Invoice 99 was sent to jordan.lee@example.com.</p>
+
+          <div class="ac-disclosure" data-ac-disclosure>
+            <button type="button" class="ac-disclosure__trigger">
+              <svg class="ac-disclosure__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M5 3.5 10.5 8 5 12.5" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <span>Show 2 more recipients</span>
+            </button>
+            <div class="ac-disclosure__panel">
+              <div class="ac-disclosure__content">
+                <p>sam.rivera@example.com and alex.chen@example.com.</p>
+              </div>
+            </div>
+          </div>
+
+          <p class="ac-disclosure-note">
+            No heading, because this is not a section of the page. Wrap the trigger in one only
+            when a reader navigating by heading should land on it.
+          </p>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="ac-disclosure" data-ac-disclosure>
-    <h3 class="ac-disclosure__heading">
-      <button type="button" class="ac-disclosure__trigger">
-        <svg class="ac-disclosure__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-          <path d="M5 3.5 10.5 8 5 12.5" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-        <span>Why not use &lt;details&gt; and &lt;summary&gt;?</span>
-      </button>
-    </h3>
-    <div class="ac-disclosure__panel">
-      <div class="ac-disclosure__content">
-        <p>
-          Often you should &mdash; it is less code and it is accessible by default. Reach for
-          this version when you need the open state in JavaScript, an animated height, or a
-          trigger that is not the first child. Note that <code>&lt;summary&gt;</code> is
-          announced differently across screen readers, whereas a button with
-          <code>aria-expanded</code> is consistent everywhere.
-        </p>
-      </div>
-    </div>
-  </div>
+  <div class="ac-demo-section ac-demo-section--mistakes">
+    <h3 class="ac-demo-section__title">Common mistakes</h3>
+    <p class="ac-demo-section__note">
+      These four are live and wrong on purpose. Each is wired by the page rather than by
+      <code>createDisclosure</code>, because the factory would repair three of them on sight.
+    </p>
 
-  <div class="ac-disclosure" data-ac-disclosure data-ac-open>
-    <h3 class="ac-disclosure__heading">
-      <button type="button" class="ac-disclosure__trigger">
-        <svg class="ac-disclosure__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-          <path d="M5 3.5 10.5 8 5 12.5" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-        <span>Can one start open?</span>
-      </button>
-    </h3>
-    <div class="ac-disclosure__panel">
-      <div class="ac-disclosure__content">
-        <p>
-          Yes &mdash; add <code>data-ac-open</code> to the wrapper, as this one has. The
-          script reads it once on startup and sets <code>aria-expanded</code> to match.
-        </p>
+    <div class="ac-demo-grid">
+      <!-- ==================================================================
+           EXAMPLE 4 · aria-expanded on the panel
+           CSS [CORE] + [CONTENT] + [FRAME]. JS [PAGE].
+
+           aria-expanded is a property of the control, not of the region. On
+           the panel it announces nothing: a reader arrives at the button,
+           hears "Payment method, button", and has no way to know there is
+           anything behind it.
+
+           The readout is measured from the DOM at load and after every press,
+           so it reports the page rather than repeating this comment.
+           ================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">4 &middot; aria-expanded on the panel</h4>
+
+        <div class="ac-disclosure-frame" data-ac-disc-case="panel-state">
+          <div class="ac-disclosure">
+            <h5 class="ac-disclosure__heading">
+              <!-- BROKEN ON PURPOSE — no aria-expanded on the button. -->
+              <button type="button" class="ac-disclosure__trigger" data-ac-disc-trigger>
+                <svg class="ac-disclosure__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                  <path d="M5 3.5 10.5 8 5 12.5" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>Payment method</span>
+              </button>
+            </h5>
+            <!-- BROKEN ON PURPOSE — the state is on the region it belongs to,
+                 which is the one element nobody is listening to. -->
+            <div class="ac-disclosure__panel" data-ac-disc-panel aria-expanded="false" hidden>
+              <div class="ac-disclosure__content">
+                <p>Visa ending 4462. Billed monthly.</p>
+              </div>
+            </div>
+          </div>
+
+          <dl class="ac-disclosure-readout">
+            <div class="ac-disclosure-readout__row">
+              <dt>Button</dt>
+              <dd><code data-ac-disc-out="trigger">&mdash;</code></dd>
+            </div>
+            <div class="ac-disclosure-readout__row">
+              <dt>Panel</dt>
+              <dd><code data-ac-disc-out="panel">&mdash;</code></dd>
+            </div>
+          </dl>
+
+          <p class="ac-disclosure-verdict" role="status" data-ac-disc-verdict></p>
+        </div>
+      </div>
+
+      <!-- ==================================================================
+           EXAMPLE 5 · Panel hidden with CSS
+           CSS [CORE] + [CONTENT] + [FRAME] + [BROKEN]. JS [PAGE].
+
+           height: 0 and overflow: hidden take the panel off the screen and
+           leave everything else exactly where it was. The text is still in the
+           accessibility tree and the link is still a tab stop, so a keyboard
+           reader tabs into a region that is closed and lands somewhere the
+           page will not scroll to.
+
+           display: none and the hidden attribute do not have this problem.
+           Neither does visibility: hidden. Anything that only changes the size
+           or the opacity of the box does.
+           ================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">5 &middot; Panel hidden with CSS</h4>
+
+        <div class="ac-disclosure-frame" data-ac-disc-case="css-hidden">
+          <div class="ac-disclosure">
+            <h5 class="ac-disclosure__heading">
+              <button type="button" class="ac-disclosure__trigger" data-ac-disc-trigger
+                      id="ac-disc-notes-trigger" aria-expanded="false"
+                      aria-controls="ac-disc-notes-panel">
+                <svg class="ac-disclosure__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                  <path d="M5 3.5 10.5 8 5 12.5" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>Notes</span>
+              </button>
+            </h5>
+            <!-- BROKEN ON PURPOSE — closed by a stylesheet, so it is closed to
+                 nobody but the person looking at it. -->
+            <div class="ac-disclosure__panel ac-disclosure__panel--css-closed" data-ac-disc-panel
+                 id="ac-disc-notes-panel" aria-labelledby="ac-disc-notes-trigger">
+              <div class="ac-disclosure__content">
+                <p>
+                  Deliver after 6pm.
+                  <a class="ac-disclosure__link" id="ac-disc-notes-link"
+                     href="../data-table/">Order 462 in the orders table</a>
+                  has the rest.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <dl class="ac-disclosure-readout">
+            <div class="ac-disclosure-readout__row">
+              <dt>Panel height</dt>
+              <dd><code data-ac-disc-out="height">&mdash;</code></dd>
+            </div>
+            <div class="ac-disclosure-readout__row">
+              <dt>Tab stops inside it</dt>
+              <dd><code data-ac-disc-out="stops">&mdash;</code></dd>
+            </div>
+          </dl>
+
+          <p class="ac-disclosure-verdict" role="status" data-ac-disc-verdict></p>
+        </div>
+      </div>
+
+      <!-- ==================================================================
+           EXAMPLE 6 · A div as the trigger
+           CSS [CORE] + [CONTENT] + [FRAME] + [BROKEN]. JS [PAGE].
+
+           The same classes, the same chevron, the same click handler, and none
+           of the four things the element was carrying: no role, no tab stop,
+           no Enter or Space, and no accessible name. It works with a pointer,
+           which is why this ships as often as it does.
+
+           There is no ARIA on it on purpose. Adding aria-expanded to a <div>
+           makes the announcement almost right and the keyboard no better —
+           the fix is the element, and the element is <button type="button">.
+           ================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">6 &middot; A div as the trigger</h4>
+
+        <div class="ac-disclosure-frame" data-ac-disc-case="div-trigger">
+          <div class="ac-disclosure">
+            <!-- BROKEN ON PURPOSE — a div with a click handler. -->
+            <div class="ac-disclosure__trigger" data-ac-disc-trigger>
+              <svg class="ac-disclosure__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M5 3.5 10.5 8 5 12.5" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <span>Tax settings</span>
+            </div>
+            <div class="ac-disclosure__panel" data-ac-disc-panel hidden>
+              <div class="ac-disclosure__content">
+                <p>Collected for United Kingdom at 20%.</p>
+              </div>
+            </div>
+          </div>
+
+          <dl class="ac-disclosure-readout">
+            <div class="ac-disclosure-readout__row">
+              <dt>Element</dt>
+              <dd><code data-ac-disc-out="element">&mdash;</code></dd>
+            </div>
+            <div class="ac-disclosure-readout__row">
+              <dt>Tab stops in this example</dt>
+              <dd><code data-ac-disc-out="stops">&mdash;</code></dd>
+            </div>
+          </dl>
+
+          <p class="ac-disclosure-verdict" role="status" data-ac-disc-verdict></p>
+        </div>
+      </div>
+
+      <!-- ==================================================================
+           EXAMPLE 7 · aria-controls naming an id nobody built
+           CSS [CORE] + [CONTENT] + [FRAME]. JS [PAGE].
+
+           A dangling idref is silent. Nothing paints differently, the toggle
+           still works, and the shortcut JAWS and NVDA offer for jumping to the
+           controlled region goes nowhere.
+
+           It survives a rename because nothing links the two strings. The
+           factory in [CORE] is the answer: it reads the panel's real id and
+           writes aria-controls from it, so the pair cannot come apart.
+           ================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">7 &middot; aria-controls naming an id nobody built</h4>
+
+        <div class="ac-disclosure-frame" data-ac-disc-case="dangling">
+          <div class="ac-disclosure">
+            <h5 class="ac-disclosure__heading">
+              <!-- BROKEN ON PURPOSE — the panel below is ac-disc-refunds-panel. -->
+              <button type="button" class="ac-disclosure__trigger" data-ac-disc-trigger
+                      id="ac-disc-refunds-trigger" aria-expanded="true"
+                      aria-controls="ac-disc-refunds-body"
+                      data-ac-demo-broken="aria-valid-attr-value">
+                <svg class="ac-disclosure__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                  <path d="M5 3.5 10.5 8 5 12.5" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>Refund policy</span>
+              </button>
+            </h5>
+            <div class="ac-disclosure__panel" data-ac-disc-panel id="ac-disc-refunds-panel"
+                 aria-labelledby="ac-disc-refunds-trigger">
+              <div class="ac-disclosure__content">
+                <p>Refunds within 30 days of delivery, to the original payment method.</p>
+              </div>
+            </div>
+          </div>
+
+          <dl class="ac-disclosure-readout">
+            <div class="ac-disclosure-readout__row">
+              <dt>aria-controls</dt>
+              <dd><code data-ac-disc-out="controls">&mdash;</code></dd>
+            </div>
+            <div class="ac-disclosure-readout__row">
+              <dt>Element with that id</dt>
+              <dd><code data-ac-disc-out="target">&mdash;</code></dd>
+            </div>
+          </dl>
+
+          <p class="ac-disclosure-verdict" role="status" data-ac-disc-verdict></p>
+        </div>
       </div>
     </div>
   </div>

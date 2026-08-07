@@ -11,11 +11,13 @@ In `library/components/disclosure/` — copy `component.{html,css,js}`, read `do
 ## ARIA
 
 - **the trigger** — `type=button` `aria-expanded` `aria-controls`
-- **the panel** — `aria-labelledby`
+- **the panel** — `hidden` `aria-labelledby`
 
 ## Keyboard
 
-- `Enter / Space` — native: it is a <button>, so there is no key handler to write
+- `Tab` — native: moves to the trigger, then into the panel when it is open
+- `Enter / Space` — native: toggles. It is a <button>, so there is no key handler to write
+- `Esc` — nothing, deliberately. A disclosure does not trap focus, so Esc stays with whatever surrounds it
 
 **States:** expanded, collapsed
 

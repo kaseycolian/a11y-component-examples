@@ -68,6 +68,13 @@ what goes in it: a horizontally scrollable `<pre>` inside one puts its own midpo
 `Element midpoint exceeds the grid bounds`. `overflow: clip` on the ancestor paints the same and is not
 in that code path.
 
+**axe ignores a dangling `aria-controls` on a collapsed control**
+
+`aria-valid-attr-value` skips it when the element carries `aria-expanded="false"` — no violation and
+no `incomplete` — because a combobox may legally name a popup that does not exist yet. So a typo'd
+`aria-controls` is invisible in the state a closed disclosure spends its life in. `aria-owns` is the
+same. Resolve the idref yourself.
+
 **An implicit role is invisible to ARIA reflection**
 
 `el.role` returns the *attribute*, so an `<output>` — which has an implicit `role="status"` — reads
@@ -144,8 +151,7 @@ A color transition gated at 150ms means `getComputedStyle` reports the animating
 and properties listed later in the `transition` shorthand can look as though they never changed at all.
 In a test, `emulateMedia({ reducedMotion: 'reduce' })` before the run, or an assertion that retries
 (`toHaveCSS`). In page code, set `el.style.transition = 'none'`, read, restore; `getComputedStyle`
-flushes the style it was just handed. Worth recognizing on sight: it looks exactly like forced colors
-ignoring the stylesheet, and cost the best part of an hour here.
+flushes the style it was just handed. It looks exactly like forced colors ignoring the stylesheet.
 
 **An axe contrast sweep after a theme switch is the same bug at page scale, and reduced motion may not
 fix it.** Setting `data-theme` and calling `analyze()` in the next statement measures every transitioning
@@ -168,9 +174,9 @@ anything settled.
 **`el.focus()` and a read of `document.activeElement` is ground truth**
 
 A selector can only list the elements that are *usually* focusable, and every interesting case is one
-that is unusually focusable or unusually not — a link inside an `opacity: 0` panel, a scroll container
-Chromium handed a stop to, a `[hidden]` box that still carries `tabindex="0"`. Asking the browser
-answers all of them: `el.focus({ preventScroll: true })`, then `document.activeElement === el`.
+that is unusually focusable or unusually not — a link inside an `opacity: 0` panel, a `[hidden]` box
+that still carries `tabindex="0"`. Asking the browser answers all of them:
+`el.focus({ preventScroll: true })`, then `document.activeElement === el`.
 
 Two rules come with it. Focus on something that cannot take it is a no-op rather than a move, so the
 probe has to `blur()` and restore focus itself or it parks a keyboard reader wherever it finished. And
@@ -195,10 +201,9 @@ nothing at all — so styling that works looks broken. A headed launch shows the
 
 **When the DOM is in a state nothing in the code appears to produce, patch the setter**
 
-`panels[i].hidden = !on` survived a rename of `on` to `isOn`, because `on` resolved to the file's own
-`on(el, type, fn)` listener helper — so `!on` was `false` on every iteration, every panel stayed
-visible, there was no error and nothing looked wrong in the source. Every test written at that point
-passed. What found it in one run: patch the property on the prototype from `addInitScript` and log
-`new Error().stack` on every set. The general shape, a leftover identifier that resolves to a
-*function* in scope, is invisible to `undefined` checks — functions are truthy and negating one is
-always `false`.
+Patch the property on the prototype from `addInitScript` and log `new Error().stack` on every set.
+What that found here in one run: `panels[i].hidden = !on` had survived a rename of `on` to `isOn`,
+because `on` still resolved to the file's own `on(el, type, fn)` helper — so `!on` was `false` every
+iteration, no panel ever hid, there was no error, and every test written at that point passed. A
+leftover identifier that resolves to a *function* in scope is invisible to `undefined` checks:
+functions are truthy and negating one is always `false`.

@@ -1,31 +1,49 @@
 /* =============================================================================
-   Disclosure
+   DISCLOSURE
 
-   Colors are written as var(--ac-token, var(--theme-token, #literal)) so this
-   works three ways with no edits: on its own (the literal), inside an app that
-   defines the theme-service tokens, or inside an app that sets --ac-* to
-   retheme everything at once.
+   WHAT TO COPY — sections are marked with the examples that need them.
+   Everything here is real component code except [FRAME]; the demo frame
+   (ac-demo-*) lives in the site's own stylesheet, not this file.
+
+     [CORE]     every example. The box, the trigger, the chevron, the panel.
+     [CONTENT]  every example. The panel's typography, and the link example 5
+                puts inside a panel it calls closed.
+     [FRAME]    the frame around each example on this page — the notes, the
+                readouts and the status lines. Delete the section.
+     [BROKEN]   examples 5 and 6. Delete them — they are the failures.
+     [FORCED]   always ship this. High Contrast drops every tint here.
+
+   Copy the file whole for the library version.
+
+   To stack several disclosures, put them in a flex column with a gap. They are
+   independent controls and need nothing from each other; several triggers over
+   one region is a tabs pattern instead.
+
+   Every color is var(--ac-token, var(--theme-token, #literal)) so this works
+   standalone, in a theme-service app, and in an app that sets --ac-*.
+   scripts/check-tokens.mjs enforces it.
    ============================================================================= */
 
-.ac-disclosure-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
-  max-width: 44rem;
-  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
-}
+/* --- [CORE] ---------------------------------------------------------------
+   The trigger is a <button> and the panel is its sibling, which is the whole
+   structure. Nothing here positions one against the other, so the pair drops
+   into a card, a sidebar or a table cell unchanged. */
 
 .ac-disclosure {
+  box-sizing: border-box;
+  width: 100%;
   border: 1px solid var(--ac-border, var(--border, #34205a));
   border-radius: var(--ac-radius, var(--radius, 10px));
   background: var(--ac-surface, var(--bg-panel, #110620));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
   overflow: hidden;
 }
 
 .ac-disclosure__heading {
   margin: 0;
-  /* The heading carries semantics, not size -- the button inside sets the type. */
+  /* The heading carries semantics, not size -- the button inside sets the type.
+     Without these two the browser's h2-to-h6 defaults would make the control
+     change size with the level, and the level is the reader's outline. */
   font-size: inherit;
   font-weight: inherit;
 }
@@ -34,6 +52,7 @@
   display: flex;
   align-items: center;
   gap: 0.7rem;
+  box-sizing: border-box;
   width: 100%;
   /* SC 2.5.8 wants 24px minimum; 44px is the comfortable touch size. */
   min-height: var(--ac-target, 44px);
@@ -67,11 +86,10 @@
   outline-offset: -3px;
 }
 
-/* Expanded state is signaled three ways -- rotated chevron, tinted background,
-   and aria-expanded -- so it never depends on color alone. */
+/* Expanded is signaled three ways -- a rotated chevron, a tinted background and
+   aria-expanded -- so it never depends on color alone (SC 1.4.1). */
 .ac-disclosure__trigger[aria-expanded="true"] {
-  /* 80% toward --text: the raw accent is drawn for a dark page and fails
-     SC 1.4.3 as text on a light theme surface. */
+  /* 80% toward --text, for the reason above. */
   color: color-mix(
     in srgb,
     var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 80%,
@@ -91,9 +109,14 @@
   transform: rotate(90deg);
 }
 
+/* [hidden] is display: none in every browser's own stylesheet already. This
+   restates it because any display value set on the panel would otherwise win,
+   and a panel that is [hidden] and still laid out is example 5. */
 .ac-disclosure__panel[hidden] {
   display: none;
 }
+
+/* --- [CONTENT] the panel's typography ------------------------------------- */
 
 .ac-disclosure__content {
   padding: 0.25rem 1rem 1rem 2.7rem;
@@ -119,16 +142,162 @@
   color: var(--ac-text, var(--text, #f3ecff));
 }
 
-/* --- Windows High Contrast --------------------------------------------------
-   color-mix fills and glows are dropped in forced-colors mode, so the hover and
-   expanded cues would vanish. Restore them with system colors. */
+/* Underlined, not just recolored. A link inside a paragraph that differs from
+   the text around it by color alone fails SC 1.4.1, and the panel is exactly
+   the place a link ends up inside a sentence. */
+.ac-disclosure__link {
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.ac-disclosure__link:focus-visible {
+  outline: 3px solid var(--ac-focus, var(--focus-ring, #3ceaff));
+  outline-offset: 2px;
+}
+
+/* --- [FRAME] the frame around each example -------------------------------
+   Page furniture: the wrapper, the notes, the readout tables and the status
+   lines. None of it is part of a disclosure. Delete the section. */
+
+.ac-disclosure-frame {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.ac-disclosure-note,
+.ac-disclosure-lede {
+  margin: 0;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+  overflow-wrap: break-word;
+}
+
+.ac-disclosure-lede {
+  font-size: 0.85rem;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-disclosure-note code {
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", Consolas, ui-monospace, monospace));
+  font-size: 0.95em;
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
+.ac-disclosure-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--ac-border, var(--border, #34205a));
+  border-radius: var(--ac-radius-sm, var(--radius-sm, 6px));
+  background: var(--ac-bg, var(--bg, #070110));
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.8rem;
+}
+
+/* Wraps to two lines rather than shrinking the value away: at 320px a label and
+   a value do not both fit, and the value is the point. */
+.ac-disclosure-readout__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.5rem;
+  min-width: 0;
+}
+
+.ac-disclosure-readout dt {
+  color: var(--ac-text-muted, var(--text-muted, #bcadde));
+}
+
+.ac-disclosure-readout dd {
+  margin: 0;
+  min-width: 0;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+  overflow-wrap: anywhere;
+}
+
+.ac-disclosure-readout code {
+  font-family: var(--ac-font-mono, var(--font-mono, "Cascadia Mono", Consolas, ui-monospace, monospace));
+  font-size: 0.95em;
+}
+
+.ac-disclosure-verdict {
+  margin: 0;
+  font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
+  font-size: 0.82rem;
+  line-height: 1.5;
+  font-weight: 700;
+  color: var(--ac-text, var(--text, #f3ecff));
+  overflow-wrap: break-word;
+}
+
+/* Collapsed while empty so the layout does not reserve a gap for a message
+   nobody has caused yet. The element itself stays in the DOM and in the
+   accessibility tree -- :empty is not display: none. */
+.ac-disclosure-verdict:empty {
+  display: none;
+}
+
+.ac-disclosure-verdict[data-ac-disc-bad="true"] {
+  /* 80% toward --text, for the reason in [CORE]. */
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-pink, var(--accent-pink, #ff2ec4)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
+}
+
+/* --- [BROKEN] examples 5 and 6 — delete these -----------------------------
+   Example 5. The panel is closed to the eye and to nothing else: the text is
+   still in the accessibility tree, the link is still a tab stop, and the page
+   will not scroll to either. Swapping these two declarations for the hidden
+   attribute is the whole fix.
+
+   Example 6 needs no CSS of its own to fail — the <div> there carries the same
+   .ac-disclosure__trigger class as the working button and is identical to look
+   at. The rule below only restores the two cues that hang off aria-expanded,
+   which a div does not have, so that the element is the one thing separating
+   the two examples. */
+
+.ac-disclosure__panel--css-closed {
+  height: 0;
+  overflow: hidden;
+}
+
+.ac-disclosure__trigger[data-ac-disc-open="true"] {
+  color: color-mix(
+    in srgb,
+    var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 80%,
+    var(--ac-text, var(--text, #f3ecff))
+  );
+  background: color-mix(in srgb, var(--ac-accent-blue, var(--accent-blue, #3ceaff)) 10%, transparent);
+}
+
+.ac-disclosure__trigger[data-ac-disc-open="true"] .ac-disclosure__icon {
+  transform: rotate(90deg);
+}
+
+/* --- [FORCED] Windows High Contrast — always ship this --------------------
+   color-mix fills are dropped in forced-colors mode, so the hover and expanded
+   cues would vanish and the chevron would be the only one left. */
 @media (forced-colors: active) {
   .ac-disclosure {
     border-color: ButtonBorder;
   }
 
   .ac-disclosure__trigger:hover,
-  .ac-disclosure__trigger[aria-expanded="true"] {
+  .ac-disclosure__trigger[aria-expanded="true"],
+  .ac-disclosure__trigger[data-ac-disc-open="true"] {
     background: Highlight;
     color: HighlightText;
     forced-color-adjust: none;
@@ -136,5 +305,20 @@
 
   .ac-disclosure__trigger:focus-visible {
     outline-color: CanvasText;
+  }
+
+  .ac-disclosure__link {
+    color: LinkText;
+  }
+
+  .ac-disclosure-readout {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+
+  /* The failing verdict loses its color here, which is why it was never only a
+     color — the sentence says the same thing. */
+  .ac-disclosure-verdict[data-ac-disc-bad="true"] {
+    color: CanvasText;
   }
 }
