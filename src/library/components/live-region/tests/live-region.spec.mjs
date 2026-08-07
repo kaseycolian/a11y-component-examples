@@ -12,7 +12,9 @@ test.beforeEach(async ({ page }) => {
 // this file records mutations as they happen and asserts on the order.
 //
 // Locators are scoped to `.ac-demo-grid` -- the code panel below the demo
-// repeats every class name and every string on this page as source text.
+// repeats every class name and every string on this page as source text. The
+// selector now matches two grids, the correct examples and the mistakes, so
+// anything that needs the grid element itself is queried from the document.
 const demo = (page) => page.locator('.ac-demo-grid');
 
 /**
@@ -64,7 +66,7 @@ test('the polite region is a status and the loud one is an alert', async ({ page
 test('pressing the polite button puts the message in the polite region only', async ({ page }) => {
   await demo(page).getByRole('button', { name: 'Say it politely' }).click();
 
-  await expect(demo(page).locator('#lr-polite')).toHaveText('Setlist saved.');
+  await expect(demo(page).locator('#lr-polite')).toHaveText('Changes saved.');
   await expect(demo(page).locator('#lr-assertive')).toHaveText('');
 });
 
@@ -147,7 +149,70 @@ test('destroy() takes both regions back out of the document', async ({ page }) =
   expect(gone).toEqual({ children: 0, cached: false });
 });
 
-/* --- example 3 · the three silences ----------------------------------------- */
+/* --- example 3 · a component's own status ----------------------------------- */
+
+test('the visible count moves immediately and the region waits for a pause', async ({ page }) => {
+  const field = demo(page).locator('#lr-invites');
+  const count = demo(page).locator('[data-ac-invites-count]');
+  const status = demo(page).locator('[data-ac-invites-status]');
+
+  await field.fill('7');
+  await expect(count).toHaveText('7 invited');
+  // Still nothing announced: a region wired to every keystroke reads a stream of
+  // numbers over the top of itself.
+  await expect(status).toHaveText('');
+
+  await expect(status).toHaveText('7 invited.', { timeout: 3000 });
+});
+
+test('the announced message changes at the threshold, so crossing it is news', async ({ page }) => {
+  const status = demo(page).locator('[data-ac-invites-status]');
+  await demo(page).locator('#lr-invites').fill('21');
+  await expect(status).toHaveText(/more than the 20/, { timeout: 3000 });
+});
+
+test('the visible count is aria-hidden, because the region already says it', async ({ page }) => {
+  await expect(demo(page).locator('[data-ac-invites-count]')).toHaveAttribute(
+    'aria-hidden',
+    'true',
+  );
+});
+
+/* --- example 4 · the append-only log ---------------------------------------- */
+
+test('the log is a log, and it accumulates', async ({ page }) => {
+  const log = demo(page).locator('#lr-log');
+  await expect(log).toHaveAttribute('role', 'log');
+  await expect(log).toHaveAccessibleName('Activity');
+
+  const btn = demo(page).getByRole('button', { name: 'Add a line to the log' });
+  await btn.click();
+  await btn.click();
+  await btn.click();
+
+  // Three entries, still all there. A status would hold only the last one.
+  await expect(log.locator('li')).toHaveCount(3);
+  await expect(log.locator('li').first()).toHaveText('Jordan Lee opened Order 462.');
+});
+
+test('a log does not carry aria-atomic, because only the new entry is news', async ({ page }) => {
+  await expect(demo(page).locator('#lr-log')).not.toHaveAttribute('aria-atomic', 'true');
+});
+
+test('the log is the only region that is a tab stop, because it is the only one that scrolls', async ({
+  page,
+}) => {
+  await expect(demo(page).locator('#lr-log')).toHaveAttribute('tabindex', '0');
+
+  // SC 2.1.1 the other way round: a stop on a region with nothing to do on it
+  // is a stop for no benefit.
+  const stops = await page.evaluate(
+    () => document.querySelectorAll('.ac-demo-grid .ac-lr-region[tabindex]').length,
+  );
+  expect(stops).toBe(1);
+});
+
+/* --- example 5 · three regions that never announce --------------------------- */
 
 test('the injected region arrives with its text already in it', async ({ page }) => {
   // Nothing was watching it, and it never changed. Both halves of the failure.
@@ -157,7 +222,7 @@ test('the injected region arrives with its text already in it', async ({ page })
 
   const injected = demo(page).locator('.ac-lr-region--broken');
   await expect(injected).toHaveAttribute('role', 'status');
-  await expect(injected).toHaveText('Sold out.');
+  await expect(injected).toHaveText('Report exported.');
 });
 
 test('the hidden region has the right text and is not in the tree', async ({ page }) => {
@@ -167,7 +232,7 @@ test('the hidden region has the right text and is not in the tree', async ({ pag
   await demo(page).getByRole('button', { name: 'Write to a hidden region' }).click();
 
   // The text is there. That is the whole problem: the DOM looks correct.
-  expect(await region.evaluate((el) => el.textContent)).toBe('Sold out.');
+  expect(await region.evaluate((el) => el.textContent)).toBe('Report exported.');
 });
 
 test('the same-tick region never reports an empty state between two presses', async ({ page }) => {
@@ -178,8 +243,8 @@ test('the same-tick region never reports an empty state between two presses', as
   // clear, but the browser reports only the state it last painted -- which is
   // the same text as before, so there is no change to announce.
   const seq = await trace(page, '#lr-fail-sametick', () => btn.click(), 200);
-  expect(seq[seq.length - 1]).toBe('Sold out.');
-  expect(seq[0]).toBe('Sold out.');
+  expect(seq[seq.length - 1]).toBe('Report exported.');
+  expect(seq[0]).toBe('Report exported.');
 });
 
 test('every failure reports what it left in the DOM', async ({ page }) => {
@@ -189,48 +254,27 @@ test('every failure reports what it left in the DOM', async ({ page }) => {
     ['Clear and set in one tick', 'sametick'],
   ]) {
     await demo(page).getByRole('button', { name }).click();
-    await expect(demo(page).locator(`[data-ac-fail-mirror="${id}"]`)).toHaveText(/Sold out\./);
+    await expect(demo(page).locator(`[data-ac-fail-mirror="${id}"]`)).toHaveText(
+      /Report exported\./,
+    );
   }
 });
 
 test('the mirrors are aria-hidden, so the page does not read them a second time', async ({
   page,
 }) => {
-  const unhidden = await demo(page).evaluate((grid) =>
-    [...grid.querySelectorAll('.ac-lr-mirror')].filter(
-      (el) => el.getAttribute('aria-hidden') !== 'true',
-    ).length,
+  // Queried from the document rather than through demo(), which now matches two
+  // grids -- the correct examples and the mistakes.
+  const unhidden = await page.evaluate(
+    () =>
+      [...document.querySelectorAll('.ac-demo-grid .ac-lr-mirror')].filter(
+        (el) => el.getAttribute('aria-hidden') !== 'true',
+      ).length,
   );
   expect(unhidden).toBe(0);
 });
 
-/* --- example 4 · a component's own status ----------------------------------- */
-
-test('the visible count moves immediately and the region waits for a pause', async ({ page }) => {
-  const field = demo(page).locator('#lr-guests');
-  const count = demo(page).locator('[data-ac-guests-count]');
-  const status = demo(page).locator('[data-ac-guests-status]');
-
-  await field.fill('7');
-  await expect(count).toHaveText('7 on the list');
-  // Still nothing announced: a region wired to every keystroke reads a stream of
-  // numbers over the top of itself.
-  await expect(status).toHaveText('');
-
-  await expect(status).toHaveText('7 on the list.', { timeout: 3000 });
-});
-
-test('the announced message changes at the threshold, so crossing it is news', async ({ page }) => {
-  const status = demo(page).locator('[data-ac-guests-status]');
-  await demo(page).locator('#lr-guests').fill('21');
-  await expect(status).toHaveText(/past the 20/, { timeout: 3000 });
-});
-
-test('the visible count is aria-hidden, because the region already says it', async ({ page }) => {
-  await expect(demo(page).locator('[data-ac-guests-count]')).toHaveAttribute('aria-hidden', 'true');
-});
-
-/* --- example 5 · repeats and role="log" ------------------------------------- */
+/* --- example 6 · the Copy button that repeats -------------------------------- */
 
 test('the fixed Copy button empties the region before writing the same words again', async ({
   page,
@@ -262,25 +306,6 @@ test('the naive Copy button never lets the region be empty, so it is silent', as
   expect(seq.every((t) => t === 'Copied.')).toBe(true);
 });
 
-test('the log is a log, and it accumulates', async ({ page }) => {
-  const log = demo(page).locator('#lr-log');
-  await expect(log).toHaveAttribute('role', 'log');
-  await expect(log).toHaveAccessibleName('Sound check');
-
-  const btn = demo(page).getByRole('button', { name: 'Add a line to the log' });
-  await btn.click();
-  await btn.click();
-  await btn.click();
-
-  // Three entries, still all there. A status would hold only the last one.
-  await expect(log.locator('li')).toHaveCount(3);
-  await expect(log.locator('li').first()).toHaveText('Kick drum, one.');
-});
-
-test('a log does not carry aria-atomic, because only the new entry is news', async ({ page }) => {
-  await expect(demo(page).locator('#lr-log')).not.toHaveAttribute('aria-atomic', 'true');
-});
-
 /* --- forced colors ---------------------------------------------------------- */
 
 test.describe('in forced colors', () => {
@@ -293,7 +318,7 @@ test.describe('in forced colors', () => {
   });
 
   test('polite and assertive stay apart by border style, not by color', async ({ page }) => {
-    const styles = await demo(page).evaluate(() => ({
+    const styles = await page.evaluate(() => ({
       polite: getComputedStyle(document.querySelector('#lr-polite')).borderTopStyle,
       loud: getComputedStyle(document.querySelector('#lr-assertive')).borderTopStyle,
     }));
@@ -306,7 +331,7 @@ test.describe('in forced colors', () => {
   });
 
   test('the regions and the buttons take system colors', async ({ page }) => {
-    const colors = await demo(page).evaluate(() => {
+    const colors = await page.evaluate(() => {
       const region = getComputedStyle(document.querySelector('#lr-polite'));
       const btn = getComputedStyle(document.querySelector('.ac-lr-btn'));
       return { regionBorder: region.borderTopColor, btnBorder: btn.borderTopColor };
@@ -330,8 +355,10 @@ test('what motion there is goes to zero under data-motion="off"', async ({ page 
 
 test('every control on the page is a real target', async ({ page }) => {
   // SC 2.5.8 asks for 24x24.
-  const small = await demo(page).evaluate((grid) =>
-    [...grid.querySelectorAll('button, input')]
+  // Queried from the document rather than through demo(), which now matches two
+  // grids -- the correct examples and the mistakes.
+  const small = await page.evaluate(() =>
+    [...document.querySelectorAll('.ac-demo-grid button, .ac-demo-grid input')]
       .map((el) => {
         const r = el.getBoundingClientRect();
         return { name: el.textContent.trim() || el.id, w: r.width, h: r.height };
@@ -345,8 +372,8 @@ test('nothing widens the page at 320px', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 640 });
   await page.reload();
 
-  // SC 1.4.10. The risk is the button rows in examples 1, 2 and 5 and the
-  // number field beside its count in example 4.
+  // SC 1.4.10. The risk is the button rows in examples 1, 2, 4 and 6 and the
+  // number field beside its count in example 3.
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
   );

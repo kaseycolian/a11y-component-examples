@@ -2,7 +2,7 @@
 
 # Live Region
 
-Announcing a change, to a region that was already being listened to.
+Announcing a change without moving focus, in a region that was already there.
 
 In `library/components/live-region/` — copy `component.{html,css,js}`, read `docs.md` for why.
 
@@ -13,6 +13,11 @@ In `library/components/live-region/` — copy `component.{html,css,js}`, read `d
 - **polite** — `role=status`
 - **assertive** — `role=alert`
 - **append-only** — `role=log` `aria-label`
+
+## Keyboard
+
+- `Tab` — native: reaches the role=log scroller, which is a tab stop only because it scrolls
+- `ArrowDown / ArrowUp` — native: scroll the focused log
 
 ## Goes wrong when
 

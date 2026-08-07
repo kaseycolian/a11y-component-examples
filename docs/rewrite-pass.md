@@ -12,20 +12,22 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 
 ## START HERE
 
-**Phase 0 is done. Components 1–16 are done. Next up is row 17, `live-region`.**
+**Phase 0 is done. Components 1–17 are done. Next up is row 18, `typography`.**
 
-Last updated 2026-08-06, after row 16. The repo was left green, and the **whole suite was re-run in
-full to verify it**:
+Last updated 2026-08-06, after row 17. The repo was left green:
 
 ```
 check:tokens                      34 files clean
 check:agents                      42 surfaces match their sources
 npm run build                     35 pages
-npx playwright test --project=chromium     1205 passed   (9.2 min, exit 0)
+npx playwright test --project=chromium live-region      27 passed
+npx playwright test --project=chromium agent-surfaces  117 passed
+npx playwright test --project=chromium a11y -g live-region   40 passed
 ```
 
-Same 1205 as the last full run at row 6 — ten components rewritten since, and no test gained, lost or
-skipped. Re-run that last line before you start if you want to be sure nothing drifted. It is the
+The last **full** run was at row 16: **1205 passed** in 9.2 minutes, exit 0 — the same 1205 as the
+full run at row 6. Row 17 added one test (the log's tab stop), so the next full run should read
+**1206**. Re-run the full suite before you start if you want to be sure nothing drifted. It is the
 honest baseline: if something is red before you have touched anything, it is not your change.
 
 Read these three things before touching anything, in this order:
@@ -36,9 +38,9 @@ Read these three things before touching anything, in this order:
 3. **The row you are about to do**, in [The roster](#the-roster). Every finished row records what
    actually bit, and that is the reason this file is worth reading rather than skimming.
 
-Then follow [The procedure](#the-procedure) for `live-region`, exactly.
+Then follow [The procedure](#the-procedure) for `typography`, exactly.
 
-**Where the pass stands.** 16 of 33 components done, in roster order — there is no reordering, so the
+**Where the pass stands.** 17 of 33 components done, in roster order — there is no reordering, so the
 next unticked row is always the next job. Four of the twelve renames are applied — `chip-toggle`,
 `field`, `fieldset-group`, `focus-ring`. The other eight happen in their own rows, and
 [Naming decisions](#naming-decisions) is the ledger. Phase 3 (the site's own copy) is untouched and
@@ -77,8 +79,20 @@ starting; every one of these cost a debugging detour the first time.
   `heading-order` does not catch it, because nothing is skipped.
 - **Splitting into two sections makes `.ac-demo-grid` match twice.** A spec that calls `.evaluate()`
   on a locator for it fails Playwright's strict mode — `visually-hidden` had exactly one such call,
-  and chained `.locator(…)` uses were unaffected, so the failure is easy to miss when reading. Grep
-  the spec for `ac-demo-grid` before splitting a page.
+  `live-region` had four, and chained `.locator(…)` uses were unaffected, so the failure is easy to
+  miss when reading. Grep the spec for `ac-demo-grid` before splitting a page. Most of them do not
+  need the grid element at all — three of `live-region`'s four already used `document.querySelector`
+  inside the callback and became a plain `page.evaluate`.
+- **An example whose title needs an "and" is two examples.** `live-region`'s old 5 was *Repeats, and
+  `role="log"`* — a correct pattern and a live failure in one block, which the two-section split has
+  nowhere to put. Splitting it gave the log a home in *Correct examples* and the Copy pair a home in
+  *Common mistakes*, and cost almost nothing: the CSS, the JS and the spec already had them in
+  separate blocks. Check for this before renumbering, not after.
+- **A JS component can be missing `## API` and `## Using it in a framework` entirely.** `live-region`
+  was, because its API had been written up as an argument (*An announcer, for messages with no
+  element*) rather than as a signature. Both headings are mandatory for a component with a
+  `component.js`, so a "restructure" is sometimes an addition. Check the canonical list against the
+  file, rather than only placing what is there.
 - **A broken example does not always carry `data-ac-demo-broken`.** `skip-link`'s two failures are
   invisible to axe — an unfocusable link and a target that never takes focus are not violations — so
   the marker would be a lie the gate then asserts. Move the example into *Common mistakes* and leave
@@ -296,11 +310,11 @@ grep -riEc "setlist|merch|zine|distro|matinee|salad days|ruby soho|gilman|bakesa
   src/library/components/*/component.html | grep -v ":0"
 ```
 
-Re-counted 2026-08-06, after row 16. Every remaining row, heaviest first:
+Re-counted 2026-08-06, after row 17. Every remaining row, heaviest first:
 
 ```
 tabs 24 · data-table 16 · modal 13 · jump-nav 11 · prose-surface 9 · result-panel 5 · notice 4
-typography 3 · motion-preferences 2 · effects 2 · tooltip 1 · status-text 1 · live-region 1 · badge 1
+typography 3 · motion-preferences 2 · effects 2 · tooltip 1 · status-text 1 · badge 1
 ```
 
 `disclosure`, `dropdown` and `drawer` return nothing, but that is not the same as being light —
@@ -481,8 +495,8 @@ bound" note, and a `summary` in the new voice.
 | 14 | `skip-link` | [x] | CSS-only. **First two-section page since `chip-toggle`** — example 5 is genuinely broken, so it moved into *Common mistakes* with no renumbering, since it was already last. It carries no `data-ac-demo-broken`, and correctly: neither failure is an axe violation or a `focus-visible`/`target-size` one, so there is nothing for the gate to assert. The `.ac-skip-lineup` mock class became `.ac-skip-people` — demo vocabulary had reached a class name, the way it reached a string in `checkbox`. |
 | 15 | `visually-hidden` | [x] | Two sections, no renumber: 1–3 are the three jobs the class does, 4–5 exist to show failures, so they moved as-is with all four `data-ac-demo-broken` markers untouched. **The split broke a test that nothing else had touched**: the spec's `demo()` helper is `page.locator('.ac-demo-grid')`, and one test called `.evaluate()` straight on it — two grids, strict-mode failure. Chained uses were fine. `contract.keyboard` did not exist and now does, one `native:` Tab row, because the mandatory Keyboard table needs something to agree with. |
 | 16 | `focus-ring` | [x] | **Renamed → Focus Indicator.** Five references, and **only one was a docs link** — the other four are source comments in `effects`, `prose-surface`, `typography` and `tokens.css`. The class prefix stays `.ac-focus-ring`: this is a display-name rename, not a slug one. Two sections, no renumber (1–3 correct, 4–5 the failures; 5 is broken-then-fixed side by side, the icon-button shape). `.ac-fr-track` → `.ac-fr-item`, and the spec's `demo(page).evaluate()` hit the two-grid strict-mode trap the last row recorded. |
-| 17 | `live-region` | [ ] | **NEXT.** Scanned, not started. 5 examples, HTML+CSS+JS, **0 `data-ac-demo-broken`** — decide one section or two by reading example 3 (*Three silences*) and 5 (*Repeats*), which discuss failures but may not ship one. `docs.md` has **seven** component-specific `##` against a cap of two, the heaviest yet: *The whole thing*, *Assertive is not "important"*, *An announcer*, *The three silences*, *The same message twice*, *Throttling*, *Where the region goes*. Its spec has the `demo = page.locator('.ac-demo-grid')` helper — check for `.evaluate()` on it before splitting. One punk string: `data-ac-announce="Setlist saved."` in `component.html:58`. |
-| 18 | `typography` | [ ] | 2 broken markers; one is a contrast ratio that must stay broken. |
+| 17 | `live-region` | [x] | Two sections, and **the first row where an example was split in two**: old 5 was *Repeats, and `role="log"`* — two topics glued together, one correct and one a live failure. The log became correct example 4 and the Copy pair became mistake 6, which made the renumber 1→1, 2→2, 4→3, 5(log)→4, 3→5, 5(repeat)→6. `data-ac-live-region` moved onto a wrapper `<div>`. Still **0 `data-ac-demo-broken`**, correctly: silence is not an axe violation, a `focus-visible` one or a `target-size` one, so the marker would be a lie the gate then asserts — the `skip-link` case. **Four `demo(page).evaluate()` calls hit the two-grid strict-mode trap**, the most of any row so far; three of them never used the grid element at all and became plain `page.evaluate`. `docs.md` had seven component-specific `##` against a cap of two: *The whole thing* folded into Required markup, *Assertive is not "important"* became a `###` there, *An announcer* became the new `## API`, and the remaining four merged into two `##` with a `###` each. It had no `## API` and no `## Using it in a framework` — both are new. `contract.keyboard` did not exist and now does, two `native:` rows for the `role="log"` scroller, which is the only tab stop on the page. Content: Changes saved / Draft saved / Report exported / Teammates to invite / an Activity log. |
+| 18 | `typography` | [ ] | **NEXT.** 2 broken markers; one is a contrast ratio that must stay broken. |
 | 19 | `motion-preferences` | [ ] | rename → Reduced Motion. |
 | 20 | `effects` | [ ] | rename → Background Effects. |
 | 21 | `disclosure` | [ ] | **full retrofit** — no demo scaffolding at all. |
@@ -559,7 +573,8 @@ can quietly rot while the pass runs:
 
 ```sh
 DONE="button icon-button loading-button chip-toggle field text-input input-group textarea \
-native-select radio-group checkbox switch fieldset-group skip-link visually-hidden focus-ring"
+native-select radio-group checkbox switch fieldset-group skip-link visually-hidden focus-ring \
+live-region"
 P=""; for d in $DONE; do P="$P src/library/components/$d"; done
 
 grep -riE "setlist|merch|zine|olympia|berkeley|gilman|bakesale" $P
@@ -568,7 +583,7 @@ grep -rn 'h3 class="ac-demo__title"' $P
 grep -rn "| Key | Action |\|| Key | Result |" $P
 ```
 
-All four return nothing as of row 16. Add each new row to `DONE` as you tick it.
+All four return nothing as of row 17. Add each new row to `DONE` as you tick it.
 
 ---
 

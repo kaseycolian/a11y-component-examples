@@ -3,12 +3,12 @@
 
    WHAT TO COPY
      [CORE]      AC.speak(element, text) — nine lines, and the fix for the bug
-                 in example 5. Needed by examples 1, 3, 4 and 5.
+                 in example 6. Needed by examples 1, 3 and 6.
      [ANNOUNCER] example 2. AC.createAnnouncer() for messages that belong to no
                  element. Depends on [CORE].
-     [THROTTLE]  example 4. A status wired to a control that changes fast.
-     [LOG]       example 5. Appending to a role="log".
-     [BROKEN]    example 3. Three regions that never announce. Never copy this.
+     [THROTTLE]  example 3. A status wired to a control that changes fast.
+     [LOG]       example 4. Appending to a role="log".
+     [BROKEN]    example 5. Three regions that never announce. Never copy this.
      [DEMO]      the buttons on this page. Delete it.
      [AUTO-INIT] delete if you construct instances yourself.
 
@@ -68,7 +68,7 @@
 
      Both regions are made and inserted here, at construction, and stay empty.
      Creating one at the moment there is something to say is the failure in
-     example 3. */
+     example 5. */
 
   /** How long a message sits in the region before it is cleared out. */
   var CLEAR_MS = 7000;
@@ -154,20 +154,20 @@
   global.AC.createAnnouncer = createAnnouncer;
 
   /* === [DEMO] the buttons on this page — delete this whole block ==========
-     Everything below wires the five examples up. The patterns inside [THROTTLE]
+     Everything below wires the six examples up. The patterns inside [THROTTLE]
      and [LOG] are real; the plumbing that finds the buttons is not. */
 
-  /** Example 4. How long typing has to stop before the status speaks. */
+  /** Example 3. How long typing has to stop before the status speaks. */
   var IDLE_MS = 900;
-  /** Example 4. Above this many guests the message changes. */
-  var CROWD = 20;
-  /** Example 5. */
+  /** Example 3. Above this many invites the message changes. */
+  var INCLUDED = 20;
+  /** Example 4. */
   var LOG_LINES = [
-    'Kick drum, one.',
-    'Snare, two.',
-    'Guitar up 3 dB.',
-    'Monitor two is feeding back.',
-    'Vocals, check.',
+    'Jordan Lee opened Order 462.',
+    'Invoice 99 marked paid.',
+    'Sam Rivera added a note.',
+    'Export report finished.',
+    'Order 462 shipped.',
   ];
 
   function wire(root) {
@@ -222,12 +222,55 @@
         return;
       }
 
+      if (btn.hasAttribute('data-ac-log')) return addLogLine();
       if (btn.hasAttribute('data-ac-fail')) return fail(btn.getAttribute('data-ac-fail'));
       if (btn.hasAttribute('data-ac-repeat')) return repeat(btn.getAttribute('data-ac-repeat'));
-      if (btn.hasAttribute('data-ac-log')) return addLogLine();
     }
 
-    /* === [BROKEN] example 3 — three regions that never announce ==========
+    /* === [THROTTLE] example 3 ============================================
+       Two copies of the same number on two different clocks. The visible one
+       moves per keystroke, because that is readable. The announced one waits
+       for a pause, because a region wired to every keystroke reads a stream of
+       numbers over the top of itself. */
+
+    var invites = root.querySelector('[data-ac-invites]');
+    var inviteCount = root.querySelector('[data-ac-invites-count]');
+    var inviteStatus = root.querySelector('[data-ac-invites-status]');
+    var idle = null;
+
+    function inviteWords(n) {
+      if (n > INCLUDED) return n + ' invited — more than the ' + INCLUDED + ' your plan includes.';
+      return n + ' invited.';
+    }
+
+    function onInviteInput() {
+      var n = parseInt(invites.value, 10);
+      if (isNaN(n)) n = 0;
+
+      inviteCount.textContent = n + ' invited';
+
+      if (idle) clearTimeout(idle);
+      idle = setTimeout(function () {
+        say(inviteStatus, inviteWords(n));
+      }, IDLE_MS);
+      timers.push(idle);
+    }
+
+    if (invites) invites.addEventListener('input', onInviteInput);
+
+    /* === [LOG] example 4 =================================================
+       A log appends and a status replaces — that is the whole difference. Each
+       new child is read as it arrives, so the same line twice is announced
+       twice, and the earlier ones stay put to be read back. */
+
+    function addLogLine() {
+      var line = document.createElement('li');
+      line.textContent = LOG_LINES[logIndex % LOG_LINES.length];
+      logIndex += 1;
+      root.querySelector('#lr-log .ac-lr-log__list').appendChild(line);
+    }
+
+    /* === [BROKEN] example 5 — three regions that never announce ==========
        Every one of these leaves the right text in the DOM. That is what makes
        them expensive: nothing you can look at says anything is wrong. */
 
@@ -242,7 +285,7 @@
         injected = document.createElement('p');
         injected.className = 'ac-lr-region ac-lr-region--broken';
         injected.setAttribute('role', 'status');
-        injected.textContent = 'Sold out.';
+        injected.textContent = 'Report exported.';
         root.querySelector('[data-ac-fail-slot="inject"]').appendChild(injected);
         el = injected;
         verdict = 'created already full, so nothing changed';
@@ -251,7 +294,7 @@
         // watching it. Unhiding it and filling it together fails the same way
         // as the case above.
         el = root.querySelector('#lr-fail-hidden');
-        el.textContent = 'Sold out.';
+        el.textContent = 'Report exported.';
         verdict = 'the region is display: none';
       } else {
         // Cleared and re-set inside one frame. The browser reports the state it
@@ -259,7 +302,7 @@
         el = root.querySelector('#lr-fail-sametick');
         var wasEmpty = el.textContent === '';
         el.textContent = '';
-        el.textContent = 'Sold out.';
+        el.textContent = 'Report exported.';
         verdict = wasEmpty
           ? 'announced — the region really was empty. Press it again.'
           : 'unchanged since the last press, so silent';
@@ -269,56 +312,14 @@
       if (out) out.textContent = '"' + el.textContent + '" — ' + verdict;
     }
 
-    /* === [THROTTLE] example 4 ============================================
-       Two copies of the same number on two different clocks. The visible one
-       moves per keystroke, because that is readable. The announced one waits
-       for a pause, because a region wired to every keystroke reads a stream of
-       numbers over the top of itself. */
-
-    var guests = root.querySelector('[data-ac-guests]');
-    var guestCount = root.querySelector('[data-ac-guests-count]');
-    var guestStatus = root.querySelector('[data-ac-guests-status]');
-    var idle = null;
-
-    function guestWords(n) {
-      if (n > CROWD) return n + ' on the list — past the ' + CROWD + ' the room holds.';
-      return n + ' on the list.';
-    }
-
-    function onGuestInput() {
-      var n = parseInt(guests.value, 10);
-      if (isNaN(n)) n = 0;
-
-      guestCount.textContent = n + ' on the list';
-
-      if (idle) clearTimeout(idle);
-      idle = setTimeout(function () {
-        say(guestStatus, guestWords(n));
-      }, IDLE_MS);
-      timers.push(idle);
-    }
-
-    if (guests) guests.addEventListener('input', onGuestInput);
-
-    /* --- example 5, the repeat ------------------------------------------ */
+    /* --- example 6, the repeat ------------------------------------------
+       Same visible result, same string, both times. Only the cleared one is
+       announced twice. */
 
     function repeat(which) {
       var el = root.querySelector('#lr-repeat');
-      // Same visible result, same string, both times.
       if (which === 'naive') el.textContent = 'Copied.';
       else say(el, 'Copied.');
-    }
-
-    /* === [LOG] example 5 =================================================
-       A log appends and a status replaces — that is the whole difference. Each
-       new child is read as it arrives, so the same line twice is announced
-       twice, and the earlier ones stay put to be read back. */
-
-    function addLogLine() {
-      var line = document.createElement('li');
-      line.textContent = LOG_LINES[logIndex % LOG_LINES.length];
-      logIndex += 1;
-      root.querySelector('#lr-log .ac-lr-log__list').appendChild(line);
     }
 
     root.addEventListener('click', onClick);
@@ -326,7 +327,7 @@
     var api = {
       destroy: function () {
         root.removeEventListener('click', onClick);
-        if (guests) guests.removeEventListener('input', onGuestInput);
+        if (invites) invites.removeEventListener('input', onInviteInput);
         watch.disconnect();
         frames.forEach(cancelAnimationFrame);
         timers.forEach(clearTimeout);
