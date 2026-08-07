@@ -1,5 +1,5 @@
 /* ===========================================================================
-   NOTICE
+   ALERT
 
    WHAT TO COPY
      [CORE]       build a notice element. Needed by everything below.
@@ -318,7 +318,7 @@
       var slot = root.querySelector('[data-ac-nc-slot="' + key + '"]');
 
       on(button, 'click', function () {
-        var notice = buildNotice('success', '462 records saved to the crate.');
+        var notice = buildNotice('success', '462 rows saved.');
 
         if (key === 'late') {
           // BROKEN ON PURPOSE — the role rides in on the notice. By the time
@@ -332,7 +332,7 @@
           pressed(
             appearLog,
             key === 'late'
-              ? 'role on the notice — the region was not being watched'
+              ? 'role on the message — the region was not being watched'
               : 'no live role anywhere',
           );
         }
@@ -366,8 +366,8 @@
         announce(
           slot,
           failing
-            ? buildNotice('error', 'The card ending 4620 was declined. Nothing was charged.')
-            : buildNotice('success', 'Paid. Your copy ships on the 9th.'),
+            ? buildNotice('error', 'The card ending 4462 was declined. Nothing was charged.')
+            : buildNotice('success', 'Paid. Invoice 99 was emailed to you.'),
         );
       });
     });

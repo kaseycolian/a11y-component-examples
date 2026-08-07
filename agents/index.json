@@ -398,7 +398,7 @@
     },
     {
       "slug": "notice",
-      "name": "Notice",
+      "name": "Alert",
       "group": "feedback-status",
       "useWhen": "An inline message: the word carries the tone, the icon carries nothing.",
       "tags": ["notice", "alert", "role-status", "live-region", "error-message", "non-text-contrast", "forced-colors", "focus-management"],
@@ -407,7 +407,7 @@
       "files": ["html", "css", "js"],
       "status": "stable",
       "hasContract": true,
-      "_summaryRev": "7365cb9a"
+      "_summaryRev": "271b84d9"
     },
     {
       "slug": "status-text",

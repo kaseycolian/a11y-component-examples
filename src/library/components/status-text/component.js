@@ -285,7 +285,7 @@
         if (key === 'many') return;
 
         // The specimen: the labels changed silently, and one region says what
-        // happened. Cleared first and written two frames later — Notice and
+        // happened. Cleared first and written two frames later — Alert and
         // Live Region have the reasoning.
         var slot = root.querySelector('[data-ac-st-slot="one"]');
         if (!slot) return;

@@ -11,7 +11,7 @@
                  of example 2.
      [STATUS]    examples 1, 3, 4 and 5. The panel's single live region.
      [COMPOSED]  examples 1, 3 and 5. Local copies of Status Text, Badge and
-                 Notice. Delete whichever of the three you already have.
+                 Alert. Delete whichever of the three you already have.
      [BTN]       every example. A copy of Input Group's addon button.
      [BROKEN]    examples 2 and 4. Delete it. It reproduces two failures that
                  otherwise have to be described rather than seen.
@@ -213,7 +213,7 @@
    knows it is inside a result panel.
 
    What the panel does add is the absence of a live role on all three. Status
-   Text, Badge and Notice each document when they should carry one; inside a
+   Text, Badge and Alert each document when they should carry one; inside a
    panel that already has a region, the answer is never. */
 
 /* Status Text — the verdict. */
@@ -349,8 +349,8 @@
   white-space: nowrap;
 }
 
-/* Notice — the reason. The icon is decoration and the prefix word is what
-   carries the tone; Notice has the SC 1.4.1 argument. */
+/* Alert — the reason. The icon is decoration and the prefix word is what
+   carries the tone; Alert has the SC 1.4.1 argument. */
 .ac-notice {
   --ac-notice-accent: var(--ac-accent-blue, var(--accent-blue, #3ceaff));
 
@@ -628,7 +628,7 @@
    color-mix is dropped, so the notice tint and the badge fill go; every accent
    becomes CanvasText, so the verdict, the count and the notice tone stop being
    told apart. Nothing puts the difference back, because the words never
-   depended on it — Notice has that argument. What does have to be rebuilt is
+   depended on it — Alert has that argument. What does have to be rebuilt is
    the copy button, which is a control and has to keep reading as one. */
 
 @media (forced-colors: active) {

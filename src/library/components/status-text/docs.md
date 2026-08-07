@@ -26,7 +26,7 @@ with the word or is decoration.
 
 ## Everything here comes from the size
 
-[Notice](../notice/) owns the argument that the word carries the tone and the icon does not, and the
+[Alert](../notice/) owns the argument that the word carries the tone and the icon does not, and the
 argument about which element carries the live role. Both are true here and neither is repeated. What
 this component adds is what happens to those answers when the whole thing is one word wide:
 

@@ -156,7 +156,7 @@
    * @param {string} [state.tone] 'ok' | 'err' | 'muted'
    * @param {number} [state.count] the Badge count; 0 removes the badge
    * @param {string} [state.subject] plural noun for the count — 'parameters'
-   * @param {string} [state.note] Notice text, or '' to clear it
+   * @param {string} [state.note] Alert text, or '' to clear it
    * @param {string} [state.notePrefix] the tone spelled out — 'Warning:'
    * @param {string} [state.noteTone] 'info' | 'success' | 'warn' | 'error'
    * @param {string} [state.say] the one sentence handed to the region
@@ -200,8 +200,8 @@
     if (status && typeof state.say === 'string') status.textContent = state.say;
   }
 
-  /** A Notice, built rather than templated so the prefix word cannot be lost.
-      The icon is left out: it is decoration, and Notice makes the case that
+  /** An Alert, built rather than templated so the prefix word cannot be lost.
+      The icon is left out: it is decoration, and Alert makes the case that
       the prefix is what carries the tone. */
   function buildNotice(text, prefix, tone) {
     var notice = document.createElement('div');

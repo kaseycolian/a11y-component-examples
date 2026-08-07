@@ -188,7 +188,7 @@
 /* --- [SLOT] example 4 -----------------------------------------------------
    One region per list, not one per row. It is in the markup from the start and
    stays empty until there is a summary to put in it — a region a screen reader
-   is not already watching cannot change. Notice has the recipe. */
+   is not already watching cannot change. Alert has the recipe. */
 
 .ac-st-slot {
   display: block;

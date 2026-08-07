@@ -78,7 +78,7 @@ treat the digits as the content:
 
 - **`99+`** is a shortening of the drawing. The words stay long: `99 or more unread messages`. The
   `+` is punctuation and announces as one.
-- **A dot** has no number at all — it is pure color and shape, which [Notice](../notice/) has the
+- **A dot** has no number at all — it is pure color and shape, which [Alert](../notice/) has the
   argument about. What is badge-specific is that there is no digit to fall back on, so the clipped
   words are the entire component. A dot without them announces nothing.
 - **Zero** is not a badge. It is removed rather than drawn empty, and the words go with it, because a

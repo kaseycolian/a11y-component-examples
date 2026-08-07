@@ -1,364 +1,392 @@
 <!-- ===========================================================================
-     NOTICE — a message with a tone
+     ALERT — a message with a tone
 
      WHAT TO COPY
-       Example 1 is the component. Examples 2 to 5 are what a notice costs when
+       Example 1 is the component. Examples 2 to 5 are what an alert costs when
        the tone is carried by the color, or when the live role is put on the
        message instead of the place the message lands. Each names the CSS and JS
        sections it needs.
 
-     THE CONTRACT
+     REQUIRED MARKUP
        .ac-notice + one tone   --info / --success / --warn / --error.
        the icon                aria-hidden. It is decoration.
        the prefix word         "Error:", "Warning:". This is what carries the
                                tone to everyone not looking at the color.
-       the live role           on the container the notice is put INTO, never on
-                               the notice. A static notice gets no role at all.
+       the live role           on the container the message is put INTO, never on
+                               the message. A static one gets no role at all.
        role="alert"            errors only, and never present at page load.
 
-     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     The class prefix stays .ac-notice. This is a display-name rename, not a slug
+     one, so nothing in the markup or the CSS moves.
+
+     There is one correct example, so its section heading is singular. Each of
+     the four under Common mistakes measures its failure rather than describing
+     it, and three put the failing case beside a correct one.
+
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the two section
+     headings, the grid, and the per-example headings. Never copy it.
      =========================================================================== -->
 
-<div class="ac-demo-grid" data-ac-notice>
-  <!-- ======================================================================
-       EXAMPLE 1 · The specimen
-       CSS [NOTICE] + [TONES] + [PANEL]. No JS.
+<div data-ac-notice>
+  <div class="ac-demo-section">
+    <h3 class="ac-demo-section__title">Correct example</h3>
+    <p class="ac-demo-section__note">
+      This is the markup to copy. Four tones, rendered with the page, and not one of them carries a
+      live role &mdash; nothing changed, so there is nothing to announce.
+    </p>
 
-       Four tones, rendered with the page. Nothing here is a live region:
-       these were on screen before anyone arrived.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">1 &middot; The specimen</h3>
+    <div class="ac-demo-grid">
+      <!-- ======================================================================
+           EXAMPLE 1 · Four tones, rendered with the page
+           CSS [NOTICE] + [TONES] + [PANEL]. No JS.
 
-    <div class="ac-nc-panel">
-      <div class="ac-notice ac-notice--info">
-        <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-          <circle cx="12" cy="12" r="9" /><path d="M12 11v6" /><path d="M12 7.6v.1" />
-        </svg>
-        <p class="ac-notice__text">
-          <b class="ac-notice__prefix">Note:</b> The Sunday matinee is all ages. Doors at 2pm.
-        </p>
+           Four tones, rendered with the page. Nothing here is a live region:
+           these were on screen before anyone arrived.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">1 &middot; Four tones, rendered with the page</h4>
+
+        <div class="ac-nc-panel">
+          <div class="ac-notice ac-notice--info">
+            <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+              <circle cx="12" cy="12" r="9" /><path d="M12 11v6" /><path d="M12 7.6v.1" />
+            </svg>
+            <p class="ac-notice__text">
+              <b class="ac-notice__prefix">Note:</b> Invoices are emailed on the 1st of each month.
+            </p>
+          </div>
+
+          <div class="ac-notice ac-notice--success">
+            <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+              <circle cx="12" cy="12" r="9" /><path d="M8 12.4l2.7 2.7L16 9.8" />
+            </svg>
+            <p class="ac-notice__text">
+              <b class="ac-notice__prefix">Success:</b> Report exported. 462 rows, as CSV.
+            </p>
+          </div>
+
+          <div class="ac-notice ac-notice--warn">
+            <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+              <path d="M12 3.6L21.2 20H2.8z" /><path d="M12 9.5v4.6" /><path d="M12 17v.1" />
+            </svg>
+            <p class="ac-notice__text">
+              <b class="ac-notice__prefix">Warning:</b> Three seats left on the Team plan.
+            </p>
+          </div>
+
+          <div class="ac-notice ac-notice--error">
+            <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+              <circle cx="12" cy="12" r="9" /><path d="M9 9l6 6" /><path d="M15 9l-6 6" />
+            </svg>
+            <p class="ac-notice__text">
+              <b class="ac-notice__prefix">Error:</b> The card ending 4462 was declined.
+            </p>
+          </div>
+
+          <p class="ac-nc__note">
+            Rendered with the page, so none of these carry a live role. Nothing changed &mdash; there is
+            nothing to announce.
+          </p>
+        </div>
       </div>
 
-      <div class="ac-notice ac-notice--success">
-        <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-          <circle cx="12" cy="12" r="9" /><path d="M8 12.4l2.7 2.7L16 9.8" />
-        </svg>
-        <p class="ac-notice__text">
-          <b class="ac-notice__prefix">Success:</b> 99 copies of <i>Basement Tapes</i> are on hold
-          for you.
-        </p>
-      </div>
-
-      <div class="ac-notice ac-notice--warn">
-        <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-          <path d="M12 3.6L21.2 20H2.8z" /><path d="M12 9.5v4.6" /><path d="M12 17v.1" />
-        </svg>
-        <p class="ac-notice__text">
-          <b class="ac-notice__prefix">Warning:</b> Only 3 left, and the crate closes at midnight.
-        </p>
-      </div>
-
-      <div class="ac-notice ac-notice--error">
-        <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-          <circle cx="12" cy="12" r="9" /><path d="M9 9l6 6" /><path d="M15 9l-6 6" />
-        </svg>
-        <p class="ac-notice__text">
-          <b class="ac-notice__prefix">Error:</b> The card ending 4620 was declined.
-        </p>
-      </div>
-
-      <p class="ac-nc__note">
-        Rendered with the page, so none of these carry a live role. Nothing changed &mdash; there is
-        nothing to announce.
-      </p>
     </div>
   </div>
 
-  <!-- ======================================================================
-       EXAMPLE 2 · The icon is decoration, the word is the meaning
-       CSS [NOTICE] + [TONES] + [PANEL] + [MONO]. JS [CORE] + [ANNOUNCED].
+  <div class="ac-demo-section ac-demo-section--mistakes">
+    <h3 class="ac-demo-section__title">Common mistakes</h3>
+    <p class="ac-demo-section__note">
+      These four are live and wrong on purpose. Each one is measured rather than described: the
+      readouts and logs record what a screen reader was actually given, and what focus did.
+    </p>
 
-       The same sentence in two tones, twice. Take the color away with the
-       checkbox, then read what is left.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">2 &middot; The icon is decoration, the word is the meaning</h3>
+    <div class="ac-demo-grid">
+      <!-- ======================================================================
+           EXAMPLE 2 · The same sentence in two tones
+           CSS [NOTICE] + [TONES] + [PANEL] + [MONO]. JS [CORE] + [ANNOUNCED].
 
-    <div class="ac-nc-panel" data-ac-nc-mono-panel>
-      <label class="ac-nc-check">
-        <input type="checkbox" data-ac-nc-mono />
-        <span>Take the color away</span>
-      </label>
+           The same sentence in two tones, twice. Take the color away with the
+           checkbox, then read what is left.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">2 &middot; The same sentence in two tones</h4>
 
-      <div class="ac-nc-cases">
-        <div class="ac-nc-case">
-          <p class="ac-nc-case__label">no prefix &mdash; broken on purpose</p>
+        <div class="ac-nc-panel" data-ac-nc-mono-panel>
+          <label class="ac-nc-check">
+            <input type="checkbox" data-ac-nc-mono />
+            <span>Take the color away</span>
+          </label>
 
-          <div class="ac-nc-stack" data-ac-nc-mono-target="bare">
-            <div class="ac-notice ac-notice--success">
-              <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-                <circle cx="12" cy="12" r="9" /><path d="M8 12.4l2.7 2.7L16 9.8" />
-              </svg>
-              <p class="ac-notice__text">The transfer is with the bank.</p>
+          <div class="ac-nc-cases">
+            <div class="ac-nc-case">
+              <p class="ac-nc-case__label">no prefix &mdash; broken on purpose</p>
+
+              <div class="ac-nc-stack" data-ac-nc-mono-target="bare">
+                <div class="ac-notice ac-notice--success">
+                  <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                    <circle cx="12" cy="12" r="9" /><path d="M8 12.4l2.7 2.7L16 9.8" />
+                  </svg>
+                  <p class="ac-notice__text">The transfer is with the bank.</p>
+                </div>
+
+                <div class="ac-notice ac-notice--error">
+                  <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                    <circle cx="12" cy="12" r="9" /><path d="M9 9l6 6" /><path d="M15 9l-6 6" />
+                  </svg>
+                  <p class="ac-notice__text">The transfer is with the bank.</p>
+                </div>
+              </div>
+
+              <dl class="ac-nc-readout">
+                <div class="ac-nc-readout__row">
+                  <dt>announced</dt><dd><code data-ac-nc-out="bare-said">&mdash;</code></dd>
+                </div>
+                <div class="ac-nc-readout__row">
+                  <dt>told apart by</dt><dd><code data-ac-nc-out="bare-tells">&mdash;</code></dd>
+                </div>
+              </dl>
             </div>
 
-            <div class="ac-notice ac-notice--error">
-              <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-                <circle cx="12" cy="12" r="9" /><path d="M9 9l6 6" /><path d="M15 9l-6 6" />
-              </svg>
-              <p class="ac-notice__text">The transfer is with the bank.</p>
+            <div class="ac-nc-case">
+              <p class="ac-nc-case__label">the specimen</p>
+
+              <div class="ac-nc-stack" data-ac-nc-mono-target="good">
+                <div class="ac-notice ac-notice--success">
+                  <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                    <circle cx="12" cy="12" r="9" /><path d="M8 12.4l2.7 2.7L16 9.8" />
+                  </svg>
+                  <p class="ac-notice__text">
+                    <b class="ac-notice__prefix">Success:</b> The transfer is with the bank.
+                  </p>
+                </div>
+
+                <div class="ac-notice ac-notice--error">
+                  <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                    <circle cx="12" cy="12" r="9" /><path d="M9 9l6 6" /><path d="M15 9l-6 6" />
+                  </svg>
+                  <p class="ac-notice__text">
+                    <b class="ac-notice__prefix">Error:</b> The transfer is with the bank.
+                  </p>
+                </div>
+              </div>
+
+              <dl class="ac-nc-readout">
+                <div class="ac-nc-readout__row">
+                  <dt>announced</dt><dd><code data-ac-nc-out="good-said">&mdash;</code></dd>
+                </div>
+                <div class="ac-nc-readout__row">
+                  <dt>told apart by</dt><dd><code data-ac-nc-out="good-tells">&mdash;</code></dd>
+                </div>
+              </dl>
             </div>
           </div>
 
-          <dl class="ac-nc-readout">
-            <div class="ac-nc-readout__row">
-              <dt>announced</dt><dd><code data-ac-nc-out="bare-said">&mdash;</code></dd>
-            </div>
-            <div class="ac-nc-readout__row">
-              <dt>told apart by</dt><dd><code data-ac-nc-out="bare-tells">&mdash;</code></dd>
-            </div>
-          </dl>
-        </div>
+          <p class="ac-nc__note">
+            One sentence, two tones, four alerts. The icon is <code>aria-hidden</code>, so it is never
+            read out.
+          </p>
 
-        <div class="ac-nc-case">
-          <p class="ac-nc-case__label">the specimen</p>
-
-          <div class="ac-nc-stack" data-ac-nc-mono-target="good">
-            <div class="ac-notice ac-notice--success">
-              <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-                <circle cx="12" cy="12" r="9" /><path d="M8 12.4l2.7 2.7L16 9.8" />
-              </svg>
-              <p class="ac-notice__text">
-                <b class="ac-notice__prefix">Success:</b> The transfer is with the bank.
-              </p>
-            </div>
-
-            <div class="ac-notice ac-notice--error">
-              <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-                <circle cx="12" cy="12" r="9" /><path d="M9 9l6 6" /><path d="M15 9l-6 6" />
-              </svg>
-              <p class="ac-notice__text">
-                <b class="ac-notice__prefix">Error:</b> The transfer is with the bank.
-              </p>
-            </div>
-          </div>
-
-          <dl class="ac-nc-readout">
-            <div class="ac-nc-readout__row">
-              <dt>announced</dt><dd><code data-ac-nc-out="good-said">&mdash;</code></dd>
-            </div>
-            <div class="ac-nc-readout__row">
-              <dt>told apart by</dt><dd><code data-ac-nc-out="good-tells">&mdash;</code></dd>
-            </div>
-          </dl>
+          <p class="ac-nc__verdict" role="status" data-ac-nc-mono-verdict></p>
         </div>
       </div>
 
-      <p class="ac-nc__note">
-        One sentence, two tones, four notices. The icon is <code>aria-hidden</code>, so it is never
-        read out.
-      </p>
+      <!-- ======================================================================
+           EXAMPLE 3 · One message added three ways
+           CSS [NOTICE] + [TONES] + [SLOT] + [BTN] + [PANEL]. JS [CORE] + [SPEAK]
+           + [LOG] + [APPEAR].
 
-      <p class="ac-nc__verdict" role="status" data-ac-nc-mono-verdict></p>
-    </div>
-  </div>
+           One success alert, added three ways. The log records what an assistive
+           technology had to work with each time.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">3 &middot; One message added three ways</h4>
 
-  <!-- ======================================================================
-       EXAMPLE 3 · Static or announced
-       CSS [NOTICE] + [TONES] + [SLOT] + [BTN] + [PANEL]. JS [CORE] + [SPEAK]
-       + [LOG] + [APPEAR].
+        <div class="ac-nc-panel" data-ac-nc-appear>
+          <div class="ac-nc-cases">
+            <div class="ac-nc-case">
+              <p class="ac-nc-case__label">the specimen</p>
+              <!-- The region is here from page load, empty, and it is the region
+                   that carries role="status" — not the alert put into it. -->
+              <div class="ac-nc-slot" role="status" data-ac-nc-slot="good"></div>
+              <!-- Three buttons reading "Save changes" would be three identical
+                   names on one page, which is the mistake example 5 is about. The
+                   name starts with the visible text, so SC 2.5.3 still holds. -->
+              <button class="ac-btn ac-btn--outline ac-btn--sm" type="button" data-ac-nc-add="good"
+                      aria-label="Save changes — the specimen">
+                Save changes
+              </button>
+            </div>
 
-       One success notice, added three ways. The log records what an assistive
-       technology had to work with each time.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">3 &middot; Static or announced</h3>
+            <div class="ac-nc-case">
+              <p class="ac-nc-case__label">role on the message &mdash; broken on purpose</p>
+              <!-- BROKEN ON PURPOSE — the container is roleless, and the alert
+                   arrives already carrying role="status". A region has to be
+                   watched before it can change. -->
+              <div class="ac-nc-slot" data-ac-nc-slot="late"></div>
+              <button class="ac-btn ac-btn--outline ac-btn--sm" type="button" data-ac-nc-add="late"
+                      aria-label="Save changes — role on the message">
+                Save changes
+              </button>
+            </div>
 
-    <div class="ac-nc-panel" data-ac-nc-appear>
-      <div class="ac-nc-cases">
-        <div class="ac-nc-case">
-          <p class="ac-nc-case__label">the specimen</p>
-          <!-- The region is here from page load, empty, and it is the region
-               that carries role="status" — not the notice put into it. -->
-          <div class="ac-nc-slot" role="status" data-ac-nc-slot="good"></div>
-          <!-- Three buttons reading "Save the crate" would be three identical
-               names on one page, which is the mistake example 5 is about. The
-               name starts with the visible text, so SC 2.5.3 still holds. -->
-          <button class="ac-btn ac-btn--outline ac-btn--sm" type="button" data-ac-nc-add="good"
-                  aria-label="Save the crate — the specimen">
-            Save the crate
-          </button>
-        </div>
-
-        <div class="ac-nc-case">
-          <p class="ac-nc-case__label">role on the notice &mdash; broken on purpose</p>
-          <!-- BROKEN ON PURPOSE — the container is roleless, and the notice
-               arrives already carrying role="status". A region has to be
-               watched before it can change. -->
-          <div class="ac-nc-slot" data-ac-nc-slot="late"></div>
-          <button class="ac-btn ac-btn--outline ac-btn--sm" type="button" data-ac-nc-add="late"
-                  aria-label="Save the crate — role on the notice">
-            Save the crate
-          </button>
-        </div>
-
-        <div class="ac-nc-case">
-          <p class="ac-nc-case__label">no role at all &mdash; broken on purpose</p>
-          <div class="ac-nc-slot" data-ac-nc-slot="mute"></div>
-          <button class="ac-btn ac-btn--outline ac-btn--sm" type="button" data-ac-nc-add="mute"
-                  aria-label="Save the crate — no live role">
-            Save the crate
-          </button>
-        </div>
-      </div>
-
-      <p class="ac-nc__note">
-        Press all three. They look identical and the DOM ends up identical, which is why this bug
-        survives review.
-      </p>
-
-      <p class="ac-nc-log__label" id="ac-nc-log-3">What a screen reader was given</p>
-      <ol class="ac-nc-log" aria-labelledby="ac-nc-log-3" data-ac-nc-log="appear"></ol>
-    </div>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 4 · role="alert" is for errors, and never at page load
-       CSS [NOTICE] + [TONES] + [SLOT] + [BTN] + [PANEL]. JS [CORE] + [SPEAK]
-       + [LOG] + [ALERT].
-
-       One alert was already on the page when you arrived. The log says so, and
-       says it again on every reload.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">4 &middot; <code>role="alert"</code> is for errors, and never at page load</h3>
-
-    <div class="ac-nc-panel" data-ac-nc-alert>
-      <!-- BROKEN ON PURPOSE — server rendered, populated, and carrying
-           role="alert". It interrupted whatever was being read the moment this
-           page loaded, and it does that again on every render. -->
-      <div class="ac-notice ac-notice--error" role="alert">
-        <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-          <circle cx="12" cy="12" r="9" /><path d="M9 9l6 6" /><path d="M15 9l-6 6" />
-        </svg>
-        <p class="ac-notice__text">
-          <b class="ac-notice__prefix">Error:</b> The card ending 4620 was declined.
-        </p>
-      </div>
-      <p class="ac-nc-case__label">server rendered, carrying <code>role="alert"</code></p>
-
-      <div class="ac-nc-cases">
-        <div class="ac-nc-case">
-          <p class="ac-nc-case__label">an error &mdash; assertive</p>
-          <div class="ac-nc-slot" role="alert" data-ac-nc-slot="err"></div>
-          <button class="ac-btn ac-btn--outline ac-btn--sm" type="button" data-ac-nc-pay="fail">
-            Pay with the declined card
-          </button>
-        </div>
-
-        <div class="ac-nc-case">
-          <p class="ac-nc-case__label">everything else &mdash; polite</p>
-          <div class="ac-nc-slot" role="status" data-ac-nc-slot="ok"></div>
-          <button class="ac-btn ac-btn--outline ac-btn--sm" type="button" data-ac-nc-pay="ok">
-            Pay with the good card
-          </button>
-        </div>
-      </div>
-
-      <p class="ac-nc__note">
-        Both regions are empty at load, so neither fires until you press something. The alert above
-        them fired before you did anything.
-      </p>
-
-      <p class="ac-nc-log__label" id="ac-nc-log-4">What a screen reader was given</p>
-      <ol class="ac-nc-log" aria-labelledby="ac-nc-log-4" data-ac-nc-log="alert"></ol>
-    </div>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 5 · Dismissing one
-       CSS [NOTICE] + [TONES] + [DISMISS] + [BTN] + [PANEL]. JS [CORE] +
-       [SPEAK] + [DISMISS].
-
-       Two dismissible notices. Dismiss each from the keyboard and watch where
-       focus went.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">5 &middot; Dismissing one</h3>
-
-    <div class="ac-nc-panel" data-ac-nc-dismiss>
-      <div class="ac-nc-cases">
-        <div class="ac-nc-case">
-          <p class="ac-nc-case__label">drops focus &mdash; broken on purpose</p>
-          <div class="ac-nc-stack" data-ac-nc-host="drop">
-            <div class="ac-notice ac-notice--warn ac-notice--dismissible">
-              <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-                <path d="M12 3.6L21.2 20H2.8z" /><path d="M12 9.5v4.6" /><path d="M12 17v.1" />
-              </svg>
-              <p class="ac-notice__text">
-                <b class="ac-notice__prefix">Warning:</b> The zine ships separately.
-              </p>
-              <!-- BROKEN ON PURPOSE — "Close" names nothing when there are two
-                   of them, and the handler removes the focused button without
-                   saying where focus goes next. -->
-              <button class="ac-notice__dismiss" type="button" data-ac-nc-close="drop"
-                      aria-label="Close">
-                <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-                  <path d="M7 7l10 10" /><path d="M17 7L7 17" />
-                </svg>
+            <div class="ac-nc-case">
+              <p class="ac-nc-case__label">no role at all &mdash; broken on purpose</p>
+              <div class="ac-nc-slot" data-ac-nc-slot="mute"></div>
+              <button class="ac-btn ac-btn--outline ac-btn--sm" type="button" data-ac-nc-add="mute"
+                      aria-label="Save changes — no live role">
+                Save changes
               </button>
             </div>
           </div>
 
-          <dl class="ac-nc-readout">
-            <div class="ac-nc-readout__row">
-              <dt>button name</dt><dd><code data-ac-nc-out="drop-name">&mdash;</code></dd>
-            </div>
-            <div class="ac-nc-readout__row">
-              <dt>focus after</dt><dd><code data-ac-nc-out="drop-focus">&mdash;</code></dd>
-            </div>
-          </dl>
-        </div>
+          <p class="ac-nc__note">
+            Press all three. They look identical and the DOM ends up identical, which is why this bug
+            survives review.
+          </p>
 
-        <div class="ac-nc-case">
-          <p class="ac-nc-case__label">the specimen</p>
-          <div class="ac-nc-stack" role="status" tabindex="-1" aria-label="Shipping notices"
-               data-ac-nc-host="keep">
-            <div class="ac-notice ac-notice--warn ac-notice--dismissible">
-              <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-                <path d="M12 3.6L21.2 20H2.8z" /><path d="M12 9.5v4.6" /><path d="M12 17v.1" />
-              </svg>
-              <p class="ac-notice__text">
-                <b class="ac-notice__prefix">Warning:</b> The zine ships separately.
-              </p>
-              <button class="ac-notice__dismiss" type="button" data-ac-nc-close="keep"
-                      aria-label="Dismiss: the zine ships separately">
-                <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-                  <path d="M7 7l10 10" /><path d="M17 7L7 17" />
-                </svg>
+          <p class="ac-nc-log__label" id="ac-nc-log-3">What a screen reader was given</p>
+          <ol class="ac-nc-log" aria-labelledby="ac-nc-log-3" data-ac-nc-log="appear"></ol>
+        </div>
+      </div>
+
+      <!-- ======================================================================
+           EXAMPLE 4 · role="alert" present at page load
+           CSS [NOTICE] + [TONES] + [SLOT] + [BTN] + [PANEL]. JS [CORE] + [SPEAK]
+           + [LOG] + [ALERT].
+
+           One alert was already on the page when you arrived. The log says so, and
+           says it again on every reload.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">4 &middot; <code>role="alert"</code> present at page load</h4>
+
+        <div class="ac-nc-panel" data-ac-nc-alert>
+          <!-- BROKEN ON PURPOSE — server rendered, populated, and carrying
+               role="alert". It interrupted whatever was being read the moment this
+               page loaded, and it does that again on every render. -->
+          <div class="ac-notice ac-notice--error" role="alert">
+            <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+              <circle cx="12" cy="12" r="9" /><path d="M9 9l6 6" /><path d="M15 9l-6 6" />
+            </svg>
+            <p class="ac-notice__text">
+              <b class="ac-notice__prefix">Error:</b> The card ending 4462 was declined.
+            </p>
+          </div>
+          <p class="ac-nc-case__label">server rendered, carrying <code>role="alert"</code></p>
+
+          <div class="ac-nc-cases">
+            <div class="ac-nc-case">
+              <p class="ac-nc-case__label">an error &mdash; assertive</p>
+              <div class="ac-nc-slot" role="alert" data-ac-nc-slot="err"></div>
+              <button class="ac-btn ac-btn--outline ac-btn--sm" type="button" data-ac-nc-pay="fail">
+                Pay with the declined card
+              </button>
+            </div>
+
+            <div class="ac-nc-case">
+              <p class="ac-nc-case__label">everything else &mdash; polite</p>
+              <div class="ac-nc-slot" role="status" data-ac-nc-slot="ok"></div>
+              <button class="ac-btn ac-btn--outline ac-btn--sm" type="button" data-ac-nc-pay="ok">
+                Pay with the good card
               </button>
             </div>
           </div>
 
-          <dl class="ac-nc-readout">
-            <div class="ac-nc-readout__row">
-              <dt>button name</dt><dd><code data-ac-nc-out="keep-name">&mdash;</code></dd>
-            </div>
-            <div class="ac-nc-readout__row">
-              <dt>focus after</dt><dd><code data-ac-nc-out="keep-focus">&mdash;</code></dd>
-            </div>
-          </dl>
+          <p class="ac-nc__note">
+            Both regions are empty at load, so neither fires until you press something. The alert above
+            them fired before you did anything.
+          </p>
+
+          <p class="ac-nc-log__label" id="ac-nc-log-4">What a screen reader was given</p>
+          <ol class="ac-nc-log" aria-labelledby="ac-nc-log-4" data-ac-nc-log="alert"></ol>
         </div>
       </div>
 
-      <p class="ac-nc__note">
-        Tab to a close button and press it. One of them leaves you at the top of the document.
-      </p>
+      <!-- ======================================================================
+           EXAMPLE 5 · A dismiss button that drops focus
+           CSS [NOTICE] + [TONES] + [DISMISS] + [BTN] + [PANEL]. JS [CORE] +
+           [SPEAK] + [DISMISS].
 
-      <button class="ac-btn ac-btn--outline ac-btn--sm" type="button" data-ac-nc-reset>
-        Put both back
-      </button>
+           Two dismissible alerts. Dismiss each from the keyboard and watch where
+           focus went.
+           ====================================================================== -->
+      <div class="ac-demo">
+        <h4 class="ac-demo__title">5 &middot; A dismiss button that drops focus</h4>
+
+        <div class="ac-nc-panel" data-ac-nc-dismiss>
+          <div class="ac-nc-cases">
+            <div class="ac-nc-case">
+              <p class="ac-nc-case__label">drops focus &mdash; broken on purpose</p>
+              <div class="ac-nc-stack" data-ac-nc-host="drop">
+                <div class="ac-notice ac-notice--warn ac-notice--dismissible">
+                  <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                    <path d="M12 3.6L21.2 20H2.8z" /><path d="M12 9.5v4.6" /><path d="M12 17v.1" />
+                  </svg>
+                  <p class="ac-notice__text">
+                    <b class="ac-notice__prefix">Warning:</b> One item ships separately.
+                  </p>
+                  <!-- BROKEN ON PURPOSE — "Close" names nothing when there are two
+                       of them, and the handler removes the focused button without
+                       saying where focus goes next. -->
+                  <button class="ac-notice__dismiss" type="button" data-ac-nc-close="drop"
+                          aria-label="Close">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                      <path d="M7 7l10 10" /><path d="M17 7L7 17" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <dl class="ac-nc-readout">
+                <div class="ac-nc-readout__row">
+                  <dt>button name</dt><dd><code data-ac-nc-out="drop-name">&mdash;</code></dd>
+                </div>
+                <div class="ac-nc-readout__row">
+                  <dt>focus after</dt><dd><code data-ac-nc-out="drop-focus">&mdash;</code></dd>
+                </div>
+              </dl>
+            </div>
+
+            <div class="ac-nc-case">
+              <p class="ac-nc-case__label">the specimen</p>
+              <div class="ac-nc-stack" role="status" tabindex="-1" aria-label="Shipping messages"
+                   data-ac-nc-host="keep">
+                <div class="ac-notice ac-notice--warn ac-notice--dismissible">
+                  <svg class="ac-notice__icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                    <path d="M12 3.6L21.2 20H2.8z" /><path d="M12 9.5v4.6" /><path d="M12 17v.1" />
+                  </svg>
+                  <p class="ac-notice__text">
+                    <b class="ac-notice__prefix">Warning:</b> One item ships separately.
+                  </p>
+                  <button class="ac-notice__dismiss" type="button" data-ac-nc-close="keep"
+                          aria-label="Dismiss: one item ships separately">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                      <path d="M7 7l10 10" /><path d="M17 7L7 17" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <dl class="ac-nc-readout">
+                <div class="ac-nc-readout__row">
+                  <dt>button name</dt><dd><code data-ac-nc-out="keep-name">&mdash;</code></dd>
+                </div>
+                <div class="ac-nc-readout__row">
+                  <dt>focus after</dt><dd><code data-ac-nc-out="keep-focus">&mdash;</code></dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+
+          <p class="ac-nc__note">
+            Tab to a close button and press it. One of them leaves you at the top of the document.
+          </p>
+
+          <button class="ac-btn ac-btn--outline ac-btn--sm" type="button" data-ac-nc-reset>
+            Put both back
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

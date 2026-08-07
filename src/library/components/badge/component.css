@@ -503,7 +503,7 @@
 /* --- [FORCED] Windows High Contrast — always ship this --------------------
    color-mix is dropped, so the tinted fill goes; every accent becomes the same
    CanvasText, so the tones stop being told apart. That is survivable here for
-   the same reason it is on Notice: the words were never the color's job. */
+   the same reason it is on Alert: the words were never the color's job. */
 
 @media (forced-colors: active) {
   .ac-badge {

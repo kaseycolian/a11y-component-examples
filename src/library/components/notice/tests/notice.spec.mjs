@@ -231,13 +231,13 @@ test('the three add buttons have three different names', async ({ page }) => {
     .evaluateAll((els) => els.map((el) => el.getAttribute('aria-label')));
 
   expect(new Set(names).size).toBe(3);
-  expect(names.every((n) => n.startsWith('Save the crate'))).toBe(true);
+  expect(names.every((n) => n.startsWith('Save changes'))).toBe(true);
 });
 
 test('the close buttons are named, and only one of them names its notice', async ({ page }) => {
   await expect(page.locator('[data-ac-nc-close="drop"]')).toHaveAccessibleName('Close');
   await expect(page.locator('[data-ac-nc-close="keep"]')).toHaveAccessibleName(
-    'Dismiss: the zine ships separately',
+    'Dismiss: one item ships separately',
   );
 });
 
@@ -260,7 +260,7 @@ test('dismissing the specimen leaves focus on the named region, which says what 
   await page.locator('[data-ac-nc-close="keep"]').focus();
   await page.keyboard.press('Enter');
 
-  await expect(page.locator('[data-ac-nc-out="keep-focus"]')).toContainText('Shipping notices');
+  await expect(page.locator('[data-ac-nc-out="keep-focus"]')).toContainText('Shipping messages');
   await expect(host).toHaveText(/Dismissed/);
   await expect
     .poll(() => page.evaluate(() => document.activeElement.getAttribute('data-ac-nc-host')))
