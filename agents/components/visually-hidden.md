@@ -12,6 +12,10 @@ In `library/components/visually-hidden/` — copy `component.{html,css}`, read `
 
 - **a clipped announcement** — `role=status` `aria-live=polite`
 
+## Keyboard
+
+- `Tab` — native: reveals the --focusable variant when focus lands inside it
+
 **States:** clipped, focusable
 
 ## Goes wrong when

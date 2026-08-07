@@ -3,13 +3,13 @@
   "name": "Visually Hidden",
   "group": "foundations",
   "order": 20,
-  "summary": "One class that takes text off the screen and leaves it in the accessibility tree — the difference between hiding something from sight and hiding it from everyone.",
+  "summary": "Visually hidden is one class that takes text off the screen and leaves it in the accessibility tree. Use it to finish an accessible name the design had to keep short, or to give a live region somewhere to live. It is nine CSS declarations, and the hand-rolled version is usually missing two of them.",
   "tags": ["visually-hidden", "sr-only", "clip-path", "accessible-name", "aria-label", "focus", "no-js"],
   "apg": null,
   "wcag": ["1.1.1", "1.3.1", "2.4.4", "2.5.3", "4.1.2"],
   "status": "stable",
   "files": ["html", "css"],
-  "demoNote": "No JavaScript on this page. Example 4 is four identical-looking buttons where three have no accessible name at all — inspect the accessibility tree, or listen to them.",
+  "demoNote": "No JavaScript on this page. Under Common mistakes, four identical-looking buttons: three have no accessible name at all. Inspect the accessibility tree, or listen to them.",
   "contract": {
     "useWhen": "Text for screen readers only, in nine declarations that all matter.",
     "root": [".ac-visually-hidden"],
@@ -19,6 +19,12 @@
         "aria-live=polite"
       ]
     },
+    "keyboard": [
+      [
+        "Tab",
+        "native: reveals the --focusable variant when focus lands inside it"
+      ]
+    ],
     "states": [
       "clipped",
       "focusable"

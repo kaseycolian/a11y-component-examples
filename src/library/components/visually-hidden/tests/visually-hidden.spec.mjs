@@ -68,8 +68,10 @@ test('it is not display:none, visibility:hidden, or aria-hidden', async ({ page 
 test('it takes no space in the line it sits in', async ({ page }) => {
   // The point of margin: -1px. A paragraph with hidden text in it is exactly
   // as tall as the same paragraph without.
-  const heights = await demo(page).evaluate((grid) => {
-    const p = [...grid.querySelectorAll('.ac-vh-body')].find((el) =>
+  // Queried from the document rather than through demo(), which now matches two
+  // grids -- the correct examples and the mistakes.
+  const heights = await page.evaluate(() => {
+    const p = [...document.querySelectorAll('.ac-demo-grid .ac-vh-body')].find((el) =>
       el.querySelector('.ac-visually-hidden'),
     );
     const before = p.getBoundingClientRect().height;
@@ -97,13 +99,13 @@ test('hidden text inside a link becomes part of the link name', async ({ page })
   const links = demo(page).locator('.ac-vh-link');
 
   // Same visible text, different names -- which is the entire point.
-  await expect(links.nth(0)).toHaveAccessibleName('Read more about Basket Case');
-  await expect(links.nth(1)).toHaveAccessibleName('Read more about Linoleum');
+  await expect(links.nth(0)).toHaveAccessibleName('Read more about Order 462');
+  await expect(links.nth(1)).toHaveAccessibleName('Read more about Invoice 99');
 });
 
 test('the leading space is inside the span, not lost between the halves', async ({ page }) => {
   const name = await demo(page).locator('.ac-vh-link').first().evaluate((el) => el.textContent);
-  // "Read moreabout Basket Case" is what happens without it.
+  // "Read moreabout Order 462" is what happens without it.
   expect(name.replace(/\s+/g, ' ')).toContain('Read more about');
 });
 
@@ -124,7 +126,7 @@ test('the visible half is what a sighted user sees, and only that', async ({ pag
 
 test('the focusable variant reveals what is inside it on focus', async ({ page }) => {
   const wrapper = demo(page).locator('.ac-visually-hidden--focusable');
-  const link = wrapper.getByRole('link', { name: 'Edit the schedule' });
+  const link = wrapper.getByRole('link', { name: 'Edit this order' });
 
   expect(await wrapper.evaluate((el) => getComputedStyle(el).clipPath)).not.toBe('none');
 
@@ -145,7 +147,7 @@ test('the focusable variant reveals what is inside it on focus', async ({ page }
 test('the revealed link is a real target once it appears', async ({ page }) => {
   const link = demo(page)
     .locator('.ac-visually-hidden--focusable')
-    .getByRole('link', { name: 'Edit the schedule' });
+    .getByRole('link', { name: 'Edit this order' });
 
   await link.focus();
   const box = await link.boundingBox();
@@ -185,7 +187,7 @@ test('only the clipped label gives its button an accessible name', async ({ page
 
   // This is the whole component, asserted: identical markup, three of them
   // silent.
-  await expect(buttons.nth(0)).toHaveAccessibleName('Add a date');
+  await expect(buttons.nth(0)).toHaveAccessibleName('Add a customer');
   await expect(buttons.nth(1)).toHaveAccessibleName('');
   await expect(buttons.nth(2)).toHaveAccessibleName('');
   await expect(buttons.nth(3)).toHaveAccessibleName('');
@@ -228,20 +230,20 @@ test('the icon is hidden from the accessibility tree, not from the screen', asyn
 
 test('hidden text is real text; an aria-label on a span is not', async ({ page }) => {
   const lines = demo(page).locator('.ac-vh-body');
-  const curfew = lines.filter({ hasText: 'Curfew' }).first();
-  const doors = lines.filter({ hasText: 'Doors' }).first();
+  const total = lines.filter({ hasText: 'Total' }).first();
+  const shipping = lines.filter({ hasText: 'Shipping' }).first();
 
   // Present in the page's text, and clipped to nothing on screen.
-  expect(await curfew.textContent()).toContain('at the Berkeley show');
-  const hidden = await curfew.locator('.ac-visually-hidden').boundingBox();
+  expect(await total.textContent()).toContain(' for Order 462');
+  const hidden = await total.locator('.ac-visually-hidden').boundingBox();
   expect(hidden.width).toBeLessThanOrEqual(1);
 
   // The aria-label version contributes nothing to the text at all -- find in
   // page and select-to-copy never see it, whatever a given AT does with it.
-  const span = doors.locator('.ac-vh-broken-arialabel');
-  await expect(span).toHaveAttribute('aria-label', /Berkeley/);
+  const span = shipping.locator('.ac-vh-broken-arialabel');
+  await expect(span).toHaveAttribute('aria-label', /Order 462/);
   expect((await span.textContent()).trim()).toBe('');
-  expect(await doors.textContent()).not.toContain('at the Berkeley show');
+  expect(await shipping.textContent()).not.toContain(' for Order 462');
   // No role, which is why the label has nothing to attach to.
   await expect(span).not.toHaveAttribute('role', /.*/);
 });
@@ -254,7 +256,7 @@ test('nothing here widens the page at 320px', async ({ page }) => {
   // box -- it must stay clipped, not stretch the document.
   await demo(page)
     .locator('.ac-visually-hidden--focusable')
-    .getByRole('link', { name: 'Edit the schedule' })
+    .getByRole('link', { name: 'Edit this order' })
     .focus();
 
   const overflow = await page.evaluate(

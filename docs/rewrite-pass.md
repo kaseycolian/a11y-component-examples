@@ -12,15 +12,17 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 
 ## START HERE
 
-**Phase 0 is done. Components 1–14 are done. Next up is row 15, `visually-hidden`.**
+**Phase 0 is done. Components 1–15 are done. Next up is row 16, `focus-ring`, which is also a
+rename → Focus Indicator.**
 
-Last updated 2026-08-06. This note is part of the `skip-link` commit. The repo was left green:
+Last updated 2026-08-06. This note is part of the `visually-hidden` commit. The repo was left green:
 
 ```
 check:tokens                      34 files clean
 check:agents                      42 surfaces match their sources
 npm run build                     35 pages
-playwright --project=chromium     skip-link 16 · agent-surfaces 117 · a11y -g skip-link 29
+playwright --project=chromium     visually-hidden 17 · agent-surfaces 117
+                                  a11y -g visually-hidden 30
 ```
 
 The whole suite was last run in full at row 6: 1205 passed, 10.9 min.
@@ -36,7 +38,9 @@ Read these three things before touching anything, in this order:
 3. **The row you are about to do**, in [The roster](#the-roster). The notes on rows 1–6 record what
    actually bit, and they are the reason this file is worth reading rather than skimming.
 
-Then follow [The procedure](#the-procedure) for `visually-hidden`, exactly.
+Then follow [The procedure](#the-procedure) for `focus-ring`, exactly. It is a **rename**, so also
+follow the rename rules: `grep -rn "Focus Ring" src/ docs/` afterwards, and check whether any of those
+references also names an example number.
 
 ### What the last session learned, in one place
 
@@ -64,6 +68,10 @@ Then follow [The procedure](#the-procedure) for `visually-hidden`, exactly.
   `fieldset-group` has one — example 3's `role="group"` is named by a real heading — and at `h4` it
   became a sibling of its own example title rather than a child. `h5` is right on this page. axe's
   `heading-order` does not catch it, because nothing is skipped.
+- **Splitting into two sections makes `.ac-demo-grid` match twice.** A spec that calls `.evaluate()`
+  on a locator for it fails Playwright's strict mode — `visually-hidden` had exactly one such call,
+  and chained `.locator(…)` uses were unaffected, so the failure is easy to miss when reading. Grep
+  the spec for `ac-demo-grid` before splitting a page.
 - **A broken example does not always carry `data-ac-demo-broken`.** `skip-link`'s two failures are
   invisible to axe — an unfocusable link and a target that never takes focus are not violations — so
   the marker would be a lie the gate then asserts. Move the example into *Common mistakes* and leave
@@ -451,8 +459,8 @@ bound" note, and a `summary` in the new voice.
 | 12 | `switch` | [x] | Single section, 4 examples, no renumber. Content: workspace defaults, order alerts, public status page, audit logging + beta features. The `docs.md` `Key \| Action` table was one of the three old shapes being eliminated. Six `##` sections placed: *Two cues* and *Unavailable, two ways* became `###` under States, *Labels* a `###` under Required markup, *Saying it out loud* a `###` under *A switch is a promise*; the two that stayed `##` are that one and *Checkbox or role=switch*. `contract.keyboard` gained the `native:` prefix on all three keys and its <kbd>Enter</kbd> effect was corrected — it said "submits the form", the docs said "nothing"; both now say it submits only if there is a form, and never toggles. |
 | 13 | `fieldset-group` | [x] | **Renamed → Fieldset.** Six references, in four other components: two `component.css` header comments and four `docs.md` links. `field/docs.md` already said `[Fieldset]`, having anticipated the rename. None named an example number. New content: delivery instructions, pickup time, invoice options, payment methods, tax settings + refund policy. **Demoting the demo titles to `h4` made example 3's `.ac-group__heading` a sibling of its own example title** — it is now `h5`, which is correct for this page and is why the docs say the level comes from your outline, not the component. `contract.keyboard` gained an arrows row: the docs table already listed them. |
 | 14 | `skip-link` | [x] | CSS-only. **First two-section page since `chip-toggle`** — example 5 is genuinely broken, so it moved into *Common mistakes* with no renumbering, since it was already last. It carries no `data-ac-demo-broken`, and correctly: neither failure is an axe violation or a `focus-visible`/`target-size` one, so there is nothing for the gate to assert. The `.ac-skip-lineup` mock class became `.ac-skip-people` — demo vocabulary had reached a class name, the way it reached a string in `checkbox`. |
-| 15 | `visually-hidden` | [ ] | **NEXT.** 4 broken markers. |
-| 16 | `focus-ring` | [ ] | rename → Focus Indicator. 2 broken markers. |
+| 15 | `visually-hidden` | [x] | Two sections, no renumber: 1–3 are the three jobs the class does, 4–5 exist to show failures, so they moved as-is with all four `data-ac-demo-broken` markers untouched. **The split broke a test that nothing else had touched**: the spec's `demo()` helper is `page.locator('.ac-demo-grid')`, and one test called `.evaluate()` straight on it — two grids, strict-mode failure. Chained uses were fine. `contract.keyboard` did not exist and now does, one `native:` Tab row, because the mandatory Keyboard table needs something to agree with. |
+| 16 | `focus-ring` | [ ] | **NEXT.** rename → Focus Indicator. 2 broken markers. |
 | 17 | `live-region` | [ ] | |
 | 18 | `typography` | [ ] | 2 broken markers; one is a contrast ratio that must stay broken. |
 | 19 | `motion-preferences` | [ ] | rename → Reduced Motion. |
