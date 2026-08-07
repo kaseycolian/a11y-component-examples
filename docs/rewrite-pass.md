@@ -26,13 +26,17 @@ npx playwright test --project=chromium a11y -g effects            29 passed
 npx playwright test --project=chromium data-table jump-nav tabs prose-surface  101 passed
 ```
 
-Row 20 added no tests, so the full suite should still be **1206**. It is the honest baseline: if
-something is red before you have touched anything, it is not your change.
+The **full** suite was re-run at row 20: **1206 passed** in 9.5 minutes, exit 0 — the number rows
+17–20 predicted, and the first clean full run since row 16. Row 20 added no tests, so the next one
+should read 1206 again. It is the honest baseline: if something is red before you have touched
+anything, it is not your change.
 
-**Open question — run the full suite first.** A full run at row 19 reported **4 failed, 1202 passed**,
-and its log was truncated before the failing names were recorded. Nothing scoped to rows 19 or 20 is
-red, so the four are somewhere else and predate row 20. Find out what they are before starting
-`disclosure`, and record them here.
+**A full run can flake, so re-run before you conclude anything.** One at row 19 reported *4 failed,
+1202 passed*; the identical tree at row 20 came back 1206/1206. Nothing was fixed in between. Four
+failures in a 1206-test suite that touches themes, forced colors and animation timing is a flake
+signature, not a regression — confirm with a second run before you go hunting. And **pipe the run to
+a file you keep**: the row-19 log was truncated to its last seven lines, which cost the failing names
+and made the question unanswerable.
 
 Read these three things before touching anything, in this order:
 
