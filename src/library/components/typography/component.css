@@ -37,9 +37,9 @@
    whether the reader can *apply* 1.5 without losing content, not about what
    you ship. Example 5 is that half of it.
 
-   overflow-wrap: break-word on all five, because a catalogue number or a URL
-   at h1 size is wider than a 320px viewport and would otherwise scroll the
-   whole page sideways (SC 1.4.10). */
+   overflow-wrap: break-word on all five, because an order id or a URL at h1
+   size is wider than a 320px viewport and would otherwise scroll the whole page
+   sideways (SC 1.4.10). */
 
 /* Case, shadow and tracking are declared rather than left open. Put one of
    these classes on an <h2> and the host app's own h1-h6 rules still cascade
@@ -152,7 +152,9 @@
 
 /* --- [BROKEN] examples 3, 4, 5 — never copy these -------------------------
    Three failures, live, so they can be looked at rather than described. Each is
-   the version that gets written by somebody who is trying.
+   the version that gets written by somebody who is trying. Example 2's failure
+   is a fourth, and it is in the markup rather than here: a heading class on a
+   <div>, which no CSS can be wrong about.
 
    1. opacity for muted text. It composites against whatever is behind the
       element, so the contrast ratio is not written down anywhere: this one

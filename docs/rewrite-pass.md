@@ -12,23 +12,24 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 
 ## START HERE
 
-**Phase 0 is done. Components 1–17 are done. Next up is row 18, `typography`.**
+**Phase 0 is done. Components 1–18 are done. Next up is row 19, `motion-preferences`.**
 
-Last updated 2026-08-06, after row 17. The repo was left green:
+Last updated 2026-08-06, after row 18. The repo was left green:
 
 ```
 check:tokens                      34 files clean
 check:agents                      42 surfaces match their sources
 npm run build                     35 pages
-npx playwright test --project=chromium live-region      27 passed
+npx playwright test --project=chromium typography       22 passed
 npx playwright test --project=chromium agent-surfaces  117 passed
-npx playwright test --project=chromium a11y -g live-region   40 passed
+npx playwright test --project=chromium a11y -g typography    35 passed
 ```
 
 The last **full** run was at row 16: **1205 passed** in 9.2 minutes, exit 0 — the same 1205 as the
-full run at row 6. Row 17 added one test (the log's tab stop), so the next full run should read
-**1206**. Re-run the full suite before you start if you want to be sure nothing drifted. It is the
-honest baseline: if something is red before you have touched anything, it is not your change.
+full run at row 6. Row 17 added one test (the log's tab stop) and row 18 added none, so the next full
+run should read **1206**. Re-run the full suite before you start if you want to be sure nothing
+drifted. It is the honest baseline: if something is red before you have touched anything, it is not
+your change.
 
 Read these three things before touching anything, in this order:
 
@@ -38,9 +39,9 @@ Read these three things before touching anything, in this order:
 3. **The row you are about to do**, in [The roster](#the-roster). Every finished row records what
    actually bit, and that is the reason this file is worth reading rather than skimming.
 
-Then follow [The procedure](#the-procedure) for `typography`, exactly.
+Then follow [The procedure](#the-procedure) for `motion-preferences`, exactly.
 
-**Where the pass stands.** 17 of 33 components done, in roster order — there is no reordering, so the
+**Where the pass stands.** 18 of 33 components done, in roster order — there is no reordering, so the
 next unticked row is always the next job. Four of the twelve renames are applied — `chip-toggle`,
 `field`, `fieldset-group`, `focus-ring`. The other eight happen in their own rows, and
 [Naming decisions](#naming-decisions) is the ledger. Phase 3 (the site's own copy) is untouched and
@@ -55,6 +56,11 @@ starting; every one of these cost a debugging detour the first time.
   (`button`, `icon-button`, `chip-toggle`). One correct example means a singular heading, *Correct
   example* (`loading-button`). No counter-examples at all means **one section only**, with the file
   header saying why (`field`, `text-input`). Never invent a broken example to fill a gap.
+- **Check whether the split costs a renumber before assuming it does.** `typography` is a specimen
+  sheet plus four failure demos, so example 1 is the whole *Correct example* section and 2–5 are all
+  mistakes — correct-first order was already the file's order, nothing moved, and not one section
+  marker in the CSS changed. Read the examples in order and find the boundary before planning the
+  work; a component whose correct examples already come first is a one-sitting row.
 - **Renumbering is the expensive part.** It ripples into `[SECTION] example N` markers in the CSS and
   JS, the order of the blocks in those files, the spec's section comments and block order, and any
   *other* component's prose that names an example number. `chip-toggle` is the worked example.
@@ -73,10 +79,12 @@ starting; every one of these cost a debugging detour the first time.
   <kbd>Space</kbd> went into `input-group`'s contract and <kbd>Enter</kbd> into `textarea`'s rather
   than being documented off-contract, where nothing would keep the two in step. Watch the Tier 2
   budget when doing it wholesale: nine rows took `native-select` from 0.9 KB to 1.6 KB of 1.8 KB.
-- **Demoting the demo titles to `h4` can strand a heading the component itself ships.** Only
-  `fieldset-group` has one — example 3's `role="group"` is named by a real heading — and at `h4` it
-  became a sibling of its own example title rather than a child. `h5` is right on this page. axe's
-  `heading-order` does not catch it, because nothing is skipped.
+- **Demoting the demo titles to `h4` can strand a heading the component itself ships.** Two rows have
+  hit it — `fieldset-group`, where example 3's `role="group"` is named by a real heading, and
+  `typography`, where example 2's specimen is a heading chosen to match its own depth. Both became a
+  sibling of their example title rather than a child, and both are `h5` now. axe's `heading-order`
+  does not catch it, because nothing is skipped. **Grep the component for `<h4`, `<h3` and `heading`
+  before demoting**, and check the spec, which asserted the old tag name in both cases.
 - **Splitting into two sections makes `.ac-demo-grid` match twice.** A spec that calls `.evaluate()`
   on a locator for it fails Playwright's strict mode — `visually-hidden` had exactly one such call,
   `live-region` had four, and chained `.locator(…)` uses were unaffected, so the failure is easy to
@@ -310,11 +318,11 @@ grep -riEc "setlist|merch|zine|distro|matinee|salad days|ruby soho|gilman|bakesa
   src/library/components/*/component.html | grep -v ":0"
 ```
 
-Re-counted 2026-08-06, after row 17. Every remaining row, heaviest first:
+Re-counted 2026-08-06, after row 18. Every remaining row, heaviest first:
 
 ```
 tabs 24 · data-table 16 · modal 13 · jump-nav 11 · prose-surface 9 · result-panel 5 · notice 4
-typography 3 · motion-preferences 2 · effects 2 · tooltip 1 · status-text 1 · badge 1
+motion-preferences 2 · effects 2 · tooltip 1 · status-text 1 · badge 1
 ```
 
 `disclosure`, `dropdown` and `drawer` return nothing, but that is not the same as being light —
@@ -496,8 +504,8 @@ bound" note, and a `summary` in the new voice.
 | 15 | `visually-hidden` | [x] | Two sections, no renumber: 1–3 are the three jobs the class does, 4–5 exist to show failures, so they moved as-is with all four `data-ac-demo-broken` markers untouched. **The split broke a test that nothing else had touched**: the spec's `demo()` helper is `page.locator('.ac-demo-grid')`, and one test called `.evaluate()` straight on it — two grids, strict-mode failure. Chained uses were fine. `contract.keyboard` did not exist and now does, one `native:` Tab row, because the mandatory Keyboard table needs something to agree with. |
 | 16 | `focus-ring` | [x] | **Renamed → Focus Indicator.** Five references, and **only one was a docs link** — the other four are source comments in `effects`, `prose-surface`, `typography` and `tokens.css`. The class prefix stays `.ac-focus-ring`: this is a display-name rename, not a slug one. Two sections, no renumber (1–3 correct, 4–5 the failures; 5 is broken-then-fixed side by side, the icon-button shape). `.ac-fr-track` → `.ac-fr-item`, and the spec's `demo(page).evaluate()` hit the two-grid strict-mode trap the last row recorded. |
 | 17 | `live-region` | [x] | Two sections, and **the first row where an example was split in two**: old 5 was *Repeats, and `role="log"`* — two topics glued together, one correct and one a live failure. The log became correct example 4 and the Copy pair became mistake 6, which made the renumber 1→1, 2→2, 4→3, 5(log)→4, 3→5, 5(repeat)→6. `data-ac-live-region` moved onto a wrapper `<div>`. Still **0 `data-ac-demo-broken`**, correctly: silence is not an axe violation, a `focus-visible` one or a `target-size` one, so the marker would be a lie the gate then asserts — the `skip-link` case. **Four `demo(page).evaluate()` calls hit the two-grid strict-mode trap**, the most of any row so far; three of them never used the grid element at all and became plain `page.evaluate`. `docs.md` had seven component-specific `##` against a cap of two: *The whole thing* folded into Required markup, *Assertive is not "important"* became a `###` there, *An announcer* became the new `## API`, and the remaining four merged into two `##` with a `###` each. It had no `## API` and no `## Using it in a framework` — both are new. `contract.keyboard` did not exist and now does, two `native:` rows for the `role="log"` scroller, which is the only tab stop on the page. Content: Changes saved / Draft saved / Report exported / Teammates to invite / an Activity log. |
-| 18 | `typography` | [ ] | **NEXT.** 2 broken markers; one is a contrast ratio that must stay broken. |
-| 19 | `motion-preferences` | [ ] | rename → Reduced Motion. |
+| 18 | `typography` | [x] | **The cheapest split so far, and the shape to look for: only example 1 is correct markup, so it is the lone *Correct example* and 2–5 are all mistakes — no renumbering at all, and not one section marker in the CSS moved.** Both `data-ac-demo-broken` markers were left untouched, including the `opacity: 0.4` one the CSS comment says to measure across every theme before changing. **Demoting the demo titles to `h4` stranded a heading**, the second component after `fieldset-group`: example 2's specimen was an `<h4 class="ac-t-h2">` chosen to match its depth, and at `h4` it became a sibling of its own example title. It is `h5` now, and the spec's `toBe('H4')` moved with it. axe does not catch this — nothing is skipped. The heading-list test found its example by `.nth(1)`; it now filters on `[data-ac-t-outline]`, so a later split cannot silently point it at a different example. Three `demo(page).evaluate()` traps. `docs.md` had nine `##` against a cap of two: *Muted text* and *A link is not a color* became `###` under States (both are that table's rows argued at length), *Forced colors* dissolved into a paragraph in each of them, and *rem*, *Text spacing* and *Reflow* merged into one *Text that survives being resized*. `## Keyboard`, `## States` and `## Related` are new. Content: Billing / Overview / Recent activity, Order 462, Invoice 99, `ORD-462-99`, Jordan Lee. |
+| 19 | `motion-preferences` | [ ] | **NEXT.** rename → Reduced Motion. |
 | 20 | `effects` | [ ] | rename → Background Effects. |
 | 21 | `disclosure` | [ ] | **full retrofit** — no demo scaffolding at all. |
 | 22 | `dropdown` | [ ] | rename → Custom Select. **25 bytes of Tier 2 headroom.** 6 examples, 433 lines. |
@@ -574,7 +582,7 @@ can quietly rot while the pass runs:
 ```sh
 DONE="button icon-button loading-button chip-toggle field text-input input-group textarea \
 native-select radio-group checkbox switch fieldset-group skip-link visually-hidden focus-ring \
-live-region"
+live-region typography"
 P=""; for d in $DONE; do P="$P src/library/components/$d"; done
 
 grep -riE "setlist|merch|zine|olympia|berkeley|gilman|bakesale" $P
@@ -583,7 +591,7 @@ grep -rn 'h3 class="ac-demo__title"' $P
 grep -rn "| Key | Action |\|| Key | Result |" $P
 ```
 
-All four return nothing as of row 17. Add each new row to `DONE` as you tick it.
+All four return nothing as of row 18. Add each new row to `DONE` as you tick it.
 
 ---
 

@@ -3,16 +3,26 @@
   "name": "Typography",
   "group": "foundations",
   "order": 50,
-  "summary": "A type scale that carries no semantics — why the element decides what a thing is and the class only decides what it looks like, what muted text still owes the reader, and the four spacing values a reader is allowed to force on your layout.",
+  "summary": "Typography is a set of visual classes for headings, body copy and links. Use them to set the size and weight of text without deciding what that text is. The classes carry no semantics, so a heading class on a `div` looks right and is missing from the heading list.",
   "tags": ["typography", "type-scale", "headings", "rem", "line-height", "text-spacing", "contrast", "links", "no-js"],
   "apg": null,
   "wcag": ["1.4.1", "1.4.3", "1.4.4", "1.4.10", "1.4.12", "2.4.6"],
   "status": "stable",
   "files": ["html", "css"],
-  "demoNote": "No JavaScript on this page. Examples 3, 4 and 5 each carry a failure that is live rather than described — the third is a contrast ratio that appears nowhere in the CSS, and the fifth needs one click of a checkbox.",
+  "demoNote": "No JavaScript on this page. Everything under Common mistakes is a live failure rather than a described one; example 5 needs one click of the checkbox before it fails.",
   "contract": {
     "useWhen": "Visual text classes that carry no semantics at all.",
     "root": [".ac-t-body"],
+    "keyboard": [
+      [
+        "Tab",
+        "native: reaches the links in body copy. None of the classes is a control"
+      ],
+      [
+        "Enter",
+        "native: follows the focused link"
+      ]
+    ],
     "failureModes": [
       "a div wearing a heading class, which is styling and not a heading",
       "opacity for muted text, which composites against whatever is behind it",

@@ -8,6 +8,11 @@ In `library/components/typography/` — copy `component.{html,css}`, read `docs.
 
 **Root:** `.ac-t-body`
 
+## Keyboard
+
+- `Tab` — native: reaches the links in body copy. None of the classes is a control
+- `Enter` — native: follows the focused link
+
 ## Goes wrong when
 
 - a div wearing a heading class, which is styling and not a heading

@@ -15,8 +15,18 @@ test.beforeEach(async ({ page }) => {
 //
 // Locators are scoped to `.ac-demo-grid` throughout -- the site shell has its own
 // headings and links, and the code panel below the demo repeats every class name
-// on this page as source text.
+// on this page as source text. The selector matches two grids, the correct
+// example and the mistakes, so anything reaching for the grid element itself is
+// queried from the document instead.
 const demo = (page) => page.locator('.ac-demo-grid');
+
+/** Computed font sizes for the five sizing classes, in scale order. */
+const scaleSizes = (page) =>
+  page.evaluate(() =>
+    ['ac-t-h1', 'ac-t-h2', 'ac-t-h3', 'ac-t-h4', 'ac-t-body'].map((cls) =>
+      parseFloat(getComputedStyle(document.querySelector(`.ac-demo-grid .${cls}`)).fontSize),
+    ),
+  );
 
 /** WCAG 2.x contrast ratio between two computed `rgb(...)` strings. */
 function ratio(a, b) {
@@ -60,11 +70,7 @@ const paintedColor = (locator) =>
 /* --- example 1 · the scale ------------------------------------------------- */
 
 test('the scale descends, and every step is set in rem', async ({ page }) => {
-  const sizes = await demo(page).evaluate((grid) =>
-    ['ac-t-h1', 'ac-t-h2', 'ac-t-h3', 'ac-t-h4', 'ac-t-body'].map((cls) =>
-      parseFloat(getComputedStyle(grid.querySelector(`.${cls}`)).fontSize),
-    ),
-  );
+  const sizes = await scaleSizes(page);
 
   // Non-increasing, not strictly decreasing: h4 is deliberately body size and is
   // told apart by weight. A heading set smaller than the text it introduces
@@ -72,9 +78,9 @@ test('the scale descends, and every step is set in rem', async ({ page }) => {
   for (let i = 1; i < sizes.length; i++) expect(sizes[i]).toBeLessThanOrEqual(sizes[i - 1]);
   expect(sizes[0]).toBeGreaterThan(sizes[4]);
 
-  const [h4Weight, bodyWeight] = await demo(page).evaluate((grid) =>
+  const [h4Weight, bodyWeight] = await page.evaluate(() =>
     ['ac-t-h4', 'ac-t-body'].map((cls) =>
-      Number(getComputedStyle(grid.querySelector(`.${cls}`)).fontWeight),
+      Number(getComputedStyle(document.querySelector(`.ac-demo-grid .${cls}`)).fontWeight),
     ),
   );
   expect(h4Weight).toBeGreaterThan(bodyWeight);
@@ -86,11 +92,7 @@ test('the scale descends, and every step is set in rem', async ({ page }) => {
   await page.evaluate(() => {
     document.documentElement.style.fontSize = '24px';
   });
-  const bigger = await demo(page).evaluate((grid) =>
-    ['ac-t-h1', 'ac-t-h2', 'ac-t-h3', 'ac-t-h4', 'ac-t-body'].map((cls) =>
-      parseFloat(getComputedStyle(grid.querySelector(`.${cls}`)).fontSize),
-    ),
-  );
+  const bigger = await scaleSizes(page);
   bigger.forEach((px, i) => expect(px).toBeGreaterThan(sizes[i]));
 });
 
@@ -143,23 +145,25 @@ test('long unbroken words cannot widen the page', async ({ page }) => {
     .locator('.ac-t-h1')
     .first()
     .evaluate((el) => getComputedStyle(el).overflowWrap);
-  // SC 1.4.10: a catalogue number at h1 size is wider than a 320px viewport, and
-  // an unbroken word does not wrap without this.
+  // SC 1.4.10: an order id at h1 size is wider than a 320px viewport, and an
+  // unbroken word does not wrap without this.
   expect(wrap).toBe('break-word');
 });
 
-/* --- example 2 · a class is not a role -------------------------------------- */
+/* --- example 2 · a heading class on a div ------------------------------------ */
 
 test('the two identical lines are one heading and one paragraph', async ({ page }) => {
-  const real = demo(page).getByRole('heading', { name: 'Kerplunk, side one' });
+  const real = demo(page).getByRole('heading', { name: 'Activity this month' });
   await expect(real).toBeVisible();
-  expect(await real.evaluate((el) => el.tagName)).toBe('H4');
+  // h5, because the demo title above it is the h4. The level comes from the
+  // document, and the size came from the class -- which is the whole example.
+  expect(await real.evaluate((el) => el.tagName)).toBe('H5');
 
   // Same class, same pixels, no role. This is the failure, live.
-  const fake = demo(page).getByText('Kerplunk, side two', { exact: true });
+  const fake = demo(page).getByText('Activity last month', { exact: true });
   await expect(fake).toBeVisible();
   expect(await fake.evaluate((el) => el.tagName)).toBe('DIV');
-  await expect(demo(page).getByRole('heading', { name: 'Kerplunk, side two' })).toHaveCount(0);
+  await expect(demo(page).getByRole('heading', { name: 'Activity last month' })).toHaveCount(0);
 });
 
 test('the two lines really are visually identical', async ({ page }) => {
@@ -186,13 +190,17 @@ test('the two lines really are visually identical', async ({ page }) => {
       ].join('|');
     });
 
-  const real = demo(page).getByRole('heading', { name: 'Kerplunk, side one' });
-  const fake = demo(page).getByText('Kerplunk, side two', { exact: true });
+  const real = demo(page).getByRole('heading', { name: 'Activity this month' });
+  const fake = demo(page).getByText('Activity last month', { exact: true });
   expect(await read(fake)).toBe(await read(real));
 });
 
 test('the printed heading list matches the real accessibility tree', async ({ page }) => {
-  const example = demo(page).locator('.ac-demo').nth(1);
+  // Found by the list it contains rather than by position, so splitting the page
+  // into two sections cannot silently point this at a different example.
+  const example = demo(page)
+    .locator('.ac-demo')
+    .filter({ has: page.locator('[data-ac-t-outline]') });
 
   // The list on the page is written by hand. This is what stops it drifting: pull
   // the actual headings out of the same example and compare.

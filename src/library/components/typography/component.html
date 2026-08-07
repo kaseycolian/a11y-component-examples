@@ -5,7 +5,7 @@
        The [CORE] section of component.css, whole. A type scale is one thing;
        there is no useful half of it. There is no JavaScript and no ARIA.
 
-     THE CONTRACT
+     REQUIRED MARKUP
        .ac-t-h1 .ac-t-h2 .ac-t-h3 .ac-t-h4   size, weight, line-height, margin
        .ac-t-body                            the reading default
        .ac-t-muted                           color only — pairs with any of the above
@@ -20,277 +20,288 @@
        navigates by, and looks completely fine. Example 2 has both, live, with
        the heading list printed underneath.
 
-     ac-demo-* / ac-demo__* is scaffolding for this page only. Never copy it.
+     ac-demo-* / ac-demo__* is scaffolding for this page only — the section
+     headings, the grid, and the per-example headings. Never copy it.
      =========================================================================== -->
 
-<div class="ac-demo-grid">
-  <!-- ======================================================================
-       EXAMPLE 1 · The scale
-       CSS [CORE].
+<div class="ac-demo-section">
+  <h3 class="ac-demo-section__title">Correct example</h3>
+  <p class="ac-demo-section__note">
+    The scale itself, every class once. Take the <code>[CORE]</code> section of
+    <code>component.css</code> whole — there is no useful half of a type scale.
+  </p>
 
-       Every class once, on a <dd>, because this is a specimen sheet and a
-       specimen is a sample rather than a document. Nothing here is a heading
-       just because it is set at heading size; example 2 is about that.
+  <div class="ac-demo-grid">
+    <!-- ======================================================================
+         EXAMPLE 1 · The type scale
+         CSS [CORE].
 
-       Sizes are rem, never px: a px font-size ignores the reader's own default
-       font size, which is a real setting real people change and the single most
-       common way a type scale locks someone out (SC 1.4.4).
+         Every class once, on a <dd>, because this is a specimen sheet and a
+         specimen is a sample rather than a document. Nothing here is a heading
+         just because it is set at heading size; example 2 is about that.
 
-       h1 and h2 are fluid — clamp() with a rem floor and a rem term inside the
-       middle value. Never a bare vw: text-only zoom does not move the viewport,
-       so a vw font-size does not respond to it at all.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">1 &middot; The scale</h3>
+         Sizes are rem, never px: a px font-size ignores the reader's own default
+         font size, which is a real setting real people change and the single most
+         common way a type scale locks someone out (SC 1.4.4).
 
-    <dl class="ac-t-specimens">
-      <dt><code>ac-t-h1</code></dt>
-      <dd class="ac-t-h1">Dookie</dd>
+         h1 and h2 are fluid — clamp() with a rem floor and a rem term inside the
+         middle value. Never a bare vw: text-only zoom does not move the viewport,
+         so a vw font-size does not respond to it at all.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">1 &middot; The type scale</h4>
 
-      <dt><code>ac-t-h2</code></dt>
-      <dd class="ac-t-h2">Side one</dd>
+      <dl class="ac-t-specimens">
+        <dt><code>ac-t-h1</code></dt>
+        <dd class="ac-t-h1">Billing</dd>
 
-      <dt><code>ac-t-h3</code></dt>
-      <dd class="ac-t-h3">Welcome to Paradise</dd>
+        <dt><code>ac-t-h2</code></dt>
+        <dd class="ac-t-h2">Overview</dd>
 
-      <dt><code>ac-t-h4</code></dt>
-      <dd class="ac-t-h4">Recorded at 924 Gilman</dd>
+        <dt><code>ac-t-h3</code></dt>
+        <dd class="ac-t-h3">Recent activity</dd>
 
-      <dt><code>ac-t-body</code></dt>
-      <dd class="ac-t-body">
-        Four tracks a side, mixed in a week, and nobody in the room expected
-        anyone to still be arguing about it 99 years later.
-      </dd>
+        <dt><code>ac-t-h4</code></dt>
+        <dd class="ac-t-h4">Payment method</dd>
 
-      <dt><code>ac-t-muted</code></dt>
-      <dd class="ac-t-body ac-t-muted">Reissue, 462 copies, clear vinyl.</dd>
+        <dt><code>ac-t-body</code></dt>
+        <dd class="ac-t-body">
+          Order 462 shipped on Tuesday. The customer was notified the same
+          afternoon, and the invoice is still pending.
+        </dd>
 
-      <dt><code>ac-t-mono</code></dt>
-      <dd class="ac-t-body"><span class="ac-t-mono">CAT-462-B</span></dd>
+        <dt><code>ac-t-muted</code></dt>
+        <dd class="ac-t-body ac-t-muted">Updated 3 days ago by Jordan Lee.</dd>
 
-      <dt><code>ac-t-link</code></dt>
-      <dd class="ac-t-body">
-        Set at a size that survives <a class="ac-t-link" href="#t-reflow">being
-        resized</a>.
-      </dd>
-    </dl>
+        <dt><code>ac-t-mono</code></dt>
+        <dd class="ac-t-body"><span class="ac-t-mono">ORD-462-99</span></dd>
 
-    <p class="ac-demo__legend">
-      <code>ac-t-muted</code> sets a color and <code>ac-t-mono</code> sets a
-      family; both pair with any of the five above them. The rest are complete
-      on their own.
-    </p>
-  </div>
+        <dt><code>ac-t-link</code></dt>
+        <dd class="ac-t-body">
+          Set at a size that survives <a class="ac-t-link" href="#t-reflow">being
+          resized</a>.
+        </dd>
+      </dl>
 
-  <!-- ======================================================================
-       EXAMPLE 2 · A class is not a role — live
-       CSS [CORE], plus the [MOCK] specimen frames.
-
-       Two lines at the same size, weight and color. One is an <h4> and one is a
-       <div>. On screen there is nothing to tell them apart.
-
-       In the accessibility tree there is one heading. Screen reader users
-       navigate long pages by pulling up the heading list and jumping — it is
-       the most-used navigation feature there is — and the second line is not in
-       it, cannot be jumped to, and announces as ordinary text.
-
-       The heading list underneath is written by hand and is what a screen
-       reader would show for this example. The spec asserts it against the real
-       accessibility tree, so it cannot drift.
-
-       The <h4> is deliberately not an <h1>: the page's own <h1> is the component
-       name and "Live example" is the <h2>, so 4 is the level this spot in the
-       document actually is. The size came from the class. Two dials, and they
-       are not connected.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">2 &middot; A class is not a role</h3>
-
-    <div class="ac-t-pair">
-      <div class="ac-t-specimen">
-        <h4 class="ac-t-h2">Kerplunk, side one</h4>
-        <p class="ac-t-specimen__note"><code>&lt;h4 class="ac-t-h2"&gt;</code></p>
-      </div>
-      <div class="ac-t-specimen">
-        <div class="ac-t-h2">Kerplunk, side two</div>
-        <p class="ac-t-specimen__note"><code>&lt;div class="ac-t-h2"&gt;</code></p>
-      </div>
+      <p class="ac-demo__legend">
+        <code>ac-t-muted</code> sets a color and <code>ac-t-mono</code> sets a
+        family; both pair with any of the five above them. The rest are complete
+        on their own.
+      </p>
     </div>
-
-    <p class="ac-t-outline__label" id="t-outline-label">
-      Heading list for this example
-    </p>
-    <ol class="ac-t-outline" aria-labelledby="t-outline-label" data-ac-t-outline>
-      <li><span class="ac-t-outline__level">h4</span> Kerplunk, side one</li>
-    </ol>
-
-    <p class="ac-demo__legend">
-      One entry, two lines. Side two is unreachable by heading navigation and
-      announces as a paragraph. Fixing it is one tag, not one class &mdash; and
-      the reverse, an <code>&lt;h2 class="ac-t-h4"&gt;</code> that is small on
-      screen and level 2 in the outline, is correct and common.
-    </p>
   </div>
+</div>
 
-  <!-- ======================================================================
-       EXAMPLE 3 · Muted text has a floor — SC 1.4.3
-       CSS [CORE] + [BROKEN].
+<div class="ac-demo-section ac-demo-section--mistakes">
+  <h3 class="ac-demo-section__title">Common mistakes</h3>
+  <p class="ac-demo-section__note">
+    Four failures, live rather than described. Each one looks correct on screen and correct in the
+    markup, and two of them are invisible to axe.
+  </p>
 
-       De-emphasized still means readable: 4.5:1 against its background at
-       normal size, with no exemption for "it is only a caption". The library's
-       muted token is 9.5:1 on this surface, which leaves a consumer room to
-       retint it — and the number is quoted rather than the class being called
-       safe, because retinting it is how this breaks silently.
+  <div class="ac-demo-grid">
+    <!-- ======================================================================
+         EXAMPLE 2 · A heading class on a div
+         CSS [CORE], plus the [MOCK] specimen frames.
 
-       The third line is the failure, and it is opacity rather than a color on
-       purpose. opacity composites against whatever happens to be behind the
-       element, so the ratio is not written anywhere and cannot be read off the
-       CSS or linted for. The same one declaration is 3.7:1 at best on a dark
-       surface and 2.5:1 on a light one, and it moves with the theme. Set a
-       color.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">3 &middot; Muted text has a floor</h3>
+         Two lines at the same size, weight and color. One is an <h5> and one is a
+         <div>. On screen there is nothing to tell them apart.
 
-    <p class="ac-t-body">
-      Pressed at 462 rpm is not a thing anyone has ever done, and the sleeve
-      said it anyway.
-    </p>
-    <p class="ac-t-body ac-t-muted">
-      Pressed at 462 rpm is not a thing anyone has ever done, and the sleeve
-      said it anyway.
-    </p>
-    <p class="ac-t-body ac-t-broken-faint" data-ac-demo-broken="color-contrast">
-      Pressed at 462 rpm is not a thing anyone has ever done, and the sleeve
-      said it anyway.
-    </p>
+         In the accessibility tree there is one heading. Screen reader users
+         navigate long pages by pulling up the heading list and jumping — it is
+         the most-used navigation feature there is — and the second line is not in
+         it, cannot be jumped to, and announces as ordinary text.
 
-    <ol class="ac-t-key">
-      <li><code>ac-t-body</code> &mdash; 17:1</li>
-      <li><code>ac-t-muted</code> &mdash; 9.5:1, and it is a color</li>
-      <li>
-        <code>opacity: 0.4</code> &mdash; <strong>3.7:1 at best, 2.5:1 in the
-        light themes</strong>, and no number appears in the CSS
-      </li>
-    </ol>
+         The heading list underneath is written by hand and is what a screen
+         reader would show for this example. The spec asserts it against the real
+         accessibility tree, so it cannot drift.
 
-    <p class="ac-demo__legend">
-      All three are the same sentence. The third is a <strong>SC 1.4.3</strong>
-      failure in one theme and a near miss in the other, from a declaration that
-      names no color at all. Change the theme in the header and watch it move.
-    </p>
-  </div>
+         The heading is an <h5> and deliberately not an <h1>: the page's own <h1>
+         is the component name, "Live example" is the <h2>, the section heading is
+         the <h3> and this example's own title is the <h4>, so 5 is the level this
+         spot in the document actually is. The size came from the class. Two
+         dials, and they are not connected.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">2 &middot; Heading class on a div</h4>
 
-  <!-- ======================================================================
-       EXAMPLE 4 · A link is not a color — SC 1.4.1
-       CSS [CORE] + [BROKEN].
-
-       A link inside a block of text has to be distinguishable from the text
-       around it by something other than color. Color alone is allowed only when
-       the link and the surrounding text are 3:1 apart *and* a non-color cue
-       appears on hover and focus — two conditions, and the first is the one
-       nobody measures.
-
-       Measure it here. The accent this theme uses for links is 13:1 against the
-       background, which reads as plenty, and 1.27:1 against the body text
-       beside it. In the light theme the same pair is 3.08:1 — a pass, barely.
-       One design, two themes, opposite verdicts.
-
-       So the underline is not a style preference. It is the cue that does not
-       depend on which theme is loaded, on how the reader perceives color, or on
-       the page being rendered in color at all.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title">4 &middot; A link is not a color</h3>
-
-    <p class="ac-t-body">
-      The setlist ran short, so they played
-      <a class="ac-t-link" href="#t-reflow">the reflow example</a> twice and
-      nobody in the room objected.
-    </p>
-    <p class="ac-t-body">
-      The setlist ran short, so they played
-      <a class="ac-t-broken-link" href="#t-outline-label" data-ac-demo-broken="link-in-text-block">the heading list</a>
-      twice and nobody in the room objected.
-    </p>
-
-    <ol class="ac-t-key">
-      <li><code>ac-t-link</code> &mdash; underlined, so the cue is not the color</li>
-      <li>
-        color only &mdash; <strong>1.27:1 against the text beside it</strong>,
-        where 3:1 is the floor
-      </li>
-    </ol>
-
-    <p class="ac-demo__legend">
-      Both are real links, and both are 13:1 against the background, which is
-      the number people check. Take the color away &mdash; print it in gray, or
-      read it through a screen tint &mdash; and only the first one is still a
-      link.
-    </p>
-  </div>
-
-  <!-- ======================================================================
-       EXAMPLE 5 · Text that survives being resized — SC 1.4.4, 1.4.10, 1.4.12
-       CSS [CORE] + [BROKEN], plus the [MOCK] toggle and boxes.
-
-       SC 1.4.12 Text Spacing is the one people have not heard of: a reader must
-       be able to force line-height to 1.5, letter-spacing to 0.12em,
-       word-spacing to 0.16em and paragraph spacing to 2em without losing any
-       content. Browser extensions and OS-level reading tools do exactly this,
-       dyslexia tooling in particular.
-
-       The criterion is not about your defaults. It is about whether your boxes
-       survive somebody else's. The failure is always the same shape: a fixed
-       height. Text that fit at 1.3 does not fit at 1.5, and overflow: hidden
-       takes the rest of the sentence with no scrollbar and no error.
-
-       The checkbox applies all four values. The first box has height and
-       overflow: hidden; the second has min-height and nothing else. Everything
-       else about them is identical, down to the width.
-       ====================================================================== -->
-  <div class="ac-demo">
-    <h3 class="ac-demo__title" id="t-reflow">5 &middot; Text that survives being resized</h3>
-
-    <div class="ac-t-spacing">
-      <div class="ac-t-check-row">
-        <input class="ac-t-check" id="t-spacing" type="checkbox" />
-        <label class="ac-t-check-row__label" for="t-spacing">
-          Apply the SC 1.4.12 text spacing
-        </label>
-      </div>
-
-      <div class="ac-t-pair ac-t-pair--boxes">
-        <div class="ac-t-box ac-t-broken-clip">
-          <p class="ac-t-prose ac-t-body">
-            The PA cut out twice at the Fireside Bowl, and nobody in the room
-            stopped playing.
-          </p>
-          <p class="ac-t-prose ac-t-body">
-            By the last song there were 462 people and one working monitor
-            between all of them.
-          </p>
+      <div class="ac-t-pair">
+        <div class="ac-t-specimen">
+          <h5 class="ac-t-h2">Activity this month</h5>
+          <p class="ac-t-specimen__note"><code>&lt;h5 class="ac-t-h2"&gt;</code></p>
         </div>
-        <div class="ac-t-box">
-          <p class="ac-t-prose ac-t-body">
-            The PA cut out twice at the Fireside Bowl, and nobody in the room
-            stopped playing.
-          </p>
-          <p class="ac-t-prose ac-t-body">
-            By the last song there were 462 people and one working monitor
-            between all of them.
-          </p>
+        <div class="ac-t-specimen">
+          <div class="ac-t-h2">Activity last month</div>
+          <p class="ac-t-specimen__note"><code>&lt;div class="ac-t-h2"&gt;</code></p>
         </div>
       </div>
+
+      <p class="ac-t-outline__label" id="t-outline-label">
+        Heading list for this example
+      </p>
+      <ol class="ac-t-outline" aria-labelledby="t-outline-label" data-ac-t-outline>
+        <li><span class="ac-t-outline__level">h5</span> Activity this month</li>
+      </ol>
+
+      <p class="ac-demo__legend">
+        One entry, two lines. The <code>&lt;div&gt;</code> is unreachable by heading navigation and
+        announces as a paragraph. Fixing it is one tag, not one class.
+      </p>
     </div>
 
-    <p class="ac-demo__legend">
-      Tick the box. The first panel loses the last line of the second sentence
-      &mdash; <code>height</code> plus <code>overflow: hidden</code>, which
-      looked fine until somebody else's settings arrived. The second panel
-      grows, because its only constraint is <code>min-height</code>. Narrow the
-      window to 320px and both still read down one column, which is
-      <strong>SC 1.4.10</strong>.
-    </p>
+    <!-- ======================================================================
+         EXAMPLE 3 · Muted text set with opacity — SC 1.4.3
+         CSS [CORE] + [BROKEN].
+
+         De-emphasized still means readable: 4.5:1 against its background at
+         normal size, with no exemption for "it is only a caption". The library's
+         muted token is 9.5:1 on this surface, which leaves a consumer room to
+         retint it — and the number is quoted rather than the class being called
+         safe, because retinting it is how this breaks silently.
+
+         The third line is the failure, and it is opacity rather than a color on
+         purpose. opacity composites against whatever happens to be behind the
+         element, so the ratio is not written anywhere and cannot be read off the
+         CSS or linted for. The same one declaration is 3.7:1 at best on a dark
+         surface and 2.5:1 on a light one, and it moves with the theme. Set a
+         color.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">3 &middot; Muted text set with opacity</h4>
+
+      <p class="ac-t-body">
+        Invoice 99 was paid on the 3rd, and the receipt went out the same
+        afternoon.
+      </p>
+      <p class="ac-t-body ac-t-muted">
+        Invoice 99 was paid on the 3rd, and the receipt went out the same
+        afternoon.
+      </p>
+      <p class="ac-t-body ac-t-broken-faint" data-ac-demo-broken="color-contrast">
+        Invoice 99 was paid on the 3rd, and the receipt went out the same
+        afternoon.
+      </p>
+
+      <ol class="ac-t-key">
+        <li><code>ac-t-body</code> &mdash; 17:1</li>
+        <li><code>ac-t-muted</code> &mdash; 9.5:1, and it is a color</li>
+        <li>
+          <code>opacity: 0.4</code> &mdash; <strong>3.7:1 at best, 2.5:1 in the
+          light themes</strong>, and no number appears in the CSS
+        </li>
+      </ol>
+
+      <p class="ac-demo__legend">
+        All three are the same sentence. The third fails <strong>SC 1.4.3</strong> from a declaration
+        that names no color at all. Change the theme in the header and watch the ratio move.
+      </p>
+    </div>
+
+    <!-- ======================================================================
+         EXAMPLE 4 · A link shown by color only — SC 1.4.1
+         CSS [CORE] + [BROKEN].
+
+         A link inside a block of text has to be distinguishable from the text
+         around it by something other than color. Color alone is allowed only when
+         the link and the surrounding text are 3:1 apart *and* a non-color cue
+         appears on hover and focus — two conditions, and the first is the one
+         nobody measures.
+
+         Measure it here. The accent this theme uses for links is 13:1 against the
+         background, which reads as plenty, and 1.27:1 against the body text
+         beside it. In the light theme the same pair is 3.08:1 — a pass, barely.
+         One design, two themes, opposite verdicts.
+
+         So the underline is not a style preference. It is the cue that does not
+         depend on which theme is loaded, on how the reader perceives color, or on
+         the page being rendered in color at all.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title">4 &middot; Link shown by color only</h4>
+
+      <p class="ac-t-body">
+        The totals looked right, so nobody opened
+        <a class="ac-t-link" href="#t-reflow">the reflow example</a> before Invoice 99 went out.
+      </p>
+      <p class="ac-t-body">
+        The totals looked right, so nobody opened
+        <a class="ac-t-broken-link" href="#t-outline-label" data-ac-demo-broken="link-in-text-block">the heading list</a>
+        before Invoice 99 went out.
+      </p>
+
+      <ol class="ac-t-key">
+        <li><code>ac-t-link</code> &mdash; underlined, so the cue is not the color</li>
+        <li>
+          color only &mdash; <strong>1.27:1 against the text beside it</strong>,
+          where 3:1 is the floor
+        </li>
+      </ol>
+
+      <p class="ac-demo__legend">
+        Both are real links, and both are 13:1 against the background, which is the number people
+        check. Take the color away and only the first one is still a link.
+      </p>
+    </div>
+
+    <!-- ======================================================================
+         EXAMPLE 5 · A fixed height on a box of text — SC 1.4.4, 1.4.10, 1.4.12
+         CSS [CORE] + [BROKEN], plus the [MOCK] toggle and boxes.
+
+         SC 1.4.12 Text Spacing is the one people have not heard of: a reader must
+         be able to force line-height to 1.5, letter-spacing to 0.12em,
+         word-spacing to 0.16em and paragraph spacing to 2em without losing any
+         content. Browser extensions and OS-level reading tools do exactly this,
+         dyslexia tooling in particular.
+
+         The criterion is not about your defaults. It is about whether your boxes
+         survive somebody else's. The failure is always the same shape: a fixed
+         height. Text that fit at 1.3 does not fit at 1.5, and overflow: hidden
+         takes the rest of the sentence with no scrollbar and no error.
+
+         The checkbox applies all four values. The first box has height and
+         overflow: hidden; the second has min-height and nothing else. Everything
+         else about them is identical, down to the width.
+         ====================================================================== -->
+    <div class="ac-demo">
+      <h4 class="ac-demo__title" id="t-reflow">5 &middot; Fixed height on a box of text</h4>
+
+      <div class="ac-t-spacing">
+        <div class="ac-t-check-row">
+          <input class="ac-t-check" id="t-spacing" type="checkbox" />
+          <label class="ac-t-check-row__label" for="t-spacing">
+            Apply the SC 1.4.12 text spacing
+          </label>
+        </div>
+
+        <div class="ac-t-pair ac-t-pair--boxes">
+          <div class="ac-t-box ac-t-broken-clip">
+            <p class="ac-t-prose ac-t-body">
+              Order 462 shipped on Tuesday, and the customer was notified the
+              same afternoon.
+            </p>
+            <p class="ac-t-prose ac-t-body">
+              By the end of the week there were 462 open orders and one person
+              left to work them.
+            </p>
+          </div>
+          <div class="ac-t-box">
+            <p class="ac-t-prose ac-t-body">
+              Order 462 shipped on Tuesday, and the customer was notified the
+              same afternoon.
+            </p>
+            <p class="ac-t-prose ac-t-body">
+              By the end of the week there were 462 open orders and one person
+              left to work them.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <p class="ac-demo__legend">
+        Tick the box. The first panel loses the last line, because it is set with
+        <code>height</code> and <code>overflow: hidden</code>. The second panel grows, because its
+        only constraint is <code>min-height</code>.
+      </p>
+    </div>
   </div>
 </div>
