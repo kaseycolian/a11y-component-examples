@@ -230,11 +230,11 @@ test('content inside keeps its own semantics', async ({ page }) => {
 });
 
 test('the body scrolls while the header stays put', async ({ page }) => {
-  await page.getByRole('button', { name: 'Terms', exact: true }).click();
-  await settled(page, '#ac-demo-long');
+  await page.getByRole('button', { name: 'Activity', exact: true }).click();
+  await settled(page, '#ac-demo-activity');
 
-  const body = page.locator('#ac-demo-long .ac-drawer__body');
-  const head = page.locator('#ac-demo-long .ac-drawer__head');
+  const body = page.locator('#ac-demo-activity .ac-drawer__body');
+  const head = page.locator('#ac-demo-activity .ac-drawer__head');
 
   const headBefore = await head.boundingBox();
   const scrolled = await body.evaluate((el) => {

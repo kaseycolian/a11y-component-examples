@@ -15,8 +15,9 @@ In `library/components/drawer/` — copy `component.{html,css,js}`, read `docs.m
 
 ## Keyboard
 
-- `Escape` — closes, and focus returns to the trigger
 - `Tab` — cycles inside — it is trapped while the drawer is modal
+- `Enter / Space` — native: activates the trigger, which toggles the drawer
+- `Escape` — closes, and focus returns to the trigger
 
 **States:** open, modal, non-modal
 

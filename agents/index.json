@@ -355,7 +355,7 @@
       "files": ["html", "css", "js"],
       "status": "stable",
       "hasContract": true,
-      "_summaryRev": "93f8cf27"
+      "_summaryRev": "73803bbd"
     },
     {
       "slug": "tooltip",

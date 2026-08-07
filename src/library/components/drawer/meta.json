@@ -3,13 +3,13 @@
   "name": "Drawer",
   "group": "overlays-disclosure",
   "order": 30,
-  "summary": "A panel that slides in from an edge of the screen. Almost entirely focus management: focus moves in, is trapped while modal, and returns to the trigger on close.",
+  "summary": "A drawer is a panel that slides in from an edge of the screen and sits above the page. Use it for filters, a menu, or anything that would crowd the layout it belongs to. It is almost entirely focus management: focus moves in on open, is trapped while the drawer is modal, and returns to the trigger on close.",
   "tags": ["dialog", "sheet", "modal", "focus-trap", "popover", "top-layer", "scroll-lock"],
   "apg": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/",
   "wcag": ["1.4.13", "2.1.1", "2.1.2", "2.4.3", "2.5.8", "4.1.2"],
   "status": "stable",
   "files": ["html", "css", "js"],
-  "demoNote": "Same behavior on a phone and on a desktop — that is what separates it from the Custom Select, which anchors to its trigger at every width. Open one and press Tab repeatedly: in the first three, focus cannot leave.",
+  "demoNote": "Open any of these and press Tab repeatedly: in the first three, focus cannot leave. Tab straight out of the fourth, which is the one that does not claim to be modal.",
   "contract": {
     "useWhen": "A panel from a screen edge. The whole component is the focus management.",
     "root": [".ac-drawer"],
@@ -27,12 +27,16 @@
     },
     "keyboard": [
       [
-        "Escape",
-        "closes, and focus returns to the trigger"
-      ],
-      [
         "Tab",
         "cycles inside — it is trapped while the drawer is modal"
+      ],
+      [
+        "Enter / Space",
+        "native: activates the trigger, which toggles the drawer"
+      ],
+      [
+        "Escape",
+        "closes, and focus returns to the trigger"
       ]
     ],
     "states": [
