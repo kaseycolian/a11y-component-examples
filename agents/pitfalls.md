@@ -190,6 +190,10 @@ quietly stopped being true. A utility class that claims to own appearance has to
 properties a host is likely to set, not only the ones it cares about. This is the hazard that comes
 free with copy-paste: the component is correct and the page it landed in changed it.
 
+The same hazard reaches an element you ship with **no** class at all. A `<pre><code>` block takes the
+host's whole `code` rule — this library's shell gives it a tint, a radius and padding — so a component
+that ships one has to reset what it never asked for.
+
 **A modifier written below the specificity of its base rule does nothing at all**
 
 No warning, no visible cause, and the base rule looks innocent because it is the one everybody writes

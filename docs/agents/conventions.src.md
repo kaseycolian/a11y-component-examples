@@ -99,6 +99,16 @@ page it was pasted into is worse than no component.
 SC 2.5.8's floor is 24×24 and this library aims at 44 where the layout allows it. `box-sizing:
 border-box` counts the border into that number.
 
+<!-- item: A landmark's name has to be unique on the page it lands in -->
+
+A named `<section>` **is** a landmark — `region` — and so is any scroll container you gave
+`role="region"` and a name. Two of them sharing a role and a name are two entries a reader cannot tell
+apart, and axe's `landmark-unique` says so. Name each one for what it holds rather than for what it is:
+`Invoice 99 as Markdown`, not `Preview` on every one. `jump-nav` is the precedent — its two navigation
+landmarks were both called *On this page*, on the page whose whole subject is that. The inverse costs
+the same: an *unnamed* `role="region"` is not a landmark at all, so it is a tab stop with nothing to
+say.
+
 <!-- item: Anything with an `id` needs `scroll-margin-top` -->
 
 Otherwise a sticky header covers the element that a fragment link, or a focus move, just scrolled to
