@@ -102,20 +102,16 @@ function write(message) {
 */
 const promises = [
   {
-    title: 'Checked against the accessibility tree',
-    body: 'Every pattern follows the WAI-ARIA APG, and the roles, names, and states it relies on are asserted against the real browser accessibility tree by the test suite. Screen reader passes have not been run yet, and every component page says so.',
+    title: 'Verification against the accessibility tree',
+    body: 'Every pattern follows the WAI-ARIA APG, and the roles, names, and states it relies on are asserted against the real browser accessibility tree by the test suite. Screen reader passes have not been run yet.',
   },
   {
-    title: 'Keyboard first, touch too',
+    title: 'Keyboard and touch support',
     body: 'Every key a component binds is listed on its page and pressed by a test: arrows, Home, End, Escape, type-ahead. Targets are at least 24×24px, and visible label text is part of the accessible name.',
   },
   {
-    title: 'Copy, do not integrate',
-    body: 'No package to install, no dependency to track. Take the HTML, CSS, and JS and paste them in. What you see running on the page is the same file you copy.',
-  },
-  {
-    title: 'Themeable from the start',
-    body: 'Colors, radii, and durations are CSS custom properties, each ending in a standalone default. Pasted into a bare app a component styles itself, and pasted into a themed one it follows the theme.',
+    title: 'Copy-friendly HTML, CSS, and JS',
+    body: 'Easy to copy HTML, CSS, and JS provided. What you see running on the page is the same code you copy.',
   },
 ];
 ---
@@ -161,7 +157,7 @@ const promises = [
       Deliberately NOT .card-grid, and that is the whole point of this block.
       The rule-and-lit-lead shape these used to wear is this site's notation for
       an entry you can go to -- the cards below, the footer's .ftr-link, the
-      section tube. These four are claims, not destinations, and a dimmer lead
+      section tube. These are claims, not destinations, and a dimmer lead
       said so only in degree: you had to point at one to find out.
 
       So they wear none of it. Three signals separate them from the group cards
@@ -169,7 +165,7 @@ const promises = [
       title in h3's own green rather than the flat --text a card title takes.
     */}
     <section class="page-section" aria-labelledby="promises-title">
-      <h2 id="promises-title">What every component here does</h2>
+      <h2 id="promises-title">Every component example has</h2>
       <ul class="promises">
         {
           promises.map((promise) => (
