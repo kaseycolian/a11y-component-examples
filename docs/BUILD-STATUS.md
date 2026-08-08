@@ -4,7 +4,7 @@
 > also holds the **style rules every human-facing string still has to follow**: read those before
 > writing a `summary`, a demo note or anything on a page, and nothing else in that file is required.
 > What is left of the build is
-> **[START HERE](#start-here--every-component-is-built-what-is-left-needs-a-screen-reader) below.**
+> **[START HERE](#start-here--the-item-6-backlog-then-item-3-then-item-4) below.**
 
 **Resume point.** `CLAUDE.md` (auto-loaded) has the conventions. This file has progress and the
 ordered next steps. `component-specs.md` is the pre-build planning record — read the one entry you
@@ -19,16 +19,25 @@ re-does work.
 
 Last updated: 2026-08-07 (**the roster is closed.** `compositions` ships no component and is not
 waiting for one — `groups.mjs` still declares the group, and both the registry and the generator drop
-an empty group, so it costs nothing. Items 0a, 0b, 1 and 2 are done; **items 3 and 4 are all that is
-left and neither is code.** Item 3 is deferred by the owner pending their own screen-reader testing.
-Run `npx playwright test --project=chromium`; the Chromium suite is **1220 passed**.)
+an empty group, so it costs nothing. Items 0a, 0b, 1 and 2 are done. **The order the owner set on
+2026-08-07 is: the item 6 backlog first, then item 3, then item 4.** Run
+`npx playwright test --project=chromium`; the Chromium suite is **1355 passed**, clean, 11.7 min on
+2026-08-07 — the number the item 6 work starts from.)
 
 ---
 
-## START HERE — every component is built. What is left needs a screen reader.
+## START HERE — the item 6 backlog, then item 3, then item 4
 
-The roster is closed. `docs/at-support.md`'s matrix (item 3) and the deploy (item 4) are the only
-remaining work, and neither is code.
+The roster is closed and every component is built. Three pieces of work remain, and **the owner has
+fixed the order**, because item 4 is worth doing once rather than three times:
+
+1. **[Item 6](#6-lint-the-gotchas-that-can-be-linted)** — five small pieces of tooling, all of them
+   code, none of them touching a component. **This is the work a fresh session picks up.** Every one
+   has its starting point written under that heading; none needs re-deriving.
+2. **[Item 3](#3-docs)** — `docs/at-support.md`'s matrix. **The owner is doing this themselves**, on
+   their own hardware. It is not a session's to start.
+3. **[Item 4](#4-final-verification)** — final verification and deploy, *after* item 3, so the
+   screen-reader results ship in the same pass rather than needing a second deploy.
 
 The shared a11y gate is `tests/shared/a11y.spec.mjs`: ten checks against every component, and
 `.github/workflows/ci.yml` runs it. It went in before the last batch for the reason recorded
@@ -79,17 +88,29 @@ Every agent-facing surface names this file exactly once, in the rule forbidding 
 
 ### The steps, in order
 
-**Step 1 — `docs/at-support.md`'s matrix**, item 3. The one piece of remaining work that code cannot
+**Step 1 — the item 6 backlog.** Five pieces, and they are independent of each other, so take them
+in whatever order and commit them separately. Two are checks that join `verify` and CI (encoding,
+readout keys) and three retire a gotcha by making it impossible rather than documented (the Node
+PATH, `scripts/shots.mjs`, `npm run clean`). Each is written up under
+**[6. Lint the gotchas that can be linted](#6-lint-the-gotchas-that-can-be-linted)** with its
+starting point, its current measurement and its trap. Read that section, not this paragraph.
+
+The one that needs saying twice: **re-measure the encoding allowlist before writing the check.** The
+count in that entry has been wrong twice already, so treat the number there as a description of a
+past measurement, not a spec.
+
+**Step 2 — `docs/at-support.md`'s matrix**, item 3. The one piece of remaining work that code cannot
 do: nothing has been tested, and the home page and 31 component pages say so in as many words.
 Filling even one row turns a disclaimer into a measurement. It needs a real screen reader rather than
 a keyboard, so it is not blocked on anything in the repo — only on sitting down with NVDA. That file
 is self-contained: the four questions, a walkthrough per AT, and a four-step **Recording a result**
-that includes replacing the house disclaimer in the component's own `docs.md`. **Deferred by the
-owner, 2026-08-07** — it is waiting on their testing, not on a session.
+that includes replacing the house disclaimer in the component's own `docs.md`. **The owner is doing
+this themselves, 2026-08-07** — a session neither starts it nor waits on it.
 
-**Step 2 — final verification and deploy**, item 4. Its two blockers are under **Remaining
-non-component work**: the cross-engine failures, and GitHub Pages **Source** needing to be set to
-**GitHub Actions** by hand.
+**Step 3 — final verification and deploy**, item 4, and **it comes after step 2 by the owner's
+decision**: the screen-reader results are page copy, so deploying before they exist means deploying
+twice. Its two blockers are under **Remaining non-component work**: the cross-engine failures, and
+GitHub Pages **Source** needing to be set to **GitHub Actions** by hand.
 
 The two copy sweeps 0a and 0b are **done** — the copy pass absorbed them, see
 `docs/rewrite-pass.md`.
@@ -206,9 +227,13 @@ Then the four items under **Remaining non-component work**, in this order:
    Every one of the 33 components now carries the copyability conventions and a spec of its own.
 2. ~~**The shared a11y gate (item 2).**~~ **Done, 2026-07-29.** Landed before the last batch, and
    the bet paid — see "What the gate found".
-3. **Docs (item 3)** — now unblocked, and `wcag-mapping.md` has something real to be generated
-   against: the gate names an SC in almost every check.
-4. **Final verification and deploy (item 4)** — last. Two known blockers are already written up below:
+3. **The item 6 backlog** — five pieces of tooling, and **the work a fresh session picks up.** Two
+   checks and three eliminations, each written up with its 2026-08-07 measurement under
+   [6. Lint the gotchas that can be linted](#6-lint-the-gotchas-that-can-be-linted).
+4. **Docs (item 3)** — unblocked, and `wcag-mapping.md` has something real to be generated
+   against: the gate names an SC in almost every check. **The owner is doing this themselves.**
+5. **Final verification and deploy (item 4)** — last, and after item 3 by the owner's decision, so the
+   screen-reader results ship in the same pass. Two known blockers are already written up below:
    WebKit is not installed, so `npm run verify` fails at the test step until
    `npx playwright install webkit` (Firefox was installed on 2026-07-29 but has never been run, so
    budget for real cross-engine failures rather than none); and GitHub Pages **Source** must be set to
@@ -1166,17 +1191,41 @@ Surveyed after phase 3, when the gotchas list was cut to the 19 that are about w
 Five of those 19 are already handled and the entry is only the explanation; six more are irreducible
 environment facts. What is left is below, ranked, with the measurements so they do not need repeating.
 
+**Re-measured 2026-08-07**, on the way into this work, and both survivors moved. Item 1's allowlist is
+still the same three files but its line count is not worth writing down, for a reason that is itself
+the finding. Item 3 turned out to be guarding a failure mode this repo no longer has, and a naive
+version of that check would fire on correct code. Read both entries before writing either check —
+neither is the one-liner the old summary implied.
+
 Worth a check:
 
 1. **Encoding, repo-wide.** `build-agent-surfaces.mjs` throws on `â€` only in what it reads — the five
    files in `docs/agents/` and every `meta.json` — so every `component.*`, every `docs.md` and this file
    are unguarded, and a 98 KB prose file is exactly what gets round-tripped. The only trap on the list
-   that silently corrupts the product. Needs an allowlist, and re-measured on 2026-07-30 it is **three
-   files, ten lines**: four in `scripts/build-agent-surfaces.mjs` (the guard's own doc comment, condition
-   and message), two in `docs/agent-layer.md`'s record of the incident, and four in this file. Same shape
-   as `data-ac-demo-broken`. **Re-measure again before writing the check rather than trusting the number**
-   — it has now been wrong twice: an earlier version said two files, having forgotten the one it was
-   written in, and the eight-line count went stale within the month.
+   that silently corrupts the product.
+
+   **Start from `readSource()` in `scripts/build-agent-surfaces.mjs`** — the guard already exists there,
+   throwing on the `â€` signature with a message naming `git checkout --` as the fix. The work is
+   hoisting it into a `scripts/check-encoding.mjs` that walks the repo, then adding it to `verify` and
+   to `ci.yml` **before** `check:tokens`, since it needs no browser and no build.
+
+   It needs an allowlist, because the files that *document* the trap contain it. As of 2026-08-07
+   that is **three files** — `scripts/build-agent-surfaces.mjs` (the guard's own doc comment,
+   condition and message), `docs/agent-layer.md`'s record of the incident, and this file. Same shape
+   as `data-ac-demo-broken`. For the current line counts run `git grep -lIc` for the signature; this
+   entry deliberately does not transcribe them, for the reason below.
+
+   **Re-measure before writing the check.** The count has been wrong three times. The first version
+   said two files, having forgotten the one it was written in. An eight-line count went stale inside
+   a month. The third is the useful one: a 2026-08-07 measurement came back "three files, ten
+   lines" and **was made stale by the act of writing it down** — this entry names the signature, so
+   the file gained a line while the paragraph describing it was being typed, and the number was wrong
+   before the commit landed. A tally of occurrences of a string, kept in prose that discusses that
+   string, cannot stay true. **Derive the allowlist, do not transcribe it** — that is the real design
+   constraint here, and it is worth more than any number this entry could carry.
+
+   **The check's own source will contain the signature**, so it has to exempt itself or it fails on
+   the commit that adds it.
 2. ~~**"What you see is what you copy", asserted.**~~ **Done, 2026-08-07** —
    `tests/shared/what-you-see.spec.mjs`, 135 tests, in `npm test` and therefore in `verify` and CI.
    It compares four things per component against `src/library/`: the panel's highlighted text, the
@@ -1184,16 +1233,41 @@ Worth a check:
    link. **The URL is read off the rendered page rather than built from the slug** — a test that
    constructs its own path proves the server works, not that the page uses it. Both failure modes
    were red-probed. Three things it found or corrected are in the gotchas list below.
-3. **Readout-key uniqueness.** 159 keys across 14 components, currently **no duplicates anywhere**, so
-   this is a green guard rather than a discovery. It bit once before shipping.
+3. **Readout-key uniqueness — do not write this one without re-deriving it first.** The entry used to
+   read "159 keys across 14 components, no duplicates anywhere, a green guard rather than a
+   discovery." Re-measured 2026-08-07: **167 keys across 15 components, and one component does have a
+   duplicate** — `disclosure` carries `data-ac-disc-out="stops"` twice, at `component.html:270` and
+   `:318`.
+
+   **It is not a bug, and a naive lint would fire on it.** The gotcha further down this file says
+   `out()` is a document-wide `querySelector`; that is now stale. Every one of the 11 components with
+   readouts scopes its lookup — ten to `root`, `disclosure` to `frame` — and **none uses `document`**.
+   `disclosure`'s two `stops` readouts sit in different `.ac-disclosure-frame` elements (`css-hidden`
+   and `div-trigger`), each read by its own frame-scoped `out()`, so both update correctly.
+
+   So the check worth writing is **not** "keys are unique per page". It is either "no `out()` resolves
+   through `document`" — which is the property that actually makes duplicates safe, and is currently
+   true 11 times out of 11 — or per-page uniqueness *with* the scoping element as part of the key.
+   Fix the stale gotcha in the same commit.
 
 Worth eliminating instead of documenting:
 
 4. **Node's PATH** → `.claude/settings.local.json`, which `.gitignore` already excludes. `C:\nvm4w\nodejs`
    is machine-specific and this repo is public, so it must not be the committed `settings.json`.
 5. **`scripts/shots.mjs <slug>`** — the screenshot entry is a recipe with two failure modes and says it
-   has been rewritten repeatedly. One command deletes both.
-6. **`npm run clean`** — `.astro` and `dist`, so the stale-cache incantation is a script.
+   has been rewritten repeatedly. One command deletes both. It does not exist yet; this is writing it,
+   not fixing it. Everything it has to do is in the **"Screenshot the finished page"** gotcha below:
+   it must resolve `@playwright/test` from the repo root (ESM walks `node_modules` up from the
+   *script's* directory, which is why the throwaway version had to sit in the root), it must start and
+   stop `npm run preview` itself, it opens at `{ width, height: 3000 }` so a tall element screenshot
+   never scrolls and the sticky header cannot paint into it, it shoots `.ac-demo-grid` plus each
+   `.ac-demo` individually at 1280 and 320, and it prints
+   `document.documentElement.scrollWidth - clientWidth` and `document.activeElement.tagName`. Write the
+   shots somewhere gitignored — the recipe's last line is that `git status` comes back with only the
+   component folder, and a script that leaves PNGs in the tree fails that on its own.
+6. **`npm run clean`** — `.astro` and `dist`, so the stale-cache incantation is a script. Two gotchas
+   below point at it (the `[glob-loader] Duplicate id` warning, and a stale `dist/` making a source
+   edit look like a broken component), and both say "remove the directory and rebuild".
 
 **Do not write a lint for `getPropertyValue('--ac-` in a spec.** Five specs do it and all five are
 correct: they read `--ac-badge-accent`, `--ac-notice-accent`, `--ac-status-accent`,
@@ -1207,6 +1281,15 @@ them would break five working tests. Also verified while surveying: **0 of 68 bu
 
 `npm run verify`, install the other two browsers, manual keyboard + screen reader pass, check at
 320px and 200% zoom, deploy, confirm the live URL matches preview.
+
+**This comes after item 3, by the owner's decision on 2026-08-07.** The screen-reader results are page
+copy — filling a row in `docs/at-support.md` rewrites the house disclaimer in that component's
+`docs.md` — so deploying first means deploying twice. Do not start it because the suite is green.
+
+The cross-engine numbers it inherits are stale and need re-running before they are worth triaging.
+The 2026-08-01 run (chromium 1205, firefox 60 fail, webkit 52 fail) predates roughly 150 tests,
+`what-you-see.spec.mjs` among them. The one Firefox failure sampled was `toBeFocused()` returning
+`inactive`, which is those engines' unfocused-window behavior rather than anything about the markup.
 
 ---
 
@@ -1332,6 +1415,15 @@ homes it belongs to, not in all of them.
   — the gate now fails on axe's `error-occurred` check, in both axe tests — and the panel had been
   hiding **over half the page from every contrast sweep** at every width (366 nodes checked, 894 after).
   A green contrast run is worth nothing until you know how many nodes it looked at.
+- **`tabs › contrast holds in every theme` is the suite's one flaky test, and it fails as
+  `axe abandoned the rule`.** Seen once on 2026-08-07 and green on the very next full run, same tree.
+  The throw is inside `AxeBuilder.analyze()` rather than in a `skippedRules()` result, so it reads as
+  the `overflow: hidden` grid-bounds bug above — it is not that one: `.panel` still carries
+  `overflow: clip`, and the only other `overflow: hidden` in the shell is `.visually-hidden`, which is
+  1px with nothing scrollable in it. What it looks like instead is load: the test sweeps ten themes
+  with a full-page axe pass each and **takes 2.1 minutes against its own `test.setTimeout(180_000)`**,
+  the longest single test in the suite by a wide margin. Re-run before investigating. If it starts
+  failing every time, raise that timeout first and suspect a real regression second.
 - **A color that passes only because the text is large fails when a media query shrinks it.** Found by
   the sweep the `overflow: clip` fix unblocked. `.site-brand__mark` is `clamp(1.35rem … 1.7rem)` and
   weight 900, so at wide widths it is large text and SC 1.4.3 asks 3:1 of it. Below 460px it shrinks to
@@ -1420,10 +1512,14 @@ homes it belongs to, not in all of them.
   names still builds correctly. `Remove-Item -Recurse -Force .astro` and rebuild; the warning is
   gone and nothing else changes. Do not go looking for a duplicate file — the glob's `base` is
   `src/library/components` and `public/library/` is not in it.
-- **A readout key has to be unique across the whole page, not within its example.** `out()` is a
-  document-wide `querySelector`, so two examples both using `data-ac-…-out="good"` silently write
-  to the first one and the second readout never updates — caught in `status-text` before it shipped.
-  Prefix the key with its example when the obvious word is already taken (`detail-good`).
+- **A readout key has to be unique across the whole page, not within its example** — *true when
+  written, and no longer true of this repo. Re-measured 2026-08-07; see item 6.3, which is where it
+  gets deleted.* `out()` **was** a document-wide `querySelector`, so two examples both using
+  `data-ac-…-out="good"` silently wrote to the first one and the second readout never updated —
+  caught in `status-text` before it shipped. Every one of the 11 components with readouts now scopes
+  `out()` to `root` or to `frame` and none reaches `document`, which is what makes `disclosure`'s two
+  `data-ac-disc-out="stops"` correct rather than a collision. Keep the scoping; the key prefix
+  (`detail-good`) is no longer what is holding this up.
 - **Git is 2.24** — no `git init -b`, no interactive flags.
 - **`src/library/tokens/tokens.css` is not loaded by the site.** It is an optional layer and no page
   links it, deliberately: a component has to work from the fallback chain alone. So
