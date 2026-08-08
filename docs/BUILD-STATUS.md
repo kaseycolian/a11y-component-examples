@@ -1,33 +1,37 @@
 # Build status
 
-> **The copy pass is finished — all 33 components and the site's own copy — so this file is the
-> active one again.** Its record is `docs/rewrite-pass.md`, which also holds the **style rules every
-> human-facing string still has to follow**: read those before writing a `summary`, a demo note or
-> anything on a page, and nothing else in that file is required. What is left of the build is
-> **[START HERE](#start-here--33-of-34-components-are-built-batch-f-is-the-last-one) below.**
+> **Every component is built, and so is the copy pass.** Its record is `docs/rewrite-pass.md`, which
+> also holds the **style rules every human-facing string still has to follow**: read those before
+> writing a `summary`, a demo note or anything on a page, and nothing else in that file is required.
+> What is left of the build is
+> **[START HERE](#start-here--every-component-is-built-what-is-left-needs-a-screen-reader) below.**
 
 **Resume point.** `CLAUDE.md` (auto-loaded) has the conventions. This file has progress and the
-ordered next steps. `component-specs.md` has the pre-decided ARIA contract for every remaining
-component — read the one entry you need, not the whole file.
+ordered next steps. `component-specs.md` is the pre-build planning record — read the one entry you
+need, and read `agents/components/<slug>.md` instead for what a component actually does.
 
-Read in this order and nothing else is needed to start: **START HERE** for the next component,
-**The road to done** for the route and what depends on what, **The loop** for how to build one.
+Read in this order and nothing else is needed to start: **START HERE** for what is left,
+**The road to done** for what each component owns, **The loop** for how to build or change one.
 **Gotchas already solved** is worth a skim before debugging anything.
 
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-08-07 (**the copy pass finished** — all 33 components plus the site's own copy, so
-items 0a, 0b and 1 below are done and `docs/rewrite-pass.md` is their record. Playwright webkit is
-still not installed, so run `npx playwright test --project=chromium`. The full suite is **1220
-passed**.)
+Last updated: 2026-08-07 (**the roster is closed.** `compositions` ships no component and is not
+waiting for one — `groups.mjs` still declares the group, and both the registry and the generator drop
+an empty group, so it costs nothing. Items 0a, 0b, 1 and 2 are done; **items 3 and 4 are all that is
+left and neither is code.** Item 3 is deferred by the owner pending their own screen-reader testing.
+Run `npx playwright test --project=chromium`; the Chromium suite is **1220 passed**.)
 
 ---
 
-## START HERE — 33 of 34 components are built. Batch F is the last one.
+## START HERE — every component is built. What is left needs a screen reader.
 
-The shared a11y gate is `tests/shared/a11y.spec.mjs`: ten checks against all 33 components, 330
-tests, and `.github/workflows/ci.yml` runs it. It went in before batch F for the reason recorded
+The roster is closed. `docs/at-support.md`'s matrix (item 3) and the deploy (item 4) are the only
+remaining work, and neither is code.
+
+The shared a11y gate is `tests/shared/a11y.spec.mjs`: ten checks against every component, and
+`.github/workflows/ci.yml` runs it. It went in before the last batch for the reason recorded
 below — its value is catching a regression across everything already built — and that paid off
 immediately. **It found nine real defects, including two that made whole pages unreadable in half
 the shipped themes.** The list is in "What the gate found" below and every one is fixed.
@@ -57,16 +61,16 @@ component fails until its contract catches up. Nothing under `agents/`, `AGENTS.
 is hand-editable; edit a file in `docs/agents/` or a `meta.json`, then run `npm run agents`.
 
 **If you edit a component, its contract is part of the edit.** `CLAUDE.md` > **Component folder shape**
-has the table of which change obliges which field. Batch F is the next work.
+has the table of which change obliges which field.
 
-**Batch F is the first component written after the copy pass, so it is written to the finished
-standard rather than swept into it later.** That means: `docs/rewrite-pass.md`'s **style rules**
+**A component added or changed from here is held to the finished standard, not swept into it
+later.** That means: `docs/rewrite-pass.md`'s **style rules**
 before the first string; the canonical `docs.md` heading order with `## Keyboard` mandatory; two
 `ac-demo-section` blocks, correct examples first, `<h4>` example titles, examples numbered
 continuously; demo content from the shared vocabulary; and the house closing under
 `## Screen reader behavior`, verbatim, unless the component genuinely has nothing to announce. The
-scaffolder already emits the right shapes — `npm run new:component -- app-page-to-markdown --group
-compositions --name "…"`. Doing this up front is cheap; the pass took 33 rows because it was not.
+scaffolder already emits the right shapes. Doing this up front is cheap; the pass took 33 rows
+because it was not.
 
 **This file is a build log and only that.** It is where progress, the roster checklist, the ordered next
 steps and the repo-local gotchas live. It is never where a component's behavior is looked up — that is
@@ -75,20 +79,20 @@ Every agent-facing surface names this file exactly once, in the rule forbidding 
 
 ### The steps, in order
 
-**Step 1 — batch F**, `app-page-to-markdown`. It composes the others and every piece it needs now
-exists. Its scrollable preview is `prose-surface` plus `effects`' `fx-scroll` and its `[PATCH]` ring —
-build it out of those rather than from scratch. The gate now covers each new component the moment its
-folder exists, so a batch F page that ships an accent as text, or a target under 24px, is red before
-it is reviewed.
+**Step 1 — `docs/at-support.md`'s matrix**, item 3. The one piece of remaining work that code cannot
+do: nothing has been tested, and the home page and 31 component pages say so in as many words.
+Filling even one row turns a disclaimer into a measurement. It needs a real screen reader rather than
+a keyboard, so it is not blocked on anything in the repo — only on sitting down with NVDA. That file
+is self-contained: the four questions, a walkthrough per AT, and a four-step **Recording a result**
+that includes replacing the house disclaimer in the component's own `docs.md`. **Deferred by the
+owner, 2026-08-07** — it is waiting on their testing, not on a session.
 
-**Then** item 3 (docs) and item 4 (deploy). The two copy sweeps 0a and 0b are **done** — the copy
-pass absorbed them, see `docs/rewrite-pass.md`.
+**Step 2 — final verification and deploy**, item 4. Its two blockers are under **Remaining
+non-component work**: the cross-engine failures, and GitHub Pages **Source** needing to be set to
+**GitHub Actions** by hand.
 
-**Step 2 — `docs/at-support.md`'s matrix**, item 3. It is the one piece of remaining work that code
-cannot do: every cell is still `—`, and the home page and 31 component pages now say so in as many
-words. Filling even one row turns a disclaimer into a measurement. It needs a real screen reader
-rather than a keyboard, so it is not blocked on anything in the repo — only on sitting down with NVDA.
-`at-support.md` has the walkthrough and the four questions.
+The two copy sweeps 0a and 0b are **done** — the copy pass absorbed them, see
+`docs/rewrite-pass.md`.
 
 Two standing caveats for every step above. The header is two rows tall, so a demo that scrolls an
 anchor into view clears `--header-h`, not 4.5rem. And a component page that ships a live failure
@@ -144,13 +148,14 @@ the argument for `data-ac-demo-broken` asserting rather than skipping, and it is
 
 ## The road to done
 
-The unticked rows in the roster below, plus four infrastructure items. Every remaining component has a spec entry
-in `component-specs.md` — `disclosure` is the only slug in the repo without one, and it is now built,
+The roster below is complete, so this section is now the record of **what each component owns** — the
+cross-batch notes are what a change to any of them has to respect. Four infrastructure items follow
+it, two of them still open. Every slug has a spec entry in `component-specs.md` — `disclosure` is the only slug in the repo without one, and it is now built,
 so that entry stays absent on purpose: writing one after the fact would be inventing design decisions
 that were never taken. `agents/components/disclosure.md` and its `docs.md` are where its behavior
 lives. **Read the entry, do not redesign it.**
 
-Build in this order. The order is the dependency graph, not a preference.
+The build order was the dependency graph, not a preference.
 
 | Batch | Slugs | Why here |
 | --- | --- | --- |
@@ -159,7 +164,6 @@ Build in this order. The order is the dependency graph, not a preference.
 | ~~**C**~~ | ~~`notice` → `status-text` → `badge` → `result-panel`~~ | **Done.** Closed `feedback-status` |
 | ~~**D**~~ | ~~`tabs` → `jump-nav`~~ | **Done.** Closed `navigation` |
 | ~~**E**~~ | ~~`data-table` → `prose-surface`~~ | **Done.** Closed `data-display` |
-| **F** | `app-page-to-markdown` | **last.** It composes the others and cannot be built before them |
 
 Cross-batch notes that will otherwise be rediscovered:
 
@@ -183,29 +187,25 @@ Cross-batch notes that will otherwise be rediscovered:
   pattern and is a candidate for the item 1 retrofit.
 - **`jump-nav` owns everything about following a fragment.** Where focus goes when the target cannot
   take it, `scroll-margin-top` against a sticky header (SC 2.4.11), and `IntersectionObserver`
-  against a scroll handler. Anything later that moves someone within a page — `prose-surface`, both
-  batch F apps — points at it rather than re-deriving any of the three.
+  against a scroll handler. Anything later that moves someone within a page — `prose-surface` is the
+  first — points at it rather than re-deriving any of the three.
 - **`data-table` owns the named scroll region.** `.ac-table-scroll` is `tabindex="0"` +
   `role="region"` + `aria-labelledby` pointing at the caption's id, so the name is written once and
-  the region and the table agree. `prose-surface` and `app-page-to-markdown`'s preview are the same
-  three attributes; point at it rather than re-deriving them. It also owns the argument against the
+  the region and the table agree. `prose-surface` is the same three attributes; point at it rather
+  than re-deriving them. It also owns the argument against the
   responsive card restyle, and the fact that a `<caption>` is not only the name.
 - **`prose-surface` owns styling markup you did not write.** Element selectors inside a container,
   the heading-cascade guard that makes them survive a host page, `<pre>` as a scroller inside a
   scroller, the `<figure>`/`<blockquote>`/`<figcaption>` split, and the argument that a region with
-  nothing to scroll is a stop and a landmark that do nothing. `app-page-to-markdown`'s preview is
-  this component plus `fx-scroll`; point at it rather than rebuilding it.
-- **Batch F composes with `effects`** — `app-page-to-markdown` is specified around `fx-bar-top`,
-  `fx-scroll` and `fx-bar-bottom`, which are now documented and patched. Its scrollable preview is
-  the `fx-scroll` case: `tabindex="0"` + `role="region"` + a name, and the focus ring from
-  `effects`' `[PATCH]`.
+  nothing to scroll is a stop and a landmark that do nothing. Anything later that shows generated
+  content in a box points at it rather than rebuilding it.
 
 Then the four items under **Remaining non-component work**, in this order:
 
 1. ~~**`disclosure` retrofit + spec backfill.**~~ **Done, 2026-08-07**, as row 21 of the copy pass.
    Every one of the 33 components now carries the copyability conventions and a spec of its own.
-2. ~~**The shared a11y gate (item 2).**~~ **Done, 2026-07-29.** Landed before batch F, and the bet
-   paid — see "What the gate found".
+2. ~~**The shared a11y gate (item 2).**~~ **Done, 2026-07-29.** Landed before the last batch, and
+   the bet paid — see "What the gate found".
 3. **Docs (item 3)** — now unblocked, and `wcag-mapping.md` has something real to be generated
    against: the gate names an SC in almost every check.
 4. **Final verification and deploy (item 4)** — last. Two known blockers are already written up below:
@@ -380,7 +380,7 @@ exempts the `Page` suffix from the contract's `api`.
 
 ---
 
-## Component roster — 33 / 34
+## Component roster — complete
 
 ### foundations
 - [x] `skip-link` — done, **CSS-only** (`--no-js`), 16/16 tests in Chromium. Five examples: the baseline,
@@ -916,9 +916,6 @@ exempts the `Page` suffix from the contract's `api`.
 
 **`data-display` is complete.**
 
-### compositions
-- [ ] `app-page-to-markdown`
-
 ---
 
 ## Remaining non-component work
@@ -1003,7 +1000,7 @@ out for now rather than adding six ids with no consumer.
 
 ### 2. ~~Shared a11y gate~~ — **done, `tests/shared/a11y.spec.mjs`**
 
-Ten checks × 33 components = 330 tests, plus `.github/workflows/ci.yml` (`npm ci`, `check:tokens`,
+Ten checks against every component, plus `.github/workflows/ci.yml` (`npm ci`, `check:tokens`,
 `playwright install chromium`, `playwright test` — the Playwright config builds and serves the site
 itself, so the build is covered). The slug list is read from `meta.json` with `node:fs`, **not**
 imported from `registry.mjs`, which is built on Vite's `import.meta.glob`.
@@ -1180,11 +1177,13 @@ Worth a check:
    as `data-ac-demo-broken`. **Re-measure again before writing the check rather than trusting the number**
    — it has now been wrong twice: an earlier version said two files, having forgotten the one it was
    written in, and the eight-line count went stale within the month.
-2. **"What you see is what you copy", asserted.** Rule 1 of `CLAUDE.md` and nothing enforces it.
-   `src/` → `public/` is byte-identical — measured, 89 of 89 files — but that is the sync, not the
-   page. The open edge is the inlined `<style>` / `<script>`: drop `is:inline` and Astro bundles it,
-   so the demo stops being the thing the code panel shows. Compare the page's inlined CSS against the
-   served file.
+2. ~~**"What you see is what you copy", asserted.**~~ **Done, 2026-08-07** —
+   `tests/shared/what-you-see.spec.mjs`, 135 tests, in `npm test` and therefore in `verify` and CI.
+   It compares four things per component against `src/library/`: the panel's highlighted text, the
+   Copy button's `data-code`, the file at whatever URL the page actually loads, and the download
+   link. **The URL is read off the rendered page rather than built from the slug** — a test that
+   constructs its own path proves the server works, not that the page uses it. Both failure modes
+   were red-probed. Three things it found or corrected are in the gotchas list below.
 3. **Readout-key uniqueness.** 159 keys across 14 components, currently **no duplicates anywhere**, so
    this is a green guard rather than a discovery. It bit once before shipping.
 
@@ -1385,9 +1384,25 @@ homes it belongs to, not in all of them.
   deliberately outside it.
 - **`[slug].astro` uses `import.meta.glob(..., { query: '?raw', import: 'default', eager: true })`**
   and picks by path suffix. Astro cannot do a dynamic `import()` of a raw file per-slug.
+- **Vite's `?raw` strips a file's trailing newline**, and everything the page inlines comes through it:
+  the panel's highlighted text, the Copy button's `data-code`, and the demo markup. The copy served
+  over HTTP is written by `fs.cp` and keeps it, so the two disagree by exactly one byte at the end and
+  by nothing else. Not Astro's compressor — measured, with `compressHTML: false` the newline is still
+  gone. `tests/shared/what-you-see.spec.mjs` allows that one byte and no other difference.
+- **One CRLF file makes the clipboard and the download link disagree.** The HTML parser normalizes
+  CRLF to LF while reading an attribute value, so a Windows-ended source arrives in `data-code` as LF
+  while the file fetched over HTTP keeps its CRs. Found on the first run of the what-you-see spec:
+  `drawer/component.html`, 217 CRLF lines, the only such file in the library — and a **working-tree
+  artifact**, because `.gitattributes` says `text=auto eol=lf` so the committed blob was already LF and
+  CI would never have seen it. `git diff` shows nothing for the same reason, which is what makes it
+  survivable. Rewrite the file with LF; do not loosen the comparison.
 - **The demo's CSS goes in `<slot name="head">`, the JS in `<slot name="end">` with `is:inline defer`.**
-  `is:inline` stops Astro bundling it, which is what keeps the served file byte-identical to the
-  copy panel.
+  `is:inline` is what stops Astro bundling a script — but **not this one, as it is written today**, and
+  the file said otherwise until it was measured. `src` is a runtime expression, so Astro cannot resolve
+  it to a module and leaves the tag alone: the built HTML is byte-identical with the directive removed.
+  Keep it anyway, because it becomes load-bearing the moment that `src` is a static relative path, and
+  `tests/shared/what-you-see.spec.mjs` now fetches whatever URL the page names rather than trusting
+  either.
 - **npm 11 gates install scripts.** `allowScripts` in `package.json` already approves esbuild and
   sharp; re-approve with `npm approve-scripts <pkg>` if a new one appears.
 - **Header height is not a number you can reason out — measure it in a browser at ~15 widths.** The

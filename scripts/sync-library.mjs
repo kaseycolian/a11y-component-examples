@@ -33,14 +33,22 @@ import { dirname, resolve } from 'node:path';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-const JOBS = [
+/**
+ * Tests live beside their component for maintainability, but they are not part
+ * of what a visitor copies, so they stay out of the served output.
+ *
+ * Exported because `tests/shared/what-you-see.spec.mjs` asserts that public/ is
+ * src/ byte for byte, and it has to exempt exactly what this exempts. Two copies
+ * of the rule would drift, and the drift would read as a passing test.
+ */
+export const isServed = (src) => !/[\\/]tests([\\/]|$)/.test(src);
+
+export const JOBS = [
   {
     source: resolve(root, 'src/library'),
     target: resolve(root, 'public/library'),
     label: 'src/library -> public/library',
-    // Tests live beside their component for maintainability, but they are not
-    // part of what a visitor copies, so they stay out of the served output.
-    filter: (src) => !/[\\/]tests([\\/]|$)/.test(src),
+    filter: isServed,
   },
   {
     source: resolve(root, 'src/site/theme'),
@@ -87,14 +95,21 @@ async function syncAll() {
   }
 }
 
-try {
-  await syncAll();
-} catch (err) {
-  console.error(`sync-library: ${err.message}`);
-  process.exit(1);
+// Only when run as a script. The spec imports `isServed` from here so the two
+// cannot disagree about what is served, and importing must not trigger a sync.
+const invokedDirectly =
+  process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (invokedDirectly) {
+  try {
+    await syncAll();
+  } catch (err) {
+    console.error(`sync-library: ${err.message}`);
+    process.exit(1);
+  }
 }
 
-if (process.argv.includes('--watch')) {
+if (invokedDirectly && process.argv.includes('--watch')) {
   let pending = null;
   for (const job of JOBS) {
     // Single-file jobs need no watcher of their own: every one of them lives

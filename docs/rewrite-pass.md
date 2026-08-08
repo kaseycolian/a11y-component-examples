@@ -22,11 +22,10 @@ the contributing contract for code, and `docs/BUILD-STATUS.md` is still the buil
 complete, and nothing in this file is waiting to be picked up.**
 
 **What is next is not in this file.** `docs/BUILD-STATUS.md` is the active document again, and its
-START HERE has it: **batch F, `app-page-to-markdown`** — the last component and the only one in
-`compositions` — and then filling `docs/at-support.md`'s matrix, which is the only remaining work
-that code cannot do. Batch F is the first component written *after* this pass, so it is written to
-the finished standard rather than swept in later; [the style rules](#the-style-rules) and
-[the demo vocabulary](#the-demo-vocabulary) are what it needs from here, and nothing else is.
+START HERE has it: filling `docs/at-support.md`'s matrix, which is the only remaining work that code
+cannot do, and then the deploy. Any component added or changed from here is held to the finished
+standard rather than swept in later; [the style rules](#the-style-rules) and
+[the demo vocabulary](#the-demo-vocabulary) are what that needs from here, and nothing else is.
 
 Last updated 2026-08-07, after Phase 3 — the site's own copy, and the last item of the pass. The repo
 was left green:

@@ -1081,5 +1081,7 @@ in them.
 The agent side is already covered: the generator carries `status` into `agents/index.{md,json}` and
 marks any non-stable component on its index row, so a draft is disclosed rather than advertised.
 
-**The `compositions` group is currently empty.** `groups.mjs` still declares it, and both the registry
-and the generator drop empty groups, so it costs nothing and is ready for batch F.
+**The `compositions` group is empty and is not waiting for anything.** `groups.mjs` still declares it,
+and both the registry and the generator drop empty groups, so it renders nowhere and costs nothing.
+Leave it: it is the category a future composition would claim, and `new-component.mjs` already accepts
+it.

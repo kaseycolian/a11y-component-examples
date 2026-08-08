@@ -12,6 +12,10 @@ is worse than admitting a gap, because it stops anyone from checking.
 
 ## Status
 
+**Nothing has been tested yet.** Every component in `src/library/components/` is untested against
+every pairing below, and the table starts with two rows only because those two existed when this file
+was written. Add a row when you test a component; there is no value in 33 rows of `—`.
+
 | Component | NVDA + Firefox | NVDA + Chrome | JAWS + Chrome | VoiceOver + Safari (macOS) | VoiceOver (iOS) | TalkBack (Android) |
 | --- | --- | --- | --- | --- | --- | --- |
 | `disclosure` | — | — | — | — | — | — |
@@ -93,10 +97,41 @@ block is for.
 
 ## Recording a result
 
-Update the row, and if anything differed, write it under **Caveats** with enough detail to act on:
+Four steps, and the third is the one that is easy to miss.
+
+**1. Update the table.** Add the component's row if it has none, then write the verdict into the cell
+for the pairing you used. A cell you did not test stays `—`.
+
+**2. Write the caveat.** If anything differed, put it under **Caveats and known differences** with
+enough detail to act on:
 
 > `dropdown` — TalkBack announces the option count as "1 of 5" only on first entry, not after
 > filtering. Not a blocker; noted so it is not rediscovered. — 2026-08-01
 
-If a pass fails, open the fix as a task in `BUILD-STATUS.md` rather than quietly downgrading the
-component's `status` in `meta.json`.
+**3. Update that component's `docs.md`.** Its `## Screen reader behavior` section closes with the
+house disclaimer, verbatim in 31 files:
+
+> **Not yet verified against real assistive technology.** Until `docs/at-support.md` has a row for
+> this component, treat the above as intent, not measurement.
+
+Once the row exists, that sentence is false. Replace it with what was heard, and name the AT and the
+date — *"NVDA + Firefox reads it as … — 2026-09-14."* The paragraph above it is written as **expected**
+behavior; a tested component states what was **observed**. `grep -rl "Not yet verified" src/library/`
+is the list of files still waiting.
+
+**4. If a pass fails, open it as work in `BUILD-STATUS.md`.** Never quietly downgrade the component's
+`status` in `meta.json` — a `draft` badge says "unfinished", not "fails in JAWS", and the difference
+is the whole point of this file.
+
+---
+
+## Why this file is the last piece of the build
+
+Everything else the library claims is asserted by a machine: `tests/shared/a11y.spec.mjs` runs ten
+checks against every component, and `tests/shared/agent-surfaces.spec.mjs` proves every contract
+matches the markup it describes. Neither can tell you whether a component is *usable*, and no amount
+of further automation will change that. The matrix is the only part of the accessibility claim that
+needs a person, a screen reader, and fifteen minutes.
+
+That is why an empty cell is worth more than a guess. The gate proves the ARIA is present; only this
+file can say it works.

@@ -265,14 +265,6 @@ Conventions: `CLAUDE.md`. Progress: `BUILD-STATUS.md`.
 
 ---
 
-## compositions
-
-### app-page-to-markdown
-- Recreates draft-3's "Page → Markdown": `fx-bar-top` header, a radio group, a checkbox, a scrollable `fx-scroll` preview, `fx-bar-bottom` footer.
-- **Gotcha** The preview is a scrollable region — `tabindex="0"` + label. This is the natural home for `prose-surface`.
-
----
-
 ## Definition of done
 
 A component is not finished until **all** of these are true:

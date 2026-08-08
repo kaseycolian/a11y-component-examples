@@ -41,7 +41,8 @@ of `dropdown` (thorough) or `disclosure` (small) rather than inventing a new one
 ## The three rules everything follows
 
 1. **What you see is what you copy.** The live demo and the code panel load the *same physical
-   files*. Never introduce a transform between them.
+   files*. Never introduce a transform between them. `tests/shared/what-you-see.spec.mjs` enforces
+   this — it fetches the URL the rendered page names and compares those bytes to `src/library/`.
 2. **A paste into a bare app must just work.** No required extra files, no unstyled result.
 3. **Adding a component is adding a folder.** Nav, index, routes, and tests all derive from
    `meta.json`. If something needs hand-wiring, that's a bug in the architecture.
@@ -58,7 +59,8 @@ scripts/         sync-library (src -> public), check-tokens (linter), new-compon
                  build-agent-surfaces (renders AGENTS.md + agents/ + the skill),
                  install-skill (links the skill into ~/.claude/skills/ so other repos can use it),
                  rehype-scrollable-tables (wraps docs.md tables so pages don't overflow at 320px)
-tests/           Site-shell specs (site-header) + the shared a11y gate every component must pass.
+tests/           Site-shell specs (site-header), the shared a11y gate every component must pass,
+                 and what-you-see.spec.mjs, which asserts rule 1 below.
 AGENTS.md        GENERATED. The agent read path. Edit docs/agents/, run npm run agents.
 agents/          GENERATED, committed. The index, the per-component contracts, and the four
                  cross-cutting surfaces (pitfalls, conventions, verify, testing) agents read.
