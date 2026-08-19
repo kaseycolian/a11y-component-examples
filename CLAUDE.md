@@ -55,9 +55,11 @@ src/site/        Astro shell (srcDir points here). Never contains component code
 src/site/theme/  Vendored theme-service files. See THEME-SERVICE.md before touching.
 src/site/styles/ Site shell CSS. The header and footer are ports of theme-service's own —
                  see A11Y-WAY-PAGES.md there before restyling either.
-scripts/         sync-library (src -> public), check-tokens (linter), new-component (scaffolder),
+scripts/         sync-library (src -> public), new-component (scaffolder),
+                 check-tokens / check-encoding / check-readouts (the three linters),
                  build-agent-surfaces (renders AGENTS.md + agents/ + the skill),
                  install-skill (links the skill into ~/.claude/skills/ so other repos can use it),
+                 shots (screenshots a component page), clean (removes build output),
                  rehype-scrollable-tables (wraps docs.md tables so pages don't overflow at 320px)
 tests/           Site-shell specs (site-header), the shared a11y gate every component must pass,
                  and what-you-see.spec.mjs, which asserts rule 1 below.
@@ -317,8 +319,10 @@ verbatim text is in `docs/rewrite-pass.md`.
 
 ## Environment gotchas
 
-- **Node is not on the inherited PATH.** Prefix PowerShell calls:
-  `$env:Path = "C:\nvm4w\nodejs;$env:Path"` — nvm4w, Node 26.5.0, npm 11.17.
+- **Node comes from nvm4w** — `C:\nvm4w\nodejs`, Node 26.5.0, npm 11.17. That folder is on the
+  Machine *and* User `Path`, so `node`, `npm` and `npx` resolve with no prefix in either shell;
+  measured 2026-08-07. If a session ever finds them missing, `$env:Path = "C:\nvm4w\nodejs;$env:Path"`
+  is the recovery, not the routine.
 - **npm 11 gates install scripts.** `allowScripts` in `package.json` already approves esbuild and
   sharp; re-approve with `npm approve-scripts <pkg>` if a new one appears.
 - **Git is 2.24** — no `git init -b`, no interactive flags.
@@ -329,12 +333,16 @@ verbatim text is in `docs/rewrite-pass.md`.
 ```sh
 npm run dev            # localhost:4321/a11y-component-examples/
 npm run build          # prebuild syncs library + agents -> public
+npm run check:encoding # mojibake + BOM, repo-wide. A file that names the signature says so
 npm run check:tokens   # the color linter
+npm run check:readouts # a demo readout is looked up from an element, never from document
 npm run agents         # render AGENTS.md + agents/ (run after editing any meta.json)
 npm run check:agents   # --check: fail if a surface drifted from its source
 npm run install:skill  # link the skill into ~/.claude/skills/ (writes nothing in the repo)
+npm run shots -- <slug>  # screenshot the demo grid and each example, into the gitignored shots/
+npm run clean          # remove .astro + dist; -- --all also clears generated public/ and shots/
 npm test               # Playwright a11y gate
-npm run verify         # both linters, then build, then test
+npm run verify         # the three linters, then check:agents, then build, then test
 ```
 
 ## Deliberate deviations (do not "fix" these)

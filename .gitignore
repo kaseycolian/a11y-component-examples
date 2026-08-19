@@ -18,6 +18,10 @@ public/theme/
 public/agents/
 public/llms.txt
 
+# Written by scripts/shots.mjs. The recipe's last line is that `git status`
+# comes back with only the component folder, so the shots must never be in it.
+shots/
+
 # Playwright
 test-results/
 playwright-report/

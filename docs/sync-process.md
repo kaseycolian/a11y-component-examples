@@ -66,8 +66,14 @@ names the attribute, key or factory.
 npm run verify
 ```
 
-`check:tokens` → `check:agents` → `build` → the full suite. On a machine without the webkit browser
-installed, run the suite as `npx playwright test --project=chromium` instead and note that you did.
+`check:encoding` → `check:tokens` → `check:readouts` → `check:agents` → `build` → the full suite. The
+first three need no browser and no build, so a typo-level failure comes back in seconds. On a machine
+without the webkit browser installed, run the suite as `npx playwright test --project=chromium`
+instead and note that you did.
+
+`check:encoding` fails on a file re-encoded by a PowerShell round-trip; the fix is
+`git checkout -- <file>`, never retyping the characters. `check:readouts` fails when a demo readout is
+looked up from `document` rather than from an element that bounds the example.
 
 ---
 

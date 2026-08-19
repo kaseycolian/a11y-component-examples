@@ -132,12 +132,15 @@ import.
 Run the definition-of-done checklist at the bottom of `component-specs.md`, then:
 
 ```sh
+npm run check:encoding  # mojibake or a BOM anywhere in the repo
 npm run check:tokens
+npm run check:readouts  # every demo readout is looked up from an element, not from document
 npm run agents          # renders agents/components/<slug>.md from the contract block
 npm run check:agents
 npm run build
 npx playwright test --project=chromium <slug>
 npx playwright test --project=chromium agent-surfaces
+npm run shots -- <slug> # the demo grid and each example, at 1280 and 320
 ```
 
 That last one is the half people skip. It reads your markup and your JS and reports anything they do

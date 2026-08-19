@@ -29,11 +29,17 @@
     "//uninstall:skill": "Removes the ~/.claude/skills/a11y-library link. Keeps the config, with the removal recorded in its history.",
     "uninstall:skill": "node scripts/install-skill.mjs --uninstall",
 
+    "clean": "node scripts/clean.mjs",
+    "//shots": "Screenshot a component page before ticking its roster row. Builds, serves, and shoots the demo grid plus each example on its own at 1280 and 320, into the gitignored shots/. Usage: npm run shots -- <slug> [--skip-build] [--widths 1280,320].",
+    "shots": "node scripts/shots.mjs",
+
+    "check:encoding": "node scripts/check-encoding.mjs",
     "check:tokens": "node scripts/check-tokens.mjs",
+    "check:readouts": "node scripts/check-readouts.mjs",
     "check:agents": "node scripts/build-agent-surfaces.mjs --check",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "verify": "npm run check:tokens && npm run check:agents && npm run build && npm run test"
+    "verify": "npm run check:encoding && npm run check:tokens && npm run check:readouts && npm run check:agents && npm run build && npm run test"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",

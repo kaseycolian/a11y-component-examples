@@ -277,12 +277,14 @@ A component is not finished until **all** of these are true:
 - [ ] `docs.md` covering: the framework caveat, ARIA contract, keyboard table, states, screen reader behavior, API, gotchas
 - [ ] `tests/<slug>.spec.mjs` asserting the keyboard map and the ARIA contract, not just that it renders
 - [ ] `npm run check:tokens` clean — every color in a `var()` fallback chain
+- [ ] `npm run check:encoding` and `npm run check:readouts` clean — no mojibake, and every demo
+      readout looked up from an element rather than from `document`
 - [ ] A `@media (forced-colors: active)` block
 - [ ] Every transition gated through `var(--ac-motion, var(--motion, 1))`
 - [ ] Interactive targets ≥24×24px
 - [ ] Demo shows the awkward states too: disabled, empty, error, long text
 - [ ] `npm run build` passes and the demo actually works in a browser
-- [ ] **Looked at, at 1280 and at 320** — a screenshot, not a passing test. Both bugs the suites missed
-      (typography's inherited `text-transform`, motion-preferences' banner-wide button) were visible in
-      one glance and invisible to every assertion. See the recipe in `BUILD-STATUS.md` → Gotchas.
+- [ ] **Looked at, at 1280 and at 320** — `npm run shots -- <slug>`, a screenshot, not a passing test.
+      Both bugs the suites missed (typography's inherited `text-transform`, motion-preferences'
+      banner-wide button) were visible in one glance and invisible to every assertion.
 - [ ] Row updated in `BUILD-STATUS.md`

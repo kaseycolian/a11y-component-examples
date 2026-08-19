@@ -4,7 +4,7 @@
 > also holds the **style rules every human-facing string still has to follow**: read those before
 > writing a `summary`, a demo note or anything on a page, and nothing else in that file is required.
 > What is left of the build is
-> **[START HERE](#start-here--the-item-6-backlog-then-item-3-then-item-4) below.**
+> **[START HERE](#start-here--item-3-is-the-owners-then-item-4) below.**
 
 **Resume point.** `CLAUDE.md` (auto-loaded) has the conventions. This file has progress and the
 ordered next steps. `component-specs.md` is the pre-build planning record — read the one entry you
@@ -17,27 +17,38 @@ Read in this order and nothing else is needed to start: **START HERE** for what 
 **Keep this file current.** Tick the roster row as each component lands, or the next session
 re-does work.
 
-Last updated: 2026-08-07 (**the roster is closed.** `compositions` ships no component and is not
+Last updated: 2026-08-07 (**the roster is closed and the item 6 backlog is done** — its last five
+entries in one session: `check-encoding`, `check-readouts`, `shots`, `clean`, and the Node PATH
+gotcha retired by measurement rather than by config. `compositions` ships no component and is not
 waiting for one — `groups.mjs` still declares the group, and both the registry and the generator drop
-an empty group, so it costs nothing. Items 0a, 0b, 1 and 2 are done. **The order the owner set on
-2026-08-07 is: the item 6 backlog first, then item 3, then item 4.** Run
-`npx playwright test --project=chromium`; the Chromium suite is **1355 passed**, clean, 11.7 min on
-2026-08-07 — the number the item 6 work starts from.)
+an empty group, so it costs nothing. Items 0a, 0b, 1, 2, 5 and 6 are done. **What remains is item 3,
+which is the owner's, then item 4.** Gate a session with `npx playwright test --project=chromium`;
+the closing run is recorded at the end of item 6.)
 
 ---
 
-## START HERE — the item 6 backlog, then item 3, then item 4
+## START HERE — item 3 is the owner's, then item 4
 
-The roster is closed and every component is built. Three pieces of work remain, and **the owner has
-fixed the order**, because item 4 is worth doing once rather than three times:
+The roster is closed, every component is built, and the tooling backlog is cleared. Two pieces of
+work remain, and **the owner has fixed the order**, because item 4 is worth doing once rather than
+twice:
 
-1. **[Item 6](#6-lint-the-gotchas-that-can-be-linted)** — five small pieces of tooling, all of them
-   code, none of them touching a component. **This is the work a fresh session picks up.** Every one
-   has its starting point written under that heading; none needs re-deriving.
-2. **[Item 3](#3-docs)** — `docs/at-support.md`'s matrix. **The owner is doing this themselves**, on
-   their own hardware. It is not a session's to start.
-3. **[Item 4](#4-final-verification)** — final verification and deploy, *after* item 3, so the
-   screen-reader results ship in the same pass rather than needing a second deploy.
+1. **[Item 3](#3-docs)** — `docs/at-support.md`'s matrix. **The owner is doing this themselves**, on
+   their own hardware. It is not a session's to start, and nothing in the repo is blocked on it.
+2. **[Item 4](#4-final-verification)** — final verification and deploy, *after* item 3, so the
+   screen-reader results ship in the same pass rather than needing a second deploy. Its two blockers
+   are written up under **Remaining non-component work**: the cross-engine failures, which are stale
+   and need re-running before they are worth triaging, and GitHub Pages **Source** needing to be set
+   to **GitHub Actions** by hand.
+
+**A session with no assignment has no build work waiting.** Do not start item 4 because the suite is
+green — that is the one instruction on this page that has been given twice.
+
+~~[Item 6](#6-lint-the-gotchas-that-can-be-linted)~~ is **done, 2026-08-07**, and its entry is now
+the record of what each of the six turned out to be. Two of them were not what their starting points
+said: the encoding allowlist had to be *derived* rather than transcribed, and the Node PATH premise
+had gone stale, so the fix was deleting the instruction rather than writing it into a config file.
+`npm run verify` is four checks now, not two.
 
 The shared a11y gate is `tests/shared/a11y.spec.mjs`: ten checks against every component, and
 `.github/workflows/ci.yml` runs it. It went in before the last batch for the reason recorded
@@ -88,18 +99,13 @@ Every agent-facing surface names this file exactly once, in the rule forbidding 
 
 ### The steps, in order
 
-**Step 1 — the item 6 backlog.** Five pieces, and they are independent of each other, so take them
-in whatever order and commit them separately. Two are checks that join `verify` and CI (encoding,
-readout keys) and three retire a gotcha by making it impossible rather than documented (the Node
-PATH, `scripts/shots.mjs`, `npm run clean`). Each is written up under
-**[6. Lint the gotchas that can be linted](#6-lint-the-gotchas-that-can-be-linted)** with its
-starting point, its current measurement and its trap. Read that section, not this paragraph.
+~~**Step 1 — the item 6 backlog.**~~ **Done, 2026-08-07.** Two checks joined `verify` and CI
+(`check:encoding`, `check:readouts`), two gotchas became commands (`npm run shots`, `npm run clean`),
+and one was retired by measuring that its premise had stopped being true (the Node PATH). What each
+turned out to be is under
+**[6. Lint the gotchas that can be linted](#6-lint-the-gotchas-that-can-be-linted)**.
 
-The one that needs saying twice: **re-measure the encoding allowlist before writing the check.** The
-count in that entry has been wrong twice already, so treat the number there as a description of a
-past measurement, not a spec.
-
-**Step 2 — `docs/at-support.md`'s matrix**, item 3. The one piece of remaining work that code cannot
+**Step 1 — `docs/at-support.md`'s matrix**, item 3. The one piece of remaining work that code cannot
 do: nothing has been tested, and the home page and 31 component pages say so in as many words.
 Filling even one row turns a disclaimer into a measurement. It needs a real screen reader rather than
 a keyboard, so it is not blocked on anything in the repo — only on sitting down with NVDA. That file
@@ -107,7 +113,7 @@ is self-contained: the four questions, a walkthrough per AT, and a four-step **R
 that includes replacing the house disclaimer in the component's own `docs.md`. **The owner is doing
 this themselves, 2026-08-07** — a session neither starts it nor waits on it.
 
-**Step 3 — final verification and deploy**, item 4, and **it comes after step 2 by the owner's
+**Step 2 — final verification and deploy**, item 4, and **it comes after step 1 by the owner's
 decision**: the screen-reader results are page copy, so deploying before they exist means deploying
 twice. Its two blockers are under **Remaining non-component work**: the cross-engine failures, and
 GitHub Pages **Source** needing to be set to **GitHub Actions** by hand.
@@ -227,8 +233,7 @@ Then the four items under **Remaining non-component work**, in this order:
    Every one of the 33 components now carries the copyability conventions and a spec of its own.
 2. ~~**The shared a11y gate (item 2).**~~ **Done, 2026-07-29.** Landed before the last batch, and
    the bet paid — see "What the gate found".
-3. **The item 6 backlog** — five pieces of tooling, and **the work a fresh session picks up.** Two
-   checks and three eliminations, each written up with its 2026-08-07 measurement under
+3. ~~**The item 6 backlog.**~~ **Done, 2026-08-07** — all six, with what each turned out to be under
    [6. Lint the gotchas that can be linted](#6-lint-the-gotchas-that-can-be-linted).
 4. **Docs (item 3)** — unblocked, and `wcag-mapping.md` has something real to be generated
    against: the gate names an SC in almost every check. **The owner is doing this themselves.**
@@ -245,7 +250,7 @@ constraints, and add anything that cost more than ten minutes to the gotchas lis
 does not do this makes the next one redo its work. Then:
 
 ```sh
-npm run check:tokens && npm run build && npx playwright test --project=chromium
+npm run check:encoding && npm run check:tokens && npm run check:readouts && npm run build && npx playwright test --project=chromium
 ```
 
 ---
@@ -266,9 +271,11 @@ npm run new:component -- <slug> --group <group-id> --name "Display Name"
    its own voice rule** in `CLAUDE.md` under Writing style — prose to a human, no enumerating the
    examples. `status-text` is the reference; the scaffolded TODO string is not.
 4. Write `docs.md` and the spec. Assert the ARIA contract and keyboard map, not just that it renders.
-5. `npm run check:tokens && npm run build`
+5. `npm run check:encoding && npm run check:tokens && npm run check:readouts && npm run build`
 6. `npx playwright test --project=chromium <slug>`
-7. Tick the roster row below.
+7. `npm run shots -- <slug>` — screenshot it before ticking the row. It has caught a real bug three
+   times with the whole suite green.
+8. Tick the roster row below.
 
 The **definition of done** is the checklist at the bottom of `component-specs.md`.
 
@@ -1188,44 +1195,37 @@ Three things from phase 1 that outlive it:
 ### 6. Lint the gotchas that can be linted
 
 Surveyed after phase 3, when the gotchas list was cut to the 19 that are about working *on* this repo.
-Five of those 19 are already handled and the entry is only the explanation; six more are irreducible
-environment facts. What is left is below, ranked, with the measurements so they do not need repeating.
+Five of those 19 were already handled and the entry was only the explanation; six more are
+irreducible environment facts. Six entries came out of the survey, and **all six are done** — entry 2
+in an earlier session, the other five on 2026-08-07. Each entry below is now the record of what it
+turned out to be, in place of the starting point it used to carry.
 
-**Re-measured 2026-08-07**, on the way into this work, and both survivors moved. Item 1's allowlist is
-still the same three files but its line count is not worth writing down, for a reason that is itself
-the finding. Item 3 turned out to be guarding a failure mode this repo no longer has, and a naive
-version of that check would fire on correct code. Read both entries before writing either check —
-neither is the one-liner the old summary implied.
+Two findings outlive the batch. **An allowlist that is derived rather than transcribed cannot go
+stale** — that is the answer to the counting problem entry 1 had got wrong three times, and it is
+reusable anywhere a check needs exceptions. And **entry 4's premise had simply stopped being true**:
+no amount of re-reading the entry would have shown it, and one measurement did. Before building the
+thing an entry asks for, check that the thing it is for still exists.
 
 Worth a check:
 
-1. **Encoding, repo-wide.** `build-agent-surfaces.mjs` throws on `â€` only in what it reads — the five
-   files in `docs/agents/` and every `meta.json` — so every `component.*`, every `docs.md` and this file
-   are unguarded, and a 98 KB prose file is exactly what gets round-tripped. The only trap on the list
-   that silently corrupts the product.
+1. ~~**Encoding, repo-wide.**~~ **Done** — `scripts/check-encoding.mjs`, `npm run check:encoding`,
+   first in `verify` and first in `ci.yml` because it needs no browser, no build and no
+   `node_modules`. It fails on the `â€` signature **and** on a leading BOM, since the same PowerShell
+   round-trip produces both and a BOM in a `meta.json` breaks `JSON.parse` before anything else can
+   go wrong. The file list comes from `git ls-files --cached --others --exclude-standard`, so a
+   brand-new `docs.md` is covered before it is ever `git add`ed and `.gitignore` stays the only
+   exclusion list. Binary files are skipped on a NUL byte rather than by extension. `readSource()`
+   in the generator keeps its own guard and now **imports `MOJIBAKE`** from the check, so the
+   signature is stated once.
 
-   **Start from `readSource()` in `scripts/build-agent-surfaces.mjs`** — the guard already exists there,
-   throwing on the `â€` signature with a message naming `git checkout --` as the fix. The work is
-   hoisting it into a `scripts/check-encoding.mjs` that walks the repo, then adding it to `verify` and
-   to `ci.yml` **before** `check:tokens`, since it needs no browser and no build.
+   **The allowlist is derived.** A file that names the signature on purpose carries the marker
+   `check-encoding:documented`, and the check reads that — no path list, nothing to keep current.
+   The check exempts itself for free, because the marker's own definition is in it. It also fails on
+   a **stale** marker, the `data-ac-demo-broken` rule in the other direction: a file that declares it
+   and no longer contains the signature has to give the marker up. Today four files carry it, and
+   that number is in the check's own output rather than in this paragraph, which is the whole point.
 
-   It needs an allowlist, because the files that *document* the trap contain it. As of 2026-08-07
-   that is **three files** — `scripts/build-agent-surfaces.mjs` (the guard's own doc comment,
-   condition and message), `docs/agent-layer.md`'s record of the incident, and this file. Same shape
-   as `data-ac-demo-broken`. For the current line counts run `git grep -lIc` for the signature; this
-   entry deliberately does not transcribe them, for the reason below.
-
-   **Re-measure before writing the check.** The count has been wrong three times. The first version
-   said two files, having forgotten the one it was written in. An eight-line count went stale inside
-   a month. The third is the useful one: a 2026-08-07 measurement came back "three files, ten
-   lines" and **was made stale by the act of writing it down** — this entry names the signature, so
-   the file gained a line while the paragraph describing it was being typed, and the number was wrong
-   before the commit landed. A tally of occurrences of a string, kept in prose that discusses that
-   string, cannot stay true. **Derive the allowlist, do not transcribe it** — that is the real design
-   constraint here, and it is worth more than any number this entry could carry.
-
-   **The check's own source will contain the signature**, so it has to exempt itself or it fails on
-   the commit that adds it.
+   All three failure modes were red-probed with planted files and the probes cleaned up.
 2. ~~**"What you see is what you copy", asserted.**~~ **Done, 2026-08-07** —
    `tests/shared/what-you-see.spec.mjs`, 135 tests, in `npm test` and therefore in `verify` and CI.
    It compares four things per component against `src/library/`: the panel's highlighted text, the
@@ -1233,41 +1233,63 @@ Worth a check:
    link. **The URL is read off the rendered page rather than built from the slug** — a test that
    constructs its own path proves the server works, not that the page uses it. Both failure modes
    were red-probed. Three things it found or corrected are in the gotchas list below.
-3. **Readout-key uniqueness — do not write this one without re-deriving it first.** The entry used to
-   read "159 keys across 14 components, no duplicates anywhere, a green guard rather than a
-   discovery." Re-measured 2026-08-07: **167 keys across 15 components, and one component does have a
-   duplicate** — `disclosure` carries `data-ac-disc-out="stops"` twice, at `component.html:270` and
-   `:318`.
+3. ~~**Readout-key uniqueness.**~~ **Done** — and it is `scripts/check-readouts.mjs`, which checks
+   **scoping** rather than uniqueness, because uniqueness is not the rule and a lint for it would
+   have failed on working code. `disclosure` carries `data-ac-disc-out="stops"` twice on purpose, in
+   two different `.ac-disclosure-frame` elements each read by its own frame-scoped lookup.
 
-   **It is not a bug, and a naive lint would fire on it.** The gotcha further down this file says
-   `out()` is a document-wide `querySelector`; that is now stale. Every one of the 11 components with
-   readouts scopes its lookup — ten to `root`, `disclosure` to `frame` — and **none uses `document`**.
-   `disclosure`'s two `stops` readouts sit in different `.ac-disclosure-frame` elements (`css-hidden`
-   and `div-trigger`), each read by its own frame-scoped `out()`, so both update correctly.
+   Two rules. **SCOPED** — every `querySelector` whose selector names a `data-ac-*-out` attribute
+   must start from an element, never from `document` (or `ownerDocument`, or `document.body`).
+   **SWEPT** — a component with a `component.js` *and* readout markup must have at least one lookup
+   the check can see, so renaming the convention fails here instead of quietly emptying the check.
+   That second rule is the "count how many components actually satisfy it" lesson made permanent.
 
-   So the check worth writing is **not** "keys are unique per page". It is either "no `out()` resolves
-   through `document`" — which is the property that actually makes duplicates safe, and is currently
-   true 11 times out of 11 — or per-page uniqueness *with* the scoping element as part of the key.
-   Fix the stale gotcha in the same commit.
+   Measured on the way in: **21 scoped lookups across 13 components**, none page-wide. Two more
+   components have readout markup and no `component.js` at all — `data-table` and `prose-surface`
+   print static values that their own specs assert against the accessibility tree, so there is
+   nothing to scope and SWEPT skips them by construction. Both rules were red-probed. The stale
+   gotcha is rewritten below, in the same commit.
 
 Worth eliminating instead of documenting:
 
-4. **Node's PATH** → `.claude/settings.local.json`, which `.gitignore` already excludes. `C:\nvm4w\nodejs`
-   is machine-specific and this repo is public, so it must not be the committed `settings.json`.
-5. **`scripts/shots.mjs <slug>`** — the screenshot entry is a recipe with two failure modes and says it
-   has been rewritten repeatedly. One command deletes both. It does not exist yet; this is writing it,
-   not fixing it. Everything it has to do is in the **"Screenshot the finished page"** gotcha below:
-   it must resolve `@playwright/test` from the repo root (ESM walks `node_modules` up from the
-   *script's* directory, which is why the throwaway version had to sit in the root), it must start and
-   stop `npm run preview` itself, it opens at `{ width, height: 3000 }` so a tall element screenshot
-   never scrolls and the sticky header cannot paint into it, it shoots `.ac-demo-grid` plus each
-   `.ac-demo` individually at 1280 and 320, and it prints
-   `document.documentElement.scrollWidth - clientWidth` and `document.activeElement.tagName`. Write the
-   shots somewhere gitignored — the recipe's last line is that `git status` comes back with only the
-   component folder, and a script that leaves PNGs in the tree fails that on its own.
-6. **`npm run clean`** — `.astro` and `dist`, so the stale-cache incantation is a script. Two gotchas
-   below point at it (the `[glob-loader] Duplicate id` warning, and a stale `dist/` making a source
-   edit look like a broken component), and both say "remove the directory and rebuild".
+4. ~~**Node's PATH.**~~ **Done, by measuring it — and the answer was not
+   `.claude/settings.local.json`.** `C:\nvm4w\nodejs` is already in both the Machine and the User
+   `Path` in the registry, so every new process inherits it: `node -v`, `npm -v` and `npx --version`
+   all answer with no prefix, in the PowerShell tool and the Bash tool alike. The premise had gone
+   stale and the instruction was costing a prefix on every call for nothing.
+
+   **Writing it into `settings.local.json` would have been worse than nothing.** That file is
+   gitignored, so it can never help a fresh clone or a second machine — the one audience a fix would
+   be for. And the `env` block takes literal strings with no expansion, so a `PATH` entry there
+   *replaces* the inherited one: get it slightly wrong and every command in the session loses git,
+   npx and the rest, in a machine-specific file nobody would think to read. The gotcha is retired to
+   a recovery note instead.
+5. ~~**`scripts/shots.mjs <slug>`.**~~ **Done** — `npm run shots -- <slug> [--skip-build]
+   [--widths 1280,320]`. It builds, brings up `npm run preview` and takes it down again, shoots every
+   `.ac-demo-grid` and every `.ac-demo` inside them at each width, and prints `scrollWidth -
+   clientWidth` and `document.activeElement` per width. Output goes to the gitignored `shots/<slug>/`,
+   named from each example's own `<h4>` — `03-trigger-with-no-heading-wrapper.png` — with the numbers
+   repeated into a `README.txt` beside them.
+
+   Four things it settled. The **repo-root import problem does not exist for a script in
+   `scripts/`**: ESM walks `node_modules` up from the script's own directory, and the parent of
+   `scripts/` is the repo root, so `@playwright/test` resolves. That gotcha was about a throwaway in
+   the scratchpad. The port and base path are **imported from `playwright.config.mjs`** so there is
+   one definition of where the site is served. A preview server already on the port is **reused and
+   left running**, and one the script started is killed as a **process tree** — `npm run preview` is
+   a shell around astro around node, and killing the shell alone leaves the port held, which is the
+   stale-server gotcha exactly. And `spawn`/`execFile` with an argv array *plus* `shell: true` is
+   Node's DEP0190; with a shell it has to be one command string.
+
+   Verified end to end on `disclosure` (7 examples), `badge` and `notice`, at 1280, 375 and 320, both
+   with and without a server to reuse, and the port came back free afterwards. The 3000px viewport
+   does what it was supposed to: no header stitched across any element shot.
+6. ~~**`npm run clean`.**~~ **Done** — `scripts/clean.mjs`. Bare, it removes `.astro` and `dist`,
+   which is both stale-cache gotchas in one command. `-- --all` also clears the generated
+   `public/library`, `public/theme`, `public/agents`, `public/llms.txt`, `shots/` and the Playwright
+   report directories. Every path is a literal and `public/` is named one subfolder at a time, for
+   the reason `.gitignore` does the same: `public/brand/` is hand-vendored and committed, and a glob
+   here would delete it.
 
 **Do not write a lint for `getPropertyValue('--ac-` in a spec.** Five specs do it and all five are
 correct: they read `--ac-badge-accent`, `--ac-notice-accent`, `--ac-status-accent`,
@@ -1276,6 +1298,12 @@ component's own `component.css`. The gotcha is narrower than it reads — it is 
 `tokens.css` would have set. The lint would be five false positives out of five hits, and "fixing"
 them would break five working tests. Also verified while surveying: **0 of 68 built pages** contain
 `style="color:#`, so `code-theme.mjs` is holding and a shiki check would be a green guard too.
+
+**Closing run, 2026-08-07: `npx playwright test --project=chromium` — 1355 passed, 9.7 min, clean.**
+The same count as before the batch, which is the point: none of the five pieces added a test or
+touched a component. The four static checks come back `check-encoding: 298 file(s) clean, 4
+documenting the signature`, `check-tokens: 34 file(s) clean`, `check-readouts: 21 scoped lookup(s)
+across 13 component(s)`, and `build-agent-surfaces: 42 surfaces match their sources`.
 
 ### 4. Final verification
 
@@ -1325,8 +1353,11 @@ component assumes about its page to `docs/agents/conventions.src.md` — all of 
 `agents/` surfaces an agent reads, see `docs/agent-layer.md`. A new finding goes in whichever of the four
 homes it belongs to, not in all of them.
 
-- **Node is not on the inherited PATH.** Prefix PowerShell calls with
-  `$env:Path = "C:\nvm4w\nodejs;$env:Path"`.
+- ~~**Node is not on the inherited PATH.**~~ **Retired 2026-08-07 by measuring it.**
+  `C:\nvm4w\nodejs` is in both the Machine and the User `Path` in the registry, so every new process
+  inherits it: `node -v`, `npm -v` and `npx --version` all answer with no prefix, in the PowerShell
+  tool and the Bash tool alike. The prefix is a recovery step now, not a habit — see item 6.4 for why
+  it is not written into `.claude/settings.local.json` instead.
 - **`.demo` is `align-items: flex-start`, so a wrapper around the demo sections shrinks to its
   content** and the grid inside it silently lays out in fewer columns than the panel has room for.
   Fixed once in `site.css`; the full write-up, including how it was measured, is the wrapper bullet in
@@ -1445,9 +1476,11 @@ homes it belongs to, not in all of them.
   theme and pick a value that fails all of them clearly; 0.4 puts the worst at 3.7:1.
 - **A probe that patches files must rebuild after it restores them.** The red probe for the above left
   `dist/` built from the patched source, so the next run served a page with a stylesheet missing —
-  which produced page-wide contrast violations that looked like a real finding and cost a detour. If
-  the probe leans on Playwright's `webServer` to build, it must also stop any preview server already
-  holding port 4321, or `reuseExistingServer` hands it the stale one.
+  which produced page-wide contrast violations that looked like a real finding and cost a detour.
+  `npm run clean` and rebuild. If the probe leans on Playwright's `webServer` to build, it must also
+  stop any preview server already holding port 4321, or `reuseExistingServer` hands it the stale
+  one — and a server left holding that port outlives the session that started it. One was found on
+  2026-08-07 still running 21 hours after the run that spawned it.
 - **`process.exit()` inside a `try` skips the `finally`.** A probe that patches files on purpose must
   restore them on every path, and exit is not a path — it terminates immediately. The first phase-7 red
   probe left a patched `component.html` behind that way. Throw instead; let `finally` run.
@@ -1457,7 +1490,9 @@ homes it belongs to, not in all of them.
   `meta.json` also breaks `JSON.parse` on the BOM. It hit `preamble.md` and `tabs/meta.json` while
   phase 1 of the agent layer was being tested, and the only visible symptom was a generated file
   growing 23 bytes. Use the editor to change a file; use `git checkout --` to undo one.
-  `build-agent-surfaces.mjs` now throws on `â€` in any source it reads.
+  **`npm run check:encoding` now fails on `â€` or a BOM anywhere in the repo**, in `verify` and in
+  CI; `build-agent-surfaces.mjs` keeps its own guard and imports the signature from it.
+  <!-- check-encoding:documented — this file names the signature on purpose, here and in item 6.1. -->
 - **Astro's `<Code>` component does not inherit `markdown.shikiConfig`.** They are configured
   separately, and a `<Code>` given no `themes` falls back to a single hardcoded `github-dark`
   written as inline `style="color:#…"` on every token — which beats any stylesheet. So a page can
@@ -1509,17 +1544,18 @@ homes it belongs to, not in all of them.
   bug.** It appears after a `docs.md` is created or replaced — the content layer has the
   old entry cached and re-syncs the new one under the same id. This was recorded twice with
   contradictory ordinals, first build versus second, so do not re-add one. The page it
-  names still builds correctly. `Remove-Item -Recurse -Force .astro` and rebuild; the warning is
-  gone and nothing else changes. Do not go looking for a duplicate file — the glob's `base` is
-  `src/library/components` and `public/library/` is not in it.
-- **A readout key has to be unique across the whole page, not within its example** — *true when
-  written, and no longer true of this repo. Re-measured 2026-08-07; see item 6.3, which is where it
-  gets deleted.* `out()` **was** a document-wide `querySelector`, so two examples both using
-  `data-ac-…-out="good"` silently wrote to the first one and the second readout never updated —
-  caught in `status-text` before it shipped. Every one of the 11 components with readouts now scopes
-  `out()` to `root` or to `frame` and none reaches `document`, which is what makes `disclosure`'s two
-  `data-ac-disc-out="stops"` correct rather than a collision. Keep the scoping; the key prefix
-  (`detail-good`) is no longer what is holding this up.
+  names still builds correctly. `npm run clean` and rebuild; the warning is gone and nothing else
+  changes. Do not go looking for a duplicate file — the glob's `base` is `src/library/components`
+  and `public/library/` is not in it.
+- **A readout key is unique inside the element its lookup starts from, and nowhere else.** `out()`
+  **was** a document-wide `querySelector`, so two examples both using `data-ac-…-out="good"` silently
+  wrote to the first one and the second readout never updated — caught in `status-text` before it
+  shipped. That is why `disclosure` can carry `data-ac-disc-out="stops"` twice: the two sit in
+  different `.ac-disclosure-frame` elements, each read by its own frame-scoped lookup, and both
+  update. **`npm run check:readouts` is the guard now** — every readout lookup must start from an
+  element rather than from `document`, and a component with readout markup and a `component.js` must
+  have a lookup the check can see, so renaming the convention fails there rather than emptying it.
+  Unique keys are not the rule and never were; scoping is.
 - **Git is 2.24** — no `git init -b`, no interactive flags.
 - **`src/library/tokens/tokens.css` is not loaded by the site.** It is an optional layer and no page
   links it, deliberately: a component has to work from the fallback chain alone. So
@@ -1539,22 +1575,24 @@ homes it belongs to, not in all of them.
 - **The header's motion toggle cannot be `.check()`ed.** The real input is `opacity: 0` under
   `.switch__track`, which intercepts the pointer, and Playwright retries for the full timeout. Click
   `.switch__track` the way a person clicks the label, or focus the input and press Space.
-- **Screenshot the finished page before ticking the row.** It has caught a real bug three times, and all
-  times every test was green. The recipe, because it fails two ways otherwise: a throwaway script that
-  imports `{ chromium } from '@playwright/test'` **must sit in the repo root** — from the scratchpad it
-  dies with `ERR_MODULE_NOT_FOUND`, since ESM resolves `node_modules` upward from the script's own
-  directory — and `npm run preview` has to already be running, started as a background job and stopped
-  after. Shoot the component root (`.ac-demo-grid`) at 1280 and 320, and print
-  `document.documentElement.scrollWidth - clientWidth` while you are in there. Delete the script from
-  the repo root afterwards; `git status` should come back with only the component folder.
-  **Shoot `.ac-demo-grid > .ac-demo` one at a time as well.** A single tall element screenshot stitches
-  while it scrolls, so the sticky header paints across the middle of it and hides an example — that is
-  an artifact, not a bug, but it is also where a real one goes unnoticed. And print
-  `document.activeElement.tagName` in the same pass; it is one line and it is what caught
-  `document.body.focus()` leaving a keyboard reader parked mid-page — now in
-  `docs/agents/pitfalls.src.md`. **The stitching is avoidable: open the page at `{ width, height: 3000 }`.** With a
-  viewport taller than the demo, an element screenshot never scrolls and the header cannot paint into
-  it — the per-example shots come back clean at both widths with no second pass.
+- **Screenshot the finished page before ticking the row** — `npm run shots -- <slug>`. It has caught
+  a real bug three times, and all three times every test was green. The recipe that used to live here
+  is the script now, including the two ways it failed: the tall viewport (`{ width, height: 3000 }`),
+  so an element screenshot never scrolls and the sticky header cannot stitch itself across the middle
+  of one and hide an example; and starting and stopping `npm run preview` itself, killing the
+  **process tree**, because `npm run preview` is a shell around astro around node and killing the
+  shell alone leaves the port held. It shoots each `.ac-demo` on its own as well as the grid, and
+  prints `scrollWidth - clientWidth` (sideways overflow, invisible in a screenshot) and
+  `document.activeElement` — the latter is what caught `document.body.focus()` leaving a keyboard
+  reader parked mid-page, now in `docs/agents/pitfalls.src.md`. Output lands in the gitignored
+  `shots/`, so `git status` still comes back with only the component folder.
+  **The repo-root import rule was about a throwaway script, not about this repo.** ESM resolves
+  `node_modules` upward from the script's own directory, and the parent of `scripts/` *is* the repo
+  root — so anything under `scripts/` imports `@playwright/test` fine. Only a script outside the
+  repo, in the scratchpad, dies with `ERR_MODULE_NOT_FOUND`.
+- **`spawn`/`execFile` with an argv array *and* `shell: true` is Node's DEP0190.** With a shell the
+  arguments are concatenated rather than escaped, so Node deprecated the combination. Pass one
+  command string instead — `spawn('npm run preview', { shell: true })` — or drop the shell.
 - **Astro's bundled `site.css` loads *after* every `component.css`.** Head order is theme, effects,
   dropdown, the page's component, then the `_astro/*.css` bundle. So a shell rule at **equal**
   specificity wins over a component's. This bites exactly one rule shape: `site.css` ships a global

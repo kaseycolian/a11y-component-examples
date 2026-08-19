@@ -36,6 +36,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve, posix } from 'node:path';
 
 import { GROUPS } from '../src/site/lib/groups.mjs';
+import { MOJIBAKE } from './check-encoding.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const COMPONENTS_DIR = resolve(root, 'src/library/components');
@@ -157,13 +158,19 @@ export const PROSE_SURFACES = [
  * and produces prose that looks fine in a diff summary and wrong on the page.
  * Every one of these files is prose or JSON destined for a generated surface,
  * so catching it here is the last point where it is still cheap.
+ *
+ * `npm run check:encoding` covers the whole repo, and the signature is imported
+ * from it rather than restated -- this guard stays because it fires with the
+ * source named, in the run that was about to render it into a surface.
+ *
+ * check-encoding:documented -- the prose above names the signature on purpose.
  */
 async function readSource(path) {
   const text = (await readFile(path, 'utf8')).replace(/^﻿/, '');
-  if (text.includes('â€')) {
+  if (text.includes(MOJIBAKE)) {
     throw new Error(
-      `${path} contains mojibake ("â€") -- it was re-encoded by something that read UTF-8 as ` +
-        `Latin-1. Restore it with \`git checkout --\` rather than retyping the characters.`,
+      `${path} contains mojibake ("${MOJIBAKE}") -- it was re-encoded by something that read ` +
+        `UTF-8 as Latin-1. Restore it with \`git checkout --\` rather than retyping the characters.`,
     );
   }
   return text;

@@ -35,11 +35,24 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # First because it needs no browser, no build and no node_modules: it
+      # asks git for the file list and reads bytes. A file re-encoded by a
+      # PowerShell round-trip renders as garbage and survives `git diff --stat`,
+      # so this is the one trap on the list that silently corrupts the product.
+      - name: Check encoding
+        run: npm run check:encoding
+
       # Every color has to be var(--ac-*, var(--theme-*, #literal)) and the
       # middle link has to be a token theme-service actually defines. Cheap,
       # and it fails before anything is built.
       - name: Check tokens
         run: npm run check:tokens
+
+      # A demo readout key is only unique inside the element its lookup starts
+      # from. A page-wide one writes to the first match and the second readout
+      # never updates, which reads as a component that stopped reporting.
+      - name: Check readouts
+        run: npm run check:readouts
 
       # AGENTS.md and agents/** are rendered from meta.json and
       # docs/agents/preamble.md. This re-renders and diffs, so editing a source

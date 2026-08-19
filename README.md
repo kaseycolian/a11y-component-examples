@@ -116,7 +116,9 @@ npm run preview    # serve the built output
 ### Checks
 
 ```sh
+npm run check:encoding # no mojibake or BOM anywhere in the repo
 npm run check:tokens   # no hardcoded colors outside a fallback position
+npm run check:readouts # every demo readout is looked up from an element, not from document
 npm test               # Playwright: axe-core, keyboard, contrast, reflow, forced-colors
 npm run verify         # all of the above plus a production build
 ```
