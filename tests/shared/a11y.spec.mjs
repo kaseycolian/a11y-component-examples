@@ -321,7 +321,20 @@ for (const { slug, name } of COMPONENTS) {
       // be repeated per theme -- and it is the one that found the code panel
       // shipping a hardcoded dark syntax theme onto light backgrounds.
       // Ten axe passes over a whole demo page does not fit in the default 30s.
-      test.setTimeout(180_000);
+      //
+      // 300s, not 180s. `tabs` is the heaviest page in the library and this is
+      // the longest test in the suite by a wide margin: measured 2026-08-19 at
+      // **1.9 minutes running alone**, and it exceeded the old 180s ceiling on
+      // three consecutive full-suite runs, one of them on an idle machine. It
+      // was recorded as flaky in 2026-08-07 at 2.1 minutes, so the margin had
+      // been under 30% from the start and this machine is simply on the wrong
+      // side of it now.
+      //
+      // Confirmed not a regression: the same run at the previous commit fails
+      // identically, and was slower still (17.3m vs 13.3m for the whole suite).
+      // What varies here is the machine, not the page -- so the ceiling has to
+      // clear the slow case rather than the median.
+      test.setTimeout(300_000);
       const failures = [];
 
       // Transitions are already suppressed in beforeEach, which this test needs

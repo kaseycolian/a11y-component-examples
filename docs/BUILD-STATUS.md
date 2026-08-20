@@ -1465,15 +1465,26 @@ homes it belongs to, not in all of them.
   — the gate now fails on axe's `error-occurred` check, in both axe tests — and the panel had been
   hiding **over half the page from every contrast sweep** at every width (366 nodes checked, 894 after).
   A green contrast run is worth nothing until you know how many nodes it looked at.
-- **`tabs › contrast holds in every theme` is the suite's one flaky test, and it fails as
-  `axe abandoned the rule`.** Seen once on 2026-08-07 and green on the very next full run, same tree.
-  The throw is inside `AxeBuilder.analyze()` rather than in a `skippedRules()` result, so it reads as
-  the `overflow: hidden` grid-bounds bug above — it is not that one: `.panel` still carries
-  `overflow: clip`, and the only other `overflow: hidden` in the shell is `.visually-hidden`, which is
-  1px with nothing scrollable in it. What it looks like instead is load: the test sweeps ten themes
-  with a full-page axe pass each and **takes 2.1 minutes against its own `test.setTimeout(180_000)`**,
-  the longest single test in the suite by a wide margin. Re-run before investigating. If it starts
-  failing every time, raise that timeout first and suspect a real regression second.
+- ~~**`tabs › contrast holds in every theme` is the suite's one flaky test.**~~ **It was not flaky, it
+  was under-budgeted, and it is fixed: `test.setTimeout(300_000)` as of 2026-08-19.** The old ceiling
+  was 180s against a test recorded at 2.1 minutes in 2026-08-07 — under 30% headroom on the longest
+  test in the suite, which sweeps ten themes with a full-page axe pass each over the heaviest page in
+  the library. It read as flaky for a year because that margin held on a quiet machine and not
+  otherwise.
+
+  **How it was settled, and the part worth keeping.** It failed three consecutive full-suite runs,
+  the third with the machine idle, so "re-run and it goes green" had stopped being true. The first
+  two failures were blamed on load from concurrent work — **that explanation was wrong**, and the
+  idle run is what disproved it. What settled it was checking out the previous commit and running the
+  same suite there: it failed identically, and was *slower* (17.3m against 13.3m). **A test that
+  fails after your change is not evidence your change caused it.** Fifteen minutes at the parent
+  commit is cheap next to redesigning a page that was never the problem, and it is the same lesson as
+  *stash and re-run before debugging* further up this list.
+
+  Alone the test takes 1.9 minutes, so the throw inside `AxeBuilder.analyze()` is a timeout and not
+  the `overflow: hidden` grid-bounds bug above, which it superficially resembles. If it ever fails at
+  300s, measure it alone first: if that number has moved, the page got heavier and the fix is the
+  page.
 - **A color that passes only because the text is large fails when a media query shrinks it.** Found by
   the sweep the `overflow: clip` fix unblocked. `.site-brand__mark` is `clamp(1.35rem … 1.7rem)` and
   weight 900, so at wide widths it is large text and SC 1.4.3 asks 3:1 of it. Below 460px it shrinks to
