@@ -1,10 +1,10 @@
 /**
  * Mirror the verbatim-served source folders into public/.
  *
- *   src/library/     -> public/library/     the components themselves
+ *   skill/library/   -> public/library/     the components themselves
  *   src/site/theme/  -> public/theme/       the vendored theme-service files
- *   agents/          -> public/agents/      the agent-facing index and contracts
- *   agents/llms.txt  -> public/llms.txt     the same file where a fetcher looks
+ *   skill/           -> public/skill/       the whole agent-facing package
+ *   llms.txt         -> public/llms.txt     the entry point a fetcher looks for
  *
  * Why this exists: the demo on each component page must load the component's
  * *real* files -- the same bytes the copy panel shows -- over HTTP, via
@@ -14,11 +14,16 @@
  * wholesale, and the theme so its vendored files stay next to the
  * THEME-SERVICE.md that tracks their version.
  *
- * agents/ joins them for the same reason and one more: an agent that fetched the
- * site rather than cloning it has to reach the same bytes a checkout has, or the
- * two disagree. It is written by scripts/build-agent-surfaces.mjs and committed;
- * this only publishes it. llms.txt gets copied twice because the convention puts
- * it at the root of a site while the generator keeps every surface in one folder.
+ * skill/ joins them so an agent that fetched the site rather than cloning it
+ * reaches the same bytes a checkout has, or the two disagree.
+ *
+ * THE COMPONENTS ARE PUBLISHED TWICE, ON PURPOSE. Once at public/library/, which
+ * is where the demo pages load them from and has been that URL since the site
+ * existed; and once at public/skill/library/, because the skill states its paths
+ * relative to its own root. Serving the package without its library would break
+ * that rule for exactly the reader who has no checkout -- the one the HTTP door
+ * is for. Both targets are generated and gitignored, so the cost is bytes in
+ * dist/, not a second copy anyone can edit or diff.
  *
  * All targets are generated and gitignored. Never edit them; edit the source.
  *
@@ -45,9 +50,9 @@ export const isServed = (src) => !/[\\/]tests([\\/]|$)/.test(src);
 
 export const JOBS = [
   {
-    source: resolve(root, 'src/library'),
+    source: resolve(root, 'skill/library'),
     target: resolve(root, 'public/library'),
-    label: 'src/library -> public/library',
+    label: 'skill/library -> public/library',
     filter: isServed,
   },
   {
@@ -58,17 +63,20 @@ export const JOBS = [
     filter: (src) => !/THEME-SERVICE\.md$/.test(src),
   },
   {
-    source: resolve(root, 'agents'),
-    target: resolve(root, 'public/agents'),
-    label: 'agents -> public/agents',
+    // The whole package, library included -- see the header. Tests are filtered
+    // for the same reason they are filtered out of public/library/.
+    source: resolve(root, 'skill'),
+    target: resolve(root, 'public/skill'),
+    label: 'skill -> public/skill',
+    filter: isServed,
   },
   {
     // llms.txt belongs at the root of what is served, which for a project Pages
-    // site is the base path. The generator keeps it with its siblings, so the
-    // copy is what puts it where a fetcher will look for it.
-    source: resolve(root, 'agents/llms.txt'),
+    // site is the base path. It is generated at the repo root for the same
+    // reason -- it is the door, not part of the package.
+    source: resolve(root, 'llms.txt'),
     target: resolve(root, 'public/llms.txt'),
-    label: 'agents/llms.txt -> public/llms.txt',
+    label: 'llms.txt -> public/llms.txt',
     file: true,
   },
 ];

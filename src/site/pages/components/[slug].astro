@@ -17,22 +17,22 @@ const base = import.meta.env.BASE_URL;
 
 /**
  * The whole point of this page: the demo below and the code panel below it are
- * the SAME bytes. Both trace to src/library/components/<slug>/, so they cannot
+ * the SAME bytes. Both trace to skill/library/components/<slug>/, so they cannot
  * drift. `?raw` gives us the text for the panel; the served copy under
  * public/library/ (produced by scripts/sync-library.mjs from the same source)
  * is what the browser actually loads to run the demo.
  */
-const rawHtml = import.meta.glob('../../../library/components/*/component.html', {
+const rawHtml = import.meta.glob('../../../../skill/library/components/*/component.html', {
   query: '?raw',
   import: 'default',
   eager: true,
 });
-const rawCss = import.meta.glob('../../../library/components/*/component.css', {
+const rawCss = import.meta.glob('../../../../skill/library/components/*/component.css', {
   query: '?raw',
   import: 'default',
   eager: true,
 });
-const rawJs = import.meta.glob('../../../library/components/*/component.js', {
+const rawJs = import.meta.glob('../../../../skill/library/components/*/component.js', {
   query: '?raw',
   import: 'default',
   eager: true,

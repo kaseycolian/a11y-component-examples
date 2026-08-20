@@ -12,7 +12,7 @@ it got; keep it current as the library grows, and record what surprised you in t
 sections.
 
 This is a contributor document. An agent *consuming* the library should read `AGENTS.md` and
-`agents/`, never this file — the same way it should never read `BUILD-STATUS.md`.
+`skill/`, never this file — the same way it should never read `BUILD-STATUS.md`.
 
 ---
 
@@ -36,7 +36,7 @@ Two things already worked, and this design builds on them rather than replacing 
 
 - **`meta.json` is perfectly consistent** — the same ten fields in every component folder, 30 KB in
   total. It is already what `registry.mjs` and `tests/shared/a11y.spec.mjs` read.
-- **The raw files are already static assets.** `scripts/sync-library.mjs` mirrors `src/library/` into
+- **The raw files are already static assets.** `scripts/sync-library.mjs` mirrors `skill/library/` into
   `public/library/`, so every component is already fetchable at
   `<base>/library/components/<slug>/{component.html,component.css,component.js,docs.md,meta.json}`.
 
@@ -53,14 +53,18 @@ cloned the repo, fetched the site, or is running Claude Code.
 
 Four tiers with hard budgets. An agent stops as soon as it has enough, and each tier names the next.
 
+Paths below are repo-relative. **The skill states the same path list relative to `skill/`**, because
+that is the only root an install or a standalone copy has — one substitution in `readPathTable()`,
+not a second list.
+
 | Tier | Surface | Budget | For |
 | --- | --- | --- | --- |
 | 0 | `AGENTS.md` / `llms.txt` / the skill | ~2.5 KB, skill 3 KB | What this is, the read path, and the one rule: never read `BUILD-STATUS.md` or `CLAUDE.md` |
-| 1 | `agents/index.md` | ~3.5 KB | Route to one component — slug, group, `useWhen`, tags, WCAG, files |
-| 2 | `agents/components/<slug>.md` | 1.8 KB | The answer: ARIA, keyboard, states, failure modes, API |
-| 3 | `library/components/<slug>/component.*` | as needed | The code to copy. Already served, unchanged |
-| 4 | `library/components/<slug>/{docs.md,meta.json}` | as needed | The *why*, per component |
-| 4 | `agents/{pitfalls,conventions,verify,testing}.md` | ≤ 15 KB each | The cross-cutting traps |
+| 1 | `skill/index.md` | ~3.5 KB | Route to one component — slug, group, `useWhen`, tags, WCAG, files |
+| 2 | `skill/components/<slug>.md` | 1.8 KB | The answer: ARIA, keyboard, states, failure modes, API |
+| 3 | `skill/library/components/<slug>/component.*` | as needed | The code to copy. Already served, unchanged |
+| 4 | `skill/library/components/<slug>/{docs.md,meta.json}` | as needed | The *why*, per component |
+| 4 | `skill/{pitfalls,conventions,verify,testing}.md` | ≤ 15 KB each | The cross-cutting traps |
 
 Tier 1 uses a new one-line `useWhen`, deliberately **not** `meta.json`'s `summary`: the summaries run
 ~50 words and are written as ledes for a human page.
@@ -68,16 +72,16 @@ Tier 1 uses a new one-line `useWhen`, deliberately **not** `meta.json`'s `summar
 The cross-cutting set is one read-path row, not four, because Tier 0 has no room for four and the file
 names already say which is which:
 
-- **`agents/pitfalls.md`** — the transferable accessibility findings, grouped by topic (names and
+- **`skill/pitfalls.md`** — the transferable accessibility findings, grouped by topic (names and
   labels · live regions · focus · forced colors · targets and pointers · color and contrast · CSS and
   the cascade · tables and reflow) and tagged with the SC where there is an honest one. This is the
   highest-value unique artifact in the repo: every item was paid for once by a real failure.
-- **`agents/conventions.md`** — the copy-paste contract with its reasoning. The token chain, the motion
+- **`skill/conventions.md`** — the copy-paste contract with its reasoning. The token chain, the motion
   gate, the forced-colors block, the `ac-` prefix, IIFE + `destroy()`. It is where Tier 0's compressed
   claims get their *why*, which is what let Tier 0 shrink enough to afford this row.
-- **`agents/verify.md`** — how to check the result, distilled from `tests/shared/a11y.spec.mjs`: the
+- **`skill/verify.md`** — how to check the result, distilled from `tests/shared/a11y.spec.mjs`: the
   ten checks, and the exceptions that make a naive sweep wrong.
-- **`agents/testing.md`** — the Playwright and axe harness findings, for an agent writing a11y tests.
+- **`skill/testing.md`** — the Playwright and axe harness findings, for an agent writing a11y tests.
 
 **No `pitfalls.json`.** The plan paired one with the markdown. There is no consumer: `index.json`
 exists because routing over the roster is a filtering job, while a reader of a 15 KB pitfalls file
@@ -95,23 +99,23 @@ are renderings of one in-memory manifest, and **no file is ever half hand-writte
 
 ```
 HAND-WRITTEN — the only places to edit
-  src/library/components/<slug>/meta.json    + a new `contract` block
-  docs/agents/preamble.md                    Tier 0 prose, in slots -- the two
+  skill/library/components/<slug>/meta.json    + a new `contract` block
+  docs/skill/preamble.md                    Tier 0 prose, in slots -- the two
                                              skill-* ones render only into SKILL.md
-  docs/agents/pitfalls.src.md                one block per transferable finding
-  docs/agents/testing.src.md                 harness findings
-  docs/agents/conventions.src.md             the copy-paste contract
-  docs/agents/verify.src.md                  how to check the result
+  docs/skill/pitfalls.src.md                one block per transferable finding
+  docs/skill/testing.src.md                 harness findings
+  docs/skill/conventions.src.md             the copy-paste contract
+  docs/skill/verify.src.md                  how to check the result
         |
         v
   scripts/build-agent-surfaces.mjs   ->  one manifest  ->  every surface below
         |
         +--> AGENTS.md                                                    committed
-        +--> agents/index.md, agents/index.json                           committed
-        +--> agents/components/<slug>.md                                  committed
-        +--> agents/{pitfalls,conventions,verify,testing}.md              committed
+        +--> skill/index.md, skill/index.json                           committed
+        +--> skill/components/<slug>.md                                  committed
+        +--> skill/{pitfalls,conventions,verify,testing}.md              committed
         +--> .claude/skills/a11y-library/SKILL.md                         committed
-        +--> public/llms.txt, public/agents/**       generated at build, gitignored
+        +--> public/llms.txt, public/skill/**       generated at build, gitignored
 ```
 
 The four `.src.md` files share one parser and one renderer. They carry three markers —
@@ -120,15 +124,15 @@ markers only, never on the prose, so a body passes through byte for byte. Same r
 slots, and for the same reason: parsing prose is what got `component-specs.md` rejected as a source.
 
 Every generated file opens with
-`<!-- generated by scripts/build-agent-surfaces.mjs from meta.json + docs/agents/ — do not edit -->`.
+`<!-- generated by scripts/build-agent-surfaces.mjs from meta.json + docs/skill/ — do not edit -->`.
 
 `node scripts/build-agent-surfaces.mjs --check` re-renders into memory and diffs against disk, exiting
 non-zero and naming the offending path. It is wired into `npm run check:agents`, into `npm run verify`,
 into `.github/workflows/ci.yml`, and asserted by a Playwright test so it cannot be quietly skipped.
 **That is the anti-drift mechanism**: editing a `meta.json` without regenerating fails CI.
 
-`public/` mirrors the committed `agents/` at `prebuild`, by extending the existing `JOBS` array in
-`scripts/sync-library.mjs` — which already does exactly this for `src/library` and `src/site/theme`.
+`public/` mirrors the committed `skill/` at `prebuild`, by extending the existing `JOBS` array in
+`scripts/sync-library.mjs` — which already does exactly this for `skill/library` and `src/site/theme`.
 
 The generated files are committed as well as served, so a fresh clone is useful before anyone runs a
 build. The `--check` mode is what keeps a committed generated file honest.
@@ -218,7 +222,7 @@ one names the part and the selector it could not find.
 - [x] **0 · Persist the design.** This file, plus pointers from `BUILD-STATUS.md` and `CLAUDE.md`, so
       an interrupted or compacted session resumes from the repo rather than from memory.
 - [x] **1 · Generator, Tier 0 and Tier 1.** `scripts/build-agent-surfaces.mjs`,
-      `docs/agents/preamble.md`, `AGENTS.md`, `agents/index.{md,json}`, `agents/llms.txt`, the
+      `docs/skill/preamble.md`, `AGENTS.md`, `skill/index.{md,json}`, `skill/llms.txt`, the
       `sync-library.mjs` job, `.gitignore`, `check:agents` in `package.json` and `ci.yml`. Renders only
       from `meta.json` fields that already exist, so it lands working before any component is touched.
 - [x] **2 · Contract blocks.** One `meta.json` edit per component, plus the accuracy tests. Seeded from
@@ -227,7 +231,7 @@ one names the part and the selector it could not find.
       their `docs.md` and markup, having no spec entry at all. The shape shipped is the one in
       **Phase 2, as revised** below, not the one sketched further up — see **What phase 2 cost**.
 - [x] **3 · Split the gotchas.** The transferable accessibility findings moved to
-      `docs/agents/pitfalls.src.md`, the harness findings to `testing.src.md`, the build trivia stayed
+      `docs/skill/pitfalls.src.md`, the harness findings to `testing.src.md`, the build trivia stayed
       in `BUILD-STATUS.md`, and the duplicated stale-cache entry collapsed to one. Then
       `conventions.src.md` and `verify.src.md`. See **What phase 3 cost**; "Phase 3, prepared" below is
       the classification it was built from and is kept as the record of what was decided before any of
@@ -240,14 +244,14 @@ one names the part and the selector it could not find.
 - [x] **5 · Split the entry docs by audience.** `CLAUDE.md` states the two contracts up front —
       contributing to the library versus consuming it, plus the one thing they share — and `README.md`
       gained an "if an agent is doing the copying" section. The conventions duplication between
-      `CLAUDE.md` and `agents/conventions.md` was resolved by keeping both and checking the overlap
+      `CLAUDE.md` and `skill/conventions.md` was resolved by keeping both and checking the overlap
       rather than by deleting one; a routing row that sent contributors to the wrong file for a
       component's contract was fixed. See **What phase 5 cost**.
 - [x] **6 · Close the record.** This file went from plan to built state: the status line above, and a
       current **What the layer costs, measured** section that re-measures rather than merging the five
       per-phase tables, which stay as the snapshots they are. `README.md` now reaches this record, so both
       entry points land on something true — humans → `README.md` → here, agents → `AGENTS.md` →
-      `agents/`. One of the two items that was to be recorded as open got closed instead, because this
+      `skill/`. One of the two items that was to be recorded as open got closed instead, because this
       phase's one required edit made it worse; the other is recorded as open. Phase 6 also found real
       drift, in `BUILD-STATUS.md` and in `scripts/new-component.mjs`. See **What phase 6 cost**.
 - [x] **7 · Couple a component edit to its agent-side knowledge.** Requested after phase 1 landed, and
@@ -273,14 +277,14 @@ written, so a merge would present history as the present.
 | Tier | Surface | Budget | Measured | Spare |
 | --- | --- | --- | --- | --- |
 | 0 | `AGENTS.md` | 2,560 B | 2,436 B | 124 B |
-| 0 | `agents/llms.txt` | 2,560 B | 2,495 B | 65 B |
+| 0 | `skill/llms.txt` | 2,560 B | 2,495 B | 65 B |
 | 0 | `.claude/skills/a11y-library/SKILL.md` | 3,072 B | 2,831 B | 241 B |
-| 1 | `agents/index.md` | 3,584 B | 3,253 B | 331 B |
-| 2 | `agents/components/<slug>.md` | 1,800 B each | 909–1,725 B, median 1,177 | **75 B on `dropdown`**, the largest |
-| 4 | `agents/pitfalls.md` | 16 KB | 14.7 KB | 1.3 KB |
-| 4 | `agents/testing.md` | 12 KB | 9.9 KB | 2.1 KB |
-| 4 | `agents/verify.md` | 8 KB | 5.8 KB | 2.2 KB |
-| 4 | `agents/conventions.md` | 7 KB | 5.0 KB | 2.0 KB |
+| 1 | `skill/index.md` | 3,584 B | 3,253 B | 331 B |
+| 2 | `skill/components/<slug>.md` | 1,800 B each | 909–1,725 B, median 1,177 | **75 B on `dropdown`**, the largest |
+| 4 | `skill/pitfalls.md` | 16 KB | 14.7 KB | 1.3 KB |
+| 4 | `skill/testing.md` | 12 KB | 9.9 KB | 2.1 KB |
+| 4 | `skill/verify.md` | 8 KB | 5.8 KB | 2.2 KB |
+| 4 | `skill/conventions.md` | 7 KB | 5.0 KB | 2.0 KB |
 
 Bytes rather than KB in the top half, because bytes are what the generator compares and those margins
 are thin enough that rounding hides them. **Every budget held, and only one was ever raised** — the
@@ -296,17 +300,17 @@ raising 1,800 — the budget is what has kept these files answers instead of doc
 than before. Read it as bytes rather than tokens — markdown tables tokenize worse than prose, and the
 conversion is the soft part of that sentence, not the measurement.
 
-**The map against the territory.** `AGENTS.md` + `agents/` + the skill is **98.7 KB across 42 files**,
-against a `src/library/` of **1,832.9 KB** — 5.4%. Those 42 files are exactly what `check:agents` reports
+**The map against the territory.** `AGENTS.md` + `skill/` + the skill is **98.7 KB across 42 files**,
+against a `skill/library/` of **1,832.9 KB** — 5.4%. Those 42 files are exactly what `check:agents` reports
 matching, which is the cheapest available proof that nothing generated is unaccounted for.
 
-**`agents/index.json` is 19.5 KB and is not on the read path.** It is the machine copy, for filtering the
+**`skill/index.json` is 19.5 KB and is not on the read path.** It is the machine copy, for filtering the
 roster; no agent reads it to answer a question. Phase 1 recorded it rendering to more than five times
 `index.md`, and the contract blocks have widened that gap — still not a problem, for the same reason. It
 is also where phase 7 put the one fingerprint in the layer, on the same argument: off the read path, so
 bookkeeping there costs an agent nothing.
 
-**What the layer cost to build.** The hand-written side is `docs/agents/` at 43.6 KB across five files;
+**What the layer cost to build.** The hand-written side is `docs/skill/` at 43.6 KB across five files;
 the machinery is `scripts/build-agent-surfaces.mjs` at 43.8 KB and
 `tests/shared/agent-surfaces.spec.mjs` at 31.0 KB, so rendering and checking the sources costs about 1.7×
 the sources themselves — phase 7 moved that ratio from 1.4×, and all of the growth is in the spec.
@@ -324,9 +328,9 @@ for the reason the plan gave: an agent reads `index.md` and then one Tier 2 file
 `meta.json`.
 
 **Where the two records sit.** The contributor docs are **about 210 KB across six files** at the top of
-`docs/`, against `agents/` at 95.4 KB across 40 — and **about 162 KB of that is `BUILD-STATUS.md` plus
+`docs/`, against `skill/` at 95.4 KB across 40 — and **about 162 KB of that is `BUILD-STATUS.md` plus
 this file**, the two an agent must never open. The audience split is not a matter of taste; it is 162 KB of
-context that would otherwise be spent saying nothing about how a component behaves. `docs/agents/` is
+context that would otherwise be spent saying nothing about how a component behaves. `docs/skill/` is
 excluded here and counted with the machinery above, being sources rather than record. Rounded, not
 because the measurement is soft but because writing this paragraph changes the number it reports — the
 one figure in this section that cannot be exact.
@@ -397,8 +401,8 @@ test 4 is skipped.
 factory returns an `api` object literal. Two greps give you everything phase 2 needs:
 
 ```sh
-grep -rn 'global\.AC\.' src/library/components/*/component.js     # factory names
-grep -rc 'BROKEN ON PURPOSE' src/library/components/*/component.html
+grep -rn 'global\.AC\.' skill/library/components/*/component.js     # factory names
+grep -rc 'BROKEN ON PURPOSE' skill/library/components/*/component.html
 ```
 
 `docs/component-specs.md` and each `docs.md` `## The contract` table are the prose seeds; roughly half
@@ -413,23 +417,23 @@ Measured, against the budgets in the table above:
 | Surface | Budget | Landed at |
 | --- | --- | --- |
 | `AGENTS.md` | 2.5 KB | 2.4 KB |
-| `agents/llms.txt` | 2.5 KB | 2.5 KB |
-| `agents/index.md` | 3.5 KB | 3.2 KB |
-| `agents/index.json` | not budgeted | 15.6 KB |
+| `skill/llms.txt` | 2.5 KB | 2.5 KB |
+| `skill/index.md` | 3.5 KB | 3.2 KB |
+| `skill/index.json` | not budgeted | 15.6 KB |
 
 Nine things the plan did not anticipate:
 
 1. **`registry.mjs` could not be shared, so the group list moved.** It globs with `import.meta.glob`,
    which is Vite-only, and the generator validates `group` against the same list the site does. Two
    copies would drift, so `GROUPS` is now `src/site/lib/groups.mjs` — plain data, no imports — and
-   `registry.mjs` re-exports it. Same pattern as `code-theme.mjs`, and the only file outside `agents/`
+   `registry.mjs` re-exports it. Same pattern as `code-theme.mjs`, and the only file outside `skill/`
    the phase touched.
 2. **The budgets are enforced by the generator, not just by a test.** It exits non-zero and names the
    overage in bytes. Written that way after Tier 0 came in at 3.4 KB on the first render: a warning
    would have been ignored. Three rounds of cutting got it under.
 3. **Tier 0's copy contract is compressed to claims without their reasoning.** It is the block that
    pays for the budget. A reader who wants *why* is one hop from a component's `docs.md`, and phase 3's
-   `agents/conventions.md` is where the expanded version belongs.
+   `skill/conventions.md` is where the expanded version belongs.
 4. **`index.json` was 20.8 KB before scalar arrays stopped being pretty-printed** one tag per line —
    six times the markdown index it is an alternative to. Objects stay expanded; arrays of short strings
    collapse to one line. It is opt-in and the read path states its size, so 15.6 KB is a fair price for
@@ -441,7 +445,7 @@ Nine things the plan did not anticipate:
 6. **Both Tier 0 renderings and the index adapt to whether any `contract` exists.** No Tier 2 row in
    the read path, and the index says to read the code rather than a slug file that would 404. Phase 2
    is therefore a data-only change: add contract blocks, regenerate, and the rows appear.
-7. **`llms.txt` is generated into `agents/` and copied to `public/llms.txt`.** The convention puts it
+7. **`llms.txt` is generated into `skill/` and copied to `public/llms.txt`.** The convention puts it
    at the root of a site; the generator keeps every surface in one folder. `sync-library.mjs` grew a
    single-file job type for it, and its `--watch` loop skips those — each one lives inside a folder
    another job already watches.
@@ -453,12 +457,12 @@ Nine things the plan did not anticipate:
    applies the same signature to the whole repo, and `readSource()` imports it from there.
    <!-- check-encoding:documented — this entry names the signature on purpose. -->
 9. **The do-not-edit header is shorter than the plan's, and names the command.**
-   `generated by npm run agents -- edit docs/agents/preamble.md or a meta.json`. It lands in every
+   `generated by npm run agents -- edit docs/skill/preamble.md or a meta.json`. It lands in every
    surface including the budgeted ones, and telling a reader how to regenerate beats listing the
    sources twice.
 
 `--check` was verified against all five ways the surfaces can drift: a hand-edit to a generated file,
-a `meta.json` edited without regenerating, a deleted surface, an orphan left in `agents/`, and an
+a `meta.json` edited without regenerating, a deleted surface, an orphan left in `skill/`, and an
 unknown slot in the preamble. Each exits 1 and names the path.
 
 ---
@@ -468,10 +472,10 @@ unknown slot in the preamble. Each exits 1 and names the path.
 | Surface | Budget | Landed at |
 | --- | --- | --- |
 | `AGENTS.md` | 2.5 KB | 2.4 KB |
-| `agents/llms.txt` | 2.5 KB | 2.5 KB |
-| `agents/index.md` | 3.5 KB | 3.2 KB |
-| `agents/components/<slug>.md` | 1.8 KB | 0.8–1.5 KB, median 1.1 KB |
-| `agents/index.json` | not budgeted | 18.4 KB (was 15.6) |
+| `skill/llms.txt` | 2.5 KB | 2.5 KB |
+| `skill/index.md` | 3.5 KB | 3.2 KB |
+| `skill/components/<slug>.md` | 1.8 KB | 0.8–1.5 KB, median 1.1 KB |
+| `skill/index.json` | not budgeted | 18.4 KB (was 15.6) |
 
 A component now costs an agent about **1.1 KB to answer**, after 2.4 KB of Tier 0 and 3.2 KB of Tier 1
 — and Tier 0 and Tier 1 are read once per session, not once per component.
@@ -489,10 +493,10 @@ content is explanatory and compressible; a Tier 2 row is a fact and does not com
 **2 · Tier 0 went over the moment Tier 2 existed**, by 70 bytes in `AGENTS.md` and 126 in `llms.txt` —
 one read-path row in each. That is content, so the prose paid for it: `copying` lost its per-convention
 reasoning, which is exactly where the preamble's own header says the pressure should land, and phase 3
-gives that reasoning a home in `agents/conventions.md`.
+gives that reasoning a home in `skill/conventions.md`.
 
 **3 · `useWhen` replaced the keywords on an index row rather than joining them.** Adding a sentence to
-33 rows would have put `agents/index.md` at ~5.5 KB against a 3.5 KB budget. But the sentence already
+33 rows would have put `skill/index.md` at ~5.5 KB against a 3.5 KB budget. But the sentence already
 *contains* the routing words, so printing the tags beside it spends the roster's one shared budget on a
 duplicate. A row now carries one or the other, and a component with no contract still falls back to
 keywords — so the generator keeps working for a component added before its contract is written. This
@@ -546,11 +550,11 @@ verification**.
 | Surface | Budget | Landed at |
 | --- | --- | --- |
 | `AGENTS.md` | 2.5 KB | 2.4 KB (124 bytes spare) |
-| `agents/llms.txt` | 2.5 KB | 2.4 KB (65 bytes spare) |
-| `agents/pitfalls.md` | 16 KB | 14.7 KB, 26 entries in 8 groups |
-| `agents/testing.md` | 12 KB | 9.9 KB, 22 entries in 5 groups |
-| `agents/verify.md` | 8 KB | 5.8 KB, 17 entries in 3 groups |
-| `agents/conventions.md` | 7 KB | 5.0 KB, 11 entries in 6 groups |
+| `skill/llms.txt` | 2.5 KB | 2.4 KB (65 bytes spare) |
+| `skill/pitfalls.md` | 16 KB | 14.7 KB, 26 entries in 8 groups |
+| `skill/testing.md` | 12 KB | 9.9 KB, 22 entries in 5 groups |
+| `skill/verify.md` | 8 KB | 5.8 KB, 17 entries in 3 groups |
+| `skill/conventions.md` | 7 KB | 5.0 KB, 11 entries in 6 groups |
 
 The four Tier 4 rows above were first written as 15.0, 10.2, 6.0 and 5.1 KB — the recorded byte counts
 (15,018 · 10,183 · 5,989 · 5,107) divided by 1000, while the Budget column and the generator both use
@@ -641,7 +645,7 @@ Seven things worth keeping:
    opened *"Two audiences, and this is the consuming one:"*, which was throat-clearing, and the budget
    failure is what made anyone look at it.
 2. **Ownership inside `.claude/` has to be by signature, not by location** — this is warning (b), and
-   the obvious fix for it was wrong. `agents/` is owned wholesale because everything in it is output.
+   the obvious fix for it was wrong. `skill/` is owned wholesale because everything in it is output.
    `.claude/skills/` cannot be: `settings.local.json` sits beside it and someone may add a skill of
    their own, which walking the folder would report as an orphan. So `ownedOnDisk()` claims a file
    there only if it carries the do-not-edit marker. Proven in both directions — a leftover generated
@@ -660,7 +664,7 @@ Seven things worth keeping:
    `CLAUDE.md` loaded already. The note first said the rule was *inverted* for a contributor — "those
    two are your files" — which reads as an invitation to look up a component in a build log. It is not
    an inversion. Working on the library changes where the *conventions* come from, `CLAUDE.md`, and
-   nothing else; a component's behavior comes from `agents/` and the component's own files for everyone,
+   nothing else; a component's behavior comes from `skill/` and the component's own files for everyone,
    contributor included. `docs/BUILD-STATUS.md` is a progress log and answers nothing about a component,
    so it now appears in exactly one place across every agent surface: the rule forbidding it. Phase 5
    generalizes the split, and this is the sentence it has to keep.
@@ -670,7 +674,7 @@ Seven things worth keeping:
    scans all three renderings for backticked verbatim `.md` paths and asserts each resolves —
    retroactive cover for phase 1. Templates are skipped (`<slug>`, `{docs.md,meta.json}` name no single
    file), and the check is `.md`-only because `llms.txt` is written bare in prose while living at
-   `agents/llms.txt`. The report is deduplicated: the skill names `CLAUDE.md` twice, in the audience note
+   `skill/llms.txt`. The report is deduplicated: the skill names `CLAUDE.md` twice, in the audience note
    and again in the rules, and one fix covers both.
 6. **The one failure that would have been total and silent is a gitignored skill.** Every other check
    here would still pass, `--check` included, and the skill would simply never reach a clone. The design
@@ -706,7 +710,7 @@ test. Six things worth keeping:
 
 1. **The duplication was measured before it was resolved, and the measurement reversed the decision.**
    The first read of it — from memory, across two files not open side by side — was that all eleven
-   entries in `agents/conventions.md` were restated in `CLAUDE.md`, which pointed at stripping
+   entries in `skill/conventions.md` were restated in `CLAUDE.md`, which pointed at stripping
    `CLAUDE.md` down to a pointer. Read properly, the two diverge exactly where they should:
    `CLAUDE.md` carries the linter contract, the `--bg-elev` incident and the shapes a contributor types;
    `conventions.md` carries the consequences for someone else's page ("one of the few things a paste does
@@ -719,7 +723,7 @@ test. Six things worth keeping:
    duration changing in one file only.
 3. **`CLAUDE.md` is canonical, and the extraction is anchored on a heading.** The test reads the fenced
    `css` blocks under `## Non-negotiable conventions` and asserts each declaration appears in
-   `docs/agents/conventions.src.md`. Canonical because a contributor changing a convention is editing
+   `docs/skill/conventions.src.md`. Canonical because a contributor changing a convention is editing
    `CLAUDE.md`; heading-anchored because parsing the prose is the mistake this project already refused
    once. It carries its own vacuity guard — a renamed heading leaves nothing to compare, so the test
    fails on an empty extraction rather than passing over it. That guard was probed, and it is the third
@@ -728,7 +732,7 @@ test. Six things worth keeping:
    `CLAUDE.md`'s table sent anyone wanting "the ARIA contract + keyboard map for a specific component" to
    `docs/component-specs.md` — a *pre-build* planning document, written before the components existed,
    with no entry at all for `disclosure`, `dropdown` or `field`, and rejected as a machine source in the
-   problem statement at the top of this file. `agents/components/<slug>.md` has been the generated,
+   problem statement at the top of this file. `skill/components/<slug>.md` has been the generated,
    test-asserted answer since phase 2 and nothing pointed at it. Both files now have a row saying what
    they are actually for: the contract, versus the up-front design decisions and CSS gotchas that the
    contract does not carry.
@@ -782,7 +786,7 @@ both before and after. Seven things worth keeping:
    it.** Point (e) said to leave `README.md`'s unchecked links open. But the phase's single mandated change
    *is* a new link in `README.md` — a fourth unchecked in-repo target on the repository's most-read page. Writing
    "these are unchecked" while adding to them is not recording a gap, it is signing off on one. The test is
-   40 lines. The generated surfaces need no equivalent: every markdown link under `agents/` points outward
+   40 lines. The generated surfaces need no equivalent: every markdown link under `skill/` points outward
    at a spec, so this is a hand-written-file problem only, which is what phase 5 had already said.
 5. **That test needs the same exclusion phase 5 argued for, and the interesting probe is the inverted
    one.** `README.md` links `../theme-service`, outside the repo. Checking it would pass on a machine with
@@ -971,8 +975,8 @@ updated to match."*
 is what a component edit has to keep in step, so designing the coupling first would have been guessing at
 its own input.
 
-**The gap it closes.** `check:agents` couples `meta.json`, `docs/agents/preamble.md` and the four
-`docs/agents/*.src.md` files to the generated surfaces — those are every file the generator reads. It
+**The gap it closes.** `check:agents` couples `meta.json`, `docs/skill/preamble.md` and the four
+`docs/skill/*.src.md` files to the generated surfaces — those are every file the generator reads. It
 never opens `component.html`, `component.css` or `component.js`. Phase 2's tests 2–4 assert a contract
 against the real markup, the real spec and the real `global.AC` registrations, and phase 3 added two
 checks reaching into component files from the other direction. **What none of them covered is a component
@@ -996,7 +1000,7 @@ phase 7 is the reverse of phase 2: read the component, report what the contract 
 - **Check 14 · factories on `global.AC` that no `api` claims.** Exempts the `create<Name>Page` suffix,
   turning an undocumented practice into a convention this check now enforces.
 - **The `summary` → `useWhen` receipt.** An eight-character hash of each `summary` in
-  `agents/index.json`, and a drift report that names the component and the field. The one edit the
+  `skill/index.json`, and a drift report that names the component and the field. The one edit the
   requirement literally names, and the only one no structural check can see.
 - **The obligation as a table** in `CLAUDE.md` > **Component folder shape**, and the pre-commit list in
   `docs/authoring-a-component.md` extended with `npm run agents` and the `agent-surfaces` run.
@@ -1018,9 +1022,9 @@ them demo-page wiring, and cutting the `create*Page` factories removed only 2, b
 in dozens of top-level helpers (`say`, `out`, `watch`, `logAdd`) with no naming convention. All
 exemption, no signal. `tabs` was fixed by hand instead and the limitation recorded under **Still open**.
 
-**Rejected: a path-based CI check** — fail a PR that touches `src/library/components/` without touching
-`agents/`. Rejected on first look and never revisited: it needs a base ref, so it does not work locally
-or on a direct push, and touching any unrelated file under `agents/` satisfies it.
+**Rejected: a path-based CI check** — fail a PR that touches `skill/library/components/` without touching
+`skill/`. Rejected on first look and never revisited: it needs a base ref, so it does not work locally
+or on a direct push, and touching any unrelated file under `skill/` satisfies it.
 
 ---
 
@@ -1037,7 +1041,7 @@ different repo, where a committed `.claude/skills/` never loads. `scripts/instal
 | Config | `~/.claude/a11y-library.local.json`, `{ repo, version, baseUrl, history[] }` | same idiom as `theme-service` — one install pattern across both repos |
 | Shared constants | `SKILL_NAME`, `SKILL_OUT`, `CONFIG_FILE`, `readBaseUrl` exported by the generator | the skill *names* the config the installer *writes*; one owner means a rename cannot half-succeed |
 | Non-Claude agents | `--into <dir>` writes a marked, idempotent block to `<dir>/AGENTS.md`; `--print` to stdout | `AGENTS.md` is the one cross-agent convention that exists; the block routes and defers to it for the tiers |
-| Block trigger text | read from the generated `SKILL.md` frontmatter at install time | keeps it rendered from `docs/agents/preamble.md` — no fourth copy of Tier 0 |
+| Block trigger text | read from the generated `SKILL.md` frontmatter at install time | keeps it rendered from `docs/skill/preamble.md` — no fourth copy of Tier 0 |
 | Skill budget | 2,831 → 2,918 B against 3,072 | unchanged |
 | Rejected | `npx` from GitHub | needs the package published or a git-URL `bin`; the premise is a clone. `repository` and `homepage` are now set, which is what it would need first |
 
@@ -1048,6 +1052,74 @@ actually writes* proves the sentence naming it is still rendered.
 
 This section is a table where the phase records around it are prose. That is deliberate — it is a set
 of decisions, not a narrative.
+
+## Phase 8 — the package, and the read path that was lying
+
+**2026-08-19.** The layer was built for an agent arriving at *this repo*. It could not be handed to
+anyone else, and one of the reasons was a defect nothing in the suite could see.
+
+**Tiers 3 and 4 pointed at a directory that did not exist.** Every surface said the code was in
+`library/components/<slug>/`. There was no `library/` at the repo root — the source was
+`src/library/`, and `public/library/` is generated and gitignored — so those paths resolved only
+against the served site. An agent handed a clone, or the installed skill, followed the read path and
+404'd on the exact files it was sent to copy. It had been that way since the layer was built.
+
+**Why no test caught it.** The Tier 0 existence check skipped any path containing a metacharacter,
+and every Tier 3/4 row is templated (`<slug>`, `{docs.md,meta.json}`). So the check ran on the
+handful of verbatim `.md` paths, passed, and reported a floor of "more than five checked" — which
+was true and meant nothing. **A guard that skips the interesting half of its input reads exactly like
+a guard.** The fix is `every templated path a Tier 0 surface names resolves for a real slug`, which
+expands each pattern against one slug and checks the files. Red-probed: it names all five expansions.
+
+**The fix for the path was to move the library, not to edit the paths.** `src/library/` became
+`skill/library/`, and the strings became true where they stood. Thirty-three contract files and three
+read-path tables were correct the moment the folder moved.
+
+### What `skill/` is
+
+The old `agents/` held documents *about* a library that lived somewhere else. `skill/` is the library:
+contracts and code under one root, so every path resolves against a root that exists in a checkout, in
+an install, and in a standalone copy alike. That is the whole of the design, and three things follow
+from it.
+
+**The skill states its paths relative to itself**, and the two doors state theirs relative to the repo
+and the site. One row list, one substitution in `readPathTable()`. A second list kept in step by hand
+is what this generator exists to avoid.
+
+**Nothing in the package names the site.** `index.json` lost its `baseUrl`; `SKILL.md` lost the
+sentence offering the hosted URL as a fallback root, which it no longer needs. `AGENTS.md` and
+`llms.txt` keep it, because a reader with no copy is exactly who they are for. Asserted, with the
+origin read out of `astro.config.mjs` so the test cannot pass against a URL the site stopped using.
+
+**`llms.txt` moved out of the package to the repo root.** It is a door, not a part of the thing —
+and its links are absolute URLs, which is the one shape the package may not contain.
+
+### The edit that could have deleted the library
+
+The generator cleared its output folder with `rm(resolve(root, 'agents'), { recursive: true })`.
+Pointed at `skill/` that is `rm -rf` over the components. It is now driven by `ownedOnDisk()`, which
+skips `skill/library/` in the walk rather than filtering it afterwards — there is no ordering in which
+a component file is claimed as a stale surface — and the write step throws if anything under that
+subtree ever reaches the delete. The rule is in `CLAUDE.md` beside *Nothing may clear `.claude/`*,
+which is the same shape and was written after the same kind of near-miss.
+
+### What the installer had been doing
+
+`install-skill.mjs` junctioned `~/.claude/skills/a11y-library` at `.claude/skills/a11y-library/` — a
+folder containing one file. So every installed skill resolved its read path against a root with no
+`library/` in it, and the config file's `repo` pointer was load-bearing for finding code that was not
+where the pointer said either. It links `skill/` now. The config is a record of what was linked and
+when; nothing resolves through it.
+
+### The cost
+
+The components are published twice under `public/` — once at `public/library/`, which is the URL the
+demo pages have always loaded, and once at `public/skill/library/`, so the package's own root resolves
+over HTTP for the reader with no checkout. Both are generated and gitignored, so the cost is bytes in
+`dist/` rather than a second copy anyone can edit. The alternative was to change every demo URL on the
+site to serve one tree, which is churn in the human-facing half to save a megabyte of static output.
+
+---
 
 ## Still open
 
@@ -1080,7 +1152,7 @@ session. Closing it properly means filtering `status !== 'draft'` out of the ind
 `getStaticPaths`, which touches human-facing pages — so it waits for a session that has reason to be
 in them.
 
-The agent side is already covered: the generator carries `status` into `agents/index.{md,json}` and
+The agent side is already covered: the generator carries `status` into `skill/index.{md,json}` and
 marks any non-stable component on its index row, so a draft is disclosed rather than advertised.
 
 **The `compositions` group is empty and is not waiting for anything.** `groups.mjs` still declares it,

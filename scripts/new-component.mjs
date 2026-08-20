@@ -70,11 +70,11 @@ const name =
 /** `text-input` -> `TextInput`, for the factory name. */
 const pascal = slug.replace(/(^|-)([a-z])/g, (_, __, ch) => ch.toUpperCase());
 
-const dir = resolve(root, 'src/library/components', slug);
+const dir = resolve(root, 'skill/library/components', slug);
 
 try {
   await access(dir);
-  die(`src/library/components/${slug}/ already exists -- refusing to overwrite`);
+  die(`skill/library/components/${slug}/ already exists -- refusing to overwrite`);
 } catch {
   /* does not exist, which is what we want */
 }
@@ -413,7 +413,7 @@ for (const [file, contents] of files) {
   await writeFile(join(dir, file), contents, 'utf8');
 }
 
-console.log(`new-component: created src/library/components/${slug}/`);
+console.log(`new-component: created skill/library/components/${slug}/`);
 for (const [file] of files) console.log(`  ${file}`);
 console.log(`
 Next:
@@ -424,7 +424,7 @@ Next:
      pointing at your component's real elements if you rename the class.
   2. Fill in the rest of meta.json (summary, tags, apg, wcag) and flip status to
      "stable". The summary has its own voice rule -- CLAUDE.md > Writing style.
-  3. npm run agents      (renders agents/components/${slug}.md from that contract)
+  3. npm run agents      (renders skill/components/${slug}.md from that contract)
   4. npm run check:tokens && npm run build
   5. npx playwright test --project=chromium ${slug}
   6. Tick the row in docs/BUILD-STATUS.md`);

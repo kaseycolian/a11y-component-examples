@@ -8,10 +8,10 @@ code is read-only.
 library: adding a component, changing one, or building the site around it. Consuming the library —
 copying a component into some other app — is a different contract with its own entry point, `AGENTS.md`,
 which is a fraction of the size and written for exactly that. Nothing in this file is needed to consume
-the library, and none of it should be paraphrased into `agents/`.
+the library, and none of it should be paraphrased into `skill/`.
 
 The two contracts share one thing: **where a component's behavior comes from.** That is
-`agents/components/<slug>.md` and the component's own files, for both audiences. Neither
+`skill/components/<slug>.md` and the component's own files, for both audiences. Neither
 `docs/BUILD-STATUS.md` nor this file answers what a component does.
 
 **When resuming build work, read `docs/BUILD-STATUS.md` first** — progress, the roster checklist, the
@@ -27,9 +27,9 @@ string, and its roster row for a component before changing that component's writ
 | --- | --- |
 | What's done, what's next | `docs/BUILD-STATUS.md` |
 | The writing style every human-facing string follows | `docs/rewrite-pass.md` |
-| The ARIA contract + keyboard map for a **built** component | `agents/components/<slug>.md` — generated from its `meta.json` and asserted against the shipped markup |
+| The ARIA contract + keyboard map for a **built** component | `skill/components/<slug>.md` — generated from its `meta.json` and asserted against the shipped markup |
 | The up-front design decisions behind one, and its CSS gotchas | `docs/component-specs.md` (read one entry, not the file) |
-| What a component assumes about the page it lands in | `agents/conventions.md` — the reasoning behind **Non-negotiable conventions** below |
+| What a component assumes about the page it lands in | `skill/conventions.md` — the reasoning behind **Non-negotiable conventions** below |
 | What to run after a change, and what a failure means | `docs/sync-process.md` |
 | Why the agent-facing layer is shaped the way it is | `docs/agent-layer.md` |
 | Original design rationale | `C:\Users\kasey\.claude\plans\this-will-be-a-curious-pnueli.md` |
@@ -42,7 +42,7 @@ of `dropdown` (thorough) or `disclosure` (small) rather than inventing a new one
 
 1. **What you see is what you copy.** The live demo and the code panel load the *same physical
    files*. Never introduce a transform between them. `tests/shared/what-you-see.spec.mjs` enforces
-   this — it fetches the URL the rendered page names and compares those bytes to `src/library/`.
+   this — it fetches the URL the rendered page names and compares those bytes to `skill/library/`.
 2. **A paste into a bare app must just work.** No required extra files, no unstyled result.
 3. **Adding a component is adding a folder.** Nav, index, routes, and tests all derive from
    `meta.json`. If something needs hand-wiring, that's a bug in the architecture.
@@ -50,55 +50,73 @@ of `dropdown` (thorough) or `disclosure` (small) rather than inventing a new one
 ## Layout
 
 ```
-src/library/     THE PRODUCT. Zero Astro. Pure vanilla. Never imports from src/site/.
+skill/           THE PACKAGE. Portable: contracts and code under one root, no URL in it.
+  library/       THE PRODUCT. Zero Astro. Pure vanilla. Never imports from src/site/.
+  SKILL.md       GENERATED. Same bytes as .claude/skills/a11y-library/SKILL.md.
+  index.md .json GENERATED. The roster.
+  components/    GENERATED. One ARIA contract per component.
+  *.md           GENERATED. pitfalls, conventions, verify, testing.
 src/site/        Astro shell (srcDir points here). Never contains component code.
 src/site/theme/  Vendored theme-service files. See THEME-SERVICE.md before touching.
 src/site/styles/ Site shell CSS. The header and footer are ports of theme-service's own —
                  see A11Y-WAY-PAGES.md there before restyling either.
 scripts/         sync-library (src -> public), new-component (scaffolder),
                  check-tokens / check-encoding / check-readouts (the three linters),
-                 build-agent-surfaces (renders AGENTS.md + agents/ + the skill),
-                 install-skill (links the skill into ~/.claude/skills/ so other repos can use it),
+                 build-agent-surfaces (renders AGENTS.md + llms.txt + skill/ + the skill),
+                 install-skill (links skill/ into ~/.claude/skills/ so other repos can use it),
                  shots (screenshots a component page), clean (removes build output),
                  rehype-scrollable-tables (wraps docs.md tables so pages don't overflow at 320px)
 tests/           Site-shell specs (site-header), the shared a11y gate every component must pass,
                  and what-you-see.spec.mjs, which asserts rule 1 below.
-AGENTS.md        GENERATED. The agent read path. Edit docs/agents/, run npm run agents.
-agents/          GENERATED, committed. The index, the per-component contracts, and the four
-                 cross-cutting surfaces (pitfalls, conventions, verify, testing) agents read.
-.claude/skills/  GENERATED, committed. The same read path as a Claude Code skill.
-docs/agents/     Hand-written sources for the above: preamble.md + four *.src.md.
+AGENTS.md        GENERATED. The checkout door. Repo-relative paths, and it may name the site.
+llms.txt         GENERATED. The HTTP door, at the root by convention. Same licence to name the site.
+.claude/skills/  GENERATED, committed. The same SKILL.md, so the skill loads while this repo is open.
+docs/skill/      Hand-written sources for all of it: preamble.md + four *.src.md.
 ```
 
-**`AGENTS.md`, everything under `agents/`, and the skill are output, never input.** `npm run
-check:agents` re-renders them and fails CI on any difference, so a hand-edit is reverted work. Edit a
-file in `docs/agents/` or a `meta.json`, then `npm run agents`. The layer has hard byte budgets and the
-generator fails when prose pushes a surface over one — `docs/agent-layer.md` says why.
+**The skill is a package, not a folder of documents about one.** `skill/` holds the generated
+surfaces *and* `skill/library/`, so every path it gives an agent resolves against one root — in a
+checkout, in an install, and in a standalone copy alike. That is what makes it publishable on its
+own, and it is why `install-skill.mjs` links `skill/` rather than the folder under `.claude/`: only
+this one has the code under it.
 
-**Nothing may clear `.claude/`.** The generator rebuilds `agents/` from scratch each run; giving
-`.claude/` the same treatment would delete `settings.local.json`, which is machine-specific, gitignored,
-and unrecoverable. The skill is written in place, and a file under `.claude/skills/` counts as the
-generator's only if it carries the do-not-edit marker — so a skill of your own beside it is safe.
+**Nothing in `skill/` may name the hosted site.** `AGENTS.md` and `llms.txt` are the doors for a
+reader who has no copy, so naming where the bytes are served is their job and theirs only.
+`tests/shared/agent-surfaces.spec.mjs` asserts it, reading the origin out of `astro.config.mjs`.
+
+**`AGENTS.md`, `llms.txt`, everything under `skill/` except `skill/library/`, and the skill are
+output, never input.** `npm run check:agents` re-renders them and fails CI on any difference, so a
+hand-edit is reverted work. Edit a file in `docs/skill/` or a `meta.json`, then `npm run agents`. The
+layer has hard byte budgets and the generator fails when prose pushes a surface over one —
+`docs/agent-layer.md` says why.
+
+**The generator may not clear `skill/`, and may not clear `.claude/`.** It once did the first, when
+`skill/` was `agents/` and held nothing but output; doing it now would delete the component library.
+Removal is driven by the owned-file set, which skips `skill/library/` by construction, and the write
+step throws rather than delete anything under it. `.claude/` is off limits for the older reason:
+`settings.local.json` lives there, machine-specific, gitignored and unrecoverable. A file under
+`.claude/skills/` counts as the generator's only if it carries the do-not-edit marker — so a skill of
+your own beside it is safe.
 
 `scripts/install-skill.mjs` is the same rule from the other side. It writes only outside this repo:
 the link at `~/.claude/skills/a11y-library` and the config beside it, nothing else under `.claude/`.
-It imports `SKILL_NAME`, `SKILL_OUT`, `CONFIG_FILE` and `readBaseUrl` from the generator rather than
-restating them, so renaming the skill folder or the config cannot be half-done.
+It imports `SKILL_NAME`, `SKILL_PACKAGE`, `SKILL_IN_PACKAGE`, `CONFIG_FILE` and `readBaseUrl` from
+the generator rather than restating them, so renaming the package or the config cannot be half-done.
 
 **An accessibility finding has four homes and belongs in exactly one.** A fact about the platform that
-makes correct-looking markup wrong → `docs/agents/pitfalls.src.md`. A fact about Playwright or axe that
+makes correct-looking markup wrong → `docs/skill/pitfalls.src.md`. A fact about Playwright or axe that
 makes a correct assertion wrong → `testing.src.md`. Something a copied component assumes about the page
 it lands in → `conventions.src.md`. Anything about working *on* this repo → the gotchas list in
 `docs/BUILD-STATUS.md`. Writing it twice is the drift this layer exists to prevent. Only one overlap is
 checked — the CSS shapes shared with **Non-negotiable conventions** below — so the rest is on you.
 
-`public/library/`, `public/theme/`, `public/agents/` and `public/llms.txt` are **generated** by
+`public/library/`, `public/theme/`, `public/skill/` and `public/llms.txt` are **generated** by
 `scripts/sync-library.mjs` and gitignored. Edit the source, never the copy.
 
 ## Component folder shape
 
 ```
-src/library/components/<slug>/
+skill/library/components/<slug>/
   component.html   canonical accessible markup (a fragment, not a document)
   component.css    scoped to .ac-<slug>
   component.js     IIFE -> window.AC.create<Name> + auto-init block
@@ -110,7 +128,7 @@ src/library/components/<slug>/
 `meta.json` `group` must be one of the ids in `src/site/lib/groups.mjs` `GROUPS`.
 
 `meta.json` `contract` is the agent-facing ARIA contract — `useWhen`, `root`, `aria`, `keyboard`,
-`states`, `failureModes`, `api`, `seeAlso` — and it renders to `agents/components/<slug>.md`. It is
+`states`, `failureModes`, `api`, `seeAlso` — and it renders to `skill/components/<slug>.md`. It is
 **asserted against the component**, so four of its fields carry an obligation:
 
 - `root` is the selector(s) that *are* this component on its demo page. It cannot be guessed from the
@@ -141,11 +159,11 @@ changed, go reread `useWhen`*, and only a person can decide whether it still hol
 
 ## Non-negotiable conventions
 
-The rules and the shapes to type, with what enforces each. `agents/conventions.md` is the same set
+The rules and the shapes to type, with what enforces each. `skill/conventions.md` is the same set
 written to whoever is pasting a component *out*, with the reasoning attached — read that one when you
 need to decide whether a rule applies somewhere else, or to explain why it exists.
 
-**The three CSS shapes below also appear in `docs/agents/conventions.src.md`, verbatim.** That is a
+**The three CSS shapes below also appear in `docs/skill/conventions.src.md`, verbatim.** That is a
 deliberate duplication — one file is a checklist and the other is an explanation — and
 `tests/shared/agent-surfaces.spec.mjs` asserts they still match, treating this file as canonical. Change
 a token name, a percentage or a duration here, and change it there in the same commit.
@@ -336,7 +354,7 @@ npm run build          # prebuild syncs library + agents -> public
 npm run check:encoding # mojibake + BOM, repo-wide. A file that names the signature says so
 npm run check:tokens   # the color linter
 npm run check:readouts # a demo readout is looked up from an element, never from document
-npm run agents         # render AGENTS.md + agents/ (run after editing any meta.json)
+npm run agents         # render AGENTS.md + skill/ (run after editing any meta.json)
 npm run check:agents   # --check: fail if a surface drifted from its source
 npm run install:skill  # link the skill into ~/.claude/skills/ (writes nothing in the repo)
 npm run shots -- <slug>  # screenshot the demo grid and each example, into the gitignored shots/
@@ -349,7 +367,7 @@ npm run verify         # the three linters, then check:agents, then build, then 
 
 - **`components.css` is not vendored** from theme-service — it styles the same components this
   library rebuilds. Structural tokens it would have provided live in `src/site/styles/site.css`
-  and `src/library/tokens/tokens.css` instead.
+  and `skill/library/tokens/tokens.css` instead.
 - **`theme-select.js` is not vendored** — the theme picker is this library's own Dropdown.
 - **The project carries no license.** No `LICENSE` file, no `license` field in `package.json`, no
   mention in the footer or README. Removed deliberately — do not add one back.

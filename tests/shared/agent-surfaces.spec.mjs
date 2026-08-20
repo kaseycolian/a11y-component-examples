@@ -27,13 +27,25 @@ import { test, expect } from '@playwright/test';
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, relative } from 'node:path';
 
-import { TIER_2_BUDGET, SKILL_OUT } from '../../scripts/build-agent-surfaces.mjs';
+import {
+  TIER_2_BUDGET,
+  SKILL_OUT,
+  SKILL_IN_PACKAGE,
+  SKILL_PACKAGE,
+  readBaseUrl,
+} from '../../scripts/build-agent-surfaces.mjs';
 import { CONFIG_DISPLAY } from '../../scripts/install-skill.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const componentsDir = resolve(root, 'src/library/components');
+const componentsDir = resolve(root, 'skill/library/components');
+
+/**
+ * Read from astro.config.mjs rather than written here, so the "package names no
+ * site" test cannot pass by checking for a URL the site stopped using.
+ */
+const SITE_ORIGIN = new URL(await readBaseUrl(root)).origin;
 
 const read = (path) => readFileSync(path, 'utf8').replace(/^﻿/, '');
 
@@ -134,7 +146,7 @@ test.describe('contract blocks', () => {
   test('every rendered Tier 2 file is under budget', () => {
     const over = [];
     for (const { slug } of COMPONENTS) {
-      const file = resolve(root, 'agents/components', `${slug}.md`);
+      const file = resolve(root, 'skill/components', `${slug}.md`);
       if (!existsSync(file)) continue; // the coverage check above owns this
       const bytes = Buffer.byteLength(read(file), 'utf8');
       if (bytes > TIER_2_BUDGET) over.push(`${slug}: ${bytes} > ${TIER_2_BUDGET}`);
@@ -252,7 +264,7 @@ test.describe('API signatures', () => {
  */
 const PROSE_SURFACES_OUT = ['pitfalls', 'conventions', 'verify', 'testing'].map((name) => ({
   name,
-  text: read(resolve(root, `agents/${name}.md`)),
+  text: read(resolve(root, `skill/${name}.md`)),
 }));
 
 const SLUG_REFERENCE = /`([a-z][a-z0-9-]*)`(?:'s?|\s+is the precedent\b)/g;
@@ -264,7 +276,7 @@ test.describe('cross-cutting surfaces', () => {
 
     for (const { name, text } of PROSE_SURFACES_OUT) {
       for (const [, slug] of text.matchAll(SLUG_REFERENCE)) {
-        if (!SLUGS.has(slug)) missing.push(`agents/${name}.md names \`${slug}\`, which is not a component`);
+        if (!SLUGS.has(slug)) missing.push(`skill/${name}.md names \`${slug}\`, which is not a component`);
       }
     }
 
@@ -282,7 +294,7 @@ test.describe('cross-cutting surfaces', () => {
         const component = COMPONENTS.find((c) => c.slug === slug);
         if (!component) continue; // the reference test above owns this case
         if (!component.css.includes(marker) && !component.js.includes(marker)) {
-          dead.push(`agents/${name}.md points at ${slug}'s ${marker}, which is in neither its CSS nor its JS`);
+          dead.push(`skill/${name}.md points at ${slug}'s ${marker}, which is in neither its CSS nor its JS`);
         }
       }
     }
@@ -296,8 +308,8 @@ test.describe('cross-cutting surfaces', () => {
     const slugs = PROSE_SURFACES_OUT.flatMap(({ text }) => [...text.matchAll(SLUG_REFERENCE)]);
     const markers = PROSE_SURFACES_OUT.flatMap(({ text }) => [...text.matchAll(MARKER_REFERENCE)]);
 
-    expect(slugs.length, 'no component references found in agents/*.md at all').toBeGreaterThan(5);
-    expect(markers.length, 'no source-comment markers found in agents/*.md at all').toBeGreaterThan(0);
+    expect(slugs.length, 'no component references found in skill/*.md at all').toBeGreaterThan(5);
+    expect(markers.length, 'no source-comment markers found in skill/*.md at all').toBeGreaterThan(0);
   });
 });
 
@@ -314,19 +326,53 @@ test.describe('cross-cutting surfaces', () => {
  * either and Tier 0 forbids a file that is not there, while the skill sends a
  * contributor nowhere.
  */
-const TIER_0 = ['AGENTS.md', 'agents/llms.txt', SKILL_OUT].map((path) => ({
-  path,
-  text: read(resolve(root, path)),
-}));
+/**
+ * Each surface states its paths against its own root, so each is checked against
+ * that root. AGENTS.md and llms.txt are repo-relative; both copies of SKILL.md
+ * are relative to the package, because that is the only root a standalone copy
+ * or an install has.
+ */
+const TIER_0 = [
+  { path: 'AGENTS.md', bases: ['.'] },
+  { path: 'llms.txt', bases: ['.'] },
+  // Two roots, and a hit against either passes. The read path is relative to the
+  // package, but the skill also forbids reading `CLAUDE.md` and
+  // `docs/BUILD-STATUS.md`, which are repo files a standalone copy will not have
+  // at all -- naming a file in order to say "never read this" is not a promise
+  // that it is there. Accepting either root still catches the failure this test
+  // exists for, because a path that resolves under *neither* is the bug:
+  // `library/components/<slug>/` was in that state for months.
+  { path: SKILL_OUT, bases: [SKILL_PACKAGE, '.'] },
+  { path: SKILL_IN_PACKAGE, bases: [SKILL_PACKAGE, '.'] },
+].map((surface) => ({ ...surface, text: read(resolve(root, surface.path)) }));
+
+/** Does this path resolve against any of the roots the surface is read from? */
+const resolvesFrom = (bases, file) => bases.some((base) => existsSync(resolve(root, base, file)));
 
 /**
- * Only `.md`, and only without a metacharacter. The read path is mostly
- * templates -- `<slug>`, `{docs.md,meta.json}` -- which name no single file, and
- * `llms.txt` is written bare in prose while living at `agents/llms.txt`. What is
- * left is every path a reader could open verbatim.
+ * Only `.md`, and only without a metacharacter -- the verbatim half of the read
+ * path. The templated half is checked by the test below it, which is the one
+ * that matters more.
  */
 const MD_PATH = /`([^`\n]+\.md)`/g;
 const TEMPLATED = /[<>{}|*]/;
+
+/** Every path in a code span, templated or not. */
+const ANY_PATH = /`([^`\n]*\/[^`\n]*)`/g;
+
+/**
+ * Expand one read-path template into the files it promises.
+ *
+ * `library/components/<slug>/component.{html,css,js}` with slug `modal` becomes
+ * three real paths. Handles the two shapes the read path uses and nothing else:
+ * a single `<slug>`, and a single `{a,b,c}` alternation.
+ */
+function expand(pattern, slug) {
+  const withSlug = pattern.replace(/<slug>/g, slug);
+  const group = withSlug.match(/\{([^}]+)\}/);
+  if (!group) return [withSlug];
+  return group[1].split(',').map((option) => withSlug.replace(group[0], option.trim()));
+}
 
 test.describe('Tier 0 references', () => {
   test('every repo file a Tier 0 surface names verbatim exists', () => {
@@ -335,11 +381,11 @@ test.describe('Tier 0 references', () => {
     const missing = new Set();
     let checked = 0;
 
-    for (const { path, text } of TIER_0) {
+    for (const { path, bases, text } of TIER_0) {
       for (const [, named] of text.matchAll(MD_PATH)) {
         if (TEMPLATED.test(named)) continue;
         checked++;
-        if (!existsSync(resolve(root, named))) missing.add(`${path} names \`${named}\``);
+        if (!resolvesFrom(bases, named)) missing.add(`${path} names \`${named}\``);
       }
     }
 
@@ -349,6 +395,71 @@ test.describe('Tier 0 references', () => {
     expect(
       [...missing],
       `Tier 0 points at files that do not exist:\n  ${[...missing].join('\n  ')}`,
+    ).toEqual([]);
+  });
+
+  /**
+   * The check that was missing, and the reason the read path could lie for
+   * months. Tiers 3 and 4 -- the code an agent is actually sent to copy -- are
+   * templated, and the verbatim test above skips anything with a metacharacter.
+   * So every surface pointed at `library/components/<slug>/`, no such directory
+   * existed in a checkout, and every test passed.
+   *
+   * Expanding against one real slug is enough: the shape is the same for all of
+   * them, and a wrong root is wrong for every slug at once.
+   */
+  test('every templated path a Tier 0 surface names resolves for a real slug', () => {
+    const slug = [...SLUGS].sort()[0];
+    const missing = new Set();
+    let checked = 0;
+
+    for (const { path, bases, text } of TIER_0) {
+      for (const [, named] of text.matchAll(ANY_PATH)) {
+        if (!TEMPLATED.test(named)) continue;
+        // A URL is the site's business, not a path on disk.
+        if (/^https?:/.test(named)) continue;
+        for (const file of expand(named, slug)) {
+          checked++;
+          if (!resolvesFrom(bases, file)) {
+            missing.add(`${path} names \`${named}\`, and \`${file}\` does not exist`);
+          }
+        }
+      }
+    }
+
+    expect(checked, 'no templated paths found in Tier 0 at all').toBeGreaterThan(5);
+    expect(
+      [...missing],
+      `Tier 0 points at files that do not exist:\n  ${[...missing].join('\n  ')}`,
+    ).toEqual([]);
+  });
+
+  /**
+   * The package has to be publishable on its own, so nothing in it may name the
+   * site. The doors may: AGENTS.md and llms.txt exist for a reader with no copy,
+   * and telling them where the bytes are served is their whole job.
+   */
+  test('nothing in the package names the site', () => {
+    const offenders = [];
+    const walk = (dir) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = resolve(dir, entry.name);
+        if (entry.isDirectory()) {
+          if (entry.name === 'library' && dir === resolve(root, SKILL_PACKAGE)) continue;
+          walk(full);
+        } else if (/\.(md|json|txt)$/.test(entry.name)) {
+          const text = read(full);
+          if (text.includes(SITE_ORIGIN)) {
+            offenders.push(relative(root, full).replace(/\\/g, '/'));
+          }
+        }
+      }
+    };
+    walk(resolve(root, SKILL_PACKAGE));
+
+    expect(
+      offenders,
+      `the skill package names the hosted site, so it cannot be published standalone:\n  ${offenders.join('\n  ')}`,
     ).toEqual([]);
   });
 
@@ -387,7 +498,7 @@ test.describe('Tier 0 references', () => {
 /* --- 10 · the one duplication between the two audiences ------------------- */
 
 /**
- * `CLAUDE.md` and `agents/conventions.md` deliberately state the same conventions
+ * `CLAUDE.md` and `skill/conventions.md` deliberately state the same conventions
  * to different readers -- one is a checklist for someone adding a component, the
  * other is an explanation for someone pasting one out -- and most of what each
  * says is its own. What they genuinely share is the canonical CSS shapes: the
@@ -415,7 +526,7 @@ const CANONICAL_CSS = (() => {
 
 test.describe('the contributor and agent conventions agree', () => {
   test('every CSS shape CLAUDE.md mandates is the shape the agent surface teaches', () => {
-    const source = read(resolve(root, 'docs/agents/conventions.src.md'));
+    const source = read(resolve(root, 'docs/skill/conventions.src.md'));
 
     // Guards the extraction, not the docs: a renamed heading or a fence that
     // stopped being ```css would silently leave nothing to compare and pass.
@@ -427,7 +538,7 @@ test.describe('the contributor and agent conventions agree', () => {
     const drifted = CANONICAL_CSS.filter((declaration) => !source.includes(declaration));
     expect(
       drifted,
-      `in CLAUDE.md but not in docs/agents/conventions.src.md:\n  ${drifted.join('\n  ')}`,
+      `in CLAUDE.md but not in docs/skill/conventions.src.md:\n  ${drifted.join('\n  ')}`,
     ).toEqual([]);
   });
 });
@@ -436,7 +547,7 @@ test.describe('the contributor and agent conventions agree', () => {
 
 /**
  * `README.md` is the human door and the only hand-written file here with
- * markdown links -- every link under `agents/` points outward at a spec, and
+ * markdown links -- every link under `skill/` points outward at a spec, and
  * `CLAUDE.md` writes its paths in backticks, which section 9 already covers.
  * So a moved `docs/at-support.md` or `docs/agent-layer.md` breaks on the
  * repository's most-read page and nothing says so.

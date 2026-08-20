@@ -35,7 +35,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # `prebuild` syncs src/library/ into public/library/ so the demos can
+      # `prebuild` syncs skill/library/ into public/library/ so the demos can
       # load the real component files over HTTP.
       - name: Build
         run: npm run build

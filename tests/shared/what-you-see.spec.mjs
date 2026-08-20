@@ -13,11 +13,11 @@
  * A component's source reaches the page four different ways, and only two of
  * them are the same journey:
  *
- *   the panel's text      import.meta.glob(...'?raw') -> src/library/, inlined
+ *   the panel's text      import.meta.glob(...'?raw') -> skill/library/, inlined
  *                         into the HTML at build time and syntax-highlighted
  *   the Copy button       the same string, verbatim, in data-code
  *   the demo's CSS/JS     <link> and <script src> -> public/library/, which
- *                         scripts/sync-library.mjs copies from src/library/
+ *                         scripts/sync-library.mjs copies from skill/library/
  *   the download link     the same public/library/ file
  *
  * So the bytes the visitor reads and the bytes the browser runs travel
@@ -57,7 +57,7 @@ import { dirname, resolve, relative, join } from 'node:path';
 import { isServed } from '../../scripts/sync-library.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const srcLibrary = resolve(root, 'src/library');
+const srcLibrary = resolve(root, 'skill/library');
 const publicLibrary = resolve(root, 'public/library');
 const componentsDir = resolve(srcLibrary, 'components');
 
@@ -134,7 +134,7 @@ const TABS = [
    Node only, no browser. public/library/ is generated and gitignored, so this
    is the first thing that goes stale and the last thing anyone looks at. */
 
-test.describe('src/library -> public/library', () => {
+test.describe('skill/library -> public/library', () => {
   test('every source file is in public, byte for byte', () => {
     const drifted = [];
 
@@ -152,10 +152,10 @@ test.describe('src/library -> public/library', () => {
     }
 
     // A sweep that reaches nothing passes forever. The library is never empty.
-    expect(walk(srcLibrary).length, 'no files found under src/library at all').toBeGreaterThan(20);
+    expect(walk(srcLibrary).length, 'no files found under skill/library at all').toBeGreaterThan(20);
     expect(
       drifted,
-      `public/library is not src/library -- run npm run build:\n  ${drifted.join('\n  ')}`,
+      `public/library is not skill/library -- run npm run build:\n  ${drifted.join('\n  ')}`,
     ).toEqual([]);
   });
 
@@ -168,7 +168,7 @@ test.describe('src/library -> public/library', () => {
 
     expect(
       orphans,
-      `served from public/library with no file in src/library:\n  ${orphans.join('\n  ')}`,
+      `served from public/library with no file in skill/library:\n  ${orphans.join('\n  ')}`,
     ).toEqual([]);
   });
 });
@@ -239,7 +239,7 @@ for (const { slug, name, files } of COMPONENTS) {
           const source = bytes(resolve(componentsDir, slug, `component.${ext}`));
           expect(
             served.equals(source),
-            `${url} served ${served.length} bytes, src/library has ${source.length}`,
+            `${url} served ${served.length} bytes, skill/library has ${source.length}`,
           ).toBe(true);
         }
       }
@@ -258,7 +258,7 @@ for (const { slug, name, files } of COMPONENTS) {
         const source = bytes(resolve(componentsDir, slug, `component.${ext}`));
         expect(
           served.equals(source),
-          `${path} served ${served.length} bytes, src/library has ${source.length}`,
+          `${path} served ${served.length} bytes, skill/library has ${source.length}`,
         ).toBe(true);
       }
     });
@@ -331,8 +331,8 @@ for (const { slug, name, files } of COMPONENTS) {
 }
 
 /* --- 3 · the guard on the guard -------------------------------------------
-   Everything above compares the page to src/library. None of it would notice
-   src/library being empty, or public/ being a directory of zero-byte files. */
+   Everything above compares the page to skill/library. None of it would notice
+   skill/library being empty, or public/ being a directory of zero-byte files. */
 
 test('the files being compared are real', () => {
   const sizes = COMPONENTS.flatMap(({ slug, files }) =>

@@ -135,7 +135,7 @@ Run the definition-of-done checklist at the bottom of `component-specs.md`, then
 npm run check:encoding  # mojibake or a BOM anywhere in the repo
 npm run check:tokens
 npm run check:readouts  # every demo readout is looked up from an element, not from document
-npm run agents          # renders agents/components/<slug>.md from the contract block
+npm run agents          # renders skill/components/<slug>.md from the contract block
 npm run check:agents
 npm run build
 npx playwright test --project=chromium <slug>

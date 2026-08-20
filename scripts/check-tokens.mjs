@@ -124,7 +124,7 @@ const TOKEN_SOURCES = [
   'src/site/theme/theme.css',
   'src/site/theme/effects.css',
   'src/site/styles/site.css',
-  'src/library/tokens/tokens.css',
+  'skill/library/tokens/tokens.css',
 ];
 
 /** Middle tokens theme-service genuinely does not ship. The chain is dead at
@@ -146,7 +146,7 @@ for (const source of TOKEN_SOURCES) {
 }
 
 const files = [];
-for await (const entry of glob('src/library/**/*.css', { cwd: root })) {
+for await (const entry of glob('skill/library/**/*.css', { cwd: root })) {
   files.push(entry);
 }
 files.sort();

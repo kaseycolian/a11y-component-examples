@@ -53,7 +53,7 @@ dropdown.destroy();
 Start at **[AGENTS.md](AGENTS.md)**, which is written for that and nothing else: a tiered read path with
 byte budgets, a one-line index of the roster, and a per-component ARIA contract — roles, keyboard map,
 states, failure modes, JS API — generated from each `meta.json` and asserted against the shipped markup
-by the test suite. Alongside it, `agents/pitfalls.md` collects the platform behaviors that make
+by the test suite. Alongside it, `skill/pitfalls.md` collects the platform behaviors that make
 correct-looking markup wrong, each one paid for by a real failure.
 
 The same files are served under the site's base path, so a fetcher needs no checkout; `llms.txt` is the
@@ -70,9 +70,10 @@ cd a11y-component-examples
 npm run install:skill        # links the skill into ~/.claude/skills/ for Claude Code
 ```
 
-That also writes `~/.claude/a11y-library.local.json` naming this clone, which is what lets a skill
-loaded from outside the checkout still resolve `agents/` and `library/`. Nothing is written inside the
-repo, and it runs before `npm install` — node builtins only.
+What gets linked is `skill/`, the package — the contracts *and* the components under one root — so the
+installed skill resolves every path inside itself, with no clone lookup and no network. It also writes
+`~/.claude/a11y-library.local.json` recording which clone was linked and when. Nothing is written
+inside the repo, and it runs before `npm install` — node builtins only.
 
 **Using an agent that is not Claude Code?** Add a pointer block to that project's `AGENTS.md` instead:
 
@@ -80,8 +81,9 @@ repo, and it runs before `npm install` — node builtins only.
 npm run install:agents-md -- ../your-project   # omit the path to print the block and paste it anywhere
 ```
 
-Both routes record both doors — the clone on disk and the hosted URL — so an agent still gets there
-when one of them is unavailable. `npm run uninstall:skill` removes the link and keeps the config.
+The pointer block names both doors — the `AGENTS.md` on disk and the hosted `llms.txt` — so an agent
+with neither this repo nor the link still gets there. `npm run uninstall:skill` removes the link and
+keeps the config.
 
 Do not point an agent at `CLAUDE.md` or `docs/`. Those are for working *on* the library and cost tens of
 thousands of tokens to say nothing about how a component behaves. Why that side is built the way it is —
@@ -91,16 +93,20 @@ recorded for people in [docs/agent-layer.md](docs/agent-layer.md).
 ## Repository layout
 
 ```
-src/library/     The components themselves. Pure vanilla, zero Astro. This is the product.
+skill/           The package an agent reads: roster index, a contract per component, the
+                 cross-cutting traps, and the components themselves. Generated except for
+                 skill/library/. Self-contained — copy it anywhere and it still works.
+skill/library/   The components themselves. Pure vanilla, zero Astro. This is the product.
 src/site/        The Astro shell that displays them. Never contains component code.
 tests/shared/    The accessibility gate every component must pass.
-AGENTS.md        The agent entry point. Generated.
-agents/          The roster index, a contract per component, and the cross-cutting traps. Generated.
+AGENTS.md        The entry point for an agent with a checkout. Generated.
+llms.txt         The entry point for one with only the URL. Generated.
 docs/            Authoring guide, AT support matrix, WCAG mapping.
 scripts/         Library sync, component scaffolder, token linter, agent-surface renderer.
 ```
 
-`src/library/` never imports from `src/site/`, so the library stays portable.
+`skill/library/` never imports from `src/site/`, so the library stays portable. The dependency runs
+one way: the site reads from the package, and nothing in the package knows the site exists.
 
 ## Development
 

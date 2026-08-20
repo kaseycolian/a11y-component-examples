@@ -4,8 +4,13 @@
    A committed .claude/skills/ loads only while this repo is the open project. This links
    it out, so it loads everywhere.
 
+   WHAT IS LINKED IS `skill/`, THE PACKAGE — not the folder under .claude/. Both hold the
+   same SKILL.md, but only skill/ has library/ under it, so only skill/ carries the code the
+   read path sends an agent to copy. The linked skill therefore needs no clone lookup and no
+   network: every path in it resolves inside the link.
+
    WRITES (all outside this repo)
-     ~/.claude/skills/a11y-library      junction (Windows) / symlink -> .claude/skills/a11y-library/
+     ~/.claude/skills/a11y-library      junction (Windows) / symlink -> <repo>/skill/
                                         cpSync fallback when links are unavailable; a copy needs a re-run
      ~/.claude/a11y-library.local.json  { repo, version, baseUrl, history: [{date, version, action, note}] }
      <dir>/AGENTS.md                    pointer block between HTML markers; --into <dir> only
@@ -13,12 +18,13 @@
    NEVER WRITES  anything inside this repo; anything under ~/.claude/ but the two paths above
                  (settings.local.json is gitignored and unrecoverable, and sits beside skills/)
 
-   READS  <repo>/.claude/skills/a11y-library/SKILL.md   frontmatter `description`, for the block
-          <repo>/astro.config.mjs                       via readBaseUrl(), for the fallback URL
+   READS  <repo>/skill/SKILL.md         frontmatter `description`, for the block
+          <repo>/astro.config.mjs       via readBaseUrl(), for the URL in the AGENTS.md block
 
-   RESOLUTION ORDER for the skill's repo-relative read path
-     1. `repo` from ~/.claude/a11y-library.local.json   local, exact, no network
-     2. `baseUrl` over HTTP                             survives a moved or deleted clone
+   THE CONFIG IS A RECORD, NOT A RESOLVER. It says which clone was linked and when, which is
+   what makes `--uninstall` and a re-link honest. The skill no longer depends on it to find
+   anything; `baseUrl` is kept for the pointer block, which is read by agents that have
+   neither this repo nor the link.
 
    COMMANDS
      npm run install:skill                         link the skill + write the config
@@ -48,7 +54,8 @@ import { dirname, join, resolve } from 'node:path';
 // cannot be half-done.
 import {
   SKILL_NAME,
-  SKILL_OUT,
+  SKILL_PACKAGE,
+  SKILL_IN_PACKAGE,
   CONFIG_FILE,
   CONFIG_DISPLAY,
   readBaseUrl,
@@ -83,7 +90,16 @@ const claude = join(homedir(), '.claude');
 const skillsDir = join(claude, 'skills');
 const configPath = join(claude, CONFIG_FILE);
 
-const skillSource = join(repo, dirname(SKILL_OUT));
+/**
+ * The package, not the folder under `.claude/`.
+ *
+ * Both hold the same SKILL.md, but only `skill/` has `library/` under it — the
+ * components the read path sends an agent to copy. Linking the other one is
+ * what left every installed skill pointing at code it could not reach: the
+ * paths looked repo-relative and resolved against a root that had no `library/`
+ * in it at all.
+ */
+const skillSource = join(repo, SKILL_PACKAGE);
 const skillTarget = join(skillsDir, SKILL_NAME);
 
 /* -------------------------------------------------------------------------- */
@@ -99,14 +115,14 @@ const END = '<!-- a11y-library:end -->';
  * The skill's `description`, read out of the generated SKILL.md.
  *
  * Not restated here: it is the string that decides whether an agent looks at this
- * library at all, and it is rendered from `docs/agents/preamble.md`. A copy would
+ * library at all, and it is rendered from `docs/skill/preamble.md`. A copy would
  * be a second thing to keep in step. YAML single-quoted, so `''` is the only escape.
  */
 function skillDescription() {
-  const text = readFileSync(join(repo, SKILL_OUT), 'utf8').replace(/^﻿/, '');
+  const text = readFileSync(join(repo, SKILL_IN_PACKAGE), 'utf8').replace(/^﻿/, '');
   const raw = text.match(/^description:\s*'((?:[^']|'')*)'\s*$/m)?.[1];
   if (!raw) {
-    throw new Error(`${SKILL_OUT} — could not read the frontmatter \`description\``);
+    throw new Error(`${SKILL_IN_PACKAGE} — could not read the frontmatter \`description\``);
   }
   return raw.replace(/''/g, "'");
 }
@@ -218,9 +234,9 @@ async function main() {
     return;
   }
 
-  if (!existsSync(join(repo, SKILL_OUT))) {
+  if (!existsSync(join(repo, SKILL_IN_PACKAGE))) {
     console.error(
-      `${SKILL_OUT} not found under ${repo} — is that a clone of a11y-component-examples?`,
+      `${SKILL_IN_PACKAGE} not found under ${repo} — is that a clone of a11y-component-examples?`,
     );
     process.exit(1);
   }

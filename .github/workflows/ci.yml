@@ -54,8 +54,8 @@ jobs:
       - name: Check readouts
         run: npm run check:readouts
 
-      # AGENTS.md and agents/** are rendered from meta.json and
-      # docs/agents/preamble.md. This re-renders and diffs, so editing a source
+      # AGENTS.md, llms.txt and skill/** are rendered from meta.json and
+      # docs/skill/preamble.md. This re-renders and diffs, so editing a source
       # without regenerating -- or hand-editing a generated file -- fails here
       # rather than shipping surfaces that disagree with each other.
       - name: Check agent surfaces

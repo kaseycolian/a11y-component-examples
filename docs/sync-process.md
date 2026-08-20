@@ -9,7 +9,7 @@ does not repeat that table. What is here is the other half: the commands, and ho
 
 ## The one rule everything follows
 
-**The generator only reads `meta.json` and `docs/agents/`.** It never opens `component.html`,
+**The generator only reads `meta.json` and `docs/skill/`.** It never opens `component.html`,
 `component.css` or `component.js`.
 
 That single fact splits the whole process in two:
@@ -21,7 +21,7 @@ That single fact splits the whole process in two:
 
 Generated files stay honest by a diff. Hand-written claims stay true by tests. Nothing is automatic —
 no watcher, and **`npm run build` does not regenerate anything**; `prebuild` only copies the committed
-`agents/` into `public/`.
+`skill/` into `public/`.
 
 ---
 
@@ -47,7 +47,7 @@ npm run agents          # re-renders every surface
 npm run check:agents    # proves they match
 ```
 
-Commit the regenerated `agents/`, `AGENTS.md` and `.claude/skills/` **in the same commit**.
+Commit the regenerated `skill/`, `AGENTS.md` and `.claude/skills/` **in the same commit**.
 
 **A component's `component.html`, `.css` or `.js`**
 
@@ -106,9 +106,9 @@ looked up from `document` rather than from an element that bounds the example.
 
 ## Two things not to do
 
-**Never hand-edit `AGENTS.md`, anything under `agents/`, or the generated skill.** They are output.
+**Never hand-edit `AGENTS.md`, anything under `skill/`, or the generated skill.** They are output.
 `check:agents` re-renders them and fails on any difference, so a hand-edit is reverted work. Edit a
-`meta.json` or a file in `docs/agents/`, then regenerate.
+`meta.json` or a file in `docs/skill/`, then regenerate.
 
 **Never commit a component change without its contract change.** That is the whole point of this
 layer: the two move together, or the agent-facing side quietly starts describing a component that no

@@ -12,7 +12,7 @@ is worse than admitting a gap, because it stops anyone from checking.
 
 ## Status
 
-**Nothing has been tested yet.** Every component in `src/library/components/` is untested against
+**Nothing has been tested yet.** Every component in `skill/library/components/` is untested against
 every pairing below, and the table starts with two rows only because those two existed when this file
 was written. Add a row when you test a component; there is no value in 33 rows of `—`.
 
@@ -116,7 +116,7 @@ house disclaimer, verbatim in 31 files:
 
 Once the row exists, that sentence is false. Replace it with what was heard, and name the AT and the
 date — *"NVDA + Firefox reads it as … — 2026-09-14."* The paragraph above it is written as **expected**
-behavior; a tested component states what was **observed**. `grep -rl "Not yet verified" src/library/`
+behavior; a tested component states what was **observed**. `grep -rl "Not yet verified" skill/library/`
 is the list of files still waiting.
 
 **4. If a pass fails, open it as work in `BUILD-STATUS.md`.** Never quietly downgrade the component's

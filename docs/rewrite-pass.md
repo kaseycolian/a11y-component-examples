@@ -59,7 +59,7 @@ repo, not only the ones this pass rewrote — read them before writing a new com
 demo note, or anything on a site page. The rest of this file is the record of how the work got here.
 
 **To touch a component again**, read its roster row first, then `button`'s four files
-(`src/library/components/button/{meta.json,component.html,docs.md,tests/button.spec.mjs}`) as the
+(`skill/library/components/button/{meta.json,component.html,docs.md,tests/button.spec.mjs}`) as the
 worked example. **A spec lives inside its component's folder**, not in the repo-root `tests/` — that
 one holds only the shared gate and the site-shell specs.
 
@@ -468,7 +468,7 @@ row can be budgeted as more than one sitting:
 
 ```sh
 grep -riEc "setlist|merch|zine|distro|matinee|salad days|ruby soho|gilman|bakesale|olympia" \
-  src/library/components/*/component.html | grep -v ":0"
+  skill/library/components/*/component.html | grep -v ":0"
 ```
 
 Re-counted 2026-08-07, after row 20. Every remaining row, heaviest first:
@@ -538,7 +538,7 @@ Group names, in `src/site/lib/groups.mjs`:
 | `foundations` | Foundations | **General Concepts** |
 
 The `id` stays `foundations`. It is in the `/components/#group-foundations` anchors and in
-`agents/index.md`.
+`skill/index.md`.
 
 ---
 
@@ -549,7 +549,7 @@ The `id` stays `foundations`. It is in the `/components/#group-foundations` anch
 ```
 COMPONENT: <slug>
 
- 1. Read src/library/components/<slug>/{meta.json, component.html, docs.md,
+ 1. Read skill/library/components/<slug>/{meta.json, component.html, docs.md,
     tests/<slug>.spec.mjs} -- the spec is inside the component folder, not in
     the repo-root tests/. Read this component's entry in
     docs/component-specs.md if it has one.
@@ -597,19 +597,19 @@ COMPONENT: <slug>
  7. Open the page. Tab through both sections. Check the two headings read as
     groups and the numbering is continuous.
 
- 8. Commit meta.json + component.* + docs.md + the regenerated agents/,
+ 8. Commit meta.json + component.* + docs.md + the regenerated skill/,
     AGENTS.md and .claude/skills/ TOGETHER. Tick the row below.
 ```
 
 ### What will bite
 
-- **Changing `summary` fires a receipt.** `agents/index.json` stores `_summaryRev`, a hash of the summary.
+- **Changing `summary` fires a receipt.** `skill/index.json` stores `_summaryRev`, a hash of the summary.
   `check:agents` exits 1 with `The summary changed on: <slug> … Reread contract.useWhen.` That is by
   design. Reread `useWhen`, then `npm run agents`. Step 6 has the order right.
 - **Tier 2 budget is 1800 bytes per component, and `dropdown` has 25 bytes of headroom.** A longer
   `useWhen` or an extra `keyboard` row pushes it over and the generator exits 1 naming
   `dropdown/meta.json "contract"`. Cut elsewhere in the contract. Do not raise the budget.
-- **`agents/index.md` has ~313 bytes of headroom** across all 33 `useWhen` strings. Keep them one line.
+- **`skill/index.md` has ~313 bytes of headroom** across all 33 `useWhen` strings. Keep them one line.
 - **Specs assert on visible demo text.** Several components print verdicts and readouts that
   `tests/<slug>.spec.mjs` matches. Step 6 catches it. Update the spec; never loosen an assertion to make
   it pass.
@@ -689,7 +689,7 @@ Landed before component 1, so a clean session cannot revert to the old voice.
 | [x] | `scripts/new-component.mjs` | HTML and docs templates emit the new shapes |
 | [x] | `src/site/styles/site.css` | `.ac-demo-section*` scaffolding |
 | [x] | `src/site/lib/groups.mjs` | General Concepts + all 8 summaries |
-| [x] | `docs/agents/conventions.src.md` | the scaffolding item names the two section headings |
+| [x] | `docs/skill/conventions.src.md` | the scaffolding item names the two section headings |
 
 Verified: `check:tokens` 34 files clean · `check:agents` 42 surfaces match · `build` 35 pages ·
 `playwright --project=chromium site-header agent-surfaces` 140 passed.
@@ -697,7 +697,7 @@ Verified: `check:tokens` 34 files clean · `check:agents` 42 surfaces match · `
 ## Phase 3 — the site, after all 33
 
 **Done, 2026-08-07.** All 33 component rows plus the site's own copy. Every file below is in
-`src/site/`, `docs/agents/` or a `docs.md`, so **the check was the whole suite, not a slug** — the
+`src/site/`, `docs/skill/` or a `docs.md`, so **the check was the whole suite, not a slug** — the
 same position row 22 was in. [The procedure](#the-procedure) is written for a component and did not
 apply; [the style rules](#the-style-rules) did.
 
@@ -739,10 +739,10 @@ promises you were not sent to fix**: the listed one was the loud version of a ha
 | [x] | `src/site/pages/index.astro` | promises 1 and 2 rewritten for accuracy (above); 4 tightened — *"sensible fallbacks"* and a semicolon out, the standalone default at the end of the chain named. 3 was already right and is unchanged. The two `<h2>`s were reviewed and **kept**: `What every component here does` and `Browse by group` are both already the plainest form. A source comment above `promises` records why 1 and 2 moved, so a later pass does not "restore" them. |
 | [x] | `src/site/pages/index.astro` | `PEEK_FILES` — reviewed, unchanged. Their content is already the shared vocabulary (`Work email`, `jordan.lee@example.com`). **The old note here was wrong and is corrected:** all three tabs are *condensed composites*, not contiguous slices. The HTML tab merges example 2's hint with example 3's server error and renames the ids (`ac-demo-email` → `email`); the JS tab inlines `control.getAttribute('aria-describedby')` where the real file reads `originalDescribedBy`. That is what `(excerpt)` and `note={false}` are for, and the surrounding comment already says the whole file lives on the component page. Do not "fix" them into verbatim slices without deciding that first. |
 | [x] | `src/site/pages/components/index.astro` | the lede lost *"each one is accessible before it is anything else"* — an aphorism, and the one sentence on the page whose subject was a concept. It now names the three things a component page actually shows. |
-| [x] | `src/site/lib/groups.mjs` | four of eight summaries. `foundations` *type* → *text styles*; `overlays-disclosure` said *content* three times; `navigation`'s *"without losing the keyboard"* and `feedback-status`'s *"not only an eye sees"* were both metaphor. `buttons-actions`, `forms-inputs`, `data-display` and `compositions` were already right. **These render into `agents/index.json`, so `npm run agents` is not optional** — but not into `agents/index.md`, which takes the group *name* only, so no budget moved. |
+| [x] | `src/site/lib/groups.mjs` | four of eight summaries. `foundations` *type* → *text styles*; `overlays-disclosure` said *content* three times; `navigation`'s *"without losing the keyboard"* and `feedback-status`'s *"not only an eye sees"* were both metaphor. `buttons-actions`, `forms-inputs`, `data-display` and `compositions` were already right. **These render into `skill/index.json`, so `npm run agents` is not optional** — but not into `skill/index.md`, which takes the group *name* only, so no budget moved. |
 | [x] | `src/site/pages/components/[slug].astro` | reviewed, **kept**. `Live example` is a documented anchor: `CLAUDE.md`, this file, `site.css` and `typography/component.html` all spell out the `h1` → `h2 Live example` → `h3` → `h4` chain, so the string is load-bearing in four places and reads as a section label whether the page holds one example or seven. |
 | [x] | `src/site/components/CodePanel.astro` | reviewed, unchanged, as scoped. **One finding left open:** the clipboard-failure label is `Press Ctrl+C`, which is wrong on a Mac. The announced status beside it already says *"Control or Command plus C"*, so only the sighted path is affected, and only when the Clipboard API throws. Left alone because this component renders on all 35 pages and the row said review only — worth a line of its own if anyone touches the panel. |
-| [x] | `docs/agents/*.src.md` | reviewed, unchanged. They make no AT-coverage claim at all — a grep for `NVDA\|JAWS\|VoiceOver\|TalkBack` over `docs/agents/` returns two lines, both about how a control is announced rather than about what this project has verified. Nothing to fix, and 10 bytes of headroom in which to fix it. |
+| [x] | `docs/skill/*.src.md` | reviewed, unchanged. They make no AT-coverage claim at all — a grep for `NVDA\|JAWS\|VoiceOver\|TalkBack` over `docs/skill/` returns two lines, both about how a control is announced rather than about what this project has verified. Nothing to fix, and 10 bytes of headroom in which to fix it. |
 
 ### The byte budgets, measured 2026-08-07
 
@@ -751,13 +751,13 @@ raising a budget needs a reason recorded.
 
 | surface | bytes | budget | headroom |
 | --- | --- | --- | --- |
-| `agents/testing.md` | 12278 | 12288 | **10** |
-| `agents/llms.txt` | 2495 | 2560 | 65 |
+| `skill/testing.md` | 12278 | 12288 | **10** |
+| `skill/llms.txt` | 2495 | 2560 | 65 |
 | `AGENTS.md` | 2436 | 2560 | 124 |
 | `.claude/skills/a11y-library/SKILL.md` | 2918 | 3072 | 154 |
-| `agents/index.md` | 3347 | 3584 | 237 |
+| `skill/index.md` | 3347 | 3584 | 237 |
 
-**`agents/testing.md` has ten bytes.** Row 21 spent nearly all of it and paid for that item by
+**`skill/testing.md` has ten bytes.** Row 21 spent nearly all of it and paid for that item by
 tightening two others. One added sentence there fails the build, so budget a cut with every addition.
 
 ### The loose end, closed
@@ -795,7 +795,7 @@ above it. The sweep below counts 31, not 33, deliberately.
 
 ```sh
 npm run check:tokens     34 files clean
-npm run agents           42 surfaces written   # groups.mjs feeds agents/index.json
+npm run agents           42 surfaces written   # groups.mjs feeds skill/index.json
 npm run check:agents     42 surfaces match their sources
 npm run build            35 pages
 npx playwright test --project=chromium         1220 passed, exit 0, first run, no flake
@@ -821,15 +821,15 @@ against a warm `.astro` cache; a second build is silent. Rebuild before investig
 
 Display names are settled first, deliberately. When a slug is ready to move, these are the touch points:
 
-1. `src/library/components/<old>/` → `<new>/`, and `tests/<old>.spec.mjs` → `<new>.spec.mjs`
+1. `skill/library/components/<old>/` → `<new>/`, and `tests/<old>.spec.mjs` → `<new>.spec.mjs`
 2. `meta.json` `slug`
 3. every `contract.seeAlso` naming the old slug — agent-surfaces §1 fails otherwise
 4. every `[Name](../<old>/)` cross-link in every `docs.md`
 5. class prefixes if they encode the slug (`.ac-notice` → `.ac-alert`), which also means `contract.root`,
    `component.css`, `component.html`, `component.js`, the spec, and agent-surfaces §12's scope
-6. `docs/agents/pitfalls.src.md` — it names slugs in backticks and agent-surfaces §8 resolves every one
+6. `docs/skill/pitfalls.src.md` — it names slugs in backticks and agent-surfaces §8 resolves every one
 7. `docs/BUILD-STATUS.md` roster rows, and the `docs/component-specs.md` entry
-8. `npm run agents` — `agents/components/<old>.md` is deleted and `<new>.md` written
+8. `npm run agents` — `skill/components/<old>.md` is deleted and `<new>.md` written
 9. a redirect from the old URL, or accept the break
 
 Steps 5 and 6 fail late. One slug per commit.
@@ -847,7 +847,7 @@ catches a regression in work already signed off, which is the only thing that ca
 DONE="button icon-button loading-button chip-toggle field text-input input-group textarea \
 native-select radio-group checkbox switch fieldset-group skip-link visually-hidden focus-ring \
 live-region typography motion-preferences effects disclosure dropdown modal drawer tooltip tabs jump-nav notice status-text badge result-panel data-table prose-surface"
-P=""; for d in $DONE; do P="$P src/library/components/$d"; done
+P=""; for d in $DONE; do P="$P skill/library/components/$d"; done
 ls -d $P | wc -l          # must equal the number of finished rows, or every grep below is vacuous
 
 grep -riE "setlist|merch|zine|olympia|berkeley|gilman|bakesale" $P
@@ -857,15 +857,15 @@ grep -rn "| Key | Action |\|| Key | Result |" $P
 
 # The three mandatory headings, exactly once each. Prints only the failures.
 for d in $DONE; do
-  f=src/library/components/$d/docs.md
+  f=skill/library/components/$d/docs.md
   k=$(grep -c "^## Keyboard$" $f); r=$(grep -c "^## Required markup$" $f); b=$(grep -c "^## Before you copy$" $f)
   [ "$k$r$b" = "111" ] || echo "$d: Keyboard=$k Required=$r Before=$b"
 done
 
 # The AT closing, one phrasing (Phase 3). 31, not 33: focus-ring and typography
 # have nothing to announce and correctly carry none -- see The loose end, closed.
-grep -rl "Not yet verified against real assistive technology" src/library/components/*/docs.md | wc -l
-grep -rn "Not yet tested against a screen reader" src/library/   # nothing
+grep -rl "Not yet verified against real assistive technology" skill/library/components/*/docs.md | wc -l
+grep -rn "Not yet tested against a screen reader" skill/library/   # nothing
 
 # Applied renames, across the whole repo rather than the finished rows -- an old
 # display name can come back in any component's prose. Add each new one as you
@@ -907,8 +907,8 @@ Then sweep by hand:
 
 ```sh
 grep -riE "setlist|merch|zine|distro|matinee|salad days|ruby soho|gilman|bakesale" src/
-grep -rn "## The contract\|## One sentence\|## What to watch for\|## Watch for" src/library/
-grep -rn "h3 class=\"ac-demo__title\"" src/library/
+grep -rn "## The contract\|## One sentence\|## What to watch for\|## Watch for" skill/library/
+grep -rn "h3 class=\"ac-demo__title\"" skill/library/
 ```
 
 All three return nothing. Every `docs.md` has exactly one `## Keyboard` and one `## Required markup`.

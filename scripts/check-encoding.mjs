@@ -3,7 +3,7 @@
  * Encoding linter, repo-wide.
  *
  * `build-agent-surfaces.mjs` has refused mojibake since the incident that
- * caused it, but only in what it reads: the five files in `docs/agents/` and
+ * caused it, but only in what it reads: the five files in `docs/skill/` and
  * every `meta.json`. Every `component.html`, every `docs.md` and every file
  * under `docs/` were unguarded, and a long prose file is exactly what gets
  * round-tripped by accident. This is that guard, hoisted to the whole repo.

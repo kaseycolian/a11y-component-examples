@@ -41,7 +41,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const COMPONENTS = resolve(root, 'src/library/components');
+const COMPONENTS = resolve(root, 'skill/library/components');
 
 /** A selector naming a readout attribute, in any quoting or concatenation. */
 const READOUT = /data-ac-[\w-]*-out\b/;
@@ -106,7 +106,7 @@ for (const slug of slugs) {
     lookups++;
     if (isPageWide(match[1])) {
       problems.push(
-        `src/library/components/${slug}/component.js:${lineOf(js, match.index)}  ` +
+        `skill/library/components/${slug}/component.js:${lineOf(js, match.index)}  ` +
           `readout lookup starts from \`${match[1]}\`, so it resolves page-wide`,
       );
     }
@@ -115,7 +115,7 @@ for (const slug of slugs) {
   if (found > 0) components++;
   else if (READOUT.test(html)) {
     problems.push(
-      `src/library/components/${slug}  has readout markup and a component.js, but no ` +
+      `skill/library/components/${slug}  has readout markup and a component.js, but no ` +
         `lookup this check can see -- if the convention moved, move this check with it`,
     );
   }

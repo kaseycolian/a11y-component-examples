@@ -8,7 +8,7 @@
 
 **Resume point.** `CLAUDE.md` (auto-loaded) has the conventions. This file has progress and the
 ordered next steps. `component-specs.md` is the pre-build planning record — read the one entry you
-need, and read `agents/components/<slug>.md` instead for what a component actually does.
+need, and read `skill/components/<slug>.md` instead for what a component actually does.
 
 Read in this order and nothing else is needed to start: **START HERE** for what is left,
 **The road to done** for what each component owns, **The loop** for how to build or change one.
@@ -26,6 +26,24 @@ which is the owner's, then item 4.** Gate a session with `npx playwright test --
 the closing run is recorded at the end of item 6.)
 
 ---
+
+## The library moved — read this before any path
+
+**2026-08-19.** `src/library/` is now **`skill/library/`**, and the old `agents/` folder is now
+**`skill/`** — one package holding the contracts *and* the components, so it can be published to the
+Claude skills repo on its own. `docs/agents/` is `docs/skill/`, and `llms.txt` moved to the repo
+root. Nothing else about the library changed: same components, same conventions, same tests.
+
+Two things a session has to know:
+
+- **The generator must never clear `skill/`.** It used to `rm -rf` its output folder, which now holds
+  the components. Removal is driven by the owned-file set, which skips `skill/library/`, and the
+  write step throws if anything under it reaches the delete.
+- **The skill's read path is relative to `skill/`; `AGENTS.md` and `llms.txt` are relative to the
+  repo and the site.** Nothing inside `skill/` may name the hosted site, and a test asserts it.
+
+Why, and what it fixed — Tiers 3 and 4 had been pointing at a directory that did not exist in any
+checkout — is **Phase 8** in `docs/agent-layer.md`.
 
 ## START HERE — item 3 is the owner's, then item 4
 
@@ -68,17 +86,17 @@ examples**. `status-text` onward is written to it; everything earlier is the swe
 same session tightened the on-page copy rule (item 0b).
 
 **Done, and it is not a component.** The **agent-facing layer** — `docs/agent-layer.md` is the record and
-item 5 below tracks it. Read that file before touching `AGENTS.md`, `agents/`, `.claude/`, or
+item 5 below tracks it. Read that file before touching `AGENTS.md`, `skill/`, `.claude/`, or
 `scripts/build-agent-surfaces.mjs`; the short version is that agents get a four-tier read path with hard
 token budgets, every surface is rendered from one manifest so they cannot drift, and the human pages are
 not touched. **All eight phases are done** — all four tiers ship, every component has a `contract` block,
-the cross-cutting surfaces (`agents/{pitfalls,conventions,verify,testing}.md`) are written, a generated
+the cross-cutting surfaces (`skill/{pitfalls,conventions,verify,testing}.md`) are written, a generated
 Claude Code skill at `.claude/skills/a11y-library/SKILL.md` is the third Tier 0 door, `CLAUDE.md` and
 `README.md` say which audience they serve, `npm run check:agents` fails if any surface drifts from its
 source, and `tests/shared/agent-surfaces.spec.mjs` fails if a contract lies about the markup **or is
 silent about it** — phase 7 added the reverse direction, so ARIA, a key handler or a factory added to a
-component fails until its contract catches up. Nothing under `agents/`, `AGENTS.md` or `.claude/skills/`
-is hand-editable; edit a file in `docs/agents/` or a `meta.json`, then run `npm run agents`.
+component fails until its contract catches up. Nothing under `skill/`, `AGENTS.md` or `.claude/skills/`
+is hand-editable; edit a file in `docs/skill/` or a `meta.json`, then run `npm run agents`.
 
 **If you edit a component, its contract is part of the edit.** `CLAUDE.md` > **Component folder shape**
 has the table of which change obliges which field.
@@ -94,7 +112,7 @@ because it was not.
 
 **This file is a build log and only that.** It is where progress, the roster checklist, the ordered next
 steps and the repo-local gotchas live. It is never where a component's behavior is looked up — that is
-`agents/components/<slug>.md` and the component's own files, for contributors as much as for agents.
+`skill/components/<slug>.md` and the component's own files, for contributors as much as for agents.
 Every agent-facing surface names this file exactly once, in the rule forbidding it.
 
 ### The steps, in order
@@ -179,7 +197,7 @@ The roster below is complete, so this section is now the record of **what each c
 cross-batch notes are what a change to any of them has to respect. Four infrastructure items follow
 it, two of them still open. Every slug has a spec entry in `component-specs.md` — `disclosure` is the only slug in the repo without one, and it is now built,
 so that entry stays absent on purpose: writing one after the fact would be inventing design decisions
-that were never taken. `agents/components/disclosure.md` and its `docs.md` are where its behavior
+that were never taken. `skill/components/disclosure.md` and its `docs.md` are where its behavior
 lives. **Read the entry, do not redesign it.**
 
 The build order was the dependency graph, not a preference.
@@ -304,7 +322,7 @@ exempts the `Page` suffix from the contract's `api`.
 - **Theme** — `src/site/theme/` has theme-service v0.3.0 (`theme.css`, `effects.css`,
   `themes.index.json`, `theme-init.js`) + `THEME-SERVICE.md`. **16 themes**, not 10 — the index
   includes "(No Background)" variants.
-- **Tokens** — `src/library/tokens/tokens.css` (optional layer; components work without it).
+- **Tokens** — `skill/library/tokens/tokens.css` (optional layer; components work without it).
 - **Scripts** — `sync-library.mjs`, `check-tokens.mjs`, `new-component.mjs`. All three verified working.
 - **Site shell** — `BaseLayout` (with `head` + `end` slots), `SiteHeader`, `CodePanel`,
   `ComponentNav`, `registry.mjs`, `themes.mjs`, `content.config.ts`, `site.css`, home, index, `[slug]`.
@@ -407,7 +425,8 @@ exempts the `Page` suffix from the contract's `api`.
   `~/.claude/a11y-library.local.json` naming the clone, so the skill loads in other repos rather than
   only while this one is open. `npm run install:agents-md -- <dir>` covers agents that do not read
   `.claude/`, via a marked block in that project's `AGENTS.md`. Writes nothing inside this repo.
-  Imports `SKILL_NAME`, `SKILL_OUT`, `CONFIG_FILE` and `readBaseUrl` from the generator, so a rename
+  Imports `SKILL_NAME`, `SKILL_PACKAGE`, `SKILL_IN_PACKAGE`, `CONFIG_FILE` and `readBaseUrl`
+  from the generator, so a rename
   cannot half-succeed. Decisions and rejected options: **Installing out** in `docs/agent-layer.md`.
 
 ---
@@ -831,7 +850,7 @@ exempts the `Page` suffix from the contract's `api`.
   silent, and the DOM afterwards is identical, which is why that bug survives review. Example 4's
   `role="alert"` is server rendered and populated, and the log records it firing before the visitor
   did anything. Four findings. **An empty live region is 0px tall, so Playwright calls it hidden** —
-  see `docs/agents/testing.src.md`; that is the correct state for a screen reader and
+  see `docs/skill/testing.src.md`; that is the correct state for a screen reader and
   `toBeVisible()` cannot express it. **Under forced colors all four tones collapse into one** — every accent becomes
   `CanvasText` and the `color-mix` tint is dropped — and the `[FORCED]` block deliberately does
   *not* put the difference back, because nothing can; that is the prefix-word argument in one
@@ -1096,14 +1115,14 @@ this 113 KB file first. The design record has the measurements, the four-tier re
 budgets, the one-manifest generator that keeps every surface in sync, and the accuracy tests that
 assert the hand-written contracts against the real markup.
 
-**All eight phases are done.** All four tiers ship — `AGENTS.md` at 2.4 KB, `agents/index.md` at
-3.2 KB, `agents/index.json`, `agents/llms.txt`, and a per-component contract in
-`agents/components/<slug>.md` at 0.9–1.7 KB — plus the four cross-cutting Tier 4 surfaces,
-`agents/{pitfalls,conventions,verify,testing}.md`, and a generated Claude Code skill at
+**All eight phases are done.** All four tiers ship — `AGENTS.md` at 2.4 KB, `skill/index.md` at
+3.2 KB, `skill/index.json`, `skill/llms.txt`, and a per-component contract in
+`skill/components/<slug>.md` at 0.9–1.7 KB — plus the four cross-cutting Tier 4 surfaces,
+`skill/{pitfalls,conventions,verify,testing}.md`, and a generated Claude Code skill at
 `.claude/skills/a11y-library/SKILL.md` (2.8 KB) that is Tier 0's third door. All of it is rendered by
 `scripts/build-agent-surfaces.mjs` and gated by `npm run check:agents` in `verify` and in CI, plus
 `tests/shared/agent-surfaces.spec.mjs` in the suite. **Answering "how do I build an accessible X" costs
-an agent 6.8–7.2 KB** — Tier 0, the index, and one contract — against a `src/library/` of 1,833 KB.
+an agent 6.8–7.2 KB** — Tier 0, the index, and one contract — against a `skill/library/` of 1,833 KB.
 
 Two things from phase 7 that outlive it:
 
@@ -1111,7 +1130,7 @@ Two things from phase 7 that outlive it:
   `component.html` in a browser and `component.js` as text, and report ARIA, keys or factories the
   contract does not admit to. `CLAUDE.md` > **Component folder shape** has the table of which change
   obliges which field. The one row nothing can check is `summary` → `contract.useWhen`: a fingerprint in
-  `agents/index.json` fires, names the component, and leaves the judgement to a person.
+  `skill/index.json` fires, names the component, and leaves the judgement to a person.
 - **`contract.root` is required, and `.ac-<slug>` is not what you think.** Every ARIA check scopes to
   the selectors a contract declares, because the class cannot be derived from the slug — it holds for 15
   of 33 components and fails for the rest. Rename a component's root class and `root` moves with it, or
@@ -1130,35 +1149,35 @@ One thing from phase 6 that outlives it:
 
 Two things from phase 5 that outlive it:
 
-- **`CLAUDE.md` and `agents/conventions.md` state the same conventions on purpose**, one as a checklist
+- **`CLAUDE.md` and `skill/conventions.md` state the same conventions on purpose**, one as a checklist
   for whoever adds a component and one as an explanation for whoever pastes one out. The three canonical
   CSS shapes — the token chain, the accent mixed toward `--text`, the motion `calc()` — are duplicated
   verbatim, `CLAUDE.md` is canonical, and `tests/shared/agent-surfaces.spec.mjs` asserts they still
   match. Change a token name, a percentage or a duration in one and change the other in the same commit.
 - **`docs/component-specs.md` is a pre-build planning record, not a component reference.** It decided
   the patterns before they were built and has no entry for `disclosure`, `dropdown` or `field`. For a
-  built component's ARIA contract and keyboard map, `agents/components/<slug>.md` is the generated,
+  built component's ARIA contract and keyboard map, `skill/components/<slug>.md` is the generated,
   asserted answer; go to `component-specs.md` for the design reasoning and the CSS gotchas it carries
   that a contract does not.
 
 Two things from phase 4 that outlive it:
 
-- **Never let a generator clear `.claude/`.** `npm run agents` rebuilds `agents/` from scratch so a
+- **Never let a generator clear `.claude/`.** `npm run agents` rebuilds `skill/` from scratch so a
   deleted component cannot leave an authoritative-looking file behind. `.claude/` must never get the
   same treatment: `settings.local.json` lives there, and it is machine-specific and gitignored and so
   unrecoverable. The skill is written in place, and a leftover from a renamed skill folder is caught
   instead by ownership-by-signature — a file under `.claude/skills/` is the generator's only if it
   carries the do-not-edit marker, which also leaves a hand-written skill of your own alone.
-- **`.claude/skills/a11y-library/SKILL.md` is generated**, from `docs/agents/preamble.md`'s two
+- **`.claude/skills/a11y-library/SKILL.md` is generated**, from `docs/skill/preamble.md`'s two
   `skill-*` slots. Hand-edit it and `npm run check:agents` reverts your work. Its `description` is the
   routing mechanism Claude Code matches against a request, which makes it the one string in this repo
   where keyword coverage beats brevity — and its pattern nouns are a trigger net, not a roster, so do
-  not sync them to `agents/index.md`.
+  not sync them to `skill/index.md`.
 
 One thing from phase 3 that outlives it:
 
 - **The accessibility findings have four homes now, and a new one belongs in exactly one.** A fact
-  about the platform that makes correct-looking markup wrong goes in `docs/agents/pitfalls.src.md`. A
+  about the platform that makes correct-looking markup wrong goes in `docs/skill/pitfalls.src.md`. A
   fact about Playwright or axe that makes a correct assertion wrong goes in `testing.src.md`. Something a
   copied component assumes about the page it lands in goes in `conventions.src.md`. Anything
   about working *on* this repo stays in the gotchas list here. Writing it in two places is the drift
@@ -1190,7 +1209,7 @@ Three things from phase 1 that outlive it:
   starts driving it. Found during phase 1, with a scaffold that was sitting in the tree; deleting it
   was the fix that session, but the gap is still open. Worth closing next time those pages are open.
   The agent surfaces are covered either way: the generator carries `status` through to
-  `agents/index.{md,json}` and marks any non-stable component on its index row.
+  `skill/index.{md,json}` and marks any non-stable component on its index row.
 
 ### 6. Lint the gotchas that can be linted
 
@@ -1228,7 +1247,7 @@ Worth a check:
    All three failure modes were red-probed with planted files and the probes cleaned up.
 2. ~~**"What you see is what you copy", asserted.**~~ **Done, 2026-08-07** —
    `tests/shared/what-you-see.spec.mjs`, 135 tests, in `npm test` and therefore in `verify` and CI.
-   It compares four things per component against `src/library/`: the panel's highlighted text, the
+   It compares four things per component against `skill/library/`: the panel's highlighted text, the
    Copy button's `data-code`, the file at whatever URL the page actually loads, and the download
    link. **The URL is read off the rendered page rather than built from the slug** — a test that
    constructs its own path proves the server works, not that the page uses it. Both failure modes
@@ -1348,9 +1367,9 @@ It must match `npm run preview` exactly, base path included.
 ## Gotchas already solved — do not rediscover these
 
 Working *on* this repo. The transferable accessibility findings moved to
-`docs/agents/pitfalls.src.md`, the harness findings to `docs/agents/testing.src.md`, and what a copied
-component assumes about its page to `docs/agents/conventions.src.md` — all of which render to the
-`agents/` surfaces an agent reads, see `docs/agent-layer.md`. A new finding goes in whichever of the four
+`docs/skill/pitfalls.src.md`, the harness findings to `docs/skill/testing.src.md`, and what a copied
+component assumes about its page to `docs/skill/conventions.src.md` — all of which render to the
+`skill/` surfaces an agent reads, see `docs/agent-layer.md`. A new finding goes in whichever of the four
 homes it belongs to, not in all of them.
 
 - ~~**Node is not on the inherited PATH.**~~ **Retired 2026-08-07 by measuring it.**
@@ -1507,7 +1526,7 @@ homes it belongs to, not in all of them.
   failure rather than skip it — same shape as a `[FORCED]` block reaching a broken variant.
 - **`npm run x -- --flag "two words"` loses the quotes.** `new-component.mjs` joins words up to the
   next `--` to compensate. Running `node scripts/new-component.mjs …` directly is more predictable.
-- **Astro `srcDir` is `./src/site`**, so pages live at `src/site/pages/`. `src/library/` is
+- **Astro `srcDir` is `./src/site`**, so pages live at `src/site/pages/`. `skill/library/` is
   deliberately outside it.
 - **`[slug].astro` uses `import.meta.glob(..., { query: '?raw', import: 'default', eager: true })`**
   and picks by path suffix. Astro cannot do a dynamic `import()` of a raw file per-slug.
@@ -1545,7 +1564,7 @@ homes it belongs to, not in all of them.
   old entry cached and re-syncs the new one under the same id. This was recorded twice with
   contradictory ordinals, first build versus second, so do not re-add one. The page it
   names still builds correctly. `npm run clean` and rebuild; the warning is gone and nothing else
-  changes. Do not go looking for a duplicate file — the glob's `base` is `src/library/components`
+  changes. Do not go looking for a duplicate file — the glob's `base` is `skill/library/components`
   and `public/library/` is not in it.
 - **A readout key is unique inside the element its lookup starts from, and nowhere else.** `out()`
   **was** a document-wide `querySelector`, so two examples both using `data-ac-…-out="good"` silently
@@ -1557,7 +1576,7 @@ homes it belongs to, not in all of them.
   have a lookup the check can see, so renaming the convention fails there rather than emptying it.
   Unique keys are not the rule and never were; scoping is.
 - **Git is 2.24** — no `git init -b`, no interactive flags.
-- **`src/library/tokens/tokens.css` is not loaded by the site.** It is an optional layer and no page
+- **`skill/library/tokens/tokens.css` is not loaded by the site.** It is an optional layer and no page
   links it, deliberately: a component has to work from the fallback chain alone. So
   `getPropertyValue('--ac-motion')` in a test on a component page returns `""`, not `1` or `0`, and
   the value that resolved is theme-service's `--motion`. Assert on the *effect* (a computed duration,
@@ -1584,7 +1603,7 @@ homes it belongs to, not in all of them.
   shell alone leaves the port held. It shoots each `.ac-demo` on its own as well as the grid, and
   prints `scrollWidth - clientWidth` (sideways overflow, invisible in a screenshot) and
   `document.activeElement` — the latter is what caught `document.body.focus()` leaving a keyboard
-  reader parked mid-page, now in `docs/agents/pitfalls.src.md`. Output lands in the gitignored
+  reader parked mid-page, now in `docs/skill/pitfalls.src.md`. Output lands in the gitignored
   `shots/`, so `git status` still comes back with only the component folder.
   **The repo-root import rule was about a throwaway script, not about this repo.** ESM resolves
   `node_modules` upward from the script's own directory, and the parent of `scripts/` *is* the repo
@@ -1660,7 +1679,7 @@ homes it belongs to, not in all of them.
 
 ## Decisions worth not re-litigating
 
-- **No `src/library/core/` shared modules.** Components are fully self-contained — deliberately not
+- **No `skill/library/core/` shared modules.** Components are fully self-contained — deliberately not
   DRY, because a copy-paste library is better served by each file standing alone.
 - **Custom Select ships one focus model** (real DOM focus on options), not two. `aria-activedescendant`
   is unreliable on iOS VoiceOver and TalkBack; the tradeoff is documented in its `docs.md`.

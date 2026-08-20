@@ -39,7 +39,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const componentsDir = resolve(root, 'src/library/components');
+const componentsDir = resolve(root, 'skill/library/components');
 
 /** Every registered component, from the same meta.json the site builds from. */
 const COMPONENTS = readdirSync(componentsDir, { withFileTypes: true })

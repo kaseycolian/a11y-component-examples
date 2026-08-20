@@ -16,7 +16,7 @@ export default defineConfig({
   site: 'https://kaseycolian.github.io',
   base: '/a11y-component-examples',
   trailingSlash: 'always',
-  // The Astro shell lives entirely under src/site/. src/library/ sits outside
+  // The Astro shell lives entirely under src/site/. skill/library/ sits outside
   // it on purpose: it is plain HTML/CSS/JS with no Astro in it at all, so it
   // can be lifted out of this repo wholesale.
   srcDir: './src/site',

@@ -70,7 +70,7 @@ a future update session does not "fix" their absence:
 
    Consequence: the structural tokens that live in `components.css` (`--font-ui`, `--font-mono`,
    `--radius`, `--radius-sm`, `--radius-pill`, `--dur`, `--press-y`, `--press-s`) are **not**
-   defined by the vendored files. `src/library/tokens/tokens.css` defines those same names with the
+   defined by the vendored files. `skill/library/tokens/tokens.css` defines those same names with the
    same semantics, so a repo that later adds `components.css` stays compatible.
 
 2. **`theme-select.js` is not vendored.** The theme picker is the library's own Custom Select component,

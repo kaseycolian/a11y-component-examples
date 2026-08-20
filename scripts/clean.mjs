@@ -32,7 +32,7 @@ const BUILD = ['.astro', 'dist'];
 const ALSO = [
   'public/library',
   'public/theme',
-  'public/agents',
+  'public/skill',
   'public/llms.txt',
   'shots',
   'test-results',

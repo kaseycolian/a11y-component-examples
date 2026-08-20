@@ -56,7 +56,7 @@ function usage(message) {
   console.error(
     `${message}\n\n` +
       '  npm run shots -- <slug> [--skip-build] [--widths 1280,320]\n\n' +
-      'Slugs are the folder names under src/library/components/.',
+      'Slugs are the folder names under skill/library/components/.',
   );
   process.exit(1);
 }
@@ -64,8 +64,8 @@ function usage(message) {
 const args = process.argv.slice(2);
 const slug = args.find((a) => !a.startsWith('--'));
 if (!slug) usage('shots: no component slug given.');
-if (!existsSync(resolve(root, 'src/library/components', slug))) {
-  usage(`shots: no component "${slug}" in src/library/components/.`);
+if (!existsSync(resolve(root, 'skill/library/components', slug))) {
+  usage(`shots: no component "${slug}" in skill/library/components/.`);
 }
 
 const skipBuild = args.includes('--skip-build');

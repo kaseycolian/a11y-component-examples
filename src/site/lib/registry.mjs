@@ -1,7 +1,7 @@
 /**
  * The component registry.
  *
- * Every component folder under src/library/components/ carries a meta.json.
+ * Every component folder under skill/library/components/ carries a meta.json.
  * This module globs them at build time, so navigation, the index page, the
  * per-component routes, and the test matrix all derive from the same source.
  * Adding a component means adding a folder -- nothing here needs editing.
@@ -17,8 +17,10 @@ export { GROUPS };
 
 const GROUP_INDEX = new Map(GROUPS.map((g, i) => [g.id, i]));
 
-/** Raw meta.json modules, keyed by their path under src/library/components/. */
-const metaModules = import.meta.glob('../../library/components/*/meta.json', { eager: true });
+/** Raw meta.json modules, keyed by their path under skill/library/components/. */
+const metaModules = import.meta.glob('../../../skill/library/components/*/meta.json', {
+  eager: true,
+});
 
 function slugFromPath(path) {
   const match = path.match(/components\/([^/]+)\/meta\.json$/);

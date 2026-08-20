@@ -9,7 +9,7 @@ const PORT = 4321;
 export default defineConfig({
   testDir: './',
   // Component specs live beside their component; shared gates live in tests/.
-  testMatch: ['tests/**/*.spec.mjs', 'src/library/components/*/tests/*.spec.mjs'],
+  testMatch: ['tests/**/*.spec.mjs', 'skill/library/components/*/tests/*.spec.mjs'],
 
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
