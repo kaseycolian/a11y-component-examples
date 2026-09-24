@@ -88,6 +88,12 @@ const fullTitle = pageTitle(title);
     <SiteFooter />
 
     {/*
+      The theme's page backdrop -- the grid, or NEO's rain. An empty element
+      rather than upstream's <body class="fx-grid">; site.css says why.
+    */}
+    <div class="fx-grid site-backdrop" aria-hidden="true"></div>
+
+    {/*
       Enhances the header's theme <select>. `defer` runs it after the header
       markup is parsed; `is:inline` keeps Astro from bundling it, so this is the
       same file the Custom Select page hands out. On that page it loads twice, which

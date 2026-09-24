@@ -60,9 +60,12 @@ must not revert — is `src/site/styles/A11Y-WAY-PAGES.md`.
   `src/site/lib/themes.mjs` from the index's `name` / `group` / `description`: a row shows the short
   one ("Dark · No Background") and the trigger the full one. How the Custom Select gets the full name
   without upstream's `data-dropdown-full-label` is deviation 19 in `src/site/styles/A11Y-WAY-PAGES.md`.
-- **Background effect:** none on the shell. `.fx-grid` is not on the page, the header or the footer.
-  The `effects` component's demo panels are the only `.fx-grid` elements, because the backdrop is that
-  page's subject, so NEO's rain shows only there. The header's Reduce motion switch stops it.
+- **Background effect:** on every page, in every theme that has one: the grid, or NEO's rain. No
+  Background themes set `--fx-grid-opacity: 0`. It is drawn on an empty
+  `<div class="fx-grid site-backdrop">` in `BaseLayout.astro`, not on `<body>` the way upstream does
+  it. That is deviation 3 below. The header's Reduce motion switch stops the rain. The `effects`
+  component's demo panels carry their own `.fx-grid` as well, because the backdrop is that page's
+  subject.
 - **Heading accents:** read, through `--heading-1` to `--heading-3` in `site.css`. This site's scale
   runs pink, blue, green and theme-service's runs pink, green, blue, so h2 takes a theme's
   `--accent-h3` and h3 its `--accent-h2`. A theme with no headings of its own sets those to the same
@@ -71,8 +74,8 @@ must not revert — is `src/site/styles/A11Y-WAY-PAGES.md`.
 
 ### Deliberate deviations from the standard apply
 
-Two files the skill normally vendors are **intentionally not** vendored. Both are recorded here so
-a future update session does not "fix" their absence:
+Two files the skill normally vendors are **intentionally not** vendored, and the page backdrop is not
+applied the standard way. All three are recorded here so a future update session does not "fix" them:
 
 1. **`components.css` is not vendored.** It styles `.btn` / `.input` / `.drop` / `.tab` — the same
    components this library rebuilds accessibly. Vendoring it would create two competing sources of
@@ -90,6 +93,15 @@ a future update session does not "fix" their absence:
    `<select>` behind it at all: `SiteHeader.astro` writes the trigger, the panel and every option, and
    the header script talks to it through `ac:dropdown:change` and `setValue()`. `theme-init.js` (the
    anti-flash bootstrap) *is* vendored and used as shipped.
+
+3. **The backdrop is not `<body class="fx-grid">`.** It is an empty `div.fx-grid.site-backdrop` that
+   `site.css` stretches over `<body>` at `z-index: -1`. axe's `color-contrast` gives up on any text
+   that has a large positioned `::before` with a background on an ancestor, and marks it
+   `incomplete`. With the class on `<body>`, the typography page went from 972 passes and 1
+   violation to 986 `incomplete` and no violations. The gate's per-theme contrast sweep reads only
+   violations, so it would have passed with nothing measured, and the deliberate failures would
+   have stopped firing. An empty element is nobody's ancestor, so axe measures exactly what it did
+   without the backdrop.
 
 ### Motion behavior worth knowing
 
@@ -137,3 +149,6 @@ page rather than worked around.
   Chromium suite on a fresh build, where every per-theme contrast sweep now includes NEO dark and
   light. 1356 of 1357 passed; the failure was the badge above, and its tests and the byte check
   re-ran green after the fix.
+- `2026-09-24` — The theme backdrop is on every page now, at the user's request. Until today it
+  appeared only inside the `effects` demo panels. It is drawn on an empty backdrop element rather
+  than on `<body>`, so axe keeps measuring contrast (deviation 3). No theme file changed.

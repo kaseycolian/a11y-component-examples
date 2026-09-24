@@ -80,6 +80,37 @@ body {
   background: var(--bg);
   color: var(--text);
   -webkit-text-size-adjust: 100%;
+  /* The box .site-backdrop fills, and the stacking context its z-index: -1 stays
+     inside, so it paints over this background and under everything else. */
+  position: relative;
+  isolation: isolate;
+}
+
+/* --- Page backdrop -----------------------------------------------------------
+   The theme's backdrop: the grid, or NEO's rain. effects.css draws it on
+   .fx-grid::before, and upstream puts that class on <body>. Here it is an empty
+   element in BaseLayout, because axe's color-contrast gives up on any text with a
+   large positioned ::before on an ANCESTOR. With the class on <body>, the
+   typography page went from 972 passes and 1 violation to 986 `incomplete` and no
+   violations. The per-theme contrast sweep reads only violations, so it would
+   have passed with nothing measured. An empty element is nobody's ancestor.
+
+   No Background themes set --fx-grid-opacity to 0. The motion gate in effects.css
+   stops the rain. (0,2,0) so effects.css's `.fx-grid { position: relative }`
+   loses whatever the load order. */
+.fx-grid.site-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Forced colors drops the grid's gradients and repaints the rain's glyph color
+   as Canvas. Neither shows, so the layer goes rather than being painted for nothing. */
+@media (forced-colors: active) {
+  .site-backdrop {
+    display: none;
+  }
 }
 
 /* Anything that can be jumped to must clear the sticky header. */
