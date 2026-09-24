@@ -52,7 +52,7 @@ test('axe finds nothing on the home page', async ({ page }) => {
 
 test('the home page holds its contrast in every theme', async ({ page }) => {
   // The promise titles carry h3's green and the bodies are --text-muted, and
-  // both are values a light theme is free to break. Ten themes, one page load:
+  // both are values a light theme is free to break. Every theme, one page load:
   // only the tokens change, so re-navigating between them buys nothing -- which
   // is exactly why the transitions have to go: this flips data-theme and calls
   // axe in the next statement, with no navigation in between to end them.

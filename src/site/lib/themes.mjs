@@ -40,17 +40,26 @@ function parseSwatches(css) {
 const SWATCHES = parseSwatches(themeCss);
 
 /**
- * All themes, each with the swatch colors the picker renders and the label it
- * shows.
+ * All themes, each with the swatch colors the picker renders and the two labels
+ * it shows.
  *
- * The mode goes INTO the label, because the groups below are families and a
- * family holds both modes -- two options reading "Rink Classic" in one group is
- * a coin toss. theme-service's own `theme-select.js` writes exactly this string,
- * separator included, so the same theme is called the same thing on both sites.
+ * `label` is the full name, "Hot Neon · Dark · No Background", composed from the
+ * three parts theme-service stores (name, group, description) the way its own
+ * `fullLabel` does, so the same theme is called the same thing on both sites.
+ * `short` is what a row shows under its family heading, "Dark · No Background" --
+ * theme-service's own rows, which say only what the heading has not.
+ *
+ * The row still carries the family, in a visually hidden prefix. The Custom
+ * Select shows the primary line's whole textContent on the trigger and matches
+ * type-ahead against it, so that prefix is what keeps the closed trigger reading
+ * "Hot Neon · Dark" rather than "Dark" -- upstream's data-dropdown-full-label,
+ * without a change to the component. It also gives each option its full name,
+ * which a screen reader that skips the group name on entry still announces.
  */
 export const THEMES = index.themes.map((theme) => ({
   ...theme,
-  label: `${theme.label} · ${theme.mode === 'light' ? 'Light' : 'Dark'}`,
+  label: [theme.name, theme.group, theme.description].filter(Boolean).join(' · '),
+  short: [theme.group, theme.description].filter(Boolean).join(' · '),
   swatch: SWATCHES.get(theme.id) ?? [],
 }));
 

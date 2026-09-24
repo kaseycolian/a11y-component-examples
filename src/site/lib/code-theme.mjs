@@ -23,7 +23,7 @@ export const CODE_THEMES = {
 /**
  * `defaultColor: false` stops Shiki committing to one of the two. It emits
  * both as --shiki-light / --shiki-dark custom properties and site.css picks,
- * so the code follows the theme picker across all 16 themes instead of being
+ * so the code follows the theme picker across every theme instead of being
  * baked in at build time.
  */
 export const CODE_DEFAULT_COLOR = false;

@@ -209,6 +209,16 @@
   );
 }
 
+/* The tint is there to pulse, not to be read on. Where 42% of the purple lands
+   depends on the theme: NEO's purple is a pale mint on its dark page and
+   near-black on its light one, so the tint comes out mid-tone against its green
+   text at about 3:1. The label sits on the panel color instead, which is a pair
+   every theme guarantees. */
+.ac-fx-swatch code {
+  background: var(--ac-surface, var(--bg-panel, #110620));
+  color: var(--ac-text, var(--text, #f3ecff));
+}
+
 /* The same 1.8s brightness loop as fx-pulse, gated the way the rest of this
    library gates motion: a duration multiplied by --ac-motion. At 0 the
    animation has no active duration, so the element renders at its base style

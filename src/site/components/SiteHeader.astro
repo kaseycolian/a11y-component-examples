@@ -125,9 +125,11 @@ const jumpLabel = here === indexHref
         of theme.css at build time by themes.mjs. It is aria-hidden, so an
         option's accessible name is always just the theme name.
 
-        One group per palette family, and the mode is inside each label --
-        theme-service's own arrangement, and the reason both are built in
-        themes.mjs rather than here.
+        One group per palette family, and each row shows only what its heading
+        has not said -- "Dark", "Dark · No Background" -- which is theme-service's
+        own arrangement. The family rides along in a visually hidden prefix, so
+        the closed trigger and the option's name are still the full "Hot Neon ·
+        Dark". themes.mjs says why that works; both labels are built there.
       */}
       <div class="ac-dropdown" data-ac-dropdown data-theme-select data-value={SITE_THEME}>
         <button
@@ -195,7 +197,7 @@ const jumpLabel = here === indexHref
                           <span style={`background: ${color}`} />
                         ))}
                       </span>
-                      <span class="ac-dropdown__primary">{theme.label}</span>
+                      <span class="ac-dropdown__primary"><span class="visually-hidden">{`${theme.name} · `}</span>{theme.short}</span>
                       <span class="ac-dropdown__check" aria-hidden="true">&check;</span>
                     </div>
                   ))}

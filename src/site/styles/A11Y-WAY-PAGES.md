@@ -173,12 +173,14 @@ Recorded so a future update does not "fix" them.
     A second one, hiding `.console__lamps` below 430px, is gone with the lamps themselves (18).
 16. **The motion toggle's label is never clipped, at any width.** It used to be, below 560px.
     `.switch__text` is part of the toggle's accessible name, so clipping was the only way to hide it
-    at all — and a bare 44×24 track beside an unlabelled console is a guess rather than a control. It
-    takes the console cap's voice (mono, 10px, uppercase, tracked) so the header has one treatment
-    for a small label naming a control rather than two, which also makes it the widest fixed thing on
-    the phone layout's second row; the tracking is eased right back from the cap's `0.16em` for that
-    reason. This is what sets the three-row breakpoint at 560px, and the spec asserts the label has
-    real width at every one of them.
+    at all — and a bare 44×24 track beside an unlabelled console is a guess rather than a control.
+    That makes it the widest fixed thing on the phone layout's second row, which is what sets the
+    three-row breakpoint at 560px, and the spec asserts the label has real width at every one of them.
+
+    Its type is upstream's `.motion`, unchanged: 12px, `--text-muted`, `--font-ui`, sentence case,
+    normal weight. From 2026-08-01 it took the console cap's voice instead (mono, 10px, bold,
+    uppercase, tracked), so that it read as the same kind of text as the THEME cap beside it. That was
+    reverted on 2026-09-24 at the user's request. The label came out 84px → 80px, so no band moved.
 
     Beside it, `--console-type` (12.5px, 13.5px on the picker) carries the trigger size as a property
     rather than a declaration, so `.console--nav` steps it up without a second `font-size` rule whose
@@ -199,14 +201,21 @@ Recorded so a future update does not "fix" them.
     The readout survives where the choice is actually made: the swatch dots on each option in the
     open panel, which keep the lamps' circular notation (deviation 1's port is the only thing that
     left). A re-sync will offer the lamps back. It should decline.
-19. **The theme options are grouped by family, and each option's label carries its mode** — "Rink
-    Classic · Dark" under a "Rink Classic" group. This is upstream's own arrangement, separator
-    included, arrived at from the other direction: the port had grouped by mode, which put the two
-    halves of one palette at opposite ends of a 17-item list. Recorded because the labels are built
-    in `src/site/lib/themes.mjs` rather than by upstream's `theme-select.js` (deviation 2), so
-    nothing keeps the two in step automatically — if upstream restyles its option text, this is the
-    file to change. **Auto** stays in a "System" group of its own: it belongs to no family, and it
-    is the one option with no mode to name, which is the point of it.
+19. **The theme options are grouped by family, and each row shows only what its heading has not
+    said** — "Dark · No Background" under a "Hot Neon" group, which is upstream's arrangement since
+    theme-service 1.2.0. The port had grouped by mode, which put the two halves of one palette at
+    opposite ends of a 17-item list. The mechanism is not upstream's: it carries the full name to the
+    closed trigger and to type-ahead with `data-dropdown-full-label`, and the Custom Select has no
+    such attribute — it shows the chosen row's text. So each row carries its family in a visually
+    hidden prefix, which keeps the trigger reading "Hot Neon · Dark" and the option's name whole. The
+    labels are built in `src/site/lib/themes.mjs` rather than by upstream's `theme-select.js`
+    (deviation 2), from the index's `name` / `group` / `description`, so nothing keeps the two in
+    step automatically. **Auto** stays in a "System" group of its own: it belongs to no family, and
+    it is the one option with no mode to name, which is the point of it.
+
+    **Upstream's second line, the theme id in mono, is declined.** The user decided this on
+    2026-09-24: it doubles the list's height, and a visitor to a components library has no use for
+    the id. A re-sync will offer it back. It should decline.
 
 ## History
 
@@ -270,3 +279,12 @@ Recorded so a future update does not "fix" them.
   which is what the two numbers differ for. And the options are grouped by family with the mode in
   the label, matching upstream (19) — which is also what made the extra width worth spending, the
   labels being longer than the ones the old `15rem` was cut for.
+- `2026-09-24` — Two header details brought back to upstream's v`1.4.2` at the user's request; no
+  re-sync. The "Reduce motion" label drops the console cap's voice and takes upstream's `.motion`
+  type: 12px, `--text-muted`, `--font-ui`, sentence case (16). It measured 84px → 80px, so no band
+  moved and `--header-h` is unchanged at every breakpoint. The theme rows now show only what their
+  family heading has not said, "Dark · No Background", with the family in a visually hidden prefix
+  so the closed trigger and each option's name stay whole (19). `themes.mjs` builds a `short` label
+  beside the full one. Upstream's theme-id second line is declined. The spec now asserts that a row's
+  visible text is short, that its accessible name is the full name, and that the trigger shows the
+  full name after a choice.

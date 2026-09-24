@@ -1,5 +1,5 @@
 {
-  "version": "0.3.0",
+  "version": "1.4.2",
   "default": {
     "family": "rink-classic",
     "dark": "rink-classic-dark",
@@ -8,145 +8,245 @@
   "families": [
     {
       "family": "rink-classic",
+      "name": "Rink Classic",
       "label": "Rink Classic",
       "dark": "rink-classic-dark",
       "light": "rink-classic-light"
     },
     {
       "family": "midnight-arcade",
+      "name": "Midnight Arcade",
       "label": "Midnight Arcade",
       "dark": "midnight-arcade-dark",
       "light": "midnight-arcade-light"
     },
     {
       "family": "hot-neon",
+      "name": "Hot Neon",
       "label": "Hot Neon",
       "dark": "hot-neon-dark",
       "light": "hot-neon-light"
     },
     {
       "family": "synthwave-sunset",
+      "name": "Synthwave Sunset",
       "label": "Synthwave Sunset",
       "dark": "synthwave-sunset-dark",
       "light": "synthwave-sunset-light"
     },
     {
       "family": "acid-arcade",
+      "name": "Acid Arcade",
       "label": "Acid Arcade",
       "dark": "acid-arcade-dark",
       "light": "acid-arcade-light"
+    },
+    {
+      "family": "neo",
+      "name": "NEO",
+      "label": "NEO",
+      "dark": "neo-dark",
+      "light": "neo-light"
     }
   ],
   "themes": [
     {
       "id": "rink-classic-dark",
-      "label": "Rink Classic",
+      "name": "Rink Classic",
+      "group": "Dark",
+      "description": "",
+      "label": "Rink Classic · Dark",
       "family": "rink-classic",
       "mode": "dark",
       "origin": "built-in"
     },
     {
       "id": "rink-classic-dark-no-background",
-      "label": "Rink Classic (No Background)",
+      "name": "Rink Classic",
+      "group": "Dark",
+      "description": "No Background",
+      "label": "Rink Classic · Dark · No Background",
       "family": "rink-classic",
       "mode": "dark",
       "origin": "built-in"
     },
     {
       "id": "midnight-arcade-dark",
-      "label": "Midnight Arcade",
+      "name": "Midnight Arcade",
+      "group": "Dark",
+      "description": "",
+      "label": "Midnight Arcade · Dark",
       "family": "midnight-arcade",
       "mode": "dark",
       "origin": "built-in"
     },
     {
       "id": "midnight-arcade-dark-no-background",
-      "label": "Midnight Arcade (No Background)",
+      "name": "Midnight Arcade",
+      "group": "Dark",
+      "description": "No Background",
+      "label": "Midnight Arcade · Dark · No Background",
       "family": "midnight-arcade",
       "mode": "dark",
       "origin": "built-in"
     },
     {
       "id": "hot-neon-dark",
-      "label": "Hot Neon",
+      "name": "Hot Neon",
+      "group": "Dark",
+      "description": "",
+      "label": "Hot Neon · Dark",
       "family": "hot-neon",
       "mode": "dark",
       "origin": "built-in"
     },
     {
       "id": "hot-neon-dark-no-background",
-      "label": "Hot Neon (No Background)",
+      "name": "Hot Neon",
+      "group": "Dark",
+      "description": "No Background",
+      "label": "Hot Neon · Dark · No Background",
       "family": "hot-neon",
       "mode": "dark",
       "origin": "built-in"
     },
     {
       "id": "synthwave-sunset-dark",
-      "label": "Synthwave Sunset",
+      "name": "Synthwave Sunset",
+      "group": "Dark",
+      "description": "",
+      "label": "Synthwave Sunset · Dark",
       "family": "synthwave-sunset",
       "mode": "dark",
       "origin": "built-in"
     },
     {
       "id": "acid-arcade-dark",
-      "label": "Acid Arcade",
+      "name": "Acid Arcade",
+      "group": "Dark",
+      "description": "",
+      "label": "Acid Arcade · Dark",
       "family": "acid-arcade",
       "mode": "dark",
       "origin": "built-in"
     },
     {
       "id": "rink-classic-light",
-      "label": "Rink Classic",
+      "name": "Rink Classic",
+      "group": "Light",
+      "description": "",
+      "label": "Rink Classic · Light",
       "family": "rink-classic",
       "mode": "light",
       "origin": "built-in"
     },
     {
       "id": "rink-classic-light-no-background",
-      "label": "Rink Classic (No Background)",
+      "name": "Rink Classic",
+      "group": "Light",
+      "description": "No Background",
+      "label": "Rink Classic · Light · No Background",
       "family": "rink-classic",
       "mode": "light",
       "origin": "built-in"
     },
     {
       "id": "midnight-arcade-light",
-      "label": "Midnight Arcade",
+      "name": "Midnight Arcade",
+      "group": "Light",
+      "description": "",
+      "label": "Midnight Arcade · Light",
       "family": "midnight-arcade",
       "mode": "light",
       "origin": "built-in"
     },
     {
       "id": "midnight-arcade-light-no-background",
-      "label": "Midnight Arcade (No Background)",
+      "name": "Midnight Arcade",
+      "group": "Light",
+      "description": "No Background",
+      "label": "Midnight Arcade · Light · No Background",
       "family": "midnight-arcade",
       "mode": "light",
       "origin": "built-in"
     },
     {
       "id": "acid-arcade-light",
-      "label": "Acid Arcade",
+      "name": "Acid Arcade",
+      "group": "Light",
+      "description": "",
+      "label": "Acid Arcade · Light",
       "family": "acid-arcade",
       "mode": "light",
       "origin": "built-in"
     },
     {
       "id": "acid-arcade-light-no-background",
-      "label": "Acid Arcade (No Background)",
+      "name": "Acid Arcade",
+      "group": "Light",
+      "description": "No Background",
+      "label": "Acid Arcade · Light · No Background",
       "family": "acid-arcade",
       "mode": "light",
       "origin": "built-in"
     },
     {
       "id": "hot-neon-light",
-      "label": "Hot Neon",
+      "name": "Hot Neon",
+      "group": "Light",
+      "description": "",
+      "label": "Hot Neon · Light",
       "family": "hot-neon",
       "mode": "light",
       "origin": "built-in"
     },
     {
       "id": "synthwave-sunset-light",
-      "label": "Synthwave Sunset",
+      "name": "Synthwave Sunset",
+      "group": "Light",
+      "description": "",
+      "label": "Synthwave Sunset · Light",
       "family": "synthwave-sunset",
+      "mode": "light",
+      "origin": "built-in"
+    },
+    {
+      "id": "neo-dark",
+      "name": "NEO",
+      "group": "Dark",
+      "description": "",
+      "label": "NEO · Dark",
+      "family": "neo",
+      "mode": "dark",
+      "origin": "built-in"
+    },
+    {
+      "id": "neo-dark-no-background",
+      "name": "NEO",
+      "group": "Dark",
+      "description": "No Background",
+      "label": "NEO · Dark · No Background",
+      "family": "neo",
+      "mode": "dark",
+      "origin": "built-in"
+    },
+    {
+      "id": "neo-light",
+      "name": "NEO",
+      "group": "Light",
+      "description": "",
+      "label": "NEO · Light",
+      "family": "neo",
+      "mode": "light",
+      "origin": "built-in"
+    },
+    {
+      "id": "neo-light-no-background",
+      "name": "NEO",
+      "group": "Light",
+      "description": "No Background",
+      "label": "NEO · Light · No Background",
+      "family": "neo",
       "mode": "light",
       "origin": "built-in"
     }

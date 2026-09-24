@@ -309,14 +309,14 @@ const promises = [
     stroke-linecap: round;
     stroke-linejoin: round;
     /* The title's own color, so an item carries one accent rather than two. */
-    color: var(--accent-green-text);
+    color: var(--heading-3-text);
   }
 
   /* No color and no text-shadow on purpose: this inherits h3's green and its
      glow, which is exactly the difference being drawn. A card title is told to
      be flat --text because an accent there would read as a link; a heading over
-     prose has no such problem, and site.css already picked --accent-green-text
-     over the raw accent so 17.6px bold clears 4.5:1 (SC 1.4.3).
+     prose has no such problem, and site.css already mixes h3's accent toward
+     --text so 17.6px bold clears 4.5:1 (SC 1.4.3).
 
      Sized to the card title it sits above so the two sections keep one type
      rhythm; only the color and the mark diverge. */

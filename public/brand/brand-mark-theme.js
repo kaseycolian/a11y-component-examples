@@ -12,8 +12,8 @@
    Why <img> and not <svg><use href="brand-mark.svg#brand-mark">: an external
    <use> is a cross-origin reference, which browsers block when a page is opened
    straight from disk — verified in Chrome, where the mark then renders as
-   nothing at all (0x0, no shadow content). docs/overview.html and
-   themes/preview.html are both meant to open from file://, and a blank spot in
+   nothing at all (0x0, no shadow content). a11y-way-pages/site/overview.html and
+   a11y-way-pages/site/preview.html are both meant to open from file://, and a blank spot in
    the lockup is worse than static brand colors.
 
    Progressive enhancement: the plain <img> already shows the mark in its default

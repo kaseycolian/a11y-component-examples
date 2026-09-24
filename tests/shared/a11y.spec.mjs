@@ -50,7 +50,7 @@ const COMPONENTS = readdirSync(componentsDir, { withFileTypes: true })
   })
   .sort((a, b) => a.slug.localeCompare(b.slug));
 
-/** Both modes of all five families. Contrast is the check that varies by theme. */
+/** Both modes of every family. Contrast is the check that varies by theme. */
 const THEMES = JSON.parse(readFileSync(resolve(root, 'src/site/theme/themes.index.json'), 'utf8'))
   .families.flatMap((family) => [family.dark, family.light])
   .filter(Boolean);
@@ -162,7 +162,7 @@ async function partition(page, violations, undetermined = []) {
  * the rule for the whole page, so a sweep that only looks at `violations` reads
  * a thrown rule as a clean page. Everything below has to fail on it instead --
  * for the deliberate failures it looks like the demo was repaired, and for the
- * theme sweep it looks like ten themes passed.
+ * theme sweep it looks like every theme passed.
  */
 const skippedRules = (results) =>
   results.incomplete.flatMap((result) =>

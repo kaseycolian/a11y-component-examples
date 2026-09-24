@@ -319,9 +319,10 @@ exempts the `Page` suffix from the contract's `api`.
 - **Pages pipeline** — `.github/workflows/deploy.yml`. `astro.config.mjs`:
   `site: https://kaseycolian.github.io`, `base: /a11y-component-examples`, `srcDir: ./src/site`,
   `trailingSlash: always`.
-- **Theme** — `src/site/theme/` has theme-service v0.3.0 (`theme.css`, `effects.css`,
-  `themes.index.json`, `theme-init.js`) + `THEME-SERVICE.md`. **16 themes**, not 10 — the index
-  includes "(No Background)" variants.
+- **Theme** — `src/site/theme/` has theme-service v1.4.2 (`theme.css`, `effects.css`,
+  `themes.index.json`, `theme-init.js`) + `THEME-SERVICE.md`, which records every update. **20
+  themes** in six families — the index includes "No Background" variants, and the contrast sweeps
+  run each family's dark and light, so a new family is covered without editing a test.
 - **Tokens** — `skill/library/tokens/tokens.css` (optional layer; components work without it).
 - **Scripts** — `sync-library.mjs`, `check-tokens.mjs`, `new-component.mjs`. All three verified working.
 - **Site shell** — `BaseLayout` (with `head` + `end` slots), `SiteHeader`, `CodePanel`,
@@ -1685,6 +1686,13 @@ homes it belongs to, not in all of them.
   `.card::before` is the divider carrying the 3:1 bar, and it keeps raw `--border-strong`. Hover
   drops the `--bg` and comes back to full accent, which is the one moment the entry outranks its own
   section.
+- **An `npm run dev` left open on 4321 is what the suite tests.** `playwright.config.mjs` reuses
+  whatever answers on its port outside CI, so no build runs and the pages are live source under hot
+  reload. Edit a file mid-run and every page open at that moment reloads: the long per-theme contrast
+  sweeps die with `Execution context was destroyed, most likely because of a navigation`, which reads
+  like a flaky test and is not one. Seven did on 2026-09-24, and none of them was a contrast result.
+  Stop the dev server before a gate run, or run a copy of the config pointed at another port with
+  `reuseExistingServer: false`.
 
 ---
 

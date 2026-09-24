@@ -42,6 +42,19 @@
   --accent-green-text: color-mix(in srgb, var(--accent-green) 60%, var(--text));
   --accent-blue-text: color-mix(in srgb, var(--accent-blue) 60%, var(--text));
   --accent-purple-text: color-mix(in srgb, var(--accent-purple) 60%, var(--text));
+
+  /* Heading colors, from the accents a theme names per heading level. Those
+     tokens follow theme-service's scale -- pink, green, blue, purple -- and
+     this site's runs pink, blue, green, so h2 reads the theme's h3 accent and
+     h3 reads its h2 one. A theme that sets no headings of its own sets them to
+     exactly the accents these rules used before, so nothing moves there; NEO
+     sets h1 to h3 to its green, where the plain pink and blue are its steel
+     grey. The fallbacks are those older accents, for a theme.css that predates
+     the tokens. */
+  --heading-1: var(--accent-h1, var(--accent-pink));
+  --heading-2: var(--accent-h3, var(--accent-blue));
+  --heading-3: var(--accent-h2, var(--accent-green));
+  --heading-3-text: color-mix(in srgb, var(--heading-3) 60%, var(--text));
 }
 
 * {
@@ -261,15 +274,18 @@ h1 {
   font-size: clamp(1.75rem, 1.2rem + 2.2vw, 2.6rem);
   font-weight: 900;
   letter-spacing: 0.02em;
-  color: var(--accent-pink);
-  text-shadow: var(--tglow-pink);
+  color: var(--heading-1);
+  text-shadow: var(--tglow-h1);
 }
 
+/* h2 and h3 keep the small glow, so it is effects.css's -sm recipe written out
+   on the heading's own accent -- effects.css ships no small per-level glow. */
 h2 {
   font-size: clamp(1.25rem, 1.05rem + 0.9vw, 1.6rem);
   font-weight: 800;
-  color: var(--accent-blue);
-  text-shadow: var(--tglow-blue-sm);
+  color: var(--heading-2);
+  text-shadow: 0 0 calc(4px * var(--glow-strength))
+    color-mix(in srgb, var(--heading-2) 40%, transparent);
   margin-top: 2.5rem;
 }
 
@@ -279,8 +295,9 @@ h3 {
   /* 17.6px bold is just under the 18.66px that would make this large text, so
      it needs the full 4.5:1 -- unlike h1 and h2, which clear the large-text
      3:1 and keep the raw accent. */
-  color: var(--accent-green-text);
-  text-shadow: var(--tglow-green-sm);
+  color: var(--heading-3-text);
+  text-shadow: 0 0 calc(4px * var(--glow-strength))
+    color-mix(in srgb, var(--heading-3) 40%, transparent);
   margin-top: 2rem;
 }
 
@@ -415,7 +432,7 @@ code {
   /* A step above the card rule below it, so the hierarchy holds before the lit
      segment is noticed. Mixing toward --text raises contrast against the
      surface in either mode -- the same fact --accent-*-text is built on.
-     Measured across all ten themes: 3.95:1 worst (synthwave-sunset-light). */
+     Measured across all twelve themes: 3.95:1 worst (synthwave-sunset-light). */
   background: linear-gradient(
     90deg,
     color-mix(in srgb, var(--border-strong) 85%, var(--text)) 78%,
@@ -508,7 +525,7 @@ code {
   /* The footer mixes this down toward --border because it sits on --bg-panel;
      here it sits on the page canvas, where that mix measured 1.79:1 in
      acid-arcade-light and all but vanished. Raw --border-strong is the first
-     value clearing 3:1 in all ten themes (worst 3.15, synthwave-sunset-light).
+     value clearing 3:1 in all twelve themes (worst 3.15, synthwave-sunset-light).
      This rule is the only thing dividing one entry from the next, so it is a
      boundary rather than decoration and 3:1 is the bar it has to clear. */
   background: linear-gradient(90deg, var(--border-strong) 62%, transparent);

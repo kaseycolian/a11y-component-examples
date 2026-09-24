@@ -521,26 +521,14 @@
   color: var(--text);
 }
 
-/* The console cap's voice -- mono, small, tracked out, uppercase, muted. The header
-   already has one treatment for a small label naming a control, and this is the
-   third thing that is one (the brand descriptor takes it below 800px for the same
-   reason), so it uses that rather than adding a second. What it buys is the pair
-   reading as one object: the switch's label and the THEME cap beside it are the
-   same species of text.
+/* .switch__text takes no type of its own: it inherits .switch's 12px muted
+   --font-ui, which is upstream's .motion exactly -- sentence case, normal weight.
 
    IT IS NEVER CLIPPED, at any width. It used to be, below 560px, and the track is
    not a control without it -- a bare 44x24 toggle beside an unlabelled console is a
-   guess. That is what makes it the widest fixed thing on the phone layout's second
-   row, so the tracking is the cap's 0.16em eased right back: at 10px it is ~88px of
-   rail, and every one of those pixels comes out of the theme trigger beside it.
-   Re-measure the 560px and 430px bands if these numbers move. */
-.switch__text {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
+   guess. That makes it the widest fixed thing on the phone layout's second row, and
+   every pixel of it comes out of the theme trigger beside it. Re-measure the 560px
+   and 430px bands if its size or wording changes. */
 
 .switch input {
   position: absolute;

@@ -63,9 +63,11 @@
   border-radius: calc(var(--ac-badge-size) / 2);
   background: color-mix(in srgb, var(--ac-badge-accent) 18%, var(--ac-surface, var(--bg-panel, #110620)));
   /* The border and the fill take the accent raw; the digits are text, and raw
-     on their own 18% tint they land at 3.92:1 in the light themes. --solid
+     on their own 18% tint they land at 3.92:1 in the light themes. 70% toward
+     --text, not the library's usual 80%: a tint this heavy leaves NEO's light
+     green at 4.47:1 at 80%, and 70% puts the worst theme at 4.69:1. --solid
      sets its own pair below and is unaffected. */
-  color: color-mix(in srgb, var(--ac-badge-accent) 80%, var(--ac-text, var(--text, #f3ecff)));
+  color: color-mix(in srgb, var(--ac-badge-accent) 70%, var(--ac-text, var(--text, #f3ecff)));
   font-family: var(--ac-font-ui, var(--font-ui, "Trebuchet MS", "Segoe UI", system-ui, sans-serif));
   font-size: 0.72rem;
   font-weight: 700;

@@ -12,12 +12,13 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
-const THEMES = JSON.parse(
+const INDEX = JSON.parse(
   readFileSync(
     resolve(dirname(fileURLToPath(import.meta.url)), '../src/site/theme/themes.index.json'),
     'utf8',
   ),
-).families.flatMap((family) => [family.dark, family.light]).filter(Boolean);
+);
+const THEMES = INDEX.families.flatMap((family) => [family.dark, family.light]).filter(Boolean);
 
 // Two Custom Selects live in the header now, so each locator names which one.
 const picker = (page) => page.locator('[data-theme-control] .ac-dropdown');
@@ -56,16 +57,31 @@ test('the header theme picker is the library Custom Select and applies a theme',
   const options = picker(page).getByRole('option');
   // Swatches are decoration, so the name stays the plain theme name. The mode is
   // part of it because the groups are families, and a family holds both modes.
-  await expect(options.filter({ hasText: 'Hot Neon (No Background)' }).first()).toHaveAccessibleName(
-    'Hot Neon (No Background) · Dark',
-  );
-  expect(await options.count()).toBe(17);
+  const noBackground = options.filter({ hasText: 'Hot Neon · Dark · No Background' }).first();
+  await expect(noBackground).toHaveAccessibleName('Hot Neon · Dark · No Background');
+  // On screen the row says only what its "Hot Neon" heading has not. The family
+  // is a visually hidden prefix, so it is in the name above but not in the row.
+  await expect(
+    picker(page).getByRole('group', { name: 'Hot Neon', exact: true }).getByRole('option').first(),
+  ).toHaveAccessibleName('Hot Neon · Dark');
+  const shown = await noBackground.locator('.ac-dropdown__primary').evaluate((primary) => {
+    const copy = primary.cloneNode(true);
+    copy.querySelectorAll('.visually-hidden').forEach((hidden) => hidden.remove());
+    return copy.textContent.trim();
+  });
+  expect(shown).toBe('Dark · No Background');
+  // Every theme the index ships, plus Auto. A theme whose family is missing from
+  // the index's `families` would be dropped by THEME_GROUPS, and this is where
+  // that shows.
+  expect(await options.count()).toBe(INDEX.themes.length + 1);
 
   // By accessible name, not text: the row's textContent also carries the tick.
   await picker(page).getByRole('option', { name: 'Hot Neon · Dark', exact: true }).click();
 
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'hot-neon-dark');
   await expect(picker(page)).toHaveAttribute('data-value', 'hot-neon-dark');
+  // The closed trigger shows the full name, not the row's short "Dark".
+  await expect(picker(page).locator('.ac-dropdown__value')).toHaveText('Hot Neon · Dark');
   await expect(toggle).toBeFocused();
 
   const stored = await page.evaluate(() => localStorage.getItem('theme'));
