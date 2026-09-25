@@ -37,7 +37,7 @@ record is `src/site/theme/THEME-SERVICE.md`. This one never edits themes.
   is below 900px where the sidebar drops out. It wears the same console shell as the theme picker,
   keyed to `--accent-blue` rather than `--accent-purple`.
 - **Footer family:** Accessible Component Library (this site, current) and Accessible Theming
-  Service (`https://kaseycolian.github.io/theme-service/`). The names and the two descriptions
+  Service (`https://kaseycolian.github.io/a11y-theme-service/`). The names and the two descriptions
   mirror theme-service's own footer, so the pair reads identically from either site —
   `tests/site-footer.spec.mjs` asserts both names so one cannot move without the other. The
   outbound link opens in a new tab, with the SC 3.2.5 warning as clipped text; it is the only

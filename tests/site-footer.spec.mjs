@@ -45,7 +45,7 @@ test('the family index names both sites and marks this one as the current produc
   await expect(here).toHaveAttribute('href', /a11y-component-examples\/$/);
 
   const themes = links.filter({ hasText: 'Accessible Theming Service' });
-  await expect(themes).toHaveAttribute('href', 'https://kaseycolian.github.io/theme-service/');
+  await expect(themes).toHaveAttribute('href', 'https://kaseycolian.github.io/a11y-theme-service/');
   await expect(themes).not.toHaveAttribute('aria-current', /.*/);
 
   // The one new tab on this site, and the only one allowed: the sibling product,

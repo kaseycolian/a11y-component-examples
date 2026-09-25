@@ -145,6 +145,6 @@ That scaffolds the folder. Navigation, the index page, and the test matrix all d
 
 ## Theming
 
-Themes come from the [theme-service](../theme-service) token system, vendored into
+Themes come from the [theme-service](https://github.com/kaseycolian/a11y-theme-service) token system, vendored into
 `src/site/theme/`. Every family ships a dark and a light theme, and every theme is validated to pass
 AA in every state. Components consume the tokens; they never hardcode a color.
